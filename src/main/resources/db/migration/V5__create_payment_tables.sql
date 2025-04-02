@@ -1,0 +1,102 @@
+-- 支付记录表
+CREATE TABLE IF NOT EXISTS `edu_payment` (
+    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+    `institution_id` BIGINT NOT NULL COMMENT '所属机构ID',
+    `student_id` BIGINT NOT NULL COMMENT '学生ID',
+    `class_id` BIGINT COMMENT '班级ID',
+    `course_id` BIGINT COMMENT '课程ID',
+    `order_no` VARCHAR(50) NOT NULL COMMENT '订单编号',
+    `payment_no` VARCHAR(100) COMMENT '支付单号',
+    `amount` DECIMAL(10,2) NOT NULL COMMENT '支付金额',
+    `payment_type` TINYINT NOT NULL COMMENT '支付方式：1-现金，2-微信，3-支付宝，4-银行卡，5-其他',
+    `payment_status` TINYINT NOT NULL DEFAULT 0 COMMENT '支付状态：0-未支付，1-已支付，2-已退款，3-已取消',
+    `payment_time` DATETIME COMMENT '支付时间',
+    `refund_time` DATETIME COMMENT '退款时间',
+    `refund_amount` DECIMAL(10,2) COMMENT '退款金额',
+    `refund_reason` VARCHAR(255) COMMENT '退款原因',
+    `remark` VARCHAR(255) COMMENT '备注',
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `created_by` BIGINT COMMENT '创建人ID',
+    `updated_by` BIGINT COMMENT '更新人ID',
+    `is_deleted` TINYINT NOT NULL DEFAULT 0 COMMENT '是否删除：0-未删除，1-已删除',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_order_no` (`order_no`),
+    KEY `idx_institution_id` (`institution_id`),
+    KEY `idx_student_id` (`student_id`),
+    KEY `idx_class_id` (`class_id`),
+    KEY `idx_course_id` (`course_id`),
+    KEY `idx_payment_status` (`payment_status`),
+    KEY `idx_payment_time` (`payment_time`),
+    KEY `idx_created_at` (`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='支付记录表';
+
+-- 费用类型表
+CREATE TABLE IF NOT EXISTS `edu_expense_type` (
+    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+    `name` VARCHAR(50) NOT NULL COMMENT '费用类型名称',
+    `code` VARCHAR(50) NOT NULL COMMENT '费用类型编码',
+    `description` VARCHAR(255) COMMENT '描述',
+    `status` TINYINT NOT NULL DEFAULT 1 COMMENT '状态：0-禁用，1-启用',
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `created_by` BIGINT COMMENT '创建人ID',
+    `updated_by` BIGINT COMMENT '更新人ID',
+    `is_deleted` TINYINT NOT NULL DEFAULT 0 COMMENT '是否删除：0-未删除，1-已删除',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_code` (`code`),
+    KEY `idx_created_at` (`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='费用类型表';
+
+-- 费用记录表
+CREATE TABLE IF NOT EXISTS `edu_expense` (
+    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+    `institution_id` BIGINT NOT NULL COMMENT '所属机构ID',
+    `campus_id` BIGINT COMMENT '所属校区ID',
+    `expense_type_id` BIGINT NOT NULL COMMENT '费用类型ID',
+    `amount` DECIMAL(10,2) NOT NULL COMMENT '费用金额',
+    `expense_date` DATE NOT NULL COMMENT '费用日期',
+    `payment_method` TINYINT COMMENT '支付方式：1-现金，2-微信，3-支付宝，4-银行卡，5-其他',
+    `payment_status` TINYINT NOT NULL DEFAULT 0 COMMENT '支付状态：0-未支付，1-已支付',
+    `payment_time` DATETIME COMMENT '支付时间',
+    `description` TEXT COMMENT '费用描述',
+    `attachments` TEXT COMMENT '附件列表(JSON)',
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `created_by` BIGINT COMMENT '创建人ID',
+    `updated_by` BIGINT COMMENT '更新人ID',
+    `is_deleted` TINYINT NOT NULL DEFAULT 0 COMMENT '是否删除：0-未删除，1-已删除',
+    PRIMARY KEY (`id`),
+    KEY `idx_institution_id` (`institution_id`),
+    KEY `idx_campus_id` (`campus_id`),
+    KEY `idx_expense_type_id` (`expense_type_id`),
+    KEY `idx_expense_date` (`expense_date`),
+    KEY `idx_payment_status` (`payment_status`),
+    KEY `idx_created_at` (`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='费用记录表';
+
+-- 发票表
+CREATE TABLE IF NOT EXISTS `edu_invoice` (
+    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+    `payment_id` BIGINT NOT NULL COMMENT '支付记录ID',
+    `invoice_no` VARCHAR(50) COMMENT '发票号码',
+    `invoice_code` VARCHAR(50) COMMENT '发票代码',
+    `invoice_type` TINYINT NOT NULL COMMENT '发票类型：1-增值税普通发票，2-增值税专用发票',
+    `invoice_title` VARCHAR(100) NOT NULL COMMENT '发票抬头',
+    `tax_number` VARCHAR(50) COMMENT '税号',
+    `amount` DECIMAL(10,2) NOT NULL COMMENT '发票金额',
+    `issue_date` DATE COMMENT '开票日期',
+    `status` TINYINT NOT NULL DEFAULT 0 COMMENT '状态：0-未开票，1-已开票，2-已作废',
+    `remark` VARCHAR(255) COMMENT '备注',
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `created_by` BIGINT COMMENT '创建人ID',
+    `updated_by` BIGINT COMMENT '更新人ID',
+    `is_deleted` TINYINT NOT NULL DEFAULT 0 COMMENT '是否删除：0-未删除，1-已删除',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_payment_id` (`payment_id`),
+    KEY `idx_invoice_no` (`invoice_no`),
+    KEY `idx_invoice_code` (`invoice_code`),
+    KEY `idx_issue_date` (`issue_date`),
+    KEY `idx_created_at` (`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='发票表'; 
