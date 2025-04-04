@@ -4,7 +4,6 @@
 package com.lesson.repository.tables;
 
 
-import com.lesson.repository.Indexes;
 import com.lesson.repository.Keys;
 import com.lesson.repository.Lesson;
 import com.lesson.repository.tables.records.SysRoleRecord;
@@ -16,10 +15,9 @@ import java.util.List;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Identity;
-import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row10;
+import org.jooq.Row7;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -62,11 +60,6 @@ public class SysRole extends TableImpl<SysRoleRecord> {
     public final TableField<SysRoleRecord, String> ROLE_NAME = createField(DSL.name("role_name"), SQLDataType.VARCHAR(50).nullable(false), this, "角色名称");
 
     /**
-     * The column <code>lesson.sys_role.role_code</code>. 角色编码
-     */
-    public final TableField<SysRoleRecord, String> ROLE_CODE = createField(DSL.name("role_code"), SQLDataType.VARCHAR(50).nullable(false), this, "角色编码");
-
-    /**
      * The column <code>lesson.sys_role.description</code>. 角色描述
      */
     public final TableField<SysRoleRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.VARCHAR(255), this, "角色描述");
@@ -77,29 +70,19 @@ public class SysRole extends TableImpl<SysRoleRecord> {
     public final TableField<SysRoleRecord, Byte> STATUS = createField(DSL.name("status"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("1", SQLDataType.TINYINT)), this, "状态：0-禁用，1-启用");
 
     /**
-     * The column <code>lesson.sys_role.created_at</code>. 创建时间
+     * The column <code>lesson.sys_role.create_time</code>. 创建时间
      */
-    public final TableField<SysRoleRecord, LocalDateTime> CREATED_AT = createField(DSL.name("created_at"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "创建时间");
+    public final TableField<SysRoleRecord, LocalDateTime> CREATE_TIME = createField(DSL.name("create_time"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "创建时间");
 
     /**
-     * The column <code>lesson.sys_role.updated_at</code>. 更新时间
+     * The column <code>lesson.sys_role.update_time</code>. 更新时间
      */
-    public final TableField<SysRoleRecord, LocalDateTime> UPDATED_AT = createField(DSL.name("updated_at"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "更新时间");
+    public final TableField<SysRoleRecord, LocalDateTime> UPDATE_TIME = createField(DSL.name("update_time"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "更新时间");
 
     /**
-     * The column <code>lesson.sys_role.created_by</code>. 创建人ID
+     * The column <code>lesson.sys_role.deleted</code>. 是否删除：0-未删除，1-已删除
      */
-    public final TableField<SysRoleRecord, Long> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINT, this, "创建人ID");
-
-    /**
-     * The column <code>lesson.sys_role.updated_by</code>. 更新人ID
-     */
-    public final TableField<SysRoleRecord, Long> UPDATED_BY = createField(DSL.name("updated_by"), SQLDataType.BIGINT, this, "更新人ID");
-
-    /**
-     * The column <code>lesson.sys_role.is_deleted</code>. 是否删除：0-未删除，1-已删除
-     */
-    public final TableField<SysRoleRecord, Byte> IS_DELETED = createField(DSL.name("is_deleted"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "是否删除：0-未删除，1-已删除");
+    public final TableField<SysRoleRecord, Byte> DELETED = createField(DSL.name("deleted"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "是否删除：0-未删除，1-已删除");
 
     private SysRole(Name alias, Table<SysRoleRecord> aliased) {
         this(alias, aliased, null);
@@ -140,11 +123,6 @@ public class SysRole extends TableImpl<SysRoleRecord> {
     }
 
     @Override
-    public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.SYS_ROLE_IDX_CREATED_AT);
-    }
-
-    @Override
     public Identity<SysRoleRecord, Long> getIdentity() {
         return (Identity<SysRoleRecord, Long>) super.getIdentity();
     }
@@ -156,7 +134,7 @@ public class SysRole extends TableImpl<SysRoleRecord> {
 
     @Override
     public List<UniqueKey<SysRoleRecord>> getKeys() {
-        return Arrays.<UniqueKey<SysRoleRecord>>asList(Keys.KEY_SYS_ROLE_PRIMARY, Keys.KEY_SYS_ROLE_UK_ROLE_CODE);
+        return Arrays.<UniqueKey<SysRoleRecord>>asList(Keys.KEY_SYS_ROLE_PRIMARY);
     }
 
     @Override
@@ -186,11 +164,11 @@ public class SysRole extends TableImpl<SysRoleRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row10 type methods
+    // Row7 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row10<Long, String, String, String, Byte, LocalDateTime, LocalDateTime, Long, Long, Byte> fieldsRow() {
-        return (Row10) super.fieldsRow();
+    public Row7<Long, String, String, Byte, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
+        return (Row7) super.fieldsRow();
     }
 }

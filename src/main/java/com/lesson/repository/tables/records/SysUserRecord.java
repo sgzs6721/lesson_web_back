@@ -10,8 +10,8 @@ import java.time.LocalDateTime;
 
 import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record16;
-import org.jooq.Row16;
+import org.jooq.Record11;
+import org.jooq.Row11;
 import org.jooq.impl.UpdatableRecordImpl;
 
 
@@ -19,7 +19,7 @@ import org.jooq.impl.UpdatableRecordImpl;
  * 系统用户表
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class SysUserRecord extends UpdatableRecordImpl<SysUserRecord> implements Record16<Long, String, String, String, String, String, String, Byte, Byte, LocalDateTime, String, LocalDateTime, LocalDateTime, Long, Long, Byte> {
+public class SysUserRecord extends UpdatableRecordImpl<SysUserRecord> implements Record11<Long, String, String, String, Long, Byte, Long, LocalDateTime, LocalDateTime, LocalDateTime, Byte> {
 
     private static final long serialVersionUID = 1L;
 
@@ -38,213 +38,143 @@ public class SysUserRecord extends UpdatableRecordImpl<SysUserRecord> implements
     }
 
     /**
-     * Setter for <code>lesson.sys_user.username</code>. 用户名
+     * Setter for <code>lesson.sys_user.phone</code>. 手机号（登录账号）
      */
-    public void setUsername(String value) {
+    public void setPhone(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_user.username</code>. 用户名
+     * Getter for <code>lesson.sys_user.phone</code>. 手机号（登录账号）
      */
-    public String getUsername() {
+    public String getPhone() {
         return (String) get(1);
-    }
-
-    /**
-     * Setter for <code>lesson.sys_user.password</code>. 密码
-     */
-    public void setPassword(String value) {
-        set(2, value);
-    }
-
-    /**
-     * Getter for <code>lesson.sys_user.password</code>. 密码
-     */
-    public String getPassword() {
-        return (String) get(2);
     }
 
     /**
      * Setter for <code>lesson.sys_user.real_name</code>. 真实姓名
      */
     public void setRealName(String value) {
-        set(3, value);
+        set(2, value);
     }
 
     /**
      * Getter for <code>lesson.sys_user.real_name</code>. 真实姓名
      */
     public String getRealName() {
+        return (String) get(2);
+    }
+
+    /**
+     * Setter for <code>lesson.sys_user.password</code>. 密码
+     */
+    public void setPassword(String value) {
+        set(3, value);
+    }
+
+    /**
+     * Getter for <code>lesson.sys_user.password</code>. 密码
+     */
+    public String getPassword() {
         return (String) get(3);
     }
 
     /**
-     * Setter for <code>lesson.sys_user.email</code>. 邮箱
+     * Setter for <code>lesson.sys_user.role_id</code>. 角色ID
      */
-    public void setEmail(String value) {
+    public void setRoleId(Long value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_user.email</code>. 邮箱
+     * Getter for <code>lesson.sys_user.role_id</code>. 角色ID
      */
-    public String getEmail() {
-        return (String) get(4);
-    }
-
-    /**
-     * Setter for <code>lesson.sys_user.phone</code>. 手机号
-     */
-    public void setPhone(String value) {
-        set(5, value);
-    }
-
-    /**
-     * Getter for <code>lesson.sys_user.phone</code>. 手机号
-     */
-    public String getPhone() {
-        return (String) get(5);
-    }
-
-    /**
-     * Setter for <code>lesson.sys_user.avatar</code>. 头像URL
-     */
-    public void setAvatar(String value) {
-        set(6, value);
-    }
-
-    /**
-     * Getter for <code>lesson.sys_user.avatar</code>. 头像URL
-     */
-    public String getAvatar() {
-        return (String) get(6);
-    }
-
-    /**
-     * Setter for <code>lesson.sys_user.gender</code>. 性别：0-未知，1-男，2-女
-     */
-    public void setGender(Byte value) {
-        set(7, value);
-    }
-
-    /**
-     * Getter for <code>lesson.sys_user.gender</code>. 性别：0-未知，1-男，2-女
-     */
-    public Byte getGender() {
-        return (Byte) get(7);
+    public Long getRoleId() {
+        return (Long) get(4);
     }
 
     /**
      * Setter for <code>lesson.sys_user.status</code>. 状态：0-禁用，1-启用
      */
     public void setStatus(Byte value) {
-        set(8, value);
+        set(5, value);
     }
 
     /**
      * Getter for <code>lesson.sys_user.status</code>. 状态：0-禁用，1-启用
      */
     public Byte getStatus() {
-        return (Byte) get(8);
+        return (Byte) get(5);
+    }
+
+    /**
+     * Setter for <code>lesson.sys_user.campus_id</code>. 所属校区ID
+     */
+    public void setCampusId(Long value) {
+        set(6, value);
+    }
+
+    /**
+     * Getter for <code>lesson.sys_user.campus_id</code>. 所属校区ID
+     */
+    public Long getCampusId() {
+        return (Long) get(6);
     }
 
     /**
      * Setter for <code>lesson.sys_user.last_login_time</code>. 最后登录时间
      */
     public void setLastLoginTime(LocalDateTime value) {
-        set(9, value);
+        set(7, value);
     }
 
     /**
      * Getter for <code>lesson.sys_user.last_login_time</code>. 最后登录时间
      */
     public LocalDateTime getLastLoginTime() {
+        return (LocalDateTime) get(7);
+    }
+
+    /**
+     * Setter for <code>lesson.sys_user.create_time</code>. 创建时间
+     */
+    public void setCreateTime(LocalDateTime value) {
+        set(8, value);
+    }
+
+    /**
+     * Getter for <code>lesson.sys_user.create_time</code>. 创建时间
+     */
+    public LocalDateTime getCreateTime() {
+        return (LocalDateTime) get(8);
+    }
+
+    /**
+     * Setter for <code>lesson.sys_user.update_time</code>. 更新时间
+     */
+    public void setUpdateTime(LocalDateTime value) {
+        set(9, value);
+    }
+
+    /**
+     * Getter for <code>lesson.sys_user.update_time</code>. 更新时间
+     */
+    public LocalDateTime getUpdateTime() {
         return (LocalDateTime) get(9);
     }
 
     /**
-     * Setter for <code>lesson.sys_user.last_login_ip</code>. 最后登录IP
+     * Setter for <code>lesson.sys_user.deleted</code>. 是否删除：0-未删除，1-已删除
      */
-    public void setLastLoginIp(String value) {
+    public void setDeleted(Byte value) {
         set(10, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_user.last_login_ip</code>. 最后登录IP
+     * Getter for <code>lesson.sys_user.deleted</code>. 是否删除：0-未删除，1-已删除
      */
-    public String getLastLoginIp() {
-        return (String) get(10);
-    }
-
-    /**
-     * Setter for <code>lesson.sys_user.created_at</code>. 创建时间
-     */
-    public void setCreatedAt(LocalDateTime value) {
-        set(11, value);
-    }
-
-    /**
-     * Getter for <code>lesson.sys_user.created_at</code>. 创建时间
-     */
-    public LocalDateTime getCreatedAt() {
-        return (LocalDateTime) get(11);
-    }
-
-    /**
-     * Setter for <code>lesson.sys_user.updated_at</code>. 更新时间
-     */
-    public void setUpdatedAt(LocalDateTime value) {
-        set(12, value);
-    }
-
-    /**
-     * Getter for <code>lesson.sys_user.updated_at</code>. 更新时间
-     */
-    public LocalDateTime getUpdatedAt() {
-        return (LocalDateTime) get(12);
-    }
-
-    /**
-     * Setter for <code>lesson.sys_user.created_by</code>. 创建人ID
-     */
-    public void setCreatedBy(Long value) {
-        set(13, value);
-    }
-
-    /**
-     * Getter for <code>lesson.sys_user.created_by</code>. 创建人ID
-     */
-    public Long getCreatedBy() {
-        return (Long) get(13);
-    }
-
-    /**
-     * Setter for <code>lesson.sys_user.updated_by</code>. 更新人ID
-     */
-    public void setUpdatedBy(Long value) {
-        set(14, value);
-    }
-
-    /**
-     * Getter for <code>lesson.sys_user.updated_by</code>. 更新人ID
-     */
-    public Long getUpdatedBy() {
-        return (Long) get(14);
-    }
-
-    /**
-     * Setter for <code>lesson.sys_user.is_deleted</code>. 是否删除：0-未删除，1-已删除
-     */
-    public void setIsDeleted(Byte value) {
-        set(15, value);
-    }
-
-    /**
-     * Getter for <code>lesson.sys_user.is_deleted</code>. 是否删除：0-未删除，1-已删除
-     */
-    public Byte getIsDeleted() {
-        return (Byte) get(15);
+    public Byte getDeleted() {
+        return (Byte) get(10);
     }
 
     // -------------------------------------------------------------------------
@@ -257,17 +187,17 @@ public class SysUserRecord extends UpdatableRecordImpl<SysUserRecord> implements
     }
 
     // -------------------------------------------------------------------------
-    // Record16 type implementation
+    // Record11 type implementation
     // -------------------------------------------------------------------------
 
     @Override
-    public Row16<Long, String, String, String, String, String, String, Byte, Byte, LocalDateTime, String, LocalDateTime, LocalDateTime, Long, Long, Byte> fieldsRow() {
-        return (Row16) super.fieldsRow();
+    public Row11<Long, String, String, String, Long, Byte, Long, LocalDateTime, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
+        return (Row11) super.fieldsRow();
     }
 
     @Override
-    public Row16<Long, String, String, String, String, String, String, Byte, Byte, LocalDateTime, String, LocalDateTime, LocalDateTime, Long, Long, Byte> valuesRow() {
-        return (Row16) super.valuesRow();
+    public Row11<Long, String, String, String, Long, Byte, Long, LocalDateTime, LocalDateTime, LocalDateTime, Byte> valuesRow() {
+        return (Row11) super.valuesRow();
     }
 
     @Override
@@ -277,77 +207,52 @@ public class SysUserRecord extends UpdatableRecordImpl<SysUserRecord> implements
 
     @Override
     public Field<String> field2() {
-        return SysUser.SYS_USER.USERNAME;
-    }
-
-    @Override
-    public Field<String> field3() {
-        return SysUser.SYS_USER.PASSWORD;
-    }
-
-    @Override
-    public Field<String> field4() {
-        return SysUser.SYS_USER.REAL_NAME;
-    }
-
-    @Override
-    public Field<String> field5() {
-        return SysUser.SYS_USER.EMAIL;
-    }
-
-    @Override
-    public Field<String> field6() {
         return SysUser.SYS_USER.PHONE;
     }
 
     @Override
-    public Field<String> field7() {
-        return SysUser.SYS_USER.AVATAR;
+    public Field<String> field3() {
+        return SysUser.SYS_USER.REAL_NAME;
     }
 
     @Override
-    public Field<Byte> field8() {
-        return SysUser.SYS_USER.GENDER;
+    public Field<String> field4() {
+        return SysUser.SYS_USER.PASSWORD;
     }
 
     @Override
-    public Field<Byte> field9() {
+    public Field<Long> field5() {
+        return SysUser.SYS_USER.ROLE_ID;
+    }
+
+    @Override
+    public Field<Byte> field6() {
         return SysUser.SYS_USER.STATUS;
     }
 
     @Override
-    public Field<LocalDateTime> field10() {
+    public Field<Long> field7() {
+        return SysUser.SYS_USER.CAMPUS_ID;
+    }
+
+    @Override
+    public Field<LocalDateTime> field8() {
         return SysUser.SYS_USER.LAST_LOGIN_TIME;
     }
 
     @Override
-    public Field<String> field11() {
-        return SysUser.SYS_USER.LAST_LOGIN_IP;
+    public Field<LocalDateTime> field9() {
+        return SysUser.SYS_USER.CREATE_TIME;
     }
 
     @Override
-    public Field<LocalDateTime> field12() {
-        return SysUser.SYS_USER.CREATED_AT;
+    public Field<LocalDateTime> field10() {
+        return SysUser.SYS_USER.UPDATE_TIME;
     }
 
     @Override
-    public Field<LocalDateTime> field13() {
-        return SysUser.SYS_USER.UPDATED_AT;
-    }
-
-    @Override
-    public Field<Long> field14() {
-        return SysUser.SYS_USER.CREATED_BY;
-    }
-
-    @Override
-    public Field<Long> field15() {
-        return SysUser.SYS_USER.UPDATED_BY;
-    }
-
-    @Override
-    public Field<Byte> field16() {
-        return SysUser.SYS_USER.IS_DELETED;
+    public Field<Byte> field11() {
+        return SysUser.SYS_USER.DELETED;
     }
 
     @Override
@@ -357,77 +262,52 @@ public class SysUserRecord extends UpdatableRecordImpl<SysUserRecord> implements
 
     @Override
     public String component2() {
-        return getUsername();
-    }
-
-    @Override
-    public String component3() {
-        return getPassword();
-    }
-
-    @Override
-    public String component4() {
-        return getRealName();
-    }
-
-    @Override
-    public String component5() {
-        return getEmail();
-    }
-
-    @Override
-    public String component6() {
         return getPhone();
     }
 
     @Override
-    public String component7() {
-        return getAvatar();
+    public String component3() {
+        return getRealName();
     }
 
     @Override
-    public Byte component8() {
-        return getGender();
+    public String component4() {
+        return getPassword();
     }
 
     @Override
-    public Byte component9() {
+    public Long component5() {
+        return getRoleId();
+    }
+
+    @Override
+    public Byte component6() {
         return getStatus();
     }
 
     @Override
-    public LocalDateTime component10() {
+    public Long component7() {
+        return getCampusId();
+    }
+
+    @Override
+    public LocalDateTime component8() {
         return getLastLoginTime();
     }
 
     @Override
-    public String component11() {
-        return getLastLoginIp();
+    public LocalDateTime component9() {
+        return getCreateTime();
     }
 
     @Override
-    public LocalDateTime component12() {
-        return getCreatedAt();
+    public LocalDateTime component10() {
+        return getUpdateTime();
     }
 
     @Override
-    public LocalDateTime component13() {
-        return getUpdatedAt();
-    }
-
-    @Override
-    public Long component14() {
-        return getCreatedBy();
-    }
-
-    @Override
-    public Long component15() {
-        return getUpdatedBy();
-    }
-
-    @Override
-    public Byte component16() {
-        return getIsDeleted();
+    public Byte component11() {
+        return getDeleted();
     }
 
     @Override
@@ -437,77 +317,52 @@ public class SysUserRecord extends UpdatableRecordImpl<SysUserRecord> implements
 
     @Override
     public String value2() {
-        return getUsername();
-    }
-
-    @Override
-    public String value3() {
-        return getPassword();
-    }
-
-    @Override
-    public String value4() {
-        return getRealName();
-    }
-
-    @Override
-    public String value5() {
-        return getEmail();
-    }
-
-    @Override
-    public String value6() {
         return getPhone();
     }
 
     @Override
-    public String value7() {
-        return getAvatar();
+    public String value3() {
+        return getRealName();
     }
 
     @Override
-    public Byte value8() {
-        return getGender();
+    public String value4() {
+        return getPassword();
     }
 
     @Override
-    public Byte value9() {
+    public Long value5() {
+        return getRoleId();
+    }
+
+    @Override
+    public Byte value6() {
         return getStatus();
     }
 
     @Override
-    public LocalDateTime value10() {
+    public Long value7() {
+        return getCampusId();
+    }
+
+    @Override
+    public LocalDateTime value8() {
         return getLastLoginTime();
     }
 
     @Override
-    public String value11() {
-        return getLastLoginIp();
+    public LocalDateTime value9() {
+        return getCreateTime();
     }
 
     @Override
-    public LocalDateTime value12() {
-        return getCreatedAt();
+    public LocalDateTime value10() {
+        return getUpdateTime();
     }
 
     @Override
-    public LocalDateTime value13() {
-        return getUpdatedAt();
-    }
-
-    @Override
-    public Long value14() {
-        return getCreatedBy();
-    }
-
-    @Override
-    public Long value15() {
-        return getUpdatedBy();
-    }
-
-    @Override
-    public Byte value16() {
-        return getIsDeleted();
+    public Byte value11() {
+        return getDeleted();
     }
 
     @Override
@@ -518,96 +373,66 @@ public class SysUserRecord extends UpdatableRecordImpl<SysUserRecord> implements
 
     @Override
     public SysUserRecord value2(String value) {
-        setUsername(value);
-        return this;
-    }
-
-    @Override
-    public SysUserRecord value3(String value) {
-        setPassword(value);
-        return this;
-    }
-
-    @Override
-    public SysUserRecord value4(String value) {
-        setRealName(value);
-        return this;
-    }
-
-    @Override
-    public SysUserRecord value5(String value) {
-        setEmail(value);
-        return this;
-    }
-
-    @Override
-    public SysUserRecord value6(String value) {
         setPhone(value);
         return this;
     }
 
     @Override
-    public SysUserRecord value7(String value) {
-        setAvatar(value);
+    public SysUserRecord value3(String value) {
+        setRealName(value);
         return this;
     }
 
     @Override
-    public SysUserRecord value8(Byte value) {
-        setGender(value);
+    public SysUserRecord value4(String value) {
+        setPassword(value);
         return this;
     }
 
     @Override
-    public SysUserRecord value9(Byte value) {
+    public SysUserRecord value5(Long value) {
+        setRoleId(value);
+        return this;
+    }
+
+    @Override
+    public SysUserRecord value6(Byte value) {
         setStatus(value);
         return this;
     }
 
     @Override
-    public SysUserRecord value10(LocalDateTime value) {
+    public SysUserRecord value7(Long value) {
+        setCampusId(value);
+        return this;
+    }
+
+    @Override
+    public SysUserRecord value8(LocalDateTime value) {
         setLastLoginTime(value);
         return this;
     }
 
     @Override
-    public SysUserRecord value11(String value) {
-        setLastLoginIp(value);
+    public SysUserRecord value9(LocalDateTime value) {
+        setCreateTime(value);
         return this;
     }
 
     @Override
-    public SysUserRecord value12(LocalDateTime value) {
-        setCreatedAt(value);
+    public SysUserRecord value10(LocalDateTime value) {
+        setUpdateTime(value);
         return this;
     }
 
     @Override
-    public SysUserRecord value13(LocalDateTime value) {
-        setUpdatedAt(value);
+    public SysUserRecord value11(Byte value) {
+        setDeleted(value);
         return this;
     }
 
     @Override
-    public SysUserRecord value14(Long value) {
-        setCreatedBy(value);
-        return this;
-    }
-
-    @Override
-    public SysUserRecord value15(Long value) {
-        setUpdatedBy(value);
-        return this;
-    }
-
-    @Override
-    public SysUserRecord value16(Byte value) {
-        setIsDeleted(value);
-        return this;
-    }
-
-    @Override
-    public SysUserRecord values(Long value1, String value2, String value3, String value4, String value5, String value6, String value7, Byte value8, Byte value9, LocalDateTime value10, String value11, LocalDateTime value12, LocalDateTime value13, Long value14, Long value15, Byte value16) {
+    public SysUserRecord values(Long value1, String value2, String value3, String value4, Long value5, Byte value6, Long value7, LocalDateTime value8, LocalDateTime value9, LocalDateTime value10, Byte value11) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -619,11 +444,6 @@ public class SysUserRecord extends UpdatableRecordImpl<SysUserRecord> implements
         value9(value9);
         value10(value10);
         value11(value11);
-        value12(value12);
-        value13(value13);
-        value14(value14);
-        value15(value15);
-        value16(value16);
         return this;
     }
 
@@ -641,24 +461,19 @@ public class SysUserRecord extends UpdatableRecordImpl<SysUserRecord> implements
     /**
      * Create a detached, initialised SysUserRecord
      */
-    public SysUserRecord(Long id, String username, String password, String realName, String email, String phone, String avatar, Byte gender, Byte status, LocalDateTime lastLoginTime, String lastLoginIp, LocalDateTime createdAt, LocalDateTime updatedAt, Long createdBy, Long updatedBy, Byte isDeleted) {
+    public SysUserRecord(Long id, String phone, String realName, String password, Long roleId, Byte status, Long campusId, LocalDateTime lastLoginTime, LocalDateTime createTime, LocalDateTime updateTime, Byte deleted) {
         super(SysUser.SYS_USER);
 
         setId(id);
-        setUsername(username);
-        setPassword(password);
-        setRealName(realName);
-        setEmail(email);
         setPhone(phone);
-        setAvatar(avatar);
-        setGender(gender);
+        setRealName(realName);
+        setPassword(password);
+        setRoleId(roleId);
         setStatus(status);
+        setCampusId(campusId);
         setLastLoginTime(lastLoginTime);
-        setLastLoginIp(lastLoginIp);
-        setCreatedAt(createdAt);
-        setUpdatedAt(updatedAt);
-        setCreatedBy(createdBy);
-        setUpdatedBy(updatedBy);
-        setIsDeleted(isDeleted);
+        setCreateTime(createTime);
+        setUpdateTime(updateTime);
+        setDeleted(deleted);
     }
 }

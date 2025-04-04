@@ -19,7 +19,7 @@ import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row15;
+import org.jooq.Row12;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -67,11 +67,6 @@ public class SysPermission extends TableImpl<SysPermissionRecord> {
     public final TableField<SysPermissionRecord, String> PERMISSION_NAME = createField(DSL.name("permission_name"), SQLDataType.VARCHAR(50).nullable(false), this, "权限名称");
 
     /**
-     * The column <code>lesson.sys_permission.permission_code</code>. 权限编码
-     */
-    public final TableField<SysPermissionRecord, String> PERMISSION_CODE = createField(DSL.name("permission_code"), SQLDataType.VARCHAR(50).nullable(false), this, "权限编码");
-
-    /**
      * The column <code>lesson.sys_permission.permission_type</code>. 权限类型：1-菜单，2-按钮，3-接口
      */
     public final TableField<SysPermissionRecord, Byte> PERMISSION_TYPE = createField(DSL.name("permission_type"), SQLDataType.TINYINT.nullable(false), this, "权限类型：1-菜单，2-按钮，3-接口");
@@ -102,29 +97,19 @@ public class SysPermission extends TableImpl<SysPermissionRecord> {
     public final TableField<SysPermissionRecord, Byte> STATUS = createField(DSL.name("status"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("1", SQLDataType.TINYINT)), this, "状态：0-禁用，1-启用");
 
     /**
-     * The column <code>lesson.sys_permission.created_at</code>. 创建时间
+     * The column <code>lesson.sys_permission.create_time</code>. 创建时间
      */
-    public final TableField<SysPermissionRecord, LocalDateTime> CREATED_AT = createField(DSL.name("created_at"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "创建时间");
+    public final TableField<SysPermissionRecord, LocalDateTime> CREATE_TIME = createField(DSL.name("create_time"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "创建时间");
 
     /**
-     * The column <code>lesson.sys_permission.updated_at</code>. 更新时间
+     * The column <code>lesson.sys_permission.update_time</code>. 更新时间
      */
-    public final TableField<SysPermissionRecord, LocalDateTime> UPDATED_AT = createField(DSL.name("updated_at"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "更新时间");
+    public final TableField<SysPermissionRecord, LocalDateTime> UPDATE_TIME = createField(DSL.name("update_time"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "更新时间");
 
     /**
-     * The column <code>lesson.sys_permission.created_by</code>. 创建人ID
+     * The column <code>lesson.sys_permission.deleted</code>. 是否删除：0-未删除，1-已删除
      */
-    public final TableField<SysPermissionRecord, Long> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINT, this, "创建人ID");
-
-    /**
-     * The column <code>lesson.sys_permission.updated_by</code>. 更新人ID
-     */
-    public final TableField<SysPermissionRecord, Long> UPDATED_BY = createField(DSL.name("updated_by"), SQLDataType.BIGINT, this, "更新人ID");
-
-    /**
-     * The column <code>lesson.sys_permission.is_deleted</code>. 是否删除：0-未删除，1-已删除
-     */
-    public final TableField<SysPermissionRecord, Byte> IS_DELETED = createField(DSL.name("is_deleted"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "是否删除：0-未删除，1-已删除");
+    public final TableField<SysPermissionRecord, Byte> DELETED = createField(DSL.name("deleted"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "是否删除：0-未删除，1-已删除");
 
     private SysPermission(Name alias, Table<SysPermissionRecord> aliased) {
         this(alias, aliased, null);
@@ -166,7 +151,7 @@ public class SysPermission extends TableImpl<SysPermissionRecord> {
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.SYS_PERMISSION_IDX_CREATED_AT, Indexes.SYS_PERMISSION_IDX_PARENT_ID);
+        return Arrays.<Index>asList(Indexes.SYS_PERMISSION_IDX_PARENT_ID);
     }
 
     @Override
@@ -181,7 +166,7 @@ public class SysPermission extends TableImpl<SysPermissionRecord> {
 
     @Override
     public List<UniqueKey<SysPermissionRecord>> getKeys() {
-        return Arrays.<UniqueKey<SysPermissionRecord>>asList(Keys.KEY_SYS_PERMISSION_PRIMARY, Keys.KEY_SYS_PERMISSION_UK_PERMISSION_CODE);
+        return Arrays.<UniqueKey<SysPermissionRecord>>asList(Keys.KEY_SYS_PERMISSION_PRIMARY);
     }
 
     @Override
@@ -211,11 +196,11 @@ public class SysPermission extends TableImpl<SysPermissionRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row15 type methods
+    // Row12 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row15<Long, Long, String, String, Byte, String, String, String, Integer, Byte, LocalDateTime, LocalDateTime, Long, Long, Byte> fieldsRow() {
-        return (Row15) super.fieldsRow();
+    public Row12<Long, Long, String, Byte, String, String, String, Integer, Byte, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
+        return (Row12) super.fieldsRow();
     }
 }

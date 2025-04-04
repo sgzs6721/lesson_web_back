@@ -19,7 +19,7 @@ import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row5;
+import org.jooq.Row6;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -67,14 +67,19 @@ public class SysRolePermission extends TableImpl<SysRolePermissionRecord> {
     public final TableField<SysRolePermissionRecord, Long> PERMISSION_ID = createField(DSL.name("permission_id"), SQLDataType.BIGINT.nullable(false), this, "权限ID");
 
     /**
-     * The column <code>lesson.sys_role_permission.created_at</code>. 创建时间
+     * The column <code>lesson.sys_role_permission.create_time</code>. 创建时间
      */
-    public final TableField<SysRolePermissionRecord, LocalDateTime> CREATED_AT = createField(DSL.name("created_at"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "创建时间");
+    public final TableField<SysRolePermissionRecord, LocalDateTime> CREATE_TIME = createField(DSL.name("create_time"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "创建时间");
 
     /**
-     * The column <code>lesson.sys_role_permission.created_by</code>. 创建人ID
+     * The column <code>lesson.sys_role_permission.update_time</code>. 更新时间
      */
-    public final TableField<SysRolePermissionRecord, Long> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINT, this, "创建人ID");
+    public final TableField<SysRolePermissionRecord, LocalDateTime> UPDATE_TIME = createField(DSL.name("update_time"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "更新时间");
+
+    /**
+     * The column <code>lesson.sys_role_permission.deleted</code>. 是否删除：0-未删除，1-已删除
+     */
+    public final TableField<SysRolePermissionRecord, Byte> DELETED = createField(DSL.name("deleted"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "是否删除：0-未删除，1-已删除");
 
     private SysRolePermission(Name alias, Table<SysRolePermissionRecord> aliased) {
         this(alias, aliased, null);
@@ -161,11 +166,11 @@ public class SysRolePermission extends TableImpl<SysRolePermissionRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row5 type methods
+    // Row6 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row5<Long, Long, Long, LocalDateTime, Long> fieldsRow() {
-        return (Row5) super.fieldsRow();
+    public Row6<Long, Long, Long, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
+        return (Row6) super.fieldsRow();
     }
 }

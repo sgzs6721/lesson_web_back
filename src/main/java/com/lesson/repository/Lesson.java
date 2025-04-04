@@ -37,7 +37,6 @@ import com.lesson.repository.tables.SysPermission;
 import com.lesson.repository.tables.SysRole;
 import com.lesson.repository.tables.SysRolePermission;
 import com.lesson.repository.tables.SysUser;
-import com.lesson.repository.tables.SysUserRole;
 
 import java.util.Arrays;
 import java.util.List;
@@ -226,11 +225,6 @@ public class Lesson extends SchemaImpl {
     public final SysUser SYS_USER = SysUser.SYS_USER;
 
     /**
-     * 用户角色关联表
-     */
-    public final SysUserRole SYS_USER_ROLE = SysUserRole.SYS_USER_ROLE;
-
-    /**
      * No further instances allowed
      */
     private Lesson() {
@@ -278,7 +272,6 @@ public class Lesson extends SchemaImpl {
             SysPermission.SYS_PERMISSION,
             SysRole.SYS_ROLE,
             SysRolePermission.SYS_ROLE_PERMISSION,
-            SysUser.SYS_USER,
-            SysUserRole.SYS_USER_ROLE);
+            SysUser.SYS_USER);
     }
 }

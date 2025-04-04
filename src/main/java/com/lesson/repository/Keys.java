@@ -37,8 +37,6 @@ import com.lesson.repository.tables.SysPermission;
 import com.lesson.repository.tables.SysRole;
 import com.lesson.repository.tables.SysRolePermission;
 import com.lesson.repository.tables.SysUser;
-import com.lesson.repository.tables.SysUserRole;
-import com.lesson.repository.tables.EduUser;
 import com.lesson.repository.tables.records.EduAttendanceRecord;
 import com.lesson.repository.tables.records.EduCampusRecord;
 import com.lesson.repository.tables.records.EduClassCoachRecord;
@@ -72,8 +70,6 @@ import com.lesson.repository.tables.records.SysPermissionRecord;
 import com.lesson.repository.tables.records.SysRolePermissionRecord;
 import com.lesson.repository.tables.records.SysRoleRecord;
 import com.lesson.repository.tables.records.SysUserRecord;
-import com.lesson.repository.tables.records.SysUserRoleRecord;
-import com.lesson.repository.tables.records.EduUserRecord;
 
 import org.jooq.TableField;
 import org.jooq.UniqueKey;
@@ -138,14 +134,9 @@ public class Keys {
     public static final UniqueKey<SysNoticeRecord> KEY_SYS_NOTICE_PRIMARY = Internal.createUniqueKey(SysNotice.SYS_NOTICE, DSL.name("KEY_sys_notice_PRIMARY"), new TableField[] { SysNotice.SYS_NOTICE.ID }, true);
     public static final UniqueKey<SysOperationLogRecord> KEY_SYS_OPERATION_LOG_PRIMARY = Internal.createUniqueKey(SysOperationLog.SYS_OPERATION_LOG, DSL.name("KEY_sys_operation_log_PRIMARY"), new TableField[] { SysOperationLog.SYS_OPERATION_LOG.ID }, true);
     public static final UniqueKey<SysPermissionRecord> KEY_SYS_PERMISSION_PRIMARY = Internal.createUniqueKey(SysPermission.SYS_PERMISSION, DSL.name("KEY_sys_permission_PRIMARY"), new TableField[] { SysPermission.SYS_PERMISSION.ID }, true);
-    public static final UniqueKey<SysPermissionRecord> KEY_SYS_PERMISSION_UK_PERMISSION_CODE = Internal.createUniqueKey(SysPermission.SYS_PERMISSION, DSL.name("KEY_sys_permission_uk_permission_code"), new TableField[] { SysPermission.SYS_PERMISSION.PERMISSION_CODE }, true);
     public static final UniqueKey<SysRoleRecord> KEY_SYS_ROLE_PRIMARY = Internal.createUniqueKey(SysRole.SYS_ROLE, DSL.name("KEY_sys_role_PRIMARY"), new TableField[] { SysRole.SYS_ROLE.ID }, true);
-    public static final UniqueKey<SysRoleRecord> KEY_SYS_ROLE_UK_ROLE_CODE = Internal.createUniqueKey(SysRole.SYS_ROLE, DSL.name("KEY_sys_role_uk_role_code"), new TableField[] { SysRole.SYS_ROLE.ROLE_CODE }, true);
     public static final UniqueKey<SysRolePermissionRecord> KEY_SYS_ROLE_PERMISSION_PRIMARY = Internal.createUniqueKey(SysRolePermission.SYS_ROLE_PERMISSION, DSL.name("KEY_sys_role_permission_PRIMARY"), new TableField[] { SysRolePermission.SYS_ROLE_PERMISSION.ID }, true);
     public static final UniqueKey<SysRolePermissionRecord> KEY_SYS_ROLE_PERMISSION_UK_ROLE_PERMISSION = Internal.createUniqueKey(SysRolePermission.SYS_ROLE_PERMISSION, DSL.name("KEY_sys_role_permission_uk_role_permission"), new TableField[] { SysRolePermission.SYS_ROLE_PERMISSION.ROLE_ID, SysRolePermission.SYS_ROLE_PERMISSION.PERMISSION_ID }, true);
     public static final UniqueKey<SysUserRecord> KEY_SYS_USER_PRIMARY = Internal.createUniqueKey(SysUser.SYS_USER, DSL.name("KEY_sys_user_PRIMARY"), new TableField[] { SysUser.SYS_USER.ID }, true);
-    public static final UniqueKey<SysUserRecord> KEY_SYS_USER_UK_USERNAME = Internal.createUniqueKey(SysUser.SYS_USER, DSL.name("KEY_sys_user_uk_username"), new TableField[] { SysUser.SYS_USER.USERNAME }, true);
-    public static final UniqueKey<SysUserRoleRecord> KEY_SYS_USER_ROLE_PRIMARY = Internal.createUniqueKey(SysUserRole.SYS_USER_ROLE, DSL.name("KEY_sys_user_role_PRIMARY"), new TableField[] { SysUserRole.SYS_USER_ROLE.ID }, true);
-    public static final UniqueKey<SysUserRoleRecord> KEY_SYS_USER_ROLE_UK_USER_ROLE = Internal.createUniqueKey(SysUserRole.SYS_USER_ROLE, DSL.name("KEY_sys_user_role_uk_user_role"), new TableField[] { SysUserRole.SYS_USER_ROLE.USER_ID, SysUserRole.SYS_USER_ROLE.ROLE_ID }, true);
-    public static final UniqueKey<EduUserRecord> KEY_EDU_USER_PRIMARY = Internal.createUniqueKey(EduUser.EDU_USER, DSL.name("KEY_edu_user_PRIMARY"), new TableField[] { EduUser.EDU_USER.ID }, true);
+    public static final UniqueKey<SysUserRecord> KEY_SYS_USER_UK_PHONE = Internal.createUniqueKey(SysUser.SYS_USER, DSL.name("KEY_sys_user_uk_phone"), new TableField[] { SysUser.SYS_USER.PHONE }, true);
 }

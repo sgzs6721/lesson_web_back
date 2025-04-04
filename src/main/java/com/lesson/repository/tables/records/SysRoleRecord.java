@@ -10,8 +10,8 @@ import java.time.LocalDateTime;
 
 import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record10;
-import org.jooq.Row10;
+import org.jooq.Record7;
+import org.jooq.Row7;
 import org.jooq.impl.UpdatableRecordImpl;
 
 
@@ -19,7 +19,7 @@ import org.jooq.impl.UpdatableRecordImpl;
  * 系统角色表
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class SysRoleRecord extends UpdatableRecordImpl<SysRoleRecord> implements Record10<Long, String, String, String, Byte, LocalDateTime, LocalDateTime, Long, Long, Byte> {
+public class SysRoleRecord extends UpdatableRecordImpl<SysRoleRecord> implements Record7<Long, String, String, Byte, LocalDateTime, LocalDateTime, Byte> {
 
     private static final long serialVersionUID = 1L;
 
@@ -52,115 +52,73 @@ public class SysRoleRecord extends UpdatableRecordImpl<SysRoleRecord> implements
     }
 
     /**
-     * Setter for <code>lesson.sys_role.role_code</code>. 角色编码
-     */
-    public void setRoleCode(String value) {
-        set(2, value);
-    }
-
-    /**
-     * Getter for <code>lesson.sys_role.role_code</code>. 角色编码
-     */
-    public String getRoleCode() {
-        return (String) get(2);
-    }
-
-    /**
      * Setter for <code>lesson.sys_role.description</code>. 角色描述
      */
     public void setDescription(String value) {
-        set(3, value);
+        set(2, value);
     }
 
     /**
      * Getter for <code>lesson.sys_role.description</code>. 角色描述
      */
     public String getDescription() {
-        return (String) get(3);
+        return (String) get(2);
     }
 
     /**
      * Setter for <code>lesson.sys_role.status</code>. 状态：0-禁用，1-启用
      */
     public void setStatus(Byte value) {
-        set(4, value);
+        set(3, value);
     }
 
     /**
      * Getter for <code>lesson.sys_role.status</code>. 状态：0-禁用，1-启用
      */
     public Byte getStatus() {
-        return (Byte) get(4);
+        return (Byte) get(3);
     }
 
     /**
-     * Setter for <code>lesson.sys_role.created_at</code>. 创建时间
+     * Setter for <code>lesson.sys_role.create_time</code>. 创建时间
      */
-    public void setCreatedAt(LocalDateTime value) {
+    public void setCreateTime(LocalDateTime value) {
+        set(4, value);
+    }
+
+    /**
+     * Getter for <code>lesson.sys_role.create_time</code>. 创建时间
+     */
+    public LocalDateTime getCreateTime() {
+        return (LocalDateTime) get(4);
+    }
+
+    /**
+     * Setter for <code>lesson.sys_role.update_time</code>. 更新时间
+     */
+    public void setUpdateTime(LocalDateTime value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_role.created_at</code>. 创建时间
+     * Getter for <code>lesson.sys_role.update_time</code>. 更新时间
      */
-    public LocalDateTime getCreatedAt() {
+    public LocalDateTime getUpdateTime() {
         return (LocalDateTime) get(5);
     }
 
     /**
-     * Setter for <code>lesson.sys_role.updated_at</code>. 更新时间
+     * Setter for <code>lesson.sys_role.deleted</code>. 是否删除：0-未删除，1-已删除
      */
-    public void setUpdatedAt(LocalDateTime value) {
+    public void setDeleted(Byte value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_role.updated_at</code>. 更新时间
+     * Getter for <code>lesson.sys_role.deleted</code>. 是否删除：0-未删除，1-已删除
      */
-    public LocalDateTime getUpdatedAt() {
-        return (LocalDateTime) get(6);
-    }
-
-    /**
-     * Setter for <code>lesson.sys_role.created_by</code>. 创建人ID
-     */
-    public void setCreatedBy(Long value) {
-        set(7, value);
-    }
-
-    /**
-     * Getter for <code>lesson.sys_role.created_by</code>. 创建人ID
-     */
-    public Long getCreatedBy() {
-        return (Long) get(7);
-    }
-
-    /**
-     * Setter for <code>lesson.sys_role.updated_by</code>. 更新人ID
-     */
-    public void setUpdatedBy(Long value) {
-        set(8, value);
-    }
-
-    /**
-     * Getter for <code>lesson.sys_role.updated_by</code>. 更新人ID
-     */
-    public Long getUpdatedBy() {
-        return (Long) get(8);
-    }
-
-    /**
-     * Setter for <code>lesson.sys_role.is_deleted</code>. 是否删除：0-未删除，1-已删除
-     */
-    public void setIsDeleted(Byte value) {
-        set(9, value);
-    }
-
-    /**
-     * Getter for <code>lesson.sys_role.is_deleted</code>. 是否删除：0-未删除，1-已删除
-     */
-    public Byte getIsDeleted() {
-        return (Byte) get(9);
+    public Byte getDeleted() {
+        return (Byte) get(6);
     }
 
     // -------------------------------------------------------------------------
@@ -173,17 +131,17 @@ public class SysRoleRecord extends UpdatableRecordImpl<SysRoleRecord> implements
     }
 
     // -------------------------------------------------------------------------
-    // Record10 type implementation
+    // Record7 type implementation
     // -------------------------------------------------------------------------
 
     @Override
-    public Row10<Long, String, String, String, Byte, LocalDateTime, LocalDateTime, Long, Long, Byte> fieldsRow() {
-        return (Row10) super.fieldsRow();
+    public Row7<Long, String, String, Byte, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
+        return (Row7) super.fieldsRow();
     }
 
     @Override
-    public Row10<Long, String, String, String, Byte, LocalDateTime, LocalDateTime, Long, Long, Byte> valuesRow() {
-        return (Row10) super.valuesRow();
+    public Row7<Long, String, String, Byte, LocalDateTime, LocalDateTime, Byte> valuesRow() {
+        return (Row7) super.valuesRow();
     }
 
     @Override
@@ -198,42 +156,27 @@ public class SysRoleRecord extends UpdatableRecordImpl<SysRoleRecord> implements
 
     @Override
     public Field<String> field3() {
-        return SysRole.SYS_ROLE.ROLE_CODE;
-    }
-
-    @Override
-    public Field<String> field4() {
         return SysRole.SYS_ROLE.DESCRIPTION;
     }
 
     @Override
-    public Field<Byte> field5() {
+    public Field<Byte> field4() {
         return SysRole.SYS_ROLE.STATUS;
     }
 
     @Override
+    public Field<LocalDateTime> field5() {
+        return SysRole.SYS_ROLE.CREATE_TIME;
+    }
+
+    @Override
     public Field<LocalDateTime> field6() {
-        return SysRole.SYS_ROLE.CREATED_AT;
+        return SysRole.SYS_ROLE.UPDATE_TIME;
     }
 
     @Override
-    public Field<LocalDateTime> field7() {
-        return SysRole.SYS_ROLE.UPDATED_AT;
-    }
-
-    @Override
-    public Field<Long> field8() {
-        return SysRole.SYS_ROLE.CREATED_BY;
-    }
-
-    @Override
-    public Field<Long> field9() {
-        return SysRole.SYS_ROLE.UPDATED_BY;
-    }
-
-    @Override
-    public Field<Byte> field10() {
-        return SysRole.SYS_ROLE.IS_DELETED;
+    public Field<Byte> field7() {
+        return SysRole.SYS_ROLE.DELETED;
     }
 
     @Override
@@ -248,42 +191,27 @@ public class SysRoleRecord extends UpdatableRecordImpl<SysRoleRecord> implements
 
     @Override
     public String component3() {
-        return getRoleCode();
-    }
-
-    @Override
-    public String component4() {
         return getDescription();
     }
 
     @Override
-    public Byte component5() {
+    public Byte component4() {
         return getStatus();
     }
 
     @Override
+    public LocalDateTime component5() {
+        return getCreateTime();
+    }
+
+    @Override
     public LocalDateTime component6() {
-        return getCreatedAt();
+        return getUpdateTime();
     }
 
     @Override
-    public LocalDateTime component7() {
-        return getUpdatedAt();
-    }
-
-    @Override
-    public Long component8() {
-        return getCreatedBy();
-    }
-
-    @Override
-    public Long component9() {
-        return getUpdatedBy();
-    }
-
-    @Override
-    public Byte component10() {
-        return getIsDeleted();
+    public Byte component7() {
+        return getDeleted();
     }
 
     @Override
@@ -298,42 +226,27 @@ public class SysRoleRecord extends UpdatableRecordImpl<SysRoleRecord> implements
 
     @Override
     public String value3() {
-        return getRoleCode();
-    }
-
-    @Override
-    public String value4() {
         return getDescription();
     }
 
     @Override
-    public Byte value5() {
+    public Byte value4() {
         return getStatus();
     }
 
     @Override
+    public LocalDateTime value5() {
+        return getCreateTime();
+    }
+
+    @Override
     public LocalDateTime value6() {
-        return getCreatedAt();
+        return getUpdateTime();
     }
 
     @Override
-    public LocalDateTime value7() {
-        return getUpdatedAt();
-    }
-
-    @Override
-    public Long value8() {
-        return getCreatedBy();
-    }
-
-    @Override
-    public Long value9() {
-        return getUpdatedBy();
-    }
-
-    @Override
-    public Byte value10() {
-        return getIsDeleted();
+    public Byte value7() {
+        return getDeleted();
     }
 
     @Override
@@ -350,54 +263,36 @@ public class SysRoleRecord extends UpdatableRecordImpl<SysRoleRecord> implements
 
     @Override
     public SysRoleRecord value3(String value) {
-        setRoleCode(value);
-        return this;
-    }
-
-    @Override
-    public SysRoleRecord value4(String value) {
         setDescription(value);
         return this;
     }
 
     @Override
-    public SysRoleRecord value5(Byte value) {
+    public SysRoleRecord value4(Byte value) {
         setStatus(value);
         return this;
     }
 
     @Override
+    public SysRoleRecord value5(LocalDateTime value) {
+        setCreateTime(value);
+        return this;
+    }
+
+    @Override
     public SysRoleRecord value6(LocalDateTime value) {
-        setCreatedAt(value);
+        setUpdateTime(value);
         return this;
     }
 
     @Override
-    public SysRoleRecord value7(LocalDateTime value) {
-        setUpdatedAt(value);
+    public SysRoleRecord value7(Byte value) {
+        setDeleted(value);
         return this;
     }
 
     @Override
-    public SysRoleRecord value8(Long value) {
-        setCreatedBy(value);
-        return this;
-    }
-
-    @Override
-    public SysRoleRecord value9(Long value) {
-        setUpdatedBy(value);
-        return this;
-    }
-
-    @Override
-    public SysRoleRecord value10(Byte value) {
-        setIsDeleted(value);
-        return this;
-    }
-
-    @Override
-    public SysRoleRecord values(Long value1, String value2, String value3, String value4, Byte value5, LocalDateTime value6, LocalDateTime value7, Long value8, Long value9, Byte value10) {
+    public SysRoleRecord values(Long value1, String value2, String value3, Byte value4, LocalDateTime value5, LocalDateTime value6, Byte value7) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -405,9 +300,6 @@ public class SysRoleRecord extends UpdatableRecordImpl<SysRoleRecord> implements
         value5(value5);
         value6(value6);
         value7(value7);
-        value8(value8);
-        value9(value9);
-        value10(value10);
         return this;
     }
 
@@ -425,18 +317,15 @@ public class SysRoleRecord extends UpdatableRecordImpl<SysRoleRecord> implements
     /**
      * Create a detached, initialised SysRoleRecord
      */
-    public SysRoleRecord(Long id, String roleName, String roleCode, String description, Byte status, LocalDateTime createdAt, LocalDateTime updatedAt, Long createdBy, Long updatedBy, Byte isDeleted) {
+    public SysRoleRecord(Long id, String roleName, String description, Byte status, LocalDateTime createTime, LocalDateTime updateTime, Byte deleted) {
         super(SysRole.SYS_ROLE);
 
         setId(id);
         setRoleName(roleName);
-        setRoleCode(roleCode);
         setDescription(description);
         setStatus(status);
-        setCreatedAt(createdAt);
-        setUpdatedAt(updatedAt);
-        setCreatedBy(createdBy);
-        setUpdatedBy(updatedBy);
-        setIsDeleted(isDeleted);
+        setCreateTime(createTime);
+        setUpdateTime(updateTime);
+        setDeleted(deleted);
     }
 }

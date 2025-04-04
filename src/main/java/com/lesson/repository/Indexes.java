@@ -34,10 +34,8 @@ import com.lesson.repository.tables.SysLoginLog;
 import com.lesson.repository.tables.SysNotice;
 import com.lesson.repository.tables.SysOperationLog;
 import com.lesson.repository.tables.SysPermission;
-import com.lesson.repository.tables.SysRole;
 import com.lesson.repository.tables.SysRolePermission;
 import com.lesson.repository.tables.SysUser;
-import com.lesson.repository.tables.SysUserRole;
 
 import org.jooq.Index;
 import org.jooq.OrderField;
@@ -61,6 +59,7 @@ public class Indexes {
     public static final Index EDU_COURSE_IDX_CAMPUS_ID = Internal.createIndex(DSL.name("idx_campus_id"), EduCourse.EDU_COURSE, new OrderField[] { EduCourse.EDU_COURSE.CAMPUS_ID }, false);
     public static final Index EDU_EXPENSE_IDX_CAMPUS_ID = Internal.createIndex(DSL.name("idx_campus_id"), EduExpense.EDU_EXPENSE, new OrderField[] { EduExpense.EDU_EXPENSE.CAMPUS_ID }, false);
     public static final Index EDU_STUDENT_IDX_CAMPUS_ID = Internal.createIndex(DSL.name("idx_campus_id"), EduStudent.EDU_STUDENT, new OrderField[] { EduStudent.EDU_STUDENT.CAMPUS_ID }, false);
+    public static final Index SYS_USER_IDX_CAMPUS_ID = Internal.createIndex(DSL.name("idx_campus_id"), SysUser.SYS_USER, new OrderField[] { SysUser.SYS_USER.CAMPUS_ID }, false);
     public static final Index EDU_COURSE_IDX_CATEGORY_ID = Internal.createIndex(DSL.name("idx_category_id"), EduCourse.EDU_COURSE, new OrderField[] { EduCourse.EDU_COURSE.CATEGORY_ID }, false);
     public static final Index EDU_COURSE_LESSON_IDX_CHAPTER_ID = Internal.createIndex(DSL.name("idx_chapter_id"), EduCourseLesson.EDU_COURSE_LESSON, new OrderField[] { EduCourseLesson.EDU_COURSE_LESSON.CHAPTER_ID }, false);
     public static final Index EDU_ATTENDANCE_IDX_CHECK_IN_TIME = Internal.createIndex(DSL.name("idx_check_in_time"), EduAttendance.EDU_ATTENDANCE, new OrderField[] { EduAttendance.EDU_ATTENDANCE.CHECK_IN_TIME }, false);
@@ -107,13 +106,9 @@ public class Indexes {
     public static final Index SYS_LOGIN_LOG_IDX_CREATED_AT = Internal.createIndex(DSL.name("idx_created_at"), SysLoginLog.SYS_LOGIN_LOG, new OrderField[] { SysLoginLog.SYS_LOGIN_LOG.CREATED_AT }, false);
     public static final Index SYS_NOTICE_IDX_CREATED_AT = Internal.createIndex(DSL.name("idx_created_at"), SysNotice.SYS_NOTICE, new OrderField[] { SysNotice.SYS_NOTICE.CREATED_AT }, false);
     public static final Index SYS_OPERATION_LOG_IDX_CREATED_AT = Internal.createIndex(DSL.name("idx_created_at"), SysOperationLog.SYS_OPERATION_LOG, new OrderField[] { SysOperationLog.SYS_OPERATION_LOG.CREATED_AT }, false);
-    public static final Index SYS_PERMISSION_IDX_CREATED_AT = Internal.createIndex(DSL.name("idx_created_at"), SysPermission.SYS_PERMISSION, new OrderField[] { SysPermission.SYS_PERMISSION.CREATED_AT }, false);
-    public static final Index SYS_ROLE_IDX_CREATED_AT = Internal.createIndex(DSL.name("idx_created_at"), SysRole.SYS_ROLE, new OrderField[] { SysRole.SYS_ROLE.CREATED_AT }, false);
-    public static final Index SYS_USER_IDX_CREATED_AT = Internal.createIndex(DSL.name("idx_created_at"), SysUser.SYS_USER, new OrderField[] { SysUser.SYS_USER.CREATED_AT }, false);
     public static final Index EDU_DASHBOARD_IDX_DASHBOARD_TYPE = Internal.createIndex(DSL.name("idx_dashboard_type"), EduDashboard.EDU_DASHBOARD, new OrderField[] { EduDashboard.EDU_DASHBOARD.DASHBOARD_TYPE }, false);
     public static final Index SYS_DICT_DATA_IDX_DICT_SORT = Internal.createIndex(DSL.name("idx_dict_sort"), SysDictData.SYS_DICT_DATA, new OrderField[] { SysDictData.SYS_DICT_DATA.DICT_SORT }, false);
     public static final Index SYS_DICT_DATA_IDX_DICT_TYPE = Internal.createIndex(DSL.name("idx_dict_type"), SysDictData.SYS_DICT_DATA, new OrderField[] { SysDictData.SYS_DICT_DATA.DICT_TYPE }, false);
-    public static final Index SYS_USER_IDX_EMAIL = Internal.createIndex(DSL.name("idx_email"), SysUser.SYS_USER, new OrderField[] { SysUser.SYS_USER.EMAIL }, false);
     public static final Index EDU_STATISTICS_REPORT_IDX_END_DATE = Internal.createIndex(DSL.name("idx_end_date"), EduStatisticsReport.EDU_STATISTICS_REPORT, new OrderField[] { EduStatisticsReport.EDU_STATISTICS_REPORT.END_DATE }, false);
     public static final Index EDU_SCHEDULE_IDX_END_TIME = Internal.createIndex(DSL.name("idx_end_time"), EduSchedule.EDU_SCHEDULE, new OrderField[] { EduSchedule.EDU_SCHEDULE.END_TIME }, false);
     public static final Index EDU_EXPENSE_IDX_EXPENSE_DATE = Internal.createIndex(DSL.name("idx_expense_date"), EduExpense.EDU_EXPENSE, new OrderField[] { EduExpense.EDU_EXPENSE.EXPENSE_DATE }, false);
@@ -151,11 +146,10 @@ public class Indexes {
     public static final Index SYS_ROLE_PERMISSION_IDX_PERMISSION_ID = Internal.createIndex(DSL.name("idx_permission_id"), SysRolePermission.SYS_ROLE_PERMISSION, new OrderField[] { SysRolePermission.SYS_ROLE_PERMISSION.PERMISSION_ID }, false);
     public static final Index EDU_COACH_IDX_PHONE = Internal.createIndex(DSL.name("idx_phone"), EduCoach.EDU_COACH, new OrderField[] { EduCoach.EDU_COACH.PHONE }, false);
     public static final Index EDU_STUDENT_IDX_PHONE = Internal.createIndex(DSL.name("idx_phone"), EduStudent.EDU_STUDENT, new OrderField[] { EduStudent.EDU_STUDENT.PHONE }, false);
-    public static final Index SYS_USER_IDX_PHONE = Internal.createIndex(DSL.name("idx_phone"), SysUser.SYS_USER, new OrderField[] { SysUser.SYS_USER.PHONE }, false);
     public static final Index EDU_STATISTICS_REPORT_IDX_REPORT_PERIOD = Internal.createIndex(DSL.name("idx_report_period"), EduStatisticsReport.EDU_STATISTICS_REPORT, new OrderField[] { EduStatisticsReport.EDU_STATISTICS_REPORT.REPORT_PERIOD }, false);
     public static final Index EDU_STATISTICS_REPORT_IDX_REPORT_TYPE = Internal.createIndex(DSL.name("idx_report_type"), EduStatisticsReport.EDU_STATISTICS_REPORT, new OrderField[] { EduStatisticsReport.EDU_STATISTICS_REPORT.REPORT_TYPE }, false);
     public static final Index SYS_ROLE_PERMISSION_IDX_ROLE_ID = Internal.createIndex(DSL.name("idx_role_id"), SysRolePermission.SYS_ROLE_PERMISSION, new OrderField[] { SysRolePermission.SYS_ROLE_PERMISSION.ROLE_ID }, false);
-    public static final Index SYS_USER_ROLE_IDX_ROLE_ID = Internal.createIndex(DSL.name("idx_role_id"), SysUserRole.SYS_USER_ROLE, new OrderField[] { SysUserRole.SYS_USER_ROLE.ROLE_ID }, false);
+    public static final Index SYS_USER_IDX_ROLE_ID = Internal.createIndex(DSL.name("idx_role_id"), SysUser.SYS_USER, new OrderField[] { SysUser.SYS_USER.ROLE_ID }, false);
     public static final Index EDU_ATTENDANCE_IDX_SCHEDULE_ID = Internal.createIndex(DSL.name("idx_schedule_id"), EduAttendance.EDU_ATTENDANCE, new OrderField[] { EduAttendance.EDU_ATTENDANCE.SCHEDULE_ID }, false);
     public static final Index EDU_STATISTICS_REPORT_IDX_START_DATE = Internal.createIndex(DSL.name("idx_start_date"), EduStatisticsReport.EDU_STATISTICS_REPORT, new OrderField[] { EduStatisticsReport.EDU_STATISTICS_REPORT.START_DATE }, false);
     public static final Index EDU_SCHEDULE_IDX_START_TIME = Internal.createIndex(DSL.name("idx_start_time"), EduSchedule.EDU_SCHEDULE, new OrderField[] { EduSchedule.EDU_SCHEDULE.START_TIME }, false);
@@ -169,7 +163,6 @@ public class Indexes {
     public static final Index EDU_STUDENT_IDX_USER_ID = Internal.createIndex(DSL.name("idx_user_id"), EduStudent.EDU_STUDENT, new OrderField[] { EduStudent.EDU_STUDENT.USER_ID }, false);
     public static final Index SYS_LOG_IDX_USER_ID = Internal.createIndex(DSL.name("idx_user_id"), SysLog.SYS_LOG, new OrderField[] { SysLog.SYS_LOG.USER_ID }, false);
     public static final Index SYS_OPERATION_LOG_IDX_USER_ID = Internal.createIndex(DSL.name("idx_user_id"), SysOperationLog.SYS_OPERATION_LOG, new OrderField[] { SysOperationLog.SYS_OPERATION_LOG.USER_ID }, false);
-    public static final Index SYS_USER_ROLE_IDX_USER_ID = Internal.createIndex(DSL.name("idx_user_id"), SysUserRole.SYS_USER_ROLE, new OrderField[] { SysUserRole.SYS_USER_ROLE.USER_ID }, false);
     public static final Index SYS_LOG_IDX_USERNAME = Internal.createIndex(DSL.name("idx_username"), SysLog.SYS_LOG, new OrderField[] { SysLog.SYS_LOG.USERNAME }, false);
     public static final Index SYS_LOGIN_LOG_IDX_USERNAME = Internal.createIndex(DSL.name("idx_username"), SysLoginLog.SYS_LOGIN_LOG, new OrderField[] { SysLoginLog.SYS_LOGIN_LOG.USERNAME }, false);
     public static final Index SYS_OPERATION_LOG_IDX_USERNAME = Internal.createIndex(DSL.name("idx_username"), SysOperationLog.SYS_OPERATION_LOG, new OrderField[] { SysOperationLog.SYS_OPERATION_LOG.USERNAME }, false);

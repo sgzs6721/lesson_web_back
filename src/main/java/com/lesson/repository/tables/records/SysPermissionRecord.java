@@ -10,8 +10,8 @@ import java.time.LocalDateTime;
 
 import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record15;
-import org.jooq.Row15;
+import org.jooq.Record12;
+import org.jooq.Row12;
 import org.jooq.impl.UpdatableRecordImpl;
 
 
@@ -19,7 +19,7 @@ import org.jooq.impl.UpdatableRecordImpl;
  * 系统权限表
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class SysPermissionRecord extends UpdatableRecordImpl<SysPermissionRecord> implements Record15<Long, Long, String, String, Byte, String, String, String, Integer, Byte, LocalDateTime, LocalDateTime, Long, Long, Byte> {
+public class SysPermissionRecord extends UpdatableRecordImpl<SysPermissionRecord> implements Record12<Long, Long, String, Byte, String, String, String, Integer, Byte, LocalDateTime, LocalDateTime, Byte> {
 
     private static final long serialVersionUID = 1L;
 
@@ -66,171 +66,129 @@ public class SysPermissionRecord extends UpdatableRecordImpl<SysPermissionRecord
     }
 
     /**
-     * Setter for <code>lesson.sys_permission.permission_code</code>. 权限编码
-     */
-    public void setPermissionCode(String value) {
-        set(3, value);
-    }
-
-    /**
-     * Getter for <code>lesson.sys_permission.permission_code</code>. 权限编码
-     */
-    public String getPermissionCode() {
-        return (String) get(3);
-    }
-
-    /**
      * Setter for <code>lesson.sys_permission.permission_type</code>. 权限类型：1-菜单，2-按钮，3-接口
      */
     public void setPermissionType(Byte value) {
-        set(4, value);
+        set(3, value);
     }
 
     /**
      * Getter for <code>lesson.sys_permission.permission_type</code>. 权限类型：1-菜单，2-按钮，3-接口
      */
     public Byte getPermissionType() {
-        return (Byte) get(4);
+        return (Byte) get(3);
     }
 
     /**
      * Setter for <code>lesson.sys_permission.path</code>. 路径
      */
     public void setPath(String value) {
-        set(5, value);
+        set(4, value);
     }
 
     /**
      * Getter for <code>lesson.sys_permission.path</code>. 路径
      */
     public String getPath() {
-        return (String) get(5);
+        return (String) get(4);
     }
 
     /**
      * Setter for <code>lesson.sys_permission.component</code>. 前端组件
      */
     public void setComponent(String value) {
-        set(6, value);
+        set(5, value);
     }
 
     /**
      * Getter for <code>lesson.sys_permission.component</code>. 前端组件
      */
     public String getComponent() {
-        return (String) get(6);
+        return (String) get(5);
     }
 
     /**
      * Setter for <code>lesson.sys_permission.icon</code>. 图标
      */
     public void setIcon(String value) {
-        set(7, value);
+        set(6, value);
     }
 
     /**
      * Getter for <code>lesson.sys_permission.icon</code>. 图标
      */
     public String getIcon() {
-        return (String) get(7);
+        return (String) get(6);
     }
 
     /**
      * Setter for <code>lesson.sys_permission.sort</code>. 排序
      */
     public void setSort(Integer value) {
-        set(8, value);
+        set(7, value);
     }
 
     /**
      * Getter for <code>lesson.sys_permission.sort</code>. 排序
      */
     public Integer getSort() {
-        return (Integer) get(8);
+        return (Integer) get(7);
     }
 
     /**
      * Setter for <code>lesson.sys_permission.status</code>. 状态：0-禁用，1-启用
      */
     public void setStatus(Byte value) {
-        set(9, value);
+        set(8, value);
     }
 
     /**
      * Getter for <code>lesson.sys_permission.status</code>. 状态：0-禁用，1-启用
      */
     public Byte getStatus() {
-        return (Byte) get(9);
+        return (Byte) get(8);
     }
 
     /**
-     * Setter for <code>lesson.sys_permission.created_at</code>. 创建时间
+     * Setter for <code>lesson.sys_permission.create_time</code>. 创建时间
      */
-    public void setCreatedAt(LocalDateTime value) {
+    public void setCreateTime(LocalDateTime value) {
+        set(9, value);
+    }
+
+    /**
+     * Getter for <code>lesson.sys_permission.create_time</code>. 创建时间
+     */
+    public LocalDateTime getCreateTime() {
+        return (LocalDateTime) get(9);
+    }
+
+    /**
+     * Setter for <code>lesson.sys_permission.update_time</code>. 更新时间
+     */
+    public void setUpdateTime(LocalDateTime value) {
         set(10, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_permission.created_at</code>. 创建时间
+     * Getter for <code>lesson.sys_permission.update_time</code>. 更新时间
      */
-    public LocalDateTime getCreatedAt() {
+    public LocalDateTime getUpdateTime() {
         return (LocalDateTime) get(10);
     }
 
     /**
-     * Setter for <code>lesson.sys_permission.updated_at</code>. 更新时间
+     * Setter for <code>lesson.sys_permission.deleted</code>. 是否删除：0-未删除，1-已删除
      */
-    public void setUpdatedAt(LocalDateTime value) {
+    public void setDeleted(Byte value) {
         set(11, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_permission.updated_at</code>. 更新时间
+     * Getter for <code>lesson.sys_permission.deleted</code>. 是否删除：0-未删除，1-已删除
      */
-    public LocalDateTime getUpdatedAt() {
-        return (LocalDateTime) get(11);
-    }
-
-    /**
-     * Setter for <code>lesson.sys_permission.created_by</code>. 创建人ID
-     */
-    public void setCreatedBy(Long value) {
-        set(12, value);
-    }
-
-    /**
-     * Getter for <code>lesson.sys_permission.created_by</code>. 创建人ID
-     */
-    public Long getCreatedBy() {
-        return (Long) get(12);
-    }
-
-    /**
-     * Setter for <code>lesson.sys_permission.updated_by</code>. 更新人ID
-     */
-    public void setUpdatedBy(Long value) {
-        set(13, value);
-    }
-
-    /**
-     * Getter for <code>lesson.sys_permission.updated_by</code>. 更新人ID
-     */
-    public Long getUpdatedBy() {
-        return (Long) get(13);
-    }
-
-    /**
-     * Setter for <code>lesson.sys_permission.is_deleted</code>. 是否删除：0-未删除，1-已删除
-     */
-    public void setIsDeleted(Byte value) {
-        set(14, value);
-    }
-
-    /**
-     * Getter for <code>lesson.sys_permission.is_deleted</code>. 是否删除：0-未删除，1-已删除
-     */
-    public Byte getIsDeleted() {
-        return (Byte) get(14);
+    public Byte getDeleted() {
+        return (Byte) get(11);
     }
 
     // -------------------------------------------------------------------------
@@ -243,17 +201,17 @@ public class SysPermissionRecord extends UpdatableRecordImpl<SysPermissionRecord
     }
 
     // -------------------------------------------------------------------------
-    // Record15 type implementation
+    // Record12 type implementation
     // -------------------------------------------------------------------------
 
     @Override
-    public Row15<Long, Long, String, String, Byte, String, String, String, Integer, Byte, LocalDateTime, LocalDateTime, Long, Long, Byte> fieldsRow() {
-        return (Row15) super.fieldsRow();
+    public Row12<Long, Long, String, Byte, String, String, String, Integer, Byte, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
+        return (Row12) super.fieldsRow();
     }
 
     @Override
-    public Row15<Long, Long, String, String, Byte, String, String, String, Integer, Byte, LocalDateTime, LocalDateTime, Long, Long, Byte> valuesRow() {
-        return (Row15) super.valuesRow();
+    public Row12<Long, Long, String, Byte, String, String, String, Integer, Byte, LocalDateTime, LocalDateTime, Byte> valuesRow() {
+        return (Row12) super.valuesRow();
     }
 
     @Override
@@ -272,63 +230,48 @@ public class SysPermissionRecord extends UpdatableRecordImpl<SysPermissionRecord
     }
 
     @Override
-    public Field<String> field4() {
-        return SysPermission.SYS_PERMISSION.PERMISSION_CODE;
-    }
-
-    @Override
-    public Field<Byte> field5() {
+    public Field<Byte> field4() {
         return SysPermission.SYS_PERMISSION.PERMISSION_TYPE;
     }
 
     @Override
-    public Field<String> field6() {
+    public Field<String> field5() {
         return SysPermission.SYS_PERMISSION.PATH;
     }
 
     @Override
-    public Field<String> field7() {
+    public Field<String> field6() {
         return SysPermission.SYS_PERMISSION.COMPONENT;
     }
 
     @Override
-    public Field<String> field8() {
+    public Field<String> field7() {
         return SysPermission.SYS_PERMISSION.ICON;
     }
 
     @Override
-    public Field<Integer> field9() {
+    public Field<Integer> field8() {
         return SysPermission.SYS_PERMISSION.SORT;
     }
 
     @Override
-    public Field<Byte> field10() {
+    public Field<Byte> field9() {
         return SysPermission.SYS_PERMISSION.STATUS;
     }
 
     @Override
+    public Field<LocalDateTime> field10() {
+        return SysPermission.SYS_PERMISSION.CREATE_TIME;
+    }
+
+    @Override
     public Field<LocalDateTime> field11() {
-        return SysPermission.SYS_PERMISSION.CREATED_AT;
+        return SysPermission.SYS_PERMISSION.UPDATE_TIME;
     }
 
     @Override
-    public Field<LocalDateTime> field12() {
-        return SysPermission.SYS_PERMISSION.UPDATED_AT;
-    }
-
-    @Override
-    public Field<Long> field13() {
-        return SysPermission.SYS_PERMISSION.CREATED_BY;
-    }
-
-    @Override
-    public Field<Long> field14() {
-        return SysPermission.SYS_PERMISSION.UPDATED_BY;
-    }
-
-    @Override
-    public Field<Byte> field15() {
-        return SysPermission.SYS_PERMISSION.IS_DELETED;
+    public Field<Byte> field12() {
+        return SysPermission.SYS_PERMISSION.DELETED;
     }
 
     @Override
@@ -347,63 +290,48 @@ public class SysPermissionRecord extends UpdatableRecordImpl<SysPermissionRecord
     }
 
     @Override
-    public String component4() {
-        return getPermissionCode();
-    }
-
-    @Override
-    public Byte component5() {
+    public Byte component4() {
         return getPermissionType();
     }
 
     @Override
-    public String component6() {
+    public String component5() {
         return getPath();
     }
 
     @Override
-    public String component7() {
+    public String component6() {
         return getComponent();
     }
 
     @Override
-    public String component8() {
+    public String component7() {
         return getIcon();
     }
 
     @Override
-    public Integer component9() {
+    public Integer component8() {
         return getSort();
     }
 
     @Override
-    public Byte component10() {
+    public Byte component9() {
         return getStatus();
     }
 
     @Override
+    public LocalDateTime component10() {
+        return getCreateTime();
+    }
+
+    @Override
     public LocalDateTime component11() {
-        return getCreatedAt();
+        return getUpdateTime();
     }
 
     @Override
-    public LocalDateTime component12() {
-        return getUpdatedAt();
-    }
-
-    @Override
-    public Long component13() {
-        return getCreatedBy();
-    }
-
-    @Override
-    public Long component14() {
-        return getUpdatedBy();
-    }
-
-    @Override
-    public Byte component15() {
-        return getIsDeleted();
+    public Byte component12() {
+        return getDeleted();
     }
 
     @Override
@@ -422,63 +350,48 @@ public class SysPermissionRecord extends UpdatableRecordImpl<SysPermissionRecord
     }
 
     @Override
-    public String value4() {
-        return getPermissionCode();
-    }
-
-    @Override
-    public Byte value5() {
+    public Byte value4() {
         return getPermissionType();
     }
 
     @Override
-    public String value6() {
+    public String value5() {
         return getPath();
     }
 
     @Override
-    public String value7() {
+    public String value6() {
         return getComponent();
     }
 
     @Override
-    public String value8() {
+    public String value7() {
         return getIcon();
     }
 
     @Override
-    public Integer value9() {
+    public Integer value8() {
         return getSort();
     }
 
     @Override
-    public Byte value10() {
+    public Byte value9() {
         return getStatus();
     }
 
     @Override
+    public LocalDateTime value10() {
+        return getCreateTime();
+    }
+
+    @Override
     public LocalDateTime value11() {
-        return getCreatedAt();
+        return getUpdateTime();
     }
 
     @Override
-    public LocalDateTime value12() {
-        return getUpdatedAt();
-    }
-
-    @Override
-    public Long value13() {
-        return getCreatedBy();
-    }
-
-    @Override
-    public Long value14() {
-        return getUpdatedBy();
-    }
-
-    @Override
-    public Byte value15() {
-        return getIsDeleted();
+    public Byte value12() {
+        return getDeleted();
     }
 
     @Override
@@ -500,79 +413,61 @@ public class SysPermissionRecord extends UpdatableRecordImpl<SysPermissionRecord
     }
 
     @Override
-    public SysPermissionRecord value4(String value) {
-        setPermissionCode(value);
-        return this;
-    }
-
-    @Override
-    public SysPermissionRecord value5(Byte value) {
+    public SysPermissionRecord value4(Byte value) {
         setPermissionType(value);
         return this;
     }
 
     @Override
-    public SysPermissionRecord value6(String value) {
+    public SysPermissionRecord value5(String value) {
         setPath(value);
         return this;
     }
 
     @Override
-    public SysPermissionRecord value7(String value) {
+    public SysPermissionRecord value6(String value) {
         setComponent(value);
         return this;
     }
 
     @Override
-    public SysPermissionRecord value8(String value) {
+    public SysPermissionRecord value7(String value) {
         setIcon(value);
         return this;
     }
 
     @Override
-    public SysPermissionRecord value9(Integer value) {
+    public SysPermissionRecord value8(Integer value) {
         setSort(value);
         return this;
     }
 
     @Override
-    public SysPermissionRecord value10(Byte value) {
+    public SysPermissionRecord value9(Byte value) {
         setStatus(value);
         return this;
     }
 
     @Override
+    public SysPermissionRecord value10(LocalDateTime value) {
+        setCreateTime(value);
+        return this;
+    }
+
+    @Override
     public SysPermissionRecord value11(LocalDateTime value) {
-        setCreatedAt(value);
+        setUpdateTime(value);
         return this;
     }
 
     @Override
-    public SysPermissionRecord value12(LocalDateTime value) {
-        setUpdatedAt(value);
+    public SysPermissionRecord value12(Byte value) {
+        setDeleted(value);
         return this;
     }
 
     @Override
-    public SysPermissionRecord value13(Long value) {
-        setCreatedBy(value);
-        return this;
-    }
-
-    @Override
-    public SysPermissionRecord value14(Long value) {
-        setUpdatedBy(value);
-        return this;
-    }
-
-    @Override
-    public SysPermissionRecord value15(Byte value) {
-        setIsDeleted(value);
-        return this;
-    }
-
-    @Override
-    public SysPermissionRecord values(Long value1, Long value2, String value3, String value4, Byte value5, String value6, String value7, String value8, Integer value9, Byte value10, LocalDateTime value11, LocalDateTime value12, Long value13, Long value14, Byte value15) {
+    public SysPermissionRecord values(Long value1, Long value2, String value3, Byte value4, String value5, String value6, String value7, Integer value8, Byte value9, LocalDateTime value10, LocalDateTime value11, Byte value12) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -585,9 +480,6 @@ public class SysPermissionRecord extends UpdatableRecordImpl<SysPermissionRecord
         value10(value10);
         value11(value11);
         value12(value12);
-        value13(value13);
-        value14(value14);
-        value15(value15);
         return this;
     }
 
@@ -605,23 +497,20 @@ public class SysPermissionRecord extends UpdatableRecordImpl<SysPermissionRecord
     /**
      * Create a detached, initialised SysPermissionRecord
      */
-    public SysPermissionRecord(Long id, Long parentId, String permissionName, String permissionCode, Byte permissionType, String path, String component, String icon, Integer sort, Byte status, LocalDateTime createdAt, LocalDateTime updatedAt, Long createdBy, Long updatedBy, Byte isDeleted) {
+    public SysPermissionRecord(Long id, Long parentId, String permissionName, Byte permissionType, String path, String component, String icon, Integer sort, Byte status, LocalDateTime createTime, LocalDateTime updateTime, Byte deleted) {
         super(SysPermission.SYS_PERMISSION);
 
         setId(id);
         setParentId(parentId);
         setPermissionName(permissionName);
-        setPermissionCode(permissionCode);
         setPermissionType(permissionType);
         setPath(path);
         setComponent(component);
         setIcon(icon);
         setSort(sort);
         setStatus(status);
-        setCreatedAt(createdAt);
-        setUpdatedAt(updatedAt);
-        setCreatedBy(createdBy);
-        setUpdatedBy(updatedBy);
-        setIsDeleted(isDeleted);
+        setCreateTime(createTime);
+        setUpdateTime(updateTime);
+        setDeleted(deleted);
     }
 }

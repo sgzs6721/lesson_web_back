@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 
 import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record11;
-import org.jooq.Row11;
+import org.jooq.Record12;
+import org.jooq.Row12;
 import org.jooq.impl.UpdatableRecordImpl;
 
 
@@ -20,7 +20,7 @@ import org.jooq.impl.UpdatableRecordImpl;
  * 班级学生关联表
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class EduClassStudentRecord extends UpdatableRecordImpl<EduClassStudentRecord> implements Record11<Long, Long, Long, LocalDate, LocalDate, Byte, LocalDateTime, LocalDateTime, Long, Long, Byte> {
+public class EduClassStudentRecord extends UpdatableRecordImpl<EduClassStudentRecord> implements Record12<Long, Long, Long, LocalDate, LocalDate, Byte, LocalDateTime, LocalDateTime, Long, Long, Byte, Integer> {
 
     private static final long serialVersionUID = 1L;
 
@@ -178,6 +178,20 @@ public class EduClassStudentRecord extends UpdatableRecordImpl<EduClassStudentRe
         return (Byte) get(10);
     }
 
+    /**
+     * Setter for <code>lesson.edu_class_student.remaining_hours</code>. 待销课时
+     */
+    public void setRemainingHours(Integer value) {
+        set(11, value);
+    }
+
+    /**
+     * Getter for <code>lesson.edu_class_student.remaining_hours</code>. 待销课时
+     */
+    public Integer getRemainingHours() {
+        return (Integer) get(11);
+    }
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -188,17 +202,17 @@ public class EduClassStudentRecord extends UpdatableRecordImpl<EduClassStudentRe
     }
 
     // -------------------------------------------------------------------------
-    // Record11 type implementation
+    // Record12 type implementation
     // -------------------------------------------------------------------------
 
     @Override
-    public Row11<Long, Long, Long, LocalDate, LocalDate, Byte, LocalDateTime, LocalDateTime, Long, Long, Byte> fieldsRow() {
-        return (Row11) super.fieldsRow();
+    public Row12<Long, Long, Long, LocalDate, LocalDate, Byte, LocalDateTime, LocalDateTime, Long, Long, Byte, Integer> fieldsRow() {
+        return (Row12) super.fieldsRow();
     }
 
     @Override
-    public Row11<Long, Long, Long, LocalDate, LocalDate, Byte, LocalDateTime, LocalDateTime, Long, Long, Byte> valuesRow() {
-        return (Row11) super.valuesRow();
+    public Row12<Long, Long, Long, LocalDate, LocalDate, Byte, LocalDateTime, LocalDateTime, Long, Long, Byte, Integer> valuesRow() {
+        return (Row12) super.valuesRow();
     }
 
     @Override
@@ -257,6 +271,11 @@ public class EduClassStudentRecord extends UpdatableRecordImpl<EduClassStudentRe
     }
 
     @Override
+    public Field<Integer> field12() {
+        return EduClassStudent.EDU_CLASS_STUDENT.REMAINING_HOURS;
+    }
+
+    @Override
     public Long component1() {
         return getId();
     }
@@ -312,6 +331,11 @@ public class EduClassStudentRecord extends UpdatableRecordImpl<EduClassStudentRe
     }
 
     @Override
+    public Integer component12() {
+        return getRemainingHours();
+    }
+
+    @Override
     public Long value1() {
         return getId();
     }
@@ -364,6 +388,11 @@ public class EduClassStudentRecord extends UpdatableRecordImpl<EduClassStudentRe
     @Override
     public Byte value11() {
         return getIsDeleted();
+    }
+
+    @Override
+    public Integer value12() {
+        return getRemainingHours();
     }
 
     @Override
@@ -433,7 +462,13 @@ public class EduClassStudentRecord extends UpdatableRecordImpl<EduClassStudentRe
     }
 
     @Override
-    public EduClassStudentRecord values(Long value1, Long value2, Long value3, LocalDate value4, LocalDate value5, Byte value6, LocalDateTime value7, LocalDateTime value8, Long value9, Long value10, Byte value11) {
+    public EduClassStudentRecord value12(Integer value) {
+        setRemainingHours(value);
+        return this;
+    }
+
+    @Override
+    public EduClassStudentRecord values(Long value1, Long value2, Long value3, LocalDate value4, LocalDate value5, Byte value6, LocalDateTime value7, LocalDateTime value8, Long value9, Long value10, Byte value11, Integer value12) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -445,6 +480,7 @@ public class EduClassStudentRecord extends UpdatableRecordImpl<EduClassStudentRe
         value9(value9);
         value10(value10);
         value11(value11);
+        value12(value12);
         return this;
     }
 
@@ -462,7 +498,7 @@ public class EduClassStudentRecord extends UpdatableRecordImpl<EduClassStudentRe
     /**
      * Create a detached, initialised EduClassStudentRecord
      */
-    public EduClassStudentRecord(Long id, Long classId, Long studentId, LocalDate joinDate, LocalDate leaveDate, Byte status, LocalDateTime createdAt, LocalDateTime updatedAt, Long createdBy, Long updatedBy, Byte isDeleted) {
+    public EduClassStudentRecord(Long id, Long classId, Long studentId, LocalDate joinDate, LocalDate leaveDate, Byte status, LocalDateTime createdAt, LocalDateTime updatedAt, Long createdBy, Long updatedBy, Byte isDeleted, Integer remainingHours) {
         super(EduClassStudent.EDU_CLASS_STUDENT);
 
         setId(id);
@@ -476,5 +512,6 @@ public class EduClassStudentRecord extends UpdatableRecordImpl<EduClassStudentRe
         setCreatedBy(createdBy);
         setUpdatedBy(updatedBy);
         setIsDeleted(isDeleted);
+        setRemainingHours(remainingHours);
     }
 }

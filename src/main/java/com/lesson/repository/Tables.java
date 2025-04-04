@@ -37,7 +37,6 @@ import com.lesson.repository.tables.SysPermission;
 import com.lesson.repository.tables.SysRole;
 import com.lesson.repository.tables.SysRolePermission;
 import com.lesson.repository.tables.SysUser;
-import com.lesson.repository.tables.SysUserRole;
 
 
 /**
@@ -210,9 +209,4 @@ public class Tables {
      * 系统用户表
      */
     public static final SysUser SYS_USER = SysUser.SYS_USER;
-
-    /**
-     * 用户角色关联表
-     */
-    public static final SysUserRole SYS_USER_ROLE = SysUserRole.SYS_USER_ROLE;
 }

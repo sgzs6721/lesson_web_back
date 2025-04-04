@@ -20,7 +20,7 @@ import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row15;
+import org.jooq.Row19;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -127,6 +127,26 @@ public class EduCampus extends TableImpl<EduCampusRecord> {
      */
     public final TableField<EduCampusRecord, Byte> IS_DELETED = createField(DSL.name("is_deleted"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "是否删除：0-未删除，1-已删除");
 
+    /**
+     * The column <code>lesson.edu_campus.monthly_rent</code>. 月租金
+     */
+    public final TableField<EduCampusRecord, BigDecimal> MONTHLY_RENT = createField(DSL.name("monthly_rent"), SQLDataType.DECIMAL(10, 2), this, "月租金");
+
+    /**
+     * The column <code>lesson.edu_campus.property_fee</code>. 物业费
+     */
+    public final TableField<EduCampusRecord, BigDecimal> PROPERTY_FEE = createField(DSL.name("property_fee"), SQLDataType.DECIMAL(10, 2), this, "物业费");
+
+    /**
+     * The column <code>lesson.edu_campus.utility_fee</code>. 水电费
+     */
+    public final TableField<EduCampusRecord, BigDecimal> UTILITY_FEE = createField(DSL.name("utility_fee"), SQLDataType.DECIMAL(10, 2), this, "水电费");
+
+    /**
+     * The column <code>lesson.edu_campus.manager_id</code>. 负责人ID
+     */
+    public final TableField<EduCampusRecord, Long> MANAGER_ID = createField(DSL.name("manager_id"), SQLDataType.BIGINT, this, "负责人ID");
+
     private EduCampus(Name alias, Table<EduCampusRecord> aliased) {
         this(alias, aliased, null);
     }
@@ -212,11 +232,11 @@ public class EduCampus extends TableImpl<EduCampusRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row15 type methods
+    // Row19 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row15<Long, Long, String, String, String, BigDecimal, String, String, String, Byte, LocalDateTime, LocalDateTime, Long, Long, Byte> fieldsRow() {
-        return (Row15) super.fieldsRow();
+    public Row19<Long, Long, String, String, String, BigDecimal, String, String, String, Byte, LocalDateTime, LocalDateTime, Long, Long, Byte, BigDecimal, BigDecimal, BigDecimal, Long> fieldsRow() {
+        return (Row19) super.fieldsRow();
     }
 }

@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 
 import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record15;
-import org.jooq.Row15;
+import org.jooq.Record19;
+import org.jooq.Row19;
 import org.jooq.impl.UpdatableRecordImpl;
 
 
@@ -20,7 +20,7 @@ import org.jooq.impl.UpdatableRecordImpl;
  * 校区表
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class EduCampusRecord extends UpdatableRecordImpl<EduCampusRecord> implements Record15<Long, Long, String, String, String, BigDecimal, String, String, String, Byte, LocalDateTime, LocalDateTime, Long, Long, Byte> {
+public class EduCampusRecord extends UpdatableRecordImpl<EduCampusRecord> implements Record19<Long, Long, String, String, String, BigDecimal, String, String, String, Byte, LocalDateTime, LocalDateTime, Long, Long, Byte, BigDecimal, BigDecimal, BigDecimal, Long> {
 
     private static final long serialVersionUID = 1L;
 
@@ -234,6 +234,62 @@ public class EduCampusRecord extends UpdatableRecordImpl<EduCampusRecord> implem
         return (Byte) get(14);
     }
 
+    /**
+     * Setter for <code>lesson.edu_campus.monthly_rent</code>. 月租金
+     */
+    public void setMonthlyRent(BigDecimal value) {
+        set(15, value);
+    }
+
+    /**
+     * Getter for <code>lesson.edu_campus.monthly_rent</code>. 月租金
+     */
+    public BigDecimal getMonthlyRent() {
+        return (BigDecimal) get(15);
+    }
+
+    /**
+     * Setter for <code>lesson.edu_campus.property_fee</code>. 物业费
+     */
+    public void setPropertyFee(BigDecimal value) {
+        set(16, value);
+    }
+
+    /**
+     * Getter for <code>lesson.edu_campus.property_fee</code>. 物业费
+     */
+    public BigDecimal getPropertyFee() {
+        return (BigDecimal) get(16);
+    }
+
+    /**
+     * Setter for <code>lesson.edu_campus.utility_fee</code>. 水电费
+     */
+    public void setUtilityFee(BigDecimal value) {
+        set(17, value);
+    }
+
+    /**
+     * Getter for <code>lesson.edu_campus.utility_fee</code>. 水电费
+     */
+    public BigDecimal getUtilityFee() {
+        return (BigDecimal) get(17);
+    }
+
+    /**
+     * Setter for <code>lesson.edu_campus.manager_id</code>. 负责人ID
+     */
+    public void setManagerId(Long value) {
+        set(18, value);
+    }
+
+    /**
+     * Getter for <code>lesson.edu_campus.manager_id</code>. 负责人ID
+     */
+    public Long getManagerId() {
+        return (Long) get(18);
+    }
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -244,17 +300,17 @@ public class EduCampusRecord extends UpdatableRecordImpl<EduCampusRecord> implem
     }
 
     // -------------------------------------------------------------------------
-    // Record15 type implementation
+    // Record19 type implementation
     // -------------------------------------------------------------------------
 
     @Override
-    public Row15<Long, Long, String, String, String, BigDecimal, String, String, String, Byte, LocalDateTime, LocalDateTime, Long, Long, Byte> fieldsRow() {
-        return (Row15) super.fieldsRow();
+    public Row19<Long, Long, String, String, String, BigDecimal, String, String, String, Byte, LocalDateTime, LocalDateTime, Long, Long, Byte, BigDecimal, BigDecimal, BigDecimal, Long> fieldsRow() {
+        return (Row19) super.fieldsRow();
     }
 
     @Override
-    public Row15<Long, Long, String, String, String, BigDecimal, String, String, String, Byte, LocalDateTime, LocalDateTime, Long, Long, Byte> valuesRow() {
-        return (Row15) super.valuesRow();
+    public Row19<Long, Long, String, String, String, BigDecimal, String, String, String, Byte, LocalDateTime, LocalDateTime, Long, Long, Byte, BigDecimal, BigDecimal, BigDecimal, Long> valuesRow() {
+        return (Row19) super.valuesRow();
     }
 
     @Override
@@ -333,6 +389,26 @@ public class EduCampusRecord extends UpdatableRecordImpl<EduCampusRecord> implem
     }
 
     @Override
+    public Field<BigDecimal> field16() {
+        return EduCampus.EDU_CAMPUS.MONTHLY_RENT;
+    }
+
+    @Override
+    public Field<BigDecimal> field17() {
+        return EduCampus.EDU_CAMPUS.PROPERTY_FEE;
+    }
+
+    @Override
+    public Field<BigDecimal> field18() {
+        return EduCampus.EDU_CAMPUS.UTILITY_FEE;
+    }
+
+    @Override
+    public Field<Long> field19() {
+        return EduCampus.EDU_CAMPUS.MANAGER_ID;
+    }
+
+    @Override
     public Long component1() {
         return getId();
     }
@@ -408,6 +484,26 @@ public class EduCampusRecord extends UpdatableRecordImpl<EduCampusRecord> implem
     }
 
     @Override
+    public BigDecimal component16() {
+        return getMonthlyRent();
+    }
+
+    @Override
+    public BigDecimal component17() {
+        return getPropertyFee();
+    }
+
+    @Override
+    public BigDecimal component18() {
+        return getUtilityFee();
+    }
+
+    @Override
+    public Long component19() {
+        return getManagerId();
+    }
+
+    @Override
     public Long value1() {
         return getId();
     }
@@ -480,6 +576,26 @@ public class EduCampusRecord extends UpdatableRecordImpl<EduCampusRecord> implem
     @Override
     public Byte value15() {
         return getIsDeleted();
+    }
+
+    @Override
+    public BigDecimal value16() {
+        return getMonthlyRent();
+    }
+
+    @Override
+    public BigDecimal value17() {
+        return getPropertyFee();
+    }
+
+    @Override
+    public BigDecimal value18() {
+        return getUtilityFee();
+    }
+
+    @Override
+    public Long value19() {
+        return getManagerId();
     }
 
     @Override
@@ -573,7 +689,31 @@ public class EduCampusRecord extends UpdatableRecordImpl<EduCampusRecord> implem
     }
 
     @Override
-    public EduCampusRecord values(Long value1, Long value2, String value3, String value4, String value5, BigDecimal value6, String value7, String value8, String value9, Byte value10, LocalDateTime value11, LocalDateTime value12, Long value13, Long value14, Byte value15) {
+    public EduCampusRecord value16(BigDecimal value) {
+        setMonthlyRent(value);
+        return this;
+    }
+
+    @Override
+    public EduCampusRecord value17(BigDecimal value) {
+        setPropertyFee(value);
+        return this;
+    }
+
+    @Override
+    public EduCampusRecord value18(BigDecimal value) {
+        setUtilityFee(value);
+        return this;
+    }
+
+    @Override
+    public EduCampusRecord value19(Long value) {
+        setManagerId(value);
+        return this;
+    }
+
+    @Override
+    public EduCampusRecord values(Long value1, Long value2, String value3, String value4, String value5, BigDecimal value6, String value7, String value8, String value9, Byte value10, LocalDateTime value11, LocalDateTime value12, Long value13, Long value14, Byte value15, BigDecimal value16, BigDecimal value17, BigDecimal value18, Long value19) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -589,6 +729,10 @@ public class EduCampusRecord extends UpdatableRecordImpl<EduCampusRecord> implem
         value13(value13);
         value14(value14);
         value15(value15);
+        value16(value16);
+        value17(value17);
+        value18(value18);
+        value19(value19);
         return this;
     }
 
@@ -606,7 +750,7 @@ public class EduCampusRecord extends UpdatableRecordImpl<EduCampusRecord> implem
     /**
      * Create a detached, initialised EduCampusRecord
      */
-    public EduCampusRecord(Long id, Long institutionId, String name, String code, String address, BigDecimal area, String contactName, String contactPhone, String description, Byte status, LocalDateTime createdAt, LocalDateTime updatedAt, Long createdBy, Long updatedBy, Byte isDeleted) {
+    public EduCampusRecord(Long id, Long institutionId, String name, String code, String address, BigDecimal area, String contactName, String contactPhone, String description, Byte status, LocalDateTime createdAt, LocalDateTime updatedAt, Long createdBy, Long updatedBy, Byte isDeleted, BigDecimal monthlyRent, BigDecimal propertyFee, BigDecimal utilityFee, Long managerId) {
         super(EduCampus.EDU_CAMPUS);
 
         setId(id);
@@ -624,5 +768,9 @@ public class EduCampusRecord extends UpdatableRecordImpl<EduCampusRecord> implem
         setCreatedBy(createdBy);
         setUpdatedBy(updatedBy);
         setIsDeleted(isDeleted);
+        setMonthlyRent(monthlyRent);
+        setPropertyFee(propertyFee);
+        setUtilityFee(utilityFee);
+        setManagerId(managerId);
     }
 }

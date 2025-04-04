@@ -7,8 +7,8 @@ import javax.annotation.Generated;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-04-02T22:05:10+0800",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 1.8.0_421 (Oracle Corporation)"
+    date = "2025-04-04T19:05:53+0800",
+    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.42.0.z20250331-1358, environment: Java 21.0.6 (Eclipse Adoptium)"
 )
 public class CampusVOConverterImpl implements CampusVOConverter {
 
@@ -20,10 +20,10 @@ public class CampusVOConverterImpl implements CampusVOConverter {
 
         CampusVO campusVO = new CampusVO();
 
-        campusVO.setId( record.getId() );
-        campusVO.setName( record.getName() );
         campusVO.setAddress( record.getAddress() );
         campusVO.setCreatedAt( record.getCreatedAt() );
+        campusVO.setId( record.getId() );
+        campusVO.setName( record.getName() );
         campusVO.setUpdatedAt( record.getUpdatedAt() );
 
         campusVO.setStatus( record.getStatus() == 1 );
