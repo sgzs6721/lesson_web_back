@@ -13,12 +13,7 @@ import lombok.Data;
 @Data
 public class UserRegisterRequest {
     
-    /**
-     * 手机号（登录账号）
-     */
-    @NotBlank(message = "手机号不能为空")
-    @Pattern(regexp = "^1[3-9]\\d{9}$", message = "手机号格式不正确")
-    private String phone;
+
     
     /**
      * 密码
@@ -30,9 +25,7 @@ public class UserRegisterRequest {
     /**
      * 真实姓名
      */
-    @NotBlank(message = "真实姓名不能为空")
-    @Size(max = 50, message = "真实姓名长度不能超过50个字符")
-    private String realName;
+
 
     /**
      * 机构名称

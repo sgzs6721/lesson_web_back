@@ -94,7 +94,7 @@ public class StudentController {
     public Result<Void> updateStudentStatus(
             @ApiParam("学员ID") @PathVariable String id,
             @ApiParam("学员状态") @RequestParam StudentStatus status) {
-        studentModel.updateStudentStatus(id, status);
+        //studentModel.updateStudentStatus(id, status);
         return Result.success();
     }
 

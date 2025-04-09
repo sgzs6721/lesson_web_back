@@ -75,7 +75,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(rollbackFor = Exception.class)
     public UserRegisterVO register(UserRegisterRequest request) {
         // 检查手机号是否已存在
-        if (userModel.existsByPhone(request.getPhone())) {
+        if (userModel.existsByPhone(request.getManagerPhone())) {
             throw new BusinessException("手机号已存在");
         }
 
@@ -96,9 +96,9 @@ public class UserServiceImpl implements UserService {
 
         // 创建用户
         Long userId = userModel.createUser(
-            request.getPhone(),
+            request.getManagerPhone(),
             request.getPassword(),
-            request.getRealName(),
+            request.getManagerName(),
             institutionId,
             superAdminRoleId,  // 使用从数据库查询的超级管理员角色ID
             passwordEncoder

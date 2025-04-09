@@ -83,31 +83,31 @@ public class EduStudentModel {
     /**
      * 创建学员
      */
-    public String createStudent(String name, String gender, Integer age, String phone, String parentName, 
-                             String parentPhone, String address, String source, Long campusId, String campusName,
-                             Long institutionId, String institutionName) {
-        String id = generateId();
-        EduStudentRecord record = dsl.newRecord(Tables.EDU_STUDENT);
-        record.setId(id);
-        record.setName(name);
-        record.setGender(gender);
-        record.setAge(age);
-        record.setPhone(phone);
-        record.setParentName(parentName);
-        record.setParentPhone(parentPhone);
-        record.setAddress(address);
-        record.setSource(source);
-        record.setCampusId(campusId);
-        record.setCampusName(campusName);
-        record.setInstitutionId(institutionId);
-        record.setInstitutionName(institutionName);
-        record.setStatus(StudentStatus.ACTIVE.name());
-        record.setCreatedTime(LocalDateTime.now());
-        record.setDeleted((byte) 0);
-        record.store();
-        
-        return id;
-    }
+//    public String createStudent(String name, String gender, Integer age, String phone, String parentName,
+//                             String parentPhone, String address, String source, Long campusId, String campusName,
+//                             Long institutionId, String institutionName) {
+//        String id = generateId();
+//        EduStudentRecord record = dsl.newRecord(Tables.EDU_STUDENT);
+//        record.setId(id);
+//        record.setName(name);
+//        record.setGender(gender);
+//        record.setAge(age);
+//        record.setPhone(phone);
+//        record.setParentName(parentName);
+//        record.setParentPhone(parentPhone);
+//        record.setAddress(address);
+//        record.setSource(source);
+//        record.setCampusId(campusId);
+//        record.setCampusName(campusName);
+//        record.setInstitutionId(institutionId);
+//        record.setInstitutionName(institutionName);
+//        record.setStatus(StudentStatus.ACTIVE.name());
+//        record.setCreatedTime(LocalDateTime.now());
+//        record.setDeleted((byte) 0);
+//        record.store();
+//
+//        return id;
+//    }
 
     /**
      * 查询学员
