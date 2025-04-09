@@ -6,355 +6,203 @@ package com.lesson.repository.tables.records;
 
 import com.lesson.repository.tables.EduStudent;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import org.jooq.Field;
 import org.jooq.Record1;
+import org.jooq.Record13;
+import org.jooq.Row13;
 import org.jooq.impl.UpdatableRecordImpl;
 
 
 /**
- * 学生表
+ * 学员表
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class EduStudentRecord extends UpdatableRecordImpl<EduStudentRecord> {
+public class EduStudentRecord extends UpdatableRecordImpl<EduStudentRecord> implements Record13<String, String, String, Integer, String, Long, String, Long, String, String, LocalDateTime, LocalDateTime, Byte> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>lesson.edu_student.id</code>. 主键ID
+     * Setter for <code>lesson.edu_student.id</code>. 学员ID
      */
-    public void setId(Long value) {
+    public void setId(String value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student.id</code>. 主键ID
+     * Getter for <code>lesson.edu_student.id</code>. 学员ID
      */
-    public Long getId() {
-        return (Long) get(0);
+    public String getId() {
+        return (String) get(0);
     }
 
     /**
-     * Setter for <code>lesson.edu_student.institution_id</code>. 所属机构ID
+     * Setter for <code>lesson.edu_student.name</code>. 学员姓名
      */
-    public void setInstitutionId(Long value) {
+    public void setName(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student.institution_id</code>. 所属机构ID
+     * Getter for <code>lesson.edu_student.name</code>. 学员姓名
      */
-    public Long getInstitutionId() {
-        return (Long) get(1);
+    public String getName() {
+        return (String) get(1);
     }
 
     /**
-     * Setter for <code>lesson.edu_student.campus_id</code>. 所属校区ID
+     * Setter for <code>lesson.edu_student.gender</code>. 性别：MALE-男，FEMALE-女
      */
-    public void setCampusId(Long value) {
+    public void setGender(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student.campus_id</code>. 所属校区ID
+     * Getter for <code>lesson.edu_student.gender</code>. 性别：MALE-男，FEMALE-女
      */
-    public Long getCampusId() {
-        return (Long) get(2);
+    public String getGender() {
+        return (String) get(2);
     }
 
     /**
-     * Setter for <code>lesson.edu_student.user_id</code>. 关联用户ID
+     * Setter for <code>lesson.edu_student.age</code>. 年龄
      */
-    public void setUserId(Long value) {
+    public void setAge(Integer value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student.user_id</code>. 关联用户ID
+     * Getter for <code>lesson.edu_student.age</code>. 年龄
      */
-    public Long getUserId() {
-        return (Long) get(3);
+    public Integer getAge() {
+        return (Integer) get(3);
     }
 
     /**
-     * Setter for <code>lesson.edu_student.name</code>. 学生姓名
+     * Setter for <code>lesson.edu_student.phone</code>. 联系电话
      */
-    public void setName(String value) {
+    public void setPhone(String value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student.name</code>. 学生姓名
+     * Getter for <code>lesson.edu_student.phone</code>. 联系电话
      */
-    public String getName() {
+    public String getPhone() {
         return (String) get(4);
     }
 
     /**
-     * Setter for <code>lesson.edu_student.code</code>. 学生编码
+     * Setter for <code>lesson.edu_student.campus_id</code>. 校区ID
      */
-    public void setCode(String value) {
+    public void setCampusId(Long value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student.code</code>. 学生编码
+     * Getter for <code>lesson.edu_student.campus_id</code>. 校区ID
      */
-    public String getCode() {
-        return (String) get(5);
+    public Long getCampusId() {
+        return (Long) get(5);
     }
 
     /**
-     * Setter for <code>lesson.edu_student.gender</code>. 性别：0-未知，1-男，2-女
+     * Setter for <code>lesson.edu_student.campus_name</code>. 校区名称
      */
-    public void setGender(Byte value) {
+    public void setCampusName(String value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student.gender</code>. 性别：0-未知，1-男，2-女
+     * Getter for <code>lesson.edu_student.campus_name</code>. 校区名称
      */
-    public Byte getGender() {
-        return (Byte) get(6);
+    public String getCampusName() {
+        return (String) get(6);
     }
 
     /**
-     * Setter for <code>lesson.edu_student.birthday</code>. 出生日期
+     * Setter for <code>lesson.edu_student.institution_id</code>. 机构ID
      */
-    public void setBirthday(LocalDate value) {
+    public void setInstitutionId(Long value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student.birthday</code>. 出生日期
+     * Getter for <code>lesson.edu_student.institution_id</code>. 机构ID
      */
-    public LocalDate getBirthday() {
-        return (LocalDate) get(7);
+    public Long getInstitutionId() {
+        return (Long) get(7);
     }
 
     /**
-     * Setter for <code>lesson.edu_student.id_card</code>. 身份证号
+     * Setter for <code>lesson.edu_student.institution_name</code>. 机构名称
      */
-    public void setIdCard(String value) {
+    public void setInstitutionName(String value) {
         set(8, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student.id_card</code>. 身份证号
+     * Getter for <code>lesson.edu_student.institution_name</code>. 机构名称
      */
-    public String getIdCard() {
+    public String getInstitutionName() {
         return (String) get(8);
     }
 
     /**
-     * Setter for <code>lesson.edu_student.phone</code>. 手机号
+     * Setter for <code>lesson.edu_student.status</code>. 状态：STUDYING-在学，SUSPENDED-停课，GRADUATED-结业
      */
-    public void setPhone(String value) {
+    public void setStatus(String value) {
         set(9, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student.phone</code>. 手机号
+     * Getter for <code>lesson.edu_student.status</code>. 状态：STUDYING-在学，SUSPENDED-停课，GRADUATED-结业
      */
-    public String getPhone() {
+    public String getStatus() {
         return (String) get(9);
     }
 
     /**
-     * Setter for <code>lesson.edu_student.email</code>. 邮箱
+     * Setter for <code>lesson.edu_student.created_time</code>. 创建时间
      */
-    public void setEmail(String value) {
+    public void setCreatedTime(LocalDateTime value) {
         set(10, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student.email</code>. 邮箱
+     * Getter for <code>lesson.edu_student.created_time</code>. 创建时间
      */
-    public String getEmail() {
-        return (String) get(10);
+    public LocalDateTime getCreatedTime() {
+        return (LocalDateTime) get(10);
     }
 
     /**
-     * Setter for <code>lesson.edu_student.avatar</code>. 头像URL
+     * Setter for <code>lesson.edu_student.update_time</code>. 更新时间
      */
-    public void setAvatar(String value) {
+    public void setUpdateTime(LocalDateTime value) {
         set(11, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student.avatar</code>. 头像URL
+     * Getter for <code>lesson.edu_student.update_time</code>. 更新时间
      */
-    public String getAvatar() {
-        return (String) get(11);
+    public LocalDateTime getUpdateTime() {
+        return (LocalDateTime) get(11);
     }
 
     /**
-     * Setter for <code>lesson.edu_student.address</code>. 地址
+     * Setter for <code>lesson.edu_student.deleted</code>. 是否删除：0-未删除，1-已删除
      */
-    public void setAddress(String value) {
+    public void setDeleted(Byte value) {
         set(12, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student.address</code>. 地址
+     * Getter for <code>lesson.edu_student.deleted</code>. 是否删除：0-未删除，1-已删除
      */
-    public String getAddress() {
-        return (String) get(12);
-    }
-
-    /**
-     * Setter for <code>lesson.edu_student.parent_name</code>. 家长姓名
-     */
-    public void setParentName(String value) {
-        set(13, value);
-    }
-
-    /**
-     * Getter for <code>lesson.edu_student.parent_name</code>. 家长姓名
-     */
-    public String getParentName() {
-        return (String) get(13);
-    }
-
-    /**
-     * Setter for <code>lesson.edu_student.parent_phone</code>. 家长电话
-     */
-    public void setParentPhone(String value) {
-        set(14, value);
-    }
-
-    /**
-     * Getter for <code>lesson.edu_student.parent_phone</code>. 家长电话
-     */
-    public String getParentPhone() {
-        return (String) get(14);
-    }
-
-    /**
-     * Setter for <code>lesson.edu_student.parent_email</code>. 家长邮箱
-     */
-    public void setParentEmail(String value) {
-        set(15, value);
-    }
-
-    /**
-     * Getter for <code>lesson.edu_student.parent_email</code>. 家长邮箱
-     */
-    public String getParentEmail() {
-        return (String) get(15);
-    }
-
-    /**
-     * Setter for <code>lesson.edu_student.enrollment_date</code>. 入学日期
-     */
-    public void setEnrollmentDate(LocalDate value) {
-        set(16, value);
-    }
-
-    /**
-     * Getter for <code>lesson.edu_student.enrollment_date</code>. 入学日期
-     */
-    public LocalDate getEnrollmentDate() {
-        return (LocalDate) get(16);
-    }
-
-    /**
-     * Setter for <code>lesson.edu_student.graduation_date</code>. 毕业日期
-     */
-    public void setGraduationDate(LocalDate value) {
-        set(17, value);
-    }
-
-    /**
-     * Getter for <code>lesson.edu_student.graduation_date</code>. 毕业日期
-     */
-    public LocalDate getGraduationDate() {
-        return (LocalDate) get(17);
-    }
-
-    /**
-     * Setter for <code>lesson.edu_student.status</code>. 状态：0-禁用，1-启用
-     */
-    public void setStatus(Byte value) {
-        set(18, value);
-    }
-
-    /**
-     * Getter for <code>lesson.edu_student.status</code>. 状态：0-禁用，1-启用
-     */
-    public Byte getStatus() {
-        return (Byte) get(18);
-    }
-
-    /**
-     * Setter for <code>lesson.edu_student.created_at</code>. 创建时间
-     */
-    public void setCreatedAt(LocalDateTime value) {
-        set(19, value);
-    }
-
-    /**
-     * Getter for <code>lesson.edu_student.created_at</code>. 创建时间
-     */
-    public LocalDateTime getCreatedAt() {
-        return (LocalDateTime) get(19);
-    }
-
-    /**
-     * Setter for <code>lesson.edu_student.updated_at</code>. 更新时间
-     */
-    public void setUpdatedAt(LocalDateTime value) {
-        set(20, value);
-    }
-
-    /**
-     * Getter for <code>lesson.edu_student.updated_at</code>. 更新时间
-     */
-    public LocalDateTime getUpdatedAt() {
-        return (LocalDateTime) get(20);
-    }
-
-    /**
-     * Setter for <code>lesson.edu_student.created_by</code>. 创建人ID
-     */
-    public void setCreatedBy(Long value) {
-        set(21, value);
-    }
-
-    /**
-     * Getter for <code>lesson.edu_student.created_by</code>. 创建人ID
-     */
-    public Long getCreatedBy() {
-        return (Long) get(21);
-    }
-
-    /**
-     * Setter for <code>lesson.edu_student.updated_by</code>. 更新人ID
-     */
-    public void setUpdatedBy(Long value) {
-        set(22, value);
-    }
-
-    /**
-     * Getter for <code>lesson.edu_student.updated_by</code>. 更新人ID
-     */
-    public Long getUpdatedBy() {
-        return (Long) get(22);
-    }
-
-    /**
-     * Setter for <code>lesson.edu_student.is_deleted</code>. 是否删除：0-未删除，1-已删除
-     */
-    public void setIsDeleted(Byte value) {
-        set(23, value);
-    }
-
-    /**
-     * Getter for <code>lesson.edu_student.is_deleted</code>. 是否删除：0-未删除，1-已删除
-     */
-    public Byte getIsDeleted() {
-        return (Byte) get(23);
+    public Byte getDeleted() {
+        return (Byte) get(12);
     }
 
     // -------------------------------------------------------------------------
@@ -362,8 +210,313 @@ public class EduStudentRecord extends UpdatableRecordImpl<EduStudentRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Record1<Long> key() {
+    public Record1<String> key() {
         return (Record1) super.key();
+    }
+
+    // -------------------------------------------------------------------------
+    // Record13 type implementation
+    // -------------------------------------------------------------------------
+
+    @Override
+    public Row13<String, String, String, Integer, String, Long, String, Long, String, String, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
+        return (Row13) super.fieldsRow();
+    }
+
+    @Override
+    public Row13<String, String, String, Integer, String, Long, String, Long, String, String, LocalDateTime, LocalDateTime, Byte> valuesRow() {
+        return (Row13) super.valuesRow();
+    }
+
+    @Override
+    public Field<String> field1() {
+        return EduStudent.EDU_STUDENT.ID;
+    }
+
+    @Override
+    public Field<String> field2() {
+        return EduStudent.EDU_STUDENT.NAME;
+    }
+
+    @Override
+    public Field<String> field3() {
+        return EduStudent.EDU_STUDENT.GENDER;
+    }
+
+    @Override
+    public Field<Integer> field4() {
+        return EduStudent.EDU_STUDENT.AGE;
+    }
+
+    @Override
+    public Field<String> field5() {
+        return EduStudent.EDU_STUDENT.PHONE;
+    }
+
+    @Override
+    public Field<Long> field6() {
+        return EduStudent.EDU_STUDENT.CAMPUS_ID;
+    }
+
+    @Override
+    public Field<String> field7() {
+        return EduStudent.EDU_STUDENT.CAMPUS_NAME;
+    }
+
+    @Override
+    public Field<Long> field8() {
+        return EduStudent.EDU_STUDENT.INSTITUTION_ID;
+    }
+
+    @Override
+    public Field<String> field9() {
+        return EduStudent.EDU_STUDENT.INSTITUTION_NAME;
+    }
+
+    @Override
+    public Field<String> field10() {
+        return EduStudent.EDU_STUDENT.STATUS;
+    }
+
+    @Override
+    public Field<LocalDateTime> field11() {
+        return EduStudent.EDU_STUDENT.CREATED_TIME;
+    }
+
+    @Override
+    public Field<LocalDateTime> field12() {
+        return EduStudent.EDU_STUDENT.UPDATE_TIME;
+    }
+
+    @Override
+    public Field<Byte> field13() {
+        return EduStudent.EDU_STUDENT.DELETED;
+    }
+
+    @Override
+    public String component1() {
+        return getId();
+    }
+
+    @Override
+    public String component2() {
+        return getName();
+    }
+
+    @Override
+    public String component3() {
+        return getGender();
+    }
+
+    @Override
+    public Integer component4() {
+        return getAge();
+    }
+
+    @Override
+    public String component5() {
+        return getPhone();
+    }
+
+    @Override
+    public Long component6() {
+        return getCampusId();
+    }
+
+    @Override
+    public String component7() {
+        return getCampusName();
+    }
+
+    @Override
+    public Long component8() {
+        return getInstitutionId();
+    }
+
+    @Override
+    public String component9() {
+        return getInstitutionName();
+    }
+
+    @Override
+    public String component10() {
+        return getStatus();
+    }
+
+    @Override
+    public LocalDateTime component11() {
+        return getCreatedTime();
+    }
+
+    @Override
+    public LocalDateTime component12() {
+        return getUpdateTime();
+    }
+
+    @Override
+    public Byte component13() {
+        return getDeleted();
+    }
+
+    @Override
+    public String value1() {
+        return getId();
+    }
+
+    @Override
+    public String value2() {
+        return getName();
+    }
+
+    @Override
+    public String value3() {
+        return getGender();
+    }
+
+    @Override
+    public Integer value4() {
+        return getAge();
+    }
+
+    @Override
+    public String value5() {
+        return getPhone();
+    }
+
+    @Override
+    public Long value6() {
+        return getCampusId();
+    }
+
+    @Override
+    public String value7() {
+        return getCampusName();
+    }
+
+    @Override
+    public Long value8() {
+        return getInstitutionId();
+    }
+
+    @Override
+    public String value9() {
+        return getInstitutionName();
+    }
+
+    @Override
+    public String value10() {
+        return getStatus();
+    }
+
+    @Override
+    public LocalDateTime value11() {
+        return getCreatedTime();
+    }
+
+    @Override
+    public LocalDateTime value12() {
+        return getUpdateTime();
+    }
+
+    @Override
+    public Byte value13() {
+        return getDeleted();
+    }
+
+    @Override
+    public EduStudentRecord value1(String value) {
+        setId(value);
+        return this;
+    }
+
+    @Override
+    public EduStudentRecord value2(String value) {
+        setName(value);
+        return this;
+    }
+
+    @Override
+    public EduStudentRecord value3(String value) {
+        setGender(value);
+        return this;
+    }
+
+    @Override
+    public EduStudentRecord value4(Integer value) {
+        setAge(value);
+        return this;
+    }
+
+    @Override
+    public EduStudentRecord value5(String value) {
+        setPhone(value);
+        return this;
+    }
+
+    @Override
+    public EduStudentRecord value6(Long value) {
+        setCampusId(value);
+        return this;
+    }
+
+    @Override
+    public EduStudentRecord value7(String value) {
+        setCampusName(value);
+        return this;
+    }
+
+    @Override
+    public EduStudentRecord value8(Long value) {
+        setInstitutionId(value);
+        return this;
+    }
+
+    @Override
+    public EduStudentRecord value9(String value) {
+        setInstitutionName(value);
+        return this;
+    }
+
+    @Override
+    public EduStudentRecord value10(String value) {
+        setStatus(value);
+        return this;
+    }
+
+    @Override
+    public EduStudentRecord value11(LocalDateTime value) {
+        setCreatedTime(value);
+        return this;
+    }
+
+    @Override
+    public EduStudentRecord value12(LocalDateTime value) {
+        setUpdateTime(value);
+        return this;
+    }
+
+    @Override
+    public EduStudentRecord value13(Byte value) {
+        setDeleted(value);
+        return this;
+    }
+
+    @Override
+    public EduStudentRecord values(String value1, String value2, String value3, Integer value4, String value5, Long value6, String value7, Long value8, String value9, String value10, LocalDateTime value11, LocalDateTime value12, Byte value13) {
+        value1(value1);
+        value2(value2);
+        value3(value3);
+        value4(value4);
+        value5(value5);
+        value6(value6);
+        value7(value7);
+        value8(value8);
+        value9(value9);
+        value10(value10);
+        value11(value11);
+        value12(value12);
+        value13(value13);
+        return this;
     }
 
     // -------------------------------------------------------------------------
@@ -380,32 +533,21 @@ public class EduStudentRecord extends UpdatableRecordImpl<EduStudentRecord> {
     /**
      * Create a detached, initialised EduStudentRecord
      */
-    public EduStudentRecord(Long id, Long institutionId, Long campusId, Long userId, String name, String code, Byte gender, LocalDate birthday, String idCard, String phone, String email, String avatar, String address, String parentName, String parentPhone, String parentEmail, LocalDate enrollmentDate, LocalDate graduationDate, Byte status, LocalDateTime createdAt, LocalDateTime updatedAt, Long createdBy, Long updatedBy, Byte isDeleted) {
+    public EduStudentRecord(String id, String name, String gender, Integer age, String phone, Long campusId, String campusName, Long institutionId, String institutionName, String status, LocalDateTime createdTime, LocalDateTime updateTime, Byte deleted) {
         super(EduStudent.EDU_STUDENT);
 
         setId(id);
-        setInstitutionId(institutionId);
-        setCampusId(campusId);
-        setUserId(userId);
         setName(name);
-        setCode(code);
         setGender(gender);
-        setBirthday(birthday);
-        setIdCard(idCard);
+        setAge(age);
         setPhone(phone);
-        setEmail(email);
-        setAvatar(avatar);
-        setAddress(address);
-        setParentName(parentName);
-        setParentPhone(parentPhone);
-        setParentEmail(parentEmail);
-        setEnrollmentDate(enrollmentDate);
-        setGraduationDate(graduationDate);
+        setCampusId(campusId);
+        setCampusName(campusName);
+        setInstitutionId(institutionId);
+        setInstitutionName(institutionName);
         setStatus(status);
-        setCreatedAt(createdAt);
-        setUpdatedAt(updatedAt);
-        setCreatedBy(createdBy);
-        setUpdatedBy(updatedBy);
-        setIsDeleted(isDeleted);
+        setCreatedTime(createdTime);
+        setUpdateTime(updateTime);
+        setDeleted(deleted);
     }
 }

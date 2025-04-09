@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 
 import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record21;
-import org.jooq.Row21;
+import org.jooq.Record18;
+import org.jooq.Row18;
 import org.jooq.impl.UpdatableRecordImpl;
 
 
@@ -20,302 +20,260 @@ import org.jooq.impl.UpdatableRecordImpl;
  * 课程表
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class EduCourseRecord extends UpdatableRecordImpl<EduCourseRecord> implements Record21<Long, Long, Long, Long, String, String, String, String, String, String, BigDecimal, BigDecimal, Integer, Integer, Byte, Byte, LocalDateTime, LocalDateTime, Long, Long, Byte> {
+public class EduCourseRecord extends UpdatableRecordImpl<EduCourseRecord> implements Record18<String, String, String, String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime, Byte> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>lesson.edu_course.id</code>. 主键ID
+     * Setter for <code>lesson.edu_course.id</code>. 课程ID
      */
-    public void setId(Long value) {
+    public void setId(String value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_course.id</code>. 主键ID
+     * Getter for <code>lesson.edu_course.id</code>. 课程ID
      */
-    public Long getId() {
-        return (Long) get(0);
-    }
-
-    /**
-     * Setter for <code>lesson.edu_course.institution_id</code>. 所属机构ID
-     */
-    public void setInstitutionId(Long value) {
-        set(1, value);
-    }
-
-    /**
-     * Getter for <code>lesson.edu_course.institution_id</code>. 所属机构ID
-     */
-    public Long getInstitutionId() {
-        return (Long) get(1);
-    }
-
-    /**
-     * Setter for <code>lesson.edu_course.campus_id</code>. 所属校区ID
-     */
-    public void setCampusId(Long value) {
-        set(2, value);
-    }
-
-    /**
-     * Getter for <code>lesson.edu_course.campus_id</code>. 所属校区ID
-     */
-    public Long getCampusId() {
-        return (Long) get(2);
-    }
-
-    /**
-     * Setter for <code>lesson.edu_course.category_id</code>. 课程分类ID
-     */
-    public void setCategoryId(Long value) {
-        set(3, value);
-    }
-
-    /**
-     * Getter for <code>lesson.edu_course.category_id</code>. 课程分类ID
-     */
-    public Long getCategoryId() {
-        return (Long) get(3);
+    public String getId() {
+        return (String) get(0);
     }
 
     /**
      * Setter for <code>lesson.edu_course.name</code>. 课程名称
      */
     public void setName(String value) {
-        set(4, value);
+        set(1, value);
     }
 
     /**
      * Getter for <code>lesson.edu_course.name</code>. 课程名称
      */
     public String getName() {
-        return (String) get(4);
+        return (String) get(1);
     }
 
     /**
-     * Setter for <code>lesson.edu_course.code</code>. 课程编码
+     * Setter for <code>lesson.edu_course.type</code>. 课程类型：PRIVATE-私教课，GROUP-团体课，ONLINE-线上课
      */
-    public void setCode(String value) {
+    public void setType(String value) {
+        set(2, value);
+    }
+
+    /**
+     * Getter for <code>lesson.edu_course.type</code>. 课程类型：PRIVATE-私教课，GROUP-团体课，ONLINE-线上课
+     */
+    public String getType() {
+        return (String) get(2);
+    }
+
+    /**
+     * Setter for <code>lesson.edu_course.status</code>. 状态：DRAFT-草稿，PUBLISHED-已发布，SUSPENDED-已暂停，TERMINATED-已终止
+     */
+    public void setStatus(String value) {
+        set(3, value);
+    }
+
+    /**
+     * Getter for <code>lesson.edu_course.status</code>. 状态：DRAFT-草稿，PUBLISHED-已发布，SUSPENDED-已暂停，TERMINATED-已终止
+     */
+    public String getStatus() {
+        return (String) get(3);
+    }
+
+    /**
+     * Setter for <code>lesson.edu_course.unit_hours</code>. 每次消耗课时数
+     */
+    public void setUnitHours(BigDecimal value) {
+        set(4, value);
+    }
+
+    /**
+     * Getter for <code>lesson.edu_course.unit_hours</code>. 每次消耗课时数
+     */
+    public BigDecimal getUnitHours() {
+        return (BigDecimal) get(4);
+    }
+
+    /**
+     * Setter for <code>lesson.edu_course.total_hours</code>. 总课时数
+     */
+    public void setTotalHours(BigDecimal value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_course.code</code>. 课程编码
+     * Getter for <code>lesson.edu_course.total_hours</code>. 总课时数
      */
-    public String getCode() {
-        return (String) get(5);
+    public BigDecimal getTotalHours() {
+        return (BigDecimal) get(5);
     }
 
     /**
-     * Setter for <code>lesson.edu_course.cover</code>. 课程封面
+     * Setter for <code>lesson.edu_course.consumed_hours</code>. 已消耗课时数
      */
-    public void setCover(String value) {
+    public void setConsumedHours(BigDecimal value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_course.cover</code>. 课程封面
+     * Getter for <code>lesson.edu_course.consumed_hours</code>. 已消耗课时数
      */
-    public String getCover() {
-        return (String) get(6);
+    public BigDecimal getConsumedHours() {
+        return (BigDecimal) get(6);
+    }
+
+    /**
+     * Setter for <code>lesson.edu_course.price</code>. 课程单价(元)
+     */
+    public void setPrice(BigDecimal value) {
+        set(7, value);
+    }
+
+    /**
+     * Getter for <code>lesson.edu_course.price</code>. 课程单价(元)
+     */
+    public BigDecimal getPrice() {
+        return (BigDecimal) get(7);
+    }
+
+    /**
+     * Setter for <code>lesson.edu_course.coach_id</code>. 上课教练ID
+     */
+    public void setCoachId(String value) {
+        set(8, value);
+    }
+
+    /**
+     * Getter for <code>lesson.edu_course.coach_id</code>. 上课教练ID
+     */
+    public String getCoachId() {
+        return (String) get(8);
+    }
+
+    /**
+     * Setter for <code>lesson.edu_course.coach_name</code>. 教练姓名
+     */
+    public void setCoachName(String value) {
+        set(9, value);
+    }
+
+    /**
+     * Getter for <code>lesson.edu_course.coach_name</code>. 教练姓名
+     */
+    public String getCoachName() {
+        return (String) get(9);
     }
 
     /**
      * Setter for <code>lesson.edu_course.description</code>. 课程描述
      */
     public void setDescription(String value) {
-        set(7, value);
+        set(10, value);
     }
 
     /**
      * Getter for <code>lesson.edu_course.description</code>. 课程描述
      */
     public String getDescription() {
-        return (String) get(7);
+        return (String) get(10);
     }
 
     /**
-     * Setter for <code>lesson.edu_course.target</code>. 课程目标
+     * Setter for <code>lesson.edu_course.campus_id</code>. 校区ID
      */
-    public void setTarget(String value) {
-        set(8, value);
-    }
-
-    /**
-     * Getter for <code>lesson.edu_course.target</code>. 课程目标
-     */
-    public String getTarget() {
-        return (String) get(8);
-    }
-
-    /**
-     * Setter for <code>lesson.edu_course.suitable_crowd</code>. 适合人群
-     */
-    public void setSuitableCrowd(String value) {
-        set(9, value);
-    }
-
-    /**
-     * Getter for <code>lesson.edu_course.suitable_crowd</code>. 适合人群
-     */
-    public String getSuitableCrowd() {
-        return (String) get(9);
-    }
-
-    /**
-     * Setter for <code>lesson.edu_course.price</code>. 课程价格
-     */
-    public void setPrice(BigDecimal value) {
-        set(10, value);
-    }
-
-    /**
-     * Getter for <code>lesson.edu_course.price</code>. 课程价格
-     */
-    public BigDecimal getPrice() {
-        return (BigDecimal) get(10);
-    }
-
-    /**
-     * Setter for <code>lesson.edu_course.original_price</code>. 原价
-     */
-    public void setOriginalPrice(BigDecimal value) {
+    public void setCampusId(Long value) {
         set(11, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_course.original_price</code>. 原价
+     * Getter for <code>lesson.edu_course.campus_id</code>. 校区ID
      */
-    public BigDecimal getOriginalPrice() {
-        return (BigDecimal) get(11);
+    public Long getCampusId() {
+        return (Long) get(11);
     }
 
     /**
-     * Setter for <code>lesson.edu_course.duration</code>. 课程时长(分钟)
+     * Setter for <code>lesson.edu_course.campus_name</code>. 校区名称
      */
-    public void setDuration(Integer value) {
+    public void setCampusName(String value) {
         set(12, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_course.duration</code>. 课程时长(分钟)
+     * Getter for <code>lesson.edu_course.campus_name</code>. 校区名称
      */
-    public Integer getDuration() {
-        return (Integer) get(12);
+    public String getCampusName() {
+        return (String) get(12);
     }
 
     /**
-     * Setter for <code>lesson.edu_course.total_lessons</code>. 总课时数
+     * Setter for <code>lesson.edu_course.institution_id</code>. 机构ID
      */
-    public void setTotalLessons(Integer value) {
+    public void setInstitutionId(Long value) {
         set(13, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_course.total_lessons</code>. 总课时数
+     * Getter for <code>lesson.edu_course.institution_id</code>. 机构ID
      */
-    public Integer getTotalLessons() {
-        return (Integer) get(13);
+    public Long getInstitutionId() {
+        return (Long) get(13);
     }
 
     /**
-     * Setter for <code>lesson.edu_course.level</code>. 难度等级：1-初级，2-中级，3-高级
+     * Setter for <code>lesson.edu_course.institution_name</code>. 机构名称
      */
-    public void setLevel(Byte value) {
+    public void setInstitutionName(String value) {
         set(14, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_course.level</code>. 难度等级：1-初级，2-中级，3-高级
+     * Getter for <code>lesson.edu_course.institution_name</code>. 机构名称
      */
-    public Byte getLevel() {
-        return (Byte) get(14);
+    public String getInstitutionName() {
+        return (String) get(14);
     }
 
     /**
-     * Setter for <code>lesson.edu_course.status</code>. 状态：0-下架，1-上架
+     * Setter for <code>lesson.edu_course.created_time</code>. 创建时间
      */
-    public void setStatus(Byte value) {
+    public void setCreatedTime(LocalDateTime value) {
         set(15, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_course.status</code>. 状态：0-下架，1-上架
+     * Getter for <code>lesson.edu_course.created_time</code>. 创建时间
      */
-    public Byte getStatus() {
-        return (Byte) get(15);
+    public LocalDateTime getCreatedTime() {
+        return (LocalDateTime) get(15);
     }
 
     /**
-     * Setter for <code>lesson.edu_course.created_at</code>. 创建时间
+     * Setter for <code>lesson.edu_course.update_time</code>. 更新时间
      */
-    public void setCreatedAt(LocalDateTime value) {
+    public void setUpdateTime(LocalDateTime value) {
         set(16, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_course.created_at</code>. 创建时间
+     * Getter for <code>lesson.edu_course.update_time</code>. 更新时间
      */
-    public LocalDateTime getCreatedAt() {
+    public LocalDateTime getUpdateTime() {
         return (LocalDateTime) get(16);
     }
 
     /**
-     * Setter for <code>lesson.edu_course.updated_at</code>. 更新时间
+     * Setter for <code>lesson.edu_course.deleted</code>. 是否删除：0-未删除，1-已删除
      */
-    public void setUpdatedAt(LocalDateTime value) {
+    public void setDeleted(Byte value) {
         set(17, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_course.updated_at</code>. 更新时间
+     * Getter for <code>lesson.edu_course.deleted</code>. 是否删除：0-未删除，1-已删除
      */
-    public LocalDateTime getUpdatedAt() {
-        return (LocalDateTime) get(17);
-    }
-
-    /**
-     * Setter for <code>lesson.edu_course.created_by</code>. 创建人ID
-     */
-    public void setCreatedBy(Long value) {
-        set(18, value);
-    }
-
-    /**
-     * Getter for <code>lesson.edu_course.created_by</code>. 创建人ID
-     */
-    public Long getCreatedBy() {
-        return (Long) get(18);
-    }
-
-    /**
-     * Setter for <code>lesson.edu_course.updated_by</code>. 更新人ID
-     */
-    public void setUpdatedBy(Long value) {
-        set(19, value);
-    }
-
-    /**
-     * Getter for <code>lesson.edu_course.updated_by</code>. 更新人ID
-     */
-    public Long getUpdatedBy() {
-        return (Long) get(19);
-    }
-
-    /**
-     * Setter for <code>lesson.edu_course.is_deleted</code>. 是否删除：0-未删除，1-已删除
-     */
-    public void setIsDeleted(Byte value) {
-        set(20, value);
-    }
-
-    /**
-     * Getter for <code>lesson.edu_course.is_deleted</code>. 是否删除：0-未删除，1-已删除
-     */
-    public Byte getIsDeleted() {
-        return (Byte) get(20);
+    public Byte getDeleted() {
+        return (Byte) get(17);
     }
 
     // -------------------------------------------------------------------------
@@ -323,467 +281,404 @@ public class EduCourseRecord extends UpdatableRecordImpl<EduCourseRecord> implem
     // -------------------------------------------------------------------------
 
     @Override
-    public Record1<Long> key() {
+    public Record1<String> key() {
         return (Record1) super.key();
     }
 
     // -------------------------------------------------------------------------
-    // Record21 type implementation
+    // Record18 type implementation
     // -------------------------------------------------------------------------
 
     @Override
-    public Row21<Long, Long, Long, Long, String, String, String, String, String, String, BigDecimal, BigDecimal, Integer, Integer, Byte, Byte, LocalDateTime, LocalDateTime, Long, Long, Byte> fieldsRow() {
-        return (Row21) super.fieldsRow();
+    public Row18<String, String, String, String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
+        return (Row18) super.fieldsRow();
     }
 
     @Override
-    public Row21<Long, Long, Long, Long, String, String, String, String, String, String, BigDecimal, BigDecimal, Integer, Integer, Byte, Byte, LocalDateTime, LocalDateTime, Long, Long, Byte> valuesRow() {
-        return (Row21) super.valuesRow();
+    public Row18<String, String, String, String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime, Byte> valuesRow() {
+        return (Row18) super.valuesRow();
     }
 
     @Override
-    public Field<Long> field1() {
+    public Field<String> field1() {
         return EduCourse.EDU_COURSE.ID;
     }
 
     @Override
-    public Field<Long> field2() {
-        return EduCourse.EDU_COURSE.INSTITUTION_ID;
-    }
-
-    @Override
-    public Field<Long> field3() {
-        return EduCourse.EDU_COURSE.CAMPUS_ID;
-    }
-
-    @Override
-    public Field<Long> field4() {
-        return EduCourse.EDU_COURSE.CATEGORY_ID;
-    }
-
-    @Override
-    public Field<String> field5() {
+    public Field<String> field2() {
         return EduCourse.EDU_COURSE.NAME;
     }
 
     @Override
-    public Field<String> field6() {
-        return EduCourse.EDU_COURSE.CODE;
+    public Field<String> field3() {
+        return EduCourse.EDU_COURSE.TYPE;
     }
 
     @Override
-    public Field<String> field7() {
-        return EduCourse.EDU_COURSE.COVER;
-    }
-
-    @Override
-    public Field<String> field8() {
-        return EduCourse.EDU_COURSE.DESCRIPTION;
-    }
-
-    @Override
-    public Field<String> field9() {
-        return EduCourse.EDU_COURSE.TARGET;
-    }
-
-    @Override
-    public Field<String> field10() {
-        return EduCourse.EDU_COURSE.SUITABLE_CROWD;
-    }
-
-    @Override
-    public Field<BigDecimal> field11() {
-        return EduCourse.EDU_COURSE.PRICE;
-    }
-
-    @Override
-    public Field<BigDecimal> field12() {
-        return EduCourse.EDU_COURSE.ORIGINAL_PRICE;
-    }
-
-    @Override
-    public Field<Integer> field13() {
-        return EduCourse.EDU_COURSE.DURATION;
-    }
-
-    @Override
-    public Field<Integer> field14() {
-        return EduCourse.EDU_COURSE.TOTAL_LESSONS;
-    }
-
-    @Override
-    public Field<Byte> field15() {
-        return EduCourse.EDU_COURSE.LEVEL;
-    }
-
-    @Override
-    public Field<Byte> field16() {
+    public Field<String> field4() {
         return EduCourse.EDU_COURSE.STATUS;
     }
 
     @Override
+    public Field<BigDecimal> field5() {
+        return EduCourse.EDU_COURSE.UNIT_HOURS;
+    }
+
+    @Override
+    public Field<BigDecimal> field6() {
+        return EduCourse.EDU_COURSE.TOTAL_HOURS;
+    }
+
+    @Override
+    public Field<BigDecimal> field7() {
+        return EduCourse.EDU_COURSE.CONSUMED_HOURS;
+    }
+
+    @Override
+    public Field<BigDecimal> field8() {
+        return EduCourse.EDU_COURSE.PRICE;
+    }
+
+    @Override
+    public Field<String> field9() {
+        return EduCourse.EDU_COURSE.COACH_ID;
+    }
+
+    @Override
+    public Field<String> field10() {
+        return EduCourse.EDU_COURSE.COACH_NAME;
+    }
+
+    @Override
+    public Field<String> field11() {
+        return EduCourse.EDU_COURSE.DESCRIPTION;
+    }
+
+    @Override
+    public Field<Long> field12() {
+        return EduCourse.EDU_COURSE.CAMPUS_ID;
+    }
+
+    @Override
+    public Field<String> field13() {
+        return EduCourse.EDU_COURSE.CAMPUS_NAME;
+    }
+
+    @Override
+    public Field<Long> field14() {
+        return EduCourse.EDU_COURSE.INSTITUTION_ID;
+    }
+
+    @Override
+    public Field<String> field15() {
+        return EduCourse.EDU_COURSE.INSTITUTION_NAME;
+    }
+
+    @Override
+    public Field<LocalDateTime> field16() {
+        return EduCourse.EDU_COURSE.CREATED_TIME;
+    }
+
+    @Override
     public Field<LocalDateTime> field17() {
-        return EduCourse.EDU_COURSE.CREATED_AT;
+        return EduCourse.EDU_COURSE.UPDATE_TIME;
     }
 
     @Override
-    public Field<LocalDateTime> field18() {
-        return EduCourse.EDU_COURSE.UPDATED_AT;
+    public Field<Byte> field18() {
+        return EduCourse.EDU_COURSE.DELETED;
     }
 
     @Override
-    public Field<Long> field19() {
-        return EduCourse.EDU_COURSE.CREATED_BY;
-    }
-
-    @Override
-    public Field<Long> field20() {
-        return EduCourse.EDU_COURSE.UPDATED_BY;
-    }
-
-    @Override
-    public Field<Byte> field21() {
-        return EduCourse.EDU_COURSE.IS_DELETED;
-    }
-
-    @Override
-    public Long component1() {
+    public String component1() {
         return getId();
     }
 
     @Override
-    public Long component2() {
-        return getInstitutionId();
-    }
-
-    @Override
-    public Long component3() {
-        return getCampusId();
-    }
-
-    @Override
-    public Long component4() {
-        return getCategoryId();
-    }
-
-    @Override
-    public String component5() {
+    public String component2() {
         return getName();
     }
 
     @Override
-    public String component6() {
-        return getCode();
+    public String component3() {
+        return getType();
     }
 
     @Override
-    public String component7() {
-        return getCover();
+    public String component4() {
+        return getStatus();
     }
 
     @Override
-    public String component8() {
-        return getDescription();
+    public BigDecimal component5() {
+        return getUnitHours();
+    }
+
+    @Override
+    public BigDecimal component6() {
+        return getTotalHours();
+    }
+
+    @Override
+    public BigDecimal component7() {
+        return getConsumedHours();
+    }
+
+    @Override
+    public BigDecimal component8() {
+        return getPrice();
     }
 
     @Override
     public String component9() {
-        return getTarget();
+        return getCoachId();
     }
 
     @Override
     public String component10() {
-        return getSuitableCrowd();
+        return getCoachName();
     }
 
     @Override
-    public BigDecimal component11() {
-        return getPrice();
-    }
-
-    @Override
-    public BigDecimal component12() {
-        return getOriginalPrice();
-    }
-
-    @Override
-    public Integer component13() {
-        return getDuration();
-    }
-
-    @Override
-    public Integer component14() {
-        return getTotalLessons();
-    }
-
-    @Override
-    public Byte component15() {
-        return getLevel();
-    }
-
-    @Override
-    public Byte component16() {
-        return getStatus();
-    }
-
-    @Override
-    public LocalDateTime component17() {
-        return getCreatedAt();
-    }
-
-    @Override
-    public LocalDateTime component18() {
-        return getUpdatedAt();
-    }
-
-    @Override
-    public Long component19() {
-        return getCreatedBy();
-    }
-
-    @Override
-    public Long component20() {
-        return getUpdatedBy();
-    }
-
-    @Override
-    public Byte component21() {
-        return getIsDeleted();
-    }
-
-    @Override
-    public Long value1() {
-        return getId();
-    }
-
-    @Override
-    public Long value2() {
-        return getInstitutionId();
-    }
-
-    @Override
-    public Long value3() {
-        return getCampusId();
-    }
-
-    @Override
-    public Long value4() {
-        return getCategoryId();
-    }
-
-    @Override
-    public String value5() {
-        return getName();
-    }
-
-    @Override
-    public String value6() {
-        return getCode();
-    }
-
-    @Override
-    public String value7() {
-        return getCover();
-    }
-
-    @Override
-    public String value8() {
+    public String component11() {
         return getDescription();
     }
 
     @Override
-    public String value9() {
-        return getTarget();
+    public Long component12() {
+        return getCampusId();
     }
 
     @Override
-    public String value10() {
-        return getSuitableCrowd();
+    public String component13() {
+        return getCampusName();
     }
 
     @Override
-    public BigDecimal value11() {
-        return getPrice();
+    public Long component14() {
+        return getInstitutionId();
     }
 
     @Override
-    public BigDecimal value12() {
-        return getOriginalPrice();
+    public String component15() {
+        return getInstitutionName();
     }
 
     @Override
-    public Integer value13() {
-        return getDuration();
+    public LocalDateTime component16() {
+        return getCreatedTime();
     }
 
     @Override
-    public Integer value14() {
-        return getTotalLessons();
+    public LocalDateTime component17() {
+        return getUpdateTime();
     }
 
     @Override
-    public Byte value15() {
-        return getLevel();
+    public Byte component18() {
+        return getDeleted();
     }
 
     @Override
-    public Byte value16() {
+    public String value1() {
+        return getId();
+    }
+
+    @Override
+    public String value2() {
+        return getName();
+    }
+
+    @Override
+    public String value3() {
+        return getType();
+    }
+
+    @Override
+    public String value4() {
         return getStatus();
     }
 
     @Override
+    public BigDecimal value5() {
+        return getUnitHours();
+    }
+
+    @Override
+    public BigDecimal value6() {
+        return getTotalHours();
+    }
+
+    @Override
+    public BigDecimal value7() {
+        return getConsumedHours();
+    }
+
+    @Override
+    public BigDecimal value8() {
+        return getPrice();
+    }
+
+    @Override
+    public String value9() {
+        return getCoachId();
+    }
+
+    @Override
+    public String value10() {
+        return getCoachName();
+    }
+
+    @Override
+    public String value11() {
+        return getDescription();
+    }
+
+    @Override
+    public Long value12() {
+        return getCampusId();
+    }
+
+    @Override
+    public String value13() {
+        return getCampusName();
+    }
+
+    @Override
+    public Long value14() {
+        return getInstitutionId();
+    }
+
+    @Override
+    public String value15() {
+        return getInstitutionName();
+    }
+
+    @Override
+    public LocalDateTime value16() {
+        return getCreatedTime();
+    }
+
+    @Override
     public LocalDateTime value17() {
-        return getCreatedAt();
+        return getUpdateTime();
     }
 
     @Override
-    public LocalDateTime value18() {
-        return getUpdatedAt();
+    public Byte value18() {
+        return getDeleted();
     }
 
     @Override
-    public Long value19() {
-        return getCreatedBy();
-    }
-
-    @Override
-    public Long value20() {
-        return getUpdatedBy();
-    }
-
-    @Override
-    public Byte value21() {
-        return getIsDeleted();
-    }
-
-    @Override
-    public EduCourseRecord value1(Long value) {
+    public EduCourseRecord value1(String value) {
         setId(value);
         return this;
     }
 
     @Override
-    public EduCourseRecord value2(Long value) {
-        setInstitutionId(value);
-        return this;
-    }
-
-    @Override
-    public EduCourseRecord value3(Long value) {
-        setCampusId(value);
-        return this;
-    }
-
-    @Override
-    public EduCourseRecord value4(Long value) {
-        setCategoryId(value);
-        return this;
-    }
-
-    @Override
-    public EduCourseRecord value5(String value) {
+    public EduCourseRecord value2(String value) {
         setName(value);
         return this;
     }
 
     @Override
-    public EduCourseRecord value6(String value) {
-        setCode(value);
+    public EduCourseRecord value3(String value) {
+        setType(value);
         return this;
     }
 
     @Override
-    public EduCourseRecord value7(String value) {
-        setCover(value);
-        return this;
-    }
-
-    @Override
-    public EduCourseRecord value8(String value) {
-        setDescription(value);
-        return this;
-    }
-
-    @Override
-    public EduCourseRecord value9(String value) {
-        setTarget(value);
-        return this;
-    }
-
-    @Override
-    public EduCourseRecord value10(String value) {
-        setSuitableCrowd(value);
-        return this;
-    }
-
-    @Override
-    public EduCourseRecord value11(BigDecimal value) {
-        setPrice(value);
-        return this;
-    }
-
-    @Override
-    public EduCourseRecord value12(BigDecimal value) {
-        setOriginalPrice(value);
-        return this;
-    }
-
-    @Override
-    public EduCourseRecord value13(Integer value) {
-        setDuration(value);
-        return this;
-    }
-
-    @Override
-    public EduCourseRecord value14(Integer value) {
-        setTotalLessons(value);
-        return this;
-    }
-
-    @Override
-    public EduCourseRecord value15(Byte value) {
-        setLevel(value);
-        return this;
-    }
-
-    @Override
-    public EduCourseRecord value16(Byte value) {
+    public EduCourseRecord value4(String value) {
         setStatus(value);
         return this;
     }
 
     @Override
+    public EduCourseRecord value5(BigDecimal value) {
+        setUnitHours(value);
+        return this;
+    }
+
+    @Override
+    public EduCourseRecord value6(BigDecimal value) {
+        setTotalHours(value);
+        return this;
+    }
+
+    @Override
+    public EduCourseRecord value7(BigDecimal value) {
+        setConsumedHours(value);
+        return this;
+    }
+
+    @Override
+    public EduCourseRecord value8(BigDecimal value) {
+        setPrice(value);
+        return this;
+    }
+
+    @Override
+    public EduCourseRecord value9(String value) {
+        setCoachId(value);
+        return this;
+    }
+
+    @Override
+    public EduCourseRecord value10(String value) {
+        setCoachName(value);
+        return this;
+    }
+
+    @Override
+    public EduCourseRecord value11(String value) {
+        setDescription(value);
+        return this;
+    }
+
+    @Override
+    public EduCourseRecord value12(Long value) {
+        setCampusId(value);
+        return this;
+    }
+
+    @Override
+    public EduCourseRecord value13(String value) {
+        setCampusName(value);
+        return this;
+    }
+
+    @Override
+    public EduCourseRecord value14(Long value) {
+        setInstitutionId(value);
+        return this;
+    }
+
+    @Override
+    public EduCourseRecord value15(String value) {
+        setInstitutionName(value);
+        return this;
+    }
+
+    @Override
+    public EduCourseRecord value16(LocalDateTime value) {
+        setCreatedTime(value);
+        return this;
+    }
+
+    @Override
     public EduCourseRecord value17(LocalDateTime value) {
-        setCreatedAt(value);
+        setUpdateTime(value);
         return this;
     }
 
     @Override
-    public EduCourseRecord value18(LocalDateTime value) {
-        setUpdatedAt(value);
+    public EduCourseRecord value18(Byte value) {
+        setDeleted(value);
         return this;
     }
 
     @Override
-    public EduCourseRecord value19(Long value) {
-        setCreatedBy(value);
-        return this;
-    }
-
-    @Override
-    public EduCourseRecord value20(Long value) {
-        setUpdatedBy(value);
-        return this;
-    }
-
-    @Override
-    public EduCourseRecord value21(Byte value) {
-        setIsDeleted(value);
-        return this;
-    }
-
-    @Override
-    public EduCourseRecord values(Long value1, Long value2, Long value3, Long value4, String value5, String value6, String value7, String value8, String value9, String value10, BigDecimal value11, BigDecimal value12, Integer value13, Integer value14, Byte value15, Byte value16, LocalDateTime value17, LocalDateTime value18, Long value19, Long value20, Byte value21) {
+    public EduCourseRecord values(String value1, String value2, String value3, String value4, BigDecimal value5, BigDecimal value6, BigDecimal value7, BigDecimal value8, String value9, String value10, String value11, Long value12, String value13, Long value14, String value15, LocalDateTime value16, LocalDateTime value17, Byte value18) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -802,9 +697,6 @@ public class EduCourseRecord extends UpdatableRecordImpl<EduCourseRecord> implem
         value16(value16);
         value17(value17);
         value18(value18);
-        value19(value19);
-        value20(value20);
-        value21(value21);
         return this;
     }
 
@@ -822,29 +714,26 @@ public class EduCourseRecord extends UpdatableRecordImpl<EduCourseRecord> implem
     /**
      * Create a detached, initialised EduCourseRecord
      */
-    public EduCourseRecord(Long id, Long institutionId, Long campusId, Long categoryId, String name, String code, String cover, String description, String target, String suitableCrowd, BigDecimal price, BigDecimal originalPrice, Integer duration, Integer totalLessons, Byte level, Byte status, LocalDateTime createdAt, LocalDateTime updatedAt, Long createdBy, Long updatedBy, Byte isDeleted) {
+    public EduCourseRecord(String id, String name, String type, String status, BigDecimal unitHours, BigDecimal totalHours, BigDecimal consumedHours, BigDecimal price, String coachId, String coachName, String description, Long campusId, String campusName, Long institutionId, String institutionName, LocalDateTime createdTime, LocalDateTime updateTime, Byte deleted) {
         super(EduCourse.EDU_COURSE);
 
         setId(id);
-        setInstitutionId(institutionId);
-        setCampusId(campusId);
-        setCategoryId(categoryId);
         setName(name);
-        setCode(code);
-        setCover(cover);
-        setDescription(description);
-        setTarget(target);
-        setSuitableCrowd(suitableCrowd);
-        setPrice(price);
-        setOriginalPrice(originalPrice);
-        setDuration(duration);
-        setTotalLessons(totalLessons);
-        setLevel(level);
+        setType(type);
         setStatus(status);
-        setCreatedAt(createdAt);
-        setUpdatedAt(updatedAt);
-        setCreatedBy(createdBy);
-        setUpdatedBy(updatedBy);
-        setIsDeleted(isDeleted);
+        setUnitHours(unitHours);
+        setTotalHours(totalHours);
+        setConsumedHours(consumedHours);
+        setPrice(price);
+        setCoachId(coachId);
+        setCoachName(coachName);
+        setDescription(description);
+        setCampusId(campusId);
+        setCampusName(campusName);
+        setInstitutionId(institutionId);
+        setInstitutionName(institutionName);
+        setCreatedTime(createdTime);
+        setUpdateTime(updateTime);
+        setDeleted(deleted);
     }
 }

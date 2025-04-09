@@ -4,36 +4,23 @@
 package com.lesson.repository;
 
 
-import com.lesson.repository.tables.EduAttendance;
-import com.lesson.repository.tables.EduCampus;
-import com.lesson.repository.tables.EduClass;
-import com.lesson.repository.tables.EduClassCoach;
-import com.lesson.repository.tables.EduClassStudent;
-import com.lesson.repository.tables.EduClassroom;
-import com.lesson.repository.tables.EduCoach;
-import com.lesson.repository.tables.EduCoachQualification;
 import com.lesson.repository.tables.EduCourse;
-import com.lesson.repository.tables.EduCourseCategory;
-import com.lesson.repository.tables.EduCourseChapter;
-import com.lesson.repository.tables.EduCourseLesson;
-import com.lesson.repository.tables.EduDashboard;
-import com.lesson.repository.tables.EduDataExport;
-import com.lesson.repository.tables.EduExpense;
-import com.lesson.repository.tables.EduExpenseType;
-import com.lesson.repository.tables.EduInstitution;
-import com.lesson.repository.tables.EduInvoice;
-import com.lesson.repository.tables.EduPayment;
-import com.lesson.repository.tables.EduSchedule;
-import com.lesson.repository.tables.EduStatisticsReport;
+import com.lesson.repository.tables.EduCourseRecord;
 import com.lesson.repository.tables.EduStudent;
-import com.lesson.repository.tables.SysConfig;
-import com.lesson.repository.tables.SysDictData;
-import com.lesson.repository.tables.SysDictType;
-import com.lesson.repository.tables.SysLog;
-import com.lesson.repository.tables.SysLoginLog;
-import com.lesson.repository.tables.SysNotice;
-import com.lesson.repository.tables.SysOperationLog;
-import com.lesson.repository.tables.SysPermission;
+import com.lesson.repository.tables.EduStudentClassTransfer;
+import com.lesson.repository.tables.EduStudentCourse;
+import com.lesson.repository.tables.EduStudentCourseOperation;
+import com.lesson.repository.tables.EduStudentCourseOperationRecord;
+import com.lesson.repository.tables.EduStudentCourseRecord;
+import com.lesson.repository.tables.EduStudentCourseTransfer;
+import com.lesson.repository.tables.EduStudentPayment;
+import com.lesson.repository.tables.EduStudentRefund;
+import com.lesson.repository.tables.SysCampus;
+import com.lesson.repository.tables.SysCoach;
+import com.lesson.repository.tables.SysCoachCertification;
+import com.lesson.repository.tables.SysCoachCourse;
+import com.lesson.repository.tables.SysCoachSalary;
+import com.lesson.repository.tables.SysInstitution;
 import com.lesson.repository.tables.SysRole;
 import com.lesson.repository.tables.SysRolePermission;
 import com.lesson.repository.tables.SysUser;
@@ -46,154 +33,89 @@ import com.lesson.repository.tables.SysUser;
 public class Tables {
 
     /**
-     * 考勤表
-     */
-    public static final EduAttendance EDU_ATTENDANCE = EduAttendance.EDU_ATTENDANCE;
-
-    /**
-     * 校区表
-     */
-    public static final EduCampus EDU_CAMPUS = EduCampus.EDU_CAMPUS;
-
-    /**
-     * 班级表
-     */
-    public static final EduClass EDU_CLASS = EduClass.EDU_CLASS;
-
-    /**
-     * 班级教练关联表
-     */
-    public static final EduClassCoach EDU_CLASS_COACH = EduClassCoach.EDU_CLASS_COACH;
-
-    /**
-     * 班级学生关联表
-     */
-    public static final EduClassStudent EDU_CLASS_STUDENT = EduClassStudent.EDU_CLASS_STUDENT;
-
-    /**
-     * 教室表
-     */
-    public static final EduClassroom EDU_CLASSROOM = EduClassroom.EDU_CLASSROOM;
-
-    /**
-     * 教练表
-     */
-    public static final EduCoach EDU_COACH = EduCoach.EDU_COACH;
-
-    /**
-     * 教练资质表
-     */
-    public static final EduCoachQualification EDU_COACH_QUALIFICATION = EduCoachQualification.EDU_COACH_QUALIFICATION;
-
-    /**
      * 课程表
      */
     public static final EduCourse EDU_COURSE = EduCourse.EDU_COURSE;
 
     /**
-     * 课程分类表
+     * 课程上课记录表
      */
-    public static final EduCourseCategory EDU_COURSE_CATEGORY = EduCourseCategory.EDU_COURSE_CATEGORY;
+    public static final EduCourseRecord EDU_COURSE_RECORD = EduCourseRecord.EDU_COURSE_RECORD;
 
     /**
-     * 课程章节表
-     */
-    public static final EduCourseChapter EDU_COURSE_CHAPTER = EduCourseChapter.EDU_COURSE_CHAPTER;
-
-    /**
-     * 课程课时表
-     */
-    public static final EduCourseLesson EDU_COURSE_LESSON = EduCourseLesson.EDU_COURSE_LESSON;
-
-    /**
-     * 数据看板表
-     */
-    public static final EduDashboard EDU_DASHBOARD = EduDashboard.EDU_DASHBOARD;
-
-    /**
-     * 数据导出记录表
-     */
-    public static final EduDataExport EDU_DATA_EXPORT = EduDataExport.EDU_DATA_EXPORT;
-
-    /**
-     * 费用记录表
-     */
-    public static final EduExpense EDU_EXPENSE = EduExpense.EDU_EXPENSE;
-
-    /**
-     * 费用类型表
-     */
-    public static final EduExpenseType EDU_EXPENSE_TYPE = EduExpenseType.EDU_EXPENSE_TYPE;
-
-    /**
-     * 教育机构表
-     */
-    public static final EduInstitution EDU_INSTITUTION = EduInstitution.EDU_INSTITUTION;
-
-    /**
-     * 发票表
-     */
-    public static final EduInvoice EDU_INVOICE = EduInvoice.EDU_INVOICE;
-
-    /**
-     * 支付记录表
-     */
-    public static final EduPayment EDU_PAYMENT = EduPayment.EDU_PAYMENT;
-
-    /**
-     * 排课表
-     */
-    public static final EduSchedule EDU_SCHEDULE = EduSchedule.EDU_SCHEDULE;
-
-    /**
-     * 统计报表表
-     */
-    public static final EduStatisticsReport EDU_STATISTICS_REPORT = EduStatisticsReport.EDU_STATISTICS_REPORT;
-
-    /**
-     * 学生表
+     * 学员表
      */
     public static final EduStudent EDU_STUDENT = EduStudent.EDU_STUDENT;
 
     /**
-     * 系统配置表
+     * 学员转班记录表
      */
-    public static final SysConfig SYS_CONFIG = SysConfig.SYS_CONFIG;
+    public static final EduStudentClassTransfer EDU_STUDENT_CLASS_TRANSFER = EduStudentClassTransfer.EDU_STUDENT_CLASS_TRANSFER;
 
     /**
-     * 字典数据表
+     * 学员课程关系表
      */
-    public static final SysDictData SYS_DICT_DATA = SysDictData.SYS_DICT_DATA;
+    public static final EduStudentCourse EDU_STUDENT_COURSE = EduStudentCourse.EDU_STUDENT_COURSE;
 
     /**
-     * 字典类型表
+     * 学员课程操作记录表
      */
-    public static final SysDictType SYS_DICT_TYPE = SysDictType.SYS_DICT_TYPE;
+    public static final EduStudentCourseOperation EDU_STUDENT_COURSE_OPERATION = EduStudentCourseOperation.EDU_STUDENT_COURSE_OPERATION;
 
     /**
-     * 系统日志表
+     * 学生课程操作记录表
      */
-    public static final SysLog SYS_LOG = SysLog.SYS_LOG;
+    public static final EduStudentCourseOperationRecord EDU_STUDENT_COURSE_OPERATION_RECORD = EduStudentCourseOperationRecord.EDU_STUDENT_COURSE_OPERATION_RECORD;
 
     /**
-     * 登录日志表
+     * 学员课程记录表
      */
-    public static final SysLoginLog SYS_LOGIN_LOG = SysLoginLog.SYS_LOGIN_LOG;
+    public static final EduStudentCourseRecord EDU_STUDENT_COURSE_RECORD = EduStudentCourseRecord.EDU_STUDENT_COURSE_RECORD;
 
     /**
-     * 通知公告表
+     * 学员转课记录表
      */
-    public static final SysNotice SYS_NOTICE = SysNotice.SYS_NOTICE;
+    public static final EduStudentCourseTransfer EDU_STUDENT_COURSE_TRANSFER = EduStudentCourseTransfer.EDU_STUDENT_COURSE_TRANSFER;
 
     /**
-     * 操作日志表
+     * 学员缴费记录表
      */
-    public static final SysOperationLog SYS_OPERATION_LOG = SysOperationLog.SYS_OPERATION_LOG;
+    public static final EduStudentPayment EDU_STUDENT_PAYMENT = EduStudentPayment.EDU_STUDENT_PAYMENT;
 
     /**
-     * 系统权限表
+     * 学员退费记录表
      */
-    public static final SysPermission SYS_PERMISSION = SysPermission.SYS_PERMISSION;
+    public static final EduStudentRefund EDU_STUDENT_REFUND = EduStudentRefund.EDU_STUDENT_REFUND;
+
+    /**
+     * 校区表
+     */
+    public static final SysCampus SYS_CAMPUS = SysCampus.SYS_CAMPUS;
+
+    /**
+     * 教练表
+     */
+    public static final SysCoach SYS_COACH = SysCoach.SYS_COACH;
+
+    /**
+     * 教练证书表
+     */
+    public static final SysCoachCertification SYS_COACH_CERTIFICATION = SysCoachCertification.SYS_COACH_CERTIFICATION;
+
+    /**
+     * 教练课程关联表
+     */
+    public static final SysCoachCourse SYS_COACH_COURSE = SysCoachCourse.SYS_COACH_COURSE;
+
+    /**
+     * 教练薪资表
+     */
+    public static final SysCoachSalary SYS_COACH_SALARY = SysCoachSalary.SYS_COACH_SALARY;
+
+    /**
+     * 机构表
+     */
+    public static final SysInstitution SYS_INSTITUTION = SysInstitution.SYS_INSTITUTION;
 
     /**
      * 系统角色表

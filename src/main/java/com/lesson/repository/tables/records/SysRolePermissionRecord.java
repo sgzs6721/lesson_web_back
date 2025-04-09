@@ -19,7 +19,7 @@ import org.jooq.impl.UpdatableRecordImpl;
  * 角色权限关联表
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class SysRolePermissionRecord extends UpdatableRecordImpl<SysRolePermissionRecord> implements Record6<Long, Long, Long, LocalDateTime, LocalDateTime, Byte> {
+public class SysRolePermissionRecord extends UpdatableRecordImpl<SysRolePermissionRecord> implements Record6<Long, Long, String, LocalDateTime, LocalDateTime, Byte> {
 
     private static final long serialVersionUID = 1L;
 
@@ -52,30 +52,30 @@ public class SysRolePermissionRecord extends UpdatableRecordImpl<SysRolePermissi
     }
 
     /**
-     * Setter for <code>lesson.sys_role_permission.permission_id</code>. 权限ID
+     * Setter for <code>lesson.sys_role_permission.permission</code>. 权限标识
      */
-    public void setPermissionId(Long value) {
+    public void setPermission(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_role_permission.permission_id</code>. 权限ID
+     * Getter for <code>lesson.sys_role_permission.permission</code>. 权限标识
      */
-    public Long getPermissionId() {
-        return (Long) get(2);
+    public String getPermission() {
+        return (String) get(2);
     }
 
     /**
-     * Setter for <code>lesson.sys_role_permission.create_time</code>. 创建时间
+     * Setter for <code>lesson.sys_role_permission.created_time</code>. 创建时间
      */
-    public void setCreateTime(LocalDateTime value) {
+    public void setCreatedTime(LocalDateTime value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_role_permission.create_time</code>. 创建时间
+     * Getter for <code>lesson.sys_role_permission.created_time</code>. 创建时间
      */
-    public LocalDateTime getCreateTime() {
+    public LocalDateTime getCreatedTime() {
         return (LocalDateTime) get(3);
     }
 
@@ -121,12 +121,12 @@ public class SysRolePermissionRecord extends UpdatableRecordImpl<SysRolePermissi
     // -------------------------------------------------------------------------
 
     @Override
-    public Row6<Long, Long, Long, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
+    public Row6<Long, Long, String, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
         return (Row6) super.fieldsRow();
     }
 
     @Override
-    public Row6<Long, Long, Long, LocalDateTime, LocalDateTime, Byte> valuesRow() {
+    public Row6<Long, Long, String, LocalDateTime, LocalDateTime, Byte> valuesRow() {
         return (Row6) super.valuesRow();
     }
 
@@ -141,13 +141,13 @@ public class SysRolePermissionRecord extends UpdatableRecordImpl<SysRolePermissi
     }
 
     @Override
-    public Field<Long> field3() {
-        return SysRolePermission.SYS_ROLE_PERMISSION.PERMISSION_ID;
+    public Field<String> field3() {
+        return SysRolePermission.SYS_ROLE_PERMISSION.PERMISSION;
     }
 
     @Override
     public Field<LocalDateTime> field4() {
-        return SysRolePermission.SYS_ROLE_PERMISSION.CREATE_TIME;
+        return SysRolePermission.SYS_ROLE_PERMISSION.CREATED_TIME;
     }
 
     @Override
@@ -171,13 +171,13 @@ public class SysRolePermissionRecord extends UpdatableRecordImpl<SysRolePermissi
     }
 
     @Override
-    public Long component3() {
-        return getPermissionId();
+    public String component3() {
+        return getPermission();
     }
 
     @Override
     public LocalDateTime component4() {
-        return getCreateTime();
+        return getCreatedTime();
     }
 
     @Override
@@ -201,13 +201,13 @@ public class SysRolePermissionRecord extends UpdatableRecordImpl<SysRolePermissi
     }
 
     @Override
-    public Long value3() {
-        return getPermissionId();
+    public String value3() {
+        return getPermission();
     }
 
     @Override
     public LocalDateTime value4() {
-        return getCreateTime();
+        return getCreatedTime();
     }
 
     @Override
@@ -233,14 +233,14 @@ public class SysRolePermissionRecord extends UpdatableRecordImpl<SysRolePermissi
     }
 
     @Override
-    public SysRolePermissionRecord value3(Long value) {
-        setPermissionId(value);
+    public SysRolePermissionRecord value3(String value) {
+        setPermission(value);
         return this;
     }
 
     @Override
     public SysRolePermissionRecord value4(LocalDateTime value) {
-        setCreateTime(value);
+        setCreatedTime(value);
         return this;
     }
 
@@ -257,7 +257,7 @@ public class SysRolePermissionRecord extends UpdatableRecordImpl<SysRolePermissi
     }
 
     @Override
-    public SysRolePermissionRecord values(Long value1, Long value2, Long value3, LocalDateTime value4, LocalDateTime value5, Byte value6) {
+    public SysRolePermissionRecord values(Long value1, Long value2, String value3, LocalDateTime value4, LocalDateTime value5, Byte value6) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -281,13 +281,13 @@ public class SysRolePermissionRecord extends UpdatableRecordImpl<SysRolePermissi
     /**
      * Create a detached, initialised SysRolePermissionRecord
      */
-    public SysRolePermissionRecord(Long id, Long roleId, Long permissionId, LocalDateTime createTime, LocalDateTime updateTime, Byte deleted) {
+    public SysRolePermissionRecord(Long id, Long roleId, String permission, LocalDateTime createdTime, LocalDateTime updateTime, Byte deleted) {
         super(SysRolePermission.SYS_ROLE_PERMISSION);
 
         setId(id);
         setRoleId(roleId);
-        setPermissionId(permissionId);
-        setCreateTime(createTime);
+        setPermission(permission);
+        setCreatedTime(createdTime);
         setUpdateTime(updateTime);
         setDeleted(deleted);
     }

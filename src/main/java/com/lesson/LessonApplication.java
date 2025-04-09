@@ -11,7 +11,9 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
     "com.lesson.controller",
     "com.lesson.service",
     "com.lesson.model",
-    "com.lesson.common"
+    "com.lesson.common",
+    "com.lesson.config",
+    "com.lesson.interceptor"
 })
 public class LessonApplication {
     public static void main(String[] args) {

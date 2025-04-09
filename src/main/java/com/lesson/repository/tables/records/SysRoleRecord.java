@@ -80,16 +80,16 @@ public class SysRoleRecord extends UpdatableRecordImpl<SysRoleRecord> implements
     }
 
     /**
-     * Setter for <code>lesson.sys_role.create_time</code>. 创建时间
+     * Setter for <code>lesson.sys_role.created_time</code>. 创建时间
      */
-    public void setCreateTime(LocalDateTime value) {
+    public void setCreatedTime(LocalDateTime value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_role.create_time</code>. 创建时间
+     * Getter for <code>lesson.sys_role.created_time</code>. 创建时间
      */
-    public LocalDateTime getCreateTime() {
+    public LocalDateTime getCreatedTime() {
         return (LocalDateTime) get(4);
     }
 
@@ -166,7 +166,7 @@ public class SysRoleRecord extends UpdatableRecordImpl<SysRoleRecord> implements
 
     @Override
     public Field<LocalDateTime> field5() {
-        return SysRole.SYS_ROLE.CREATE_TIME;
+        return SysRole.SYS_ROLE.CREATED_TIME;
     }
 
     @Override
@@ -201,7 +201,7 @@ public class SysRoleRecord extends UpdatableRecordImpl<SysRoleRecord> implements
 
     @Override
     public LocalDateTime component5() {
-        return getCreateTime();
+        return getCreatedTime();
     }
 
     @Override
@@ -236,7 +236,7 @@ public class SysRoleRecord extends UpdatableRecordImpl<SysRoleRecord> implements
 
     @Override
     public LocalDateTime value5() {
-        return getCreateTime();
+        return getCreatedTime();
     }
 
     @Override
@@ -275,7 +275,7 @@ public class SysRoleRecord extends UpdatableRecordImpl<SysRoleRecord> implements
 
     @Override
     public SysRoleRecord value5(LocalDateTime value) {
-        setCreateTime(value);
+        setCreatedTime(value);
         return this;
     }
 
@@ -317,14 +317,14 @@ public class SysRoleRecord extends UpdatableRecordImpl<SysRoleRecord> implements
     /**
      * Create a detached, initialised SysRoleRecord
      */
-    public SysRoleRecord(Long id, String roleName, String description, Byte status, LocalDateTime createTime, LocalDateTime updateTime, Byte deleted) {
+    public SysRoleRecord(Long id, String roleName, String description, Byte status, LocalDateTime createdTime, LocalDateTime updateTime, Byte deleted) {
         super(SysRole.SYS_ROLE);
 
         setId(id);
         setRoleName(roleName);
         setDescription(description);
         setStatus(status);
-        setCreateTime(createTime);
+        setCreatedTime(createdTime);
         setUpdateTime(updateTime);
         setDeleted(deleted);
     }

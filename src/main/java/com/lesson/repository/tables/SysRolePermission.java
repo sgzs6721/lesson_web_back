@@ -62,14 +62,14 @@ public class SysRolePermission extends TableImpl<SysRolePermissionRecord> {
     public final TableField<SysRolePermissionRecord, Long> ROLE_ID = createField(DSL.name("role_id"), SQLDataType.BIGINT.nullable(false), this, "角色ID");
 
     /**
-     * The column <code>lesson.sys_role_permission.permission_id</code>. 权限ID
+     * The column <code>lesson.sys_role_permission.permission</code>. 权限标识
      */
-    public final TableField<SysRolePermissionRecord, Long> PERMISSION_ID = createField(DSL.name("permission_id"), SQLDataType.BIGINT.nullable(false), this, "权限ID");
+    public final TableField<SysRolePermissionRecord, String> PERMISSION = createField(DSL.name("permission"), SQLDataType.VARCHAR(100).nullable(false), this, "权限标识");
 
     /**
-     * The column <code>lesson.sys_role_permission.create_time</code>. 创建时间
+     * The column <code>lesson.sys_role_permission.created_time</code>. 创建时间
      */
-    public final TableField<SysRolePermissionRecord, LocalDateTime> CREATE_TIME = createField(DSL.name("create_time"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "创建时间");
+    public final TableField<SysRolePermissionRecord, LocalDateTime> CREATED_TIME = createField(DSL.name("created_time"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "创建时间");
 
     /**
      * The column <code>lesson.sys_role_permission.update_time</code>. 更新时间
@@ -121,7 +121,7 @@ public class SysRolePermission extends TableImpl<SysRolePermissionRecord> {
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.SYS_ROLE_PERMISSION_IDX_PERMISSION_ID, Indexes.SYS_ROLE_PERMISSION_IDX_ROLE_ID);
+        return Arrays.<Index>asList(Indexes.SYS_ROLE_PERMISSION_IDX_CREATED_TIME, Indexes.SYS_ROLE_PERMISSION_IDX_PERMISSION);
     }
 
     @Override
@@ -170,7 +170,7 @@ public class SysRolePermission extends TableImpl<SysRolePermissionRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Row6<Long, Long, Long, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
+    public Row6<Long, Long, String, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
         return (Row6) super.fieldsRow();
     }
 }

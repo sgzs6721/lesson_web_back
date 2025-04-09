@@ -9,17 +9,16 @@ import com.lesson.repository.Keys;
 import com.lesson.repository.Lesson;
 import com.lesson.repository.tables.records.EduStudentRecord;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
+import org.jooq.Row13;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -31,7 +30,7 @@ import org.jooq.impl.TableImpl;
 
 
 /**
- * 学生表
+ * 学员表
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class EduStudent extends TableImpl<EduStudentRecord> {
@@ -52,131 +51,76 @@ public class EduStudent extends TableImpl<EduStudentRecord> {
     }
 
     /**
-     * The column <code>lesson.edu_student.id</code>. 主键ID
+     * The column <code>lesson.edu_student.id</code>. 学员ID
      */
-    public final TableField<EduStudentRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "主键ID");
+    public final TableField<EduStudentRecord, String> ID = createField(DSL.name("id"), SQLDataType.VARCHAR(32).nullable(false), this, "学员ID");
 
     /**
-     * The column <code>lesson.edu_student.institution_id</code>. 所属机构ID
+     * The column <code>lesson.edu_student.name</code>. 学员姓名
      */
-    public final TableField<EduStudentRecord, Long> INSTITUTION_ID = createField(DSL.name("institution_id"), SQLDataType.BIGINT.nullable(false), this, "所属机构ID");
+    public final TableField<EduStudentRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(50).nullable(false), this, "学员姓名");
 
     /**
-     * The column <code>lesson.edu_student.campus_id</code>. 所属校区ID
+     * The column <code>lesson.edu_student.gender</code>. 性别：MALE-男，FEMALE-女
      */
-    public final TableField<EduStudentRecord, Long> CAMPUS_ID = createField(DSL.name("campus_id"), SQLDataType.BIGINT, this, "所属校区ID");
+    public final TableField<EduStudentRecord, String> GENDER = createField(DSL.name("gender"), SQLDataType.VARCHAR(10).nullable(false), this, "性别：MALE-男，FEMALE-女");
 
     /**
-     * The column <code>lesson.edu_student.user_id</code>. 关联用户ID
+     * The column <code>lesson.edu_student.age</code>. 年龄
      */
-    public final TableField<EduStudentRecord, Long> USER_ID = createField(DSL.name("user_id"), SQLDataType.BIGINT, this, "关联用户ID");
+    public final TableField<EduStudentRecord, Integer> AGE = createField(DSL.name("age"), SQLDataType.INTEGER.nullable(false), this, "年龄");
 
     /**
-     * The column <code>lesson.edu_student.name</code>. 学生姓名
+     * The column <code>lesson.edu_student.phone</code>. 联系电话
      */
-    public final TableField<EduStudentRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(50).nullable(false), this, "学生姓名");
+    public final TableField<EduStudentRecord, String> PHONE = createField(DSL.name("phone"), SQLDataType.VARCHAR(20).nullable(false), this, "联系电话");
 
     /**
-     * The column <code>lesson.edu_student.code</code>. 学生编码
+     * The column <code>lesson.edu_student.campus_id</code>. 校区ID
      */
-    public final TableField<EduStudentRecord, String> CODE = createField(DSL.name("code"), SQLDataType.VARCHAR(50).nullable(false), this, "学生编码");
+    public final TableField<EduStudentRecord, Long> CAMPUS_ID = createField(DSL.name("campus_id"), SQLDataType.BIGINT.nullable(false), this, "校区ID");
 
     /**
-     * The column <code>lesson.edu_student.gender</code>. 性别：0-未知，1-男，2-女
+     * The column <code>lesson.edu_student.campus_name</code>. 校区名称
      */
-    public final TableField<EduStudentRecord, Byte> GENDER = createField(DSL.name("gender"), SQLDataType.TINYINT, this, "性别：0-未知，1-男，2-女");
+    public final TableField<EduStudentRecord, String> CAMPUS_NAME = createField(DSL.name("campus_name"), SQLDataType.VARCHAR(100).nullable(false), this, "校区名称");
 
     /**
-     * The column <code>lesson.edu_student.birthday</code>. 出生日期
+     * The column <code>lesson.edu_student.institution_id</code>. 机构ID
      */
-    public final TableField<EduStudentRecord, LocalDate> BIRTHDAY = createField(DSL.name("birthday"), SQLDataType.LOCALDATE, this, "出生日期");
+    public final TableField<EduStudentRecord, Long> INSTITUTION_ID = createField(DSL.name("institution_id"), SQLDataType.BIGINT.nullable(false), this, "机构ID");
 
     /**
-     * The column <code>lesson.edu_student.id_card</code>. 身份证号
+     * The column <code>lesson.edu_student.institution_name</code>. 机构名称
      */
-    public final TableField<EduStudentRecord, String> ID_CARD = createField(DSL.name("id_card"), SQLDataType.VARCHAR(18), this, "身份证号");
+    public final TableField<EduStudentRecord, String> INSTITUTION_NAME = createField(DSL.name("institution_name"), SQLDataType.VARCHAR(100).nullable(false), this, "机构名称");
 
     /**
-     * The column <code>lesson.edu_student.phone</code>. 手机号
+     * The column <code>lesson.edu_student.status</code>. 状态：STUDYING-在学，SUSPENDED-停课，GRADUATED-结业
      */
-    public final TableField<EduStudentRecord, String> PHONE = createField(DSL.name("phone"), SQLDataType.VARCHAR(20), this, "手机号");
+    public final TableField<EduStudentRecord, String> STATUS = createField(DSL.name("status"), SQLDataType.VARCHAR(20).nullable(false), this, "状态：STUDYING-在学，SUSPENDED-停课，GRADUATED-结业");
 
     /**
-     * The column <code>lesson.edu_student.email</code>. 邮箱
+     * The column <code>lesson.edu_student.created_time</code>. 创建时间
      */
-    public final TableField<EduStudentRecord, String> EMAIL = createField(DSL.name("email"), SQLDataType.VARCHAR(100), this, "邮箱");
+    public final TableField<EduStudentRecord, LocalDateTime> CREATED_TIME = createField(DSL.name("created_time"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "创建时间");
 
     /**
-     * The column <code>lesson.edu_student.avatar</code>. 头像URL
+     * The column <code>lesson.edu_student.update_time</code>. 更新时间
      */
-    public final TableField<EduStudentRecord, String> AVATAR = createField(DSL.name("avatar"), SQLDataType.VARCHAR(255), this, "头像URL");
+    public final TableField<EduStudentRecord, LocalDateTime> UPDATE_TIME = createField(DSL.name("update_time"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "更新时间");
 
     /**
-     * The column <code>lesson.edu_student.address</code>. 地址
+     * The column <code>lesson.edu_student.deleted</code>. 是否删除：0-未删除，1-已删除
      */
-    public final TableField<EduStudentRecord, String> ADDRESS = createField(DSL.name("address"), SQLDataType.VARCHAR(255), this, "地址");
-
-    /**
-     * The column <code>lesson.edu_student.parent_name</code>. 家长姓名
-     */
-    public final TableField<EduStudentRecord, String> PARENT_NAME = createField(DSL.name("parent_name"), SQLDataType.VARCHAR(50), this, "家长姓名");
-
-    /**
-     * The column <code>lesson.edu_student.parent_phone</code>. 家长电话
-     */
-    public final TableField<EduStudentRecord, String> PARENT_PHONE = createField(DSL.name("parent_phone"), SQLDataType.VARCHAR(20), this, "家长电话");
-
-    /**
-     * The column <code>lesson.edu_student.parent_email</code>. 家长邮箱
-     */
-    public final TableField<EduStudentRecord, String> PARENT_EMAIL = createField(DSL.name("parent_email"), SQLDataType.VARCHAR(100), this, "家长邮箱");
-
-    /**
-     * The column <code>lesson.edu_student.enrollment_date</code>. 入学日期
-     */
-    public final TableField<EduStudentRecord, LocalDate> ENROLLMENT_DATE = createField(DSL.name("enrollment_date"), SQLDataType.LOCALDATE, this, "入学日期");
-
-    /**
-     * The column <code>lesson.edu_student.graduation_date</code>. 毕业日期
-     */
-    public final TableField<EduStudentRecord, LocalDate> GRADUATION_DATE = createField(DSL.name("graduation_date"), SQLDataType.LOCALDATE, this, "毕业日期");
-
-    /**
-     * The column <code>lesson.edu_student.status</code>. 状态：0-禁用，1-启用
-     */
-    public final TableField<EduStudentRecord, Byte> STATUS = createField(DSL.name("status"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("1", SQLDataType.TINYINT)), this, "状态：0-禁用，1-启用");
-
-    /**
-     * The column <code>lesson.edu_student.created_at</code>. 创建时间
-     */
-    public final TableField<EduStudentRecord, LocalDateTime> CREATED_AT = createField(DSL.name("created_at"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "创建时间");
-
-    /**
-     * The column <code>lesson.edu_student.updated_at</code>. 更新时间
-     */
-    public final TableField<EduStudentRecord, LocalDateTime> UPDATED_AT = createField(DSL.name("updated_at"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "更新时间");
-
-    /**
-     * The column <code>lesson.edu_student.created_by</code>. 创建人ID
-     */
-    public final TableField<EduStudentRecord, Long> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINT, this, "创建人ID");
-
-    /**
-     * The column <code>lesson.edu_student.updated_by</code>. 更新人ID
-     */
-    public final TableField<EduStudentRecord, Long> UPDATED_BY = createField(DSL.name("updated_by"), SQLDataType.BIGINT, this, "更新人ID");
-
-    /**
-     * The column <code>lesson.edu_student.is_deleted</code>. 是否删除：0-未删除，1-已删除
-     */
-    public final TableField<EduStudentRecord, Byte> IS_DELETED = createField(DSL.name("is_deleted"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "是否删除：0-未删除，1-已删除");
+    public final TableField<EduStudentRecord, Byte> DELETED = createField(DSL.name("deleted"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "是否删除：0-未删除，1-已删除");
 
     private EduStudent(Name alias, Table<EduStudentRecord> aliased) {
         this(alias, aliased, null);
     }
 
     private EduStudent(Name alias, Table<EduStudentRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment("学生表"), TableOptions.table());
+        super(alias, null, aliased, parameters, DSL.comment("学员表"), TableOptions.table());
     }
 
     /**
@@ -211,12 +155,7 @@ public class EduStudent extends TableImpl<EduStudentRecord> {
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.EDU_STUDENT_IDX_CAMPUS_ID, Indexes.EDU_STUDENT_IDX_CREATED_AT, Indexes.EDU_STUDENT_IDX_INSTITUTION_ID, Indexes.EDU_STUDENT_IDX_NAME, Indexes.EDU_STUDENT_IDX_PARENT_PHONE, Indexes.EDU_STUDENT_IDX_PHONE, Indexes.EDU_STUDENT_IDX_USER_ID);
-    }
-
-    @Override
-    public Identity<EduStudentRecord, Long> getIdentity() {
-        return (Identity<EduStudentRecord, Long>) super.getIdentity();
+        return Arrays.<Index>asList(Indexes.EDU_STUDENT_IDX_CAMPUS_ID, Indexes.EDU_STUDENT_IDX_INSTITUTION_ID, Indexes.EDU_STUDENT_IDX_NAME, Indexes.EDU_STUDENT_IDX_PHONE, Indexes.EDU_STUDENT_IDX_STATUS);
     }
 
     @Override
@@ -226,7 +165,7 @@ public class EduStudent extends TableImpl<EduStudentRecord> {
 
     @Override
     public List<UniqueKey<EduStudentRecord>> getKeys() {
-        return Arrays.<UniqueKey<EduStudentRecord>>asList(Keys.KEY_EDU_STUDENT_PRIMARY, Keys.KEY_EDU_STUDENT_UK_CODE);
+        return Arrays.<UniqueKey<EduStudentRecord>>asList(Keys.KEY_EDU_STUDENT_PRIMARY);
     }
 
     @Override
@@ -253,5 +192,14 @@ public class EduStudent extends TableImpl<EduStudentRecord> {
     @Override
     public EduStudent rename(Name name) {
         return new EduStudent(name, null);
+    }
+
+    // -------------------------------------------------------------------------
+    // Row13 type methods
+    // -------------------------------------------------------------------------
+
+    @Override
+    public Row13<String, String, String, Integer, String, Long, String, Long, String, String, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
+        return (Row13) super.fieldsRow();
     }
 }

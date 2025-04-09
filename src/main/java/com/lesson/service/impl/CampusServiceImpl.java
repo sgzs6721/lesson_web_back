@@ -1,83 +1,205 @@
 package com.lesson.service.impl;
 
-import com.lesson.common.Result;
-import com.lesson.model.CampusModel;
-import com.lesson.repository.tables.records.EduCampusRecord;
+import com.lesson.common.exception.BusinessException;
+import com.lesson.enums.CampusStatus;
+import com.lesson.model.SysCampusModel;
+import com.lesson.model.record.CampusDetailRecord;
+import com.lesson.repository.tables.records.SysCampusRecord;
+import com.lesson.request.campus.CampusCreateRequest;
+import com.lesson.request.campus.CampusQueryRequest;
+import com.lesson.request.campus.CampusUpdateRequest;
+import com.lesson.vo.CampusVO;
+import com.lesson.vo.CampusSimpleVO;
+import com.lesson.vo.PageResult;
 import com.lesson.service.CampusService;
-import com.lesson.vo.campus.*;
 import lombok.RequiredArgsConstructor;
+import org.jooq.Result;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.lesson.repository.Tables.SYS_CAMPUS;
 
 /**
  * 校区服务实现
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CampusServiceImpl implements CampusService {
 
-    private final CampusModel campusModel;
+    private final SysCampusModel campusModel;
+
+    /**
+     * 转换数据库记录为VO
+     */
+    private CampusVO convertToVO(CampusDetailRecord record) {
+        if (record == null) {
+            return null;
+        }
+        
+        CampusVO vo = new CampusVO();
+        
+        // 设置基本信息
+        vo.setId(record.getId());
+        vo.setName(record.getName());
+        vo.setAddress(record.getAddress());
+        vo.setStatus(CampusStatus.getByCode(record.getStatus()));
+        //vo.setContactPhone(record.getContactPhone());
+        vo.setManagerName(record.getUserName());
+        vo.setMonthlyRent(record.getMonthlyRent());
+        vo.setPropertyFee(record.getPropertyFee());
+        vo.setUtilityFee(record.getUtilityFee());
+        vo.setCreatedTime(record.getCreatedTime());
+        vo.setUpdateTime(record.getUpdateTime());
+        
+        // 设置用户相关信息
+        vo.setUserCount(record.getUserCount());
+        vo.setStudentCount(record.getStudentCount());
+        vo.setTeacherCount(record.getTeacherCount());
+        vo.setPendingLessonCount(record.getPendingLessonCount());
+        
+        return vo;
+    }
+ 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Long createCampus(CampusCreateRequest request) {
+        try {
+            return campusModel.createCampus(
+                request.getName(),
+                request.getAddress(),
+                request.getContactPhone(),
+                request.getMonthlyRent(),
+                request.getPropertyFee(),
+                request.getUtilityFee(),
+                request.getStatus()
+            );
+        } catch (RuntimeException e) {
+            throw new BusinessException(e.getMessage());
+        }
+    }
 
     @Override
-    public Result<CampusListVO> list(String name, Boolean status) {
+    @Transactional(rollbackFor = Exception.class)
+    public void updateCampus(Long id, CampusUpdateRequest request) {
         try {
-            List<EduCampusRecord> records = campusModel.list(name, status);
-            List<CampusVO> list = CampusVOConverter.INSTANCE.toVOList(records);
+            CampusStatus status = CampusStatus.fromInteger(request.getStatus());
+            if (status == null) {
+                throw new BusinessException("状态值无效");
+            }
+            campusModel.updateCampus(
+                id,
+                request.getName(),
+                request.getAddress(),
+                status,
+                request.getContactPhone(),
+                request.getMonthlyRent(),
+                request.getPropertyFee(),
+                request.getUtilityFee()
+            );
+        } catch (RuntimeException e) {
+            throw new BusinessException(e.getMessage());
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteCampus(Long id) {
+        try {
+            campusModel.deleteCampus(id);
+        } catch (RuntimeException e) {
+            throw new BusinessException(e.getMessage());
+        }
+    }
+
+    @Override
+    public CampusVO getCampus(Long id) {
+        try {
+            CampusDetailRecord record = campusModel.getCampus(id);
+            if (record == null) {
+                throw new BusinessException("校区不存在或已删除");
+            }
+            return convertToVO(record);
+        } catch (RuntimeException e) {
+            throw new BusinessException(e.getMessage());
+        }
+    }
+
+    @Override
+    public PageResult<CampusVO> listCampuses(CampusQueryRequest request) {
+        try {
+            CampusStatus status = request.getStatus() != null ? CampusStatus.fromInteger(request.getStatus()) : null;
             
-            CampusListVO result = new CampusListVO();
-            result.setList(list);
-            result.setTotal((long) list.size());
-            return Result.success(result);
-        } catch (Exception e) {
-            return Result.error("查询校区列表失败：" + e.getMessage());
+            // 查询总数
+            long total = campusModel.countCampuses(request.getKeyword(), status);
+            
+            // 创建分页结果
+            PageResult<CampusVO> result = new PageResult<>();
+            result.setTotal(total);
+            
+            if (total > 0) {
+                // 查询列表数据
+                List<CampusDetailRecord> records = campusModel.listCampuses(
+                    request.getKeyword(),
+                    status,
+                    request.getPageNum(),
+                    request.getPageSize()
+                );
+                
+                // 转换为VO列表
+                List<CampusVO> voList = records.stream()
+                    .map(this::convertToVO)
+                    .collect(Collectors.toList());
+                
+                result.setList(voList);
+            } else {
+                result.setList(new ArrayList<>());
+            }
+            
+            return result;
+        } catch (RuntimeException e) {
+            throw new BusinessException(e.getMessage());
         }
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Result<CampusVO> create(CampusCreateVO vo) {
-        try {
-            EduCampusRecord record = CampusVOConverter.INSTANCE.toRecord(vo);
-            record = campusModel.create(record);
-            return Result.success(CampusVOConverter.INSTANCE.toVO(record));
-        } catch (Exception e) {
-            return Result.error("创建校区失败：" + e.getMessage());
+    public void updateStatus(Long id, Integer status) {
+        // 参数校验
+        CampusStatus campusStatus = CampusStatus.fromInteger(status);
+        if (campusStatus == null) {
+            throw new BusinessException("状态值无效");
         }
+
+        // 检查校区是否存在
+        if (!campusModel.existsById(id)) {
+            throw new BusinessException("校区不存在");
+        }
+
+        // 更新状态
+        campusModel.updateStatus(id, campusStatus);
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public Result<CampusVO> update(CampusUpdateVO vo) {
+    public List<CampusSimpleVO> listSimpleCampuses() {
         try {
-            EduCampusRecord record = CampusVOConverter.INSTANCE.toRecord(vo);
-            record = campusModel.update(record);
-            return Result.success(CampusVOConverter.INSTANCE.toVO(record));
-        } catch (Exception e) {
-            return Result.error("更新校区失败：" + e.getMessage());
+            List<CampusDetailRecord> records = campusModel.listCampuses(null, null, 1, Integer.MAX_VALUE);
+            return records.stream()
+                .map(record -> {
+                    CampusSimpleVO vo = new CampusSimpleVO();
+                    vo.setId(record.getId());
+                    vo.setName(record.getName());
+                    return vo;
+                })
+                .collect(Collectors.toList());
+        } catch (RuntimeException e) {
+            throw new BusinessException(e.getMessage());
         }
     }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public Result<Void> delete(Long id) {
-        try {
-            campusModel.delete(id);
-            return Result.success(null);
-        } catch (Exception e) {
-            return Result.error("删除校区失败：" + e.getMessage());
-        }
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public Result<Void> toggleStatus(Long id) {
-        try {
-            campusModel.toggleStatus(id);
-            return Result.success(null);
-        } catch (Exception e) {
-            return Result.error("切换校区状态失败：" + e.getMessage());
-        }
-    }
-} 
+}

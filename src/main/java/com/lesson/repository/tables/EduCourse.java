@@ -16,11 +16,10 @@ import java.util.List;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row21;
+import org.jooq.Row18;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -53,24 +52,9 @@ public class EduCourse extends TableImpl<EduCourseRecord> {
     }
 
     /**
-     * The column <code>lesson.edu_course.id</code>. 主键ID
+     * The column <code>lesson.edu_course.id</code>. 课程ID
      */
-    public final TableField<EduCourseRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "主键ID");
-
-    /**
-     * The column <code>lesson.edu_course.institution_id</code>. 所属机构ID
-     */
-    public final TableField<EduCourseRecord, Long> INSTITUTION_ID = createField(DSL.name("institution_id"), SQLDataType.BIGINT.nullable(false), this, "所属机构ID");
-
-    /**
-     * The column <code>lesson.edu_course.campus_id</code>. 所属校区ID
-     */
-    public final TableField<EduCourseRecord, Long> CAMPUS_ID = createField(DSL.name("campus_id"), SQLDataType.BIGINT, this, "所属校区ID");
-
-    /**
-     * The column <code>lesson.edu_course.category_id</code>. 课程分类ID
-     */
-    public final TableField<EduCourseRecord, Long> CATEGORY_ID = createField(DSL.name("category_id"), SQLDataType.BIGINT.nullable(false), this, "课程分类ID");
+    public final TableField<EduCourseRecord, String> ID = createField(DSL.name("id"), SQLDataType.VARCHAR(32).nullable(false), this, "课程ID");
 
     /**
      * The column <code>lesson.edu_course.name</code>. 课程名称
@@ -78,14 +62,44 @@ public class EduCourse extends TableImpl<EduCourseRecord> {
     public final TableField<EduCourseRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(100).nullable(false), this, "课程名称");
 
     /**
-     * The column <code>lesson.edu_course.code</code>. 课程编码
+     * The column <code>lesson.edu_course.type</code>. 课程类型：PRIVATE-私教课，GROUP-团体课，ONLINE-线上课
      */
-    public final TableField<EduCourseRecord, String> CODE = createField(DSL.name("code"), SQLDataType.VARCHAR(50).nullable(false), this, "课程编码");
+    public final TableField<EduCourseRecord, String> TYPE = createField(DSL.name("type"), SQLDataType.VARCHAR(50).nullable(false), this, "课程类型：PRIVATE-私教课，GROUP-团体课，ONLINE-线上课");
 
     /**
-     * The column <code>lesson.edu_course.cover</code>. 课程封面
+     * The column <code>lesson.edu_course.status</code>. 状态：DRAFT-草稿，PUBLISHED-已发布，SUSPENDED-已暂停，TERMINATED-已终止
      */
-    public final TableField<EduCourseRecord, String> COVER = createField(DSL.name("cover"), SQLDataType.VARCHAR(255), this, "课程封面");
+    public final TableField<EduCourseRecord, String> STATUS = createField(DSL.name("status"), SQLDataType.VARCHAR(20).nullable(false), this, "状态：DRAFT-草稿，PUBLISHED-已发布，SUSPENDED-已暂停，TERMINATED-已终止");
+
+    /**
+     * The column <code>lesson.edu_course.unit_hours</code>. 每次消耗课时数
+     */
+    public final TableField<EduCourseRecord, BigDecimal> UNIT_HOURS = createField(DSL.name("unit_hours"), SQLDataType.DECIMAL(10, 2).nullable(false).defaultValue(DSL.inline("1.00", SQLDataType.DECIMAL)), this, "每次消耗课时数");
+
+    /**
+     * The column <code>lesson.edu_course.total_hours</code>. 总课时数
+     */
+    public final TableField<EduCourseRecord, BigDecimal> TOTAL_HOURS = createField(DSL.name("total_hours"), SQLDataType.DECIMAL(10, 2).nullable(false).defaultValue(DSL.inline("0.00", SQLDataType.DECIMAL)), this, "总课时数");
+
+    /**
+     * The column <code>lesson.edu_course.consumed_hours</code>. 已消耗课时数
+     */
+    public final TableField<EduCourseRecord, BigDecimal> CONSUMED_HOURS = createField(DSL.name("consumed_hours"), SQLDataType.DECIMAL(10, 2).nullable(false).defaultValue(DSL.inline("0.00", SQLDataType.DECIMAL)), this, "已消耗课时数");
+
+    /**
+     * The column <code>lesson.edu_course.price</code>. 课程单价(元)
+     */
+    public final TableField<EduCourseRecord, BigDecimal> PRICE = createField(DSL.name("price"), SQLDataType.DECIMAL(10, 2).nullable(false).defaultValue(DSL.inline("0.00", SQLDataType.DECIMAL)), this, "课程单价(元)");
+
+    /**
+     * The column <code>lesson.edu_course.coach_id</code>. 上课教练ID
+     */
+    public final TableField<EduCourseRecord, String> COACH_ID = createField(DSL.name("coach_id"), SQLDataType.VARCHAR(32).nullable(false), this, "上课教练ID");
+
+    /**
+     * The column <code>lesson.edu_course.coach_name</code>. 教练姓名
+     */
+    public final TableField<EduCourseRecord, String> COACH_NAME = createField(DSL.name("coach_name"), SQLDataType.VARCHAR(50).nullable(false), this, "教练姓名");
 
     /**
      * The column <code>lesson.edu_course.description</code>. 课程描述
@@ -93,69 +107,39 @@ public class EduCourse extends TableImpl<EduCourseRecord> {
     public final TableField<EduCourseRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB, this, "课程描述");
 
     /**
-     * The column <code>lesson.edu_course.target</code>. 课程目标
+     * The column <code>lesson.edu_course.campus_id</code>. 校区ID
      */
-    public final TableField<EduCourseRecord, String> TARGET = createField(DSL.name("target"), SQLDataType.CLOB, this, "课程目标");
+    public final TableField<EduCourseRecord, Long> CAMPUS_ID = createField(DSL.name("campus_id"), SQLDataType.BIGINT.nullable(false), this, "校区ID");
 
     /**
-     * The column <code>lesson.edu_course.suitable_crowd</code>. 适合人群
+     * The column <code>lesson.edu_course.campus_name</code>. 校区名称
      */
-    public final TableField<EduCourseRecord, String> SUITABLE_CROWD = createField(DSL.name("suitable_crowd"), SQLDataType.CLOB, this, "适合人群");
+    public final TableField<EduCourseRecord, String> CAMPUS_NAME = createField(DSL.name("campus_name"), SQLDataType.VARCHAR(100).nullable(false), this, "校区名称");
 
     /**
-     * The column <code>lesson.edu_course.price</code>. 课程价格
+     * The column <code>lesson.edu_course.institution_id</code>. 机构ID
      */
-    public final TableField<EduCourseRecord, BigDecimal> PRICE = createField(DSL.name("price"), SQLDataType.DECIMAL(10, 2).nullable(false).defaultValue(DSL.inline("0.00", SQLDataType.DECIMAL)), this, "课程价格");
+    public final TableField<EduCourseRecord, Long> INSTITUTION_ID = createField(DSL.name("institution_id"), SQLDataType.BIGINT.nullable(false), this, "机构ID");
 
     /**
-     * The column <code>lesson.edu_course.original_price</code>. 原价
+     * The column <code>lesson.edu_course.institution_name</code>. 机构名称
      */
-    public final TableField<EduCourseRecord, BigDecimal> ORIGINAL_PRICE = createField(DSL.name("original_price"), SQLDataType.DECIMAL(10, 2), this, "原价");
+    public final TableField<EduCourseRecord, String> INSTITUTION_NAME = createField(DSL.name("institution_name"), SQLDataType.VARCHAR(100).nullable(false), this, "机构名称");
 
     /**
-     * The column <code>lesson.edu_course.duration</code>. 课程时长(分钟)
+     * The column <code>lesson.edu_course.created_time</code>. 创建时间
      */
-    public final TableField<EduCourseRecord, Integer> DURATION = createField(DSL.name("duration"), SQLDataType.INTEGER, this, "课程时长(分钟)");
+    public final TableField<EduCourseRecord, LocalDateTime> CREATED_TIME = createField(DSL.name("created_time"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "创建时间");
 
     /**
-     * The column <code>lesson.edu_course.total_lessons</code>. 总课时数
+     * The column <code>lesson.edu_course.update_time</code>. 更新时间
      */
-    public final TableField<EduCourseRecord, Integer> TOTAL_LESSONS = createField(DSL.name("total_lessons"), SQLDataType.INTEGER, this, "总课时数");
+    public final TableField<EduCourseRecord, LocalDateTime> UPDATE_TIME = createField(DSL.name("update_time"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "更新时间");
 
     /**
-     * The column <code>lesson.edu_course.level</code>. 难度等级：1-初级，2-中级，3-高级
+     * The column <code>lesson.edu_course.deleted</code>. 是否删除：0-未删除，1-已删除
      */
-    public final TableField<EduCourseRecord, Byte> LEVEL = createField(DSL.name("level"), SQLDataType.TINYINT, this, "难度等级：1-初级，2-中级，3-高级");
-
-    /**
-     * The column <code>lesson.edu_course.status</code>. 状态：0-下架，1-上架
-     */
-    public final TableField<EduCourseRecord, Byte> STATUS = createField(DSL.name("status"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("1", SQLDataType.TINYINT)), this, "状态：0-下架，1-上架");
-
-    /**
-     * The column <code>lesson.edu_course.created_at</code>. 创建时间
-     */
-    public final TableField<EduCourseRecord, LocalDateTime> CREATED_AT = createField(DSL.name("created_at"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "创建时间");
-
-    /**
-     * The column <code>lesson.edu_course.updated_at</code>. 更新时间
-     */
-    public final TableField<EduCourseRecord, LocalDateTime> UPDATED_AT = createField(DSL.name("updated_at"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "更新时间");
-
-    /**
-     * The column <code>lesson.edu_course.created_by</code>. 创建人ID
-     */
-    public final TableField<EduCourseRecord, Long> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINT, this, "创建人ID");
-
-    /**
-     * The column <code>lesson.edu_course.updated_by</code>. 更新人ID
-     */
-    public final TableField<EduCourseRecord, Long> UPDATED_BY = createField(DSL.name("updated_by"), SQLDataType.BIGINT, this, "更新人ID");
-
-    /**
-     * The column <code>lesson.edu_course.is_deleted</code>. 是否删除：0-未删除，1-已删除
-     */
-    public final TableField<EduCourseRecord, Byte> IS_DELETED = createField(DSL.name("is_deleted"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "是否删除：0-未删除，1-已删除");
+    public final TableField<EduCourseRecord, Byte> DELETED = createField(DSL.name("deleted"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "是否删除：0-未删除，1-已删除");
 
     private EduCourse(Name alias, Table<EduCourseRecord> aliased) {
         this(alias, aliased, null);
@@ -197,12 +181,7 @@ public class EduCourse extends TableImpl<EduCourseRecord> {
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.EDU_COURSE_IDX_CAMPUS_ID, Indexes.EDU_COURSE_IDX_CATEGORY_ID, Indexes.EDU_COURSE_IDX_CREATED_AT, Indexes.EDU_COURSE_IDX_INSTITUTION_ID, Indexes.EDU_COURSE_IDX_NAME);
-    }
-
-    @Override
-    public Identity<EduCourseRecord, Long> getIdentity() {
-        return (Identity<EduCourseRecord, Long>) super.getIdentity();
+        return Arrays.<Index>asList(Indexes.EDU_COURSE_IDX_CAMPUS_ID, Indexes.EDU_COURSE_IDX_COACH_ID, Indexes.EDU_COURSE_IDX_INSTITUTION_ID, Indexes.EDU_COURSE_IDX_NAME, Indexes.EDU_COURSE_IDX_STATUS, Indexes.EDU_COURSE_IDX_TYPE);
     }
 
     @Override
@@ -212,7 +191,7 @@ public class EduCourse extends TableImpl<EduCourseRecord> {
 
     @Override
     public List<UniqueKey<EduCourseRecord>> getKeys() {
-        return Arrays.<UniqueKey<EduCourseRecord>>asList(Keys.KEY_EDU_COURSE_PRIMARY, Keys.KEY_EDU_COURSE_UK_CODE);
+        return Arrays.<UniqueKey<EduCourseRecord>>asList(Keys.KEY_EDU_COURSE_PRIMARY);
     }
 
     @Override
@@ -242,11 +221,11 @@ public class EduCourse extends TableImpl<EduCourseRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row21 type methods
+    // Row18 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row21<Long, Long, Long, Long, String, String, String, String, String, String, BigDecimal, BigDecimal, Integer, Integer, Byte, Byte, LocalDateTime, LocalDateTime, Long, Long, Byte> fieldsRow() {
-        return (Row21) super.fieldsRow();
+    public Row18<String, String, String, String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
+        return (Row18) super.fieldsRow();
     }
 }

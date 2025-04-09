@@ -4,6 +4,7 @@
 package com.lesson.repository.tables;
 
 
+import com.lesson.repository.Indexes;
 import com.lesson.repository.Keys;
 import com.lesson.repository.Lesson;
 import com.lesson.repository.tables.records.SysRoleRecord;
@@ -15,6 +16,7 @@ import java.util.List;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Identity;
+import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
 import org.jooq.Row7;
@@ -62,7 +64,7 @@ public class SysRole extends TableImpl<SysRoleRecord> {
     /**
      * The column <code>lesson.sys_role.description</code>. 角色描述
      */
-    public final TableField<SysRoleRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.VARCHAR(255), this, "角色描述");
+    public final TableField<SysRoleRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.VARCHAR(200), this, "角色描述");
 
     /**
      * The column <code>lesson.sys_role.status</code>. 状态：0-禁用，1-启用
@@ -70,9 +72,9 @@ public class SysRole extends TableImpl<SysRoleRecord> {
     public final TableField<SysRoleRecord, Byte> STATUS = createField(DSL.name("status"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("1", SQLDataType.TINYINT)), this, "状态：0-禁用，1-启用");
 
     /**
-     * The column <code>lesson.sys_role.create_time</code>. 创建时间
+     * The column <code>lesson.sys_role.created_time</code>. 创建时间
      */
-    public final TableField<SysRoleRecord, LocalDateTime> CREATE_TIME = createField(DSL.name("create_time"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "创建时间");
+    public final TableField<SysRoleRecord, LocalDateTime> CREATED_TIME = createField(DSL.name("created_time"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "创建时间");
 
     /**
      * The column <code>lesson.sys_role.update_time</code>. 更新时间
@@ -123,6 +125,11 @@ public class SysRole extends TableImpl<SysRoleRecord> {
     }
 
     @Override
+    public List<Index> getIndexes() {
+        return Arrays.<Index>asList(Indexes.SYS_ROLE_IDX_CREATED_TIME, Indexes.SYS_ROLE_IDX_STATUS);
+    }
+
+    @Override
     public Identity<SysRoleRecord, Long> getIdentity() {
         return (Identity<SysRoleRecord, Long>) super.getIdentity();
     }
@@ -134,7 +141,7 @@ public class SysRole extends TableImpl<SysRoleRecord> {
 
     @Override
     public List<UniqueKey<SysRoleRecord>> getKeys() {
-        return Arrays.<UniqueKey<SysRoleRecord>>asList(Keys.KEY_SYS_ROLE_PRIMARY);
+        return Arrays.<UniqueKey<SysRoleRecord>>asList(Keys.KEY_SYS_ROLE_PRIMARY, Keys.KEY_SYS_ROLE_UK_ROLE_NAME);
     }
 
     @Override

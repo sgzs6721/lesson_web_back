@@ -3,19 +3,19 @@ package com.lesson.constant;
 /**
  * 角色常量
  */
-public interface RoleConstant {
+public class RoleConstant {
     /**
      * 超级管理员
      */
-    String ROLE_SUPER_ADMIN = "ROLE_SUPER_ADMIN";
-
+    public static final String ROLE_SUPER_ADMIN = "超级管理员";
+    
     /**
      * 协同管理员
      */
-    String ROLE_COLLABORATOR = "ROLE_COLLABORATOR";
-
+    public static final String ROLE_COLLABORATOR = "协同管理员";
+    
     /**
      * 校区管理员
      */
-    String ROLE_CAMPUS_ADMIN = "ROLE_CAMPUS_ADMIN";
+    public static final String ROLE_CAMPUS_ADMIN = "校区管理员";
 } 

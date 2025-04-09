@@ -19,7 +19,7 @@ import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row11;
+import org.jooq.Row13;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -57,9 +57,9 @@ public class SysUser extends TableImpl<SysUserRecord> {
     public final TableField<SysUserRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "主键ID");
 
     /**
-     * The column <code>lesson.sys_user.phone</code>. 手机号（登录账号）
+     * The column <code>lesson.sys_user.password</code>. 密码
      */
-    public final TableField<SysUserRecord, String> PHONE = createField(DSL.name("phone"), SQLDataType.VARCHAR(11).nullable(false), this, "手机号（登录账号）");
+    public final TableField<SysUserRecord, String> PASSWORD = createField(DSL.name("password"), SQLDataType.VARCHAR(100).nullable(false), this, "密码");
 
     /**
      * The column <code>lesson.sys_user.real_name</code>. 真实姓名
@@ -67,9 +67,9 @@ public class SysUser extends TableImpl<SysUserRecord> {
     public final TableField<SysUserRecord, String> REAL_NAME = createField(DSL.name("real_name"), SQLDataType.VARCHAR(50).nullable(false), this, "真实姓名");
 
     /**
-     * The column <code>lesson.sys_user.password</code>. 密码
+     * The column <code>lesson.sys_user.phone</code>. 手机号
      */
-    public final TableField<SysUserRecord, String> PASSWORD = createField(DSL.name("password"), SQLDataType.VARCHAR(100).nullable(false), this, "密码");
+    public final TableField<SysUserRecord, String> PHONE = createField(DSL.name("phone"), SQLDataType.VARCHAR(20).nullable(false), this, "手机号");
 
     /**
      * The column <code>lesson.sys_user.role_id</code>. 角色ID
@@ -77,14 +77,24 @@ public class SysUser extends TableImpl<SysUserRecord> {
     public final TableField<SysUserRecord, Long> ROLE_ID = createField(DSL.name("role_id"), SQLDataType.BIGINT.nullable(false), this, "角色ID");
 
     /**
+     * The column <code>lesson.sys_user.institution_id</code>. 所属机构ID（超级管理员可为空或设为0）
+     */
+    public final TableField<SysUserRecord, Long> INSTITUTION_ID = createField(DSL.name("institution_id"), SQLDataType.BIGINT, this, "所属机构ID（超级管理员可为空或设为0）");
+
+    /**
+     * The column <code>lesson.sys_user.campus_id</code>. 所属校区ID（超级管理员可为空）
+     */
+    public final TableField<SysUserRecord, Long> CAMPUS_ID = createField(DSL.name("campus_id"), SQLDataType.BIGINT, this, "所属校区ID（超级管理员可为空）");
+
+    /**
+     * The column <code>lesson.sys_user.avatar</code>. 头像URL
+     */
+    public final TableField<SysUserRecord, String> AVATAR = createField(DSL.name("avatar"), SQLDataType.VARCHAR(255), this, "头像URL");
+
+    /**
      * The column <code>lesson.sys_user.status</code>. 状态：0-禁用，1-启用
      */
     public final TableField<SysUserRecord, Byte> STATUS = createField(DSL.name("status"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("1", SQLDataType.TINYINT)), this, "状态：0-禁用，1-启用");
-
-    /**
-     * The column <code>lesson.sys_user.campus_id</code>. 所属校区ID
-     */
-    public final TableField<SysUserRecord, Long> CAMPUS_ID = createField(DSL.name("campus_id"), SQLDataType.BIGINT.nullable(false), this, "所属校区ID");
 
     /**
      * The column <code>lesson.sys_user.last_login_time</code>. 最后登录时间
@@ -92,9 +102,9 @@ public class SysUser extends TableImpl<SysUserRecord> {
     public final TableField<SysUserRecord, LocalDateTime> LAST_LOGIN_TIME = createField(DSL.name("last_login_time"), SQLDataType.LOCALDATETIME(0), this, "最后登录时间");
 
     /**
-     * The column <code>lesson.sys_user.create_time</code>. 创建时间
+     * The column <code>lesson.sys_user.created_time</code>. 创建时间
      */
-    public final TableField<SysUserRecord, LocalDateTime> CREATE_TIME = createField(DSL.name("create_time"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "创建时间");
+    public final TableField<SysUserRecord, LocalDateTime> CREATED_TIME = createField(DSL.name("created_time"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "创建时间");
 
     /**
      * The column <code>lesson.sys_user.update_time</code>. 更新时间
@@ -146,7 +156,7 @@ public class SysUser extends TableImpl<SysUserRecord> {
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.SYS_USER_IDX_CAMPUS_ID, Indexes.SYS_USER_IDX_ROLE_ID);
+        return Arrays.<Index>asList(Indexes.SYS_USER_IDX_CAMPUS_ID, Indexes.SYS_USER_IDX_CREATED_TIME, Indexes.SYS_USER_IDX_INSTITUTION_ID, Indexes.SYS_USER_IDX_REAL_NAME, Indexes.SYS_USER_IDX_ROLE_ID, Indexes.SYS_USER_IDX_STATUS);
     }
 
     @Override
@@ -191,11 +201,11 @@ public class SysUser extends TableImpl<SysUserRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row11 type methods
+    // Row13 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row11<Long, String, String, String, Long, Byte, Long, LocalDateTime, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
-        return (Row11) super.fieldsRow();
+    public Row13<Long, String, String, String, Long, Long, Long, String, Byte, LocalDateTime, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
+        return (Row13) super.fieldsRow();
     }
 }

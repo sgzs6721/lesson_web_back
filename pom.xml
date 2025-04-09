@@ -21,10 +21,11 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <jooq.version>3.14.16</jooq.version>
-        <mysql.version>8.0.23</mysql.version>
-        <lombok.version>1.18.30</lombok.version>
-        <hutool.version>5.8.25</hutool.version>
-        <mapstruct.version>1.5.5.Final</mapstruct.version>
+        <mysql.version>8.0.28</mysql.version>
+        <lombok.version>1.18.22</lombok.version>
+        <hutool.version>5.7.22</hutool.version>
+        <mapstruct.version>1.5.3.Final</mapstruct.version>
+        <spring-boot.version>2.7.0</spring-boot.version>
     </properties>
 
     <dependencies>
@@ -40,6 +41,22 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
+        <!-- Swagger -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
+            <version>1.6.15</version>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-annotations</artifactId>
+            <version>1.6.9</version>
         </dependency>
 
         <!-- Database -->
@@ -101,6 +118,34 @@
         </dependency>
     </dependencies>
 
+    <repositories>
+        <repository>
+            <id>aliyun</id>
+            <name>aliyun</name>
+            <url>https://maven.aliyun.com/repository/public</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>aliyun-plugin</id>
+            <name>aliyun-plugin</name>
+            <url>https://maven.aliyun.com/repository/public</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
+
     <build>
         <pluginManagement>
             <plugins>
@@ -116,6 +161,7 @@
                         <locations>
                             <location>filesystem:src/main/resources/db/migration</location>
                         </locations>
+                        <outOfOrder>true</outOfOrder>
                     </configuration>
                     <dependencies>
                         <dependency>
@@ -129,8 +175,31 @@
         </pluginManagement>
         <plugins>
             <plugin>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <version>7.14.0</version>
+                <configuration>
+                    <url><![CDATA[jdbc:mysql://localhost:3306/lesson?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai]]></url>
+                    <user>root</user>
+                    <password></password>
+                    <initSql>SET GLOBAL time_zone = '+8:00';</initSql>
+                    <locations>
+                        <location>filesystem:src/main/resources/db/migration</location>
+                    </locations>
+                    <outOfOrder>true</outOfOrder>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>mysql</groupId>
+                        <artifactId>mysql-connector-java</artifactId>
+                        <version>${mysql.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot.version}</version>
                 <configuration>
                     <excludes>
                         <exclude>
@@ -145,20 +214,6 @@
                 <groupId>org.jooq</groupId>
                 <artifactId>jooq-codegen-maven</artifactId>
                 <version>${jooq.version}</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>mysql</groupId>
-                        <artifactId>mysql-connector-java</artifactId>
-                        <version>${mysql.version}</version>
-                    </dependency>
-                </dependencies>
                 <configuration>
                     <jdbc>
                         <driver>com.mysql.cj.jdbc.Driver</driver>
@@ -169,14 +224,26 @@
                     <generator>
                         <database>
                             <name>org.jooq.meta.mysql.MySQLDatabase</name>
-                            <includes>edu_.*|sys_.*</includes>
+                            <includes>edu_.*|sys_.*|student_course</includes>
                             <excludes></excludes>
-                            <inputSchema>lesson</inputSchema>
                             <schemata>
                                 <schema>
                                     <inputSchema>lesson</inputSchema>
                                 </schema>
                             </schemata>
+                            <forcedTypes>
+                                <!-- 添加 TINYINT 到 INTEGER 的映射 -->
+                                <forcedType>
+                                    <name>INTEGER</name>
+                                    <includeTypes>TINYINT</includeTypes>
+                                </forcedType>
+                                <!-- 保留原有的 deleted 字段的 BOOLEAN 映射 -->
+                                <forcedType>
+                                    <name>BOOLEAN</name>
+                                    <includeTypes>TINYINT</includeTypes>
+                                    <includeExpression>.*\.deleted</includeExpression>
+                                </forcedType>
+                            </forcedTypes>
                         </database>
                         <target>
                             <packageName>com.lesson.repository</packageName>
@@ -187,12 +254,6 @@
                         </strategy>
                     </generator>
                 </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.flywaydb</groupId>
-                <artifactId>flyway-maven-plugin</artifactId>
-                <version>7.14.0</version>
             </plugin>
 
             <plugin>

@@ -4,36 +4,23 @@
 package com.lesson.repository;
 
 
-import com.lesson.repository.tables.EduAttendance;
-import com.lesson.repository.tables.EduCampus;
-import com.lesson.repository.tables.EduClass;
-import com.lesson.repository.tables.EduClassCoach;
-import com.lesson.repository.tables.EduClassStudent;
-import com.lesson.repository.tables.EduClassroom;
-import com.lesson.repository.tables.EduCoach;
-import com.lesson.repository.tables.EduCoachQualification;
 import com.lesson.repository.tables.EduCourse;
-import com.lesson.repository.tables.EduCourseCategory;
-import com.lesson.repository.tables.EduCourseChapter;
-import com.lesson.repository.tables.EduCourseLesson;
-import com.lesson.repository.tables.EduDashboard;
-import com.lesson.repository.tables.EduDataExport;
-import com.lesson.repository.tables.EduExpense;
-import com.lesson.repository.tables.EduExpenseType;
-import com.lesson.repository.tables.EduInstitution;
-import com.lesson.repository.tables.EduInvoice;
-import com.lesson.repository.tables.EduPayment;
-import com.lesson.repository.tables.EduSchedule;
-import com.lesson.repository.tables.EduStatisticsReport;
+import com.lesson.repository.tables.EduCourseRecord;
 import com.lesson.repository.tables.EduStudent;
-import com.lesson.repository.tables.SysConfig;
-import com.lesson.repository.tables.SysDictData;
-import com.lesson.repository.tables.SysDictType;
-import com.lesson.repository.tables.SysLog;
-import com.lesson.repository.tables.SysLoginLog;
-import com.lesson.repository.tables.SysNotice;
-import com.lesson.repository.tables.SysOperationLog;
-import com.lesson.repository.tables.SysPermission;
+import com.lesson.repository.tables.EduStudentClassTransfer;
+import com.lesson.repository.tables.EduStudentCourse;
+import com.lesson.repository.tables.EduStudentCourseOperation;
+import com.lesson.repository.tables.EduStudentCourseOperationRecord;
+import com.lesson.repository.tables.EduStudentCourseRecord;
+import com.lesson.repository.tables.EduStudentCourseTransfer;
+import com.lesson.repository.tables.EduStudentPayment;
+import com.lesson.repository.tables.EduStudentRefund;
+import com.lesson.repository.tables.SysCampus;
+import com.lesson.repository.tables.SysCoach;
+import com.lesson.repository.tables.SysCoachCertification;
+import com.lesson.repository.tables.SysCoachCourse;
+import com.lesson.repository.tables.SysCoachSalary;
+import com.lesson.repository.tables.SysInstitution;
 import com.lesson.repository.tables.SysRole;
 import com.lesson.repository.tables.SysRolePermission;
 import com.lesson.repository.tables.SysUser;
@@ -60,154 +47,89 @@ public class Lesson extends SchemaImpl {
     public static final Lesson LESSON = new Lesson();
 
     /**
-     * 考勤表
-     */
-    public final EduAttendance EDU_ATTENDANCE = EduAttendance.EDU_ATTENDANCE;
-
-    /**
-     * 校区表
-     */
-    public final EduCampus EDU_CAMPUS = EduCampus.EDU_CAMPUS;
-
-    /**
-     * 班级表
-     */
-    public final EduClass EDU_CLASS = EduClass.EDU_CLASS;
-
-    /**
-     * 班级教练关联表
-     */
-    public final EduClassCoach EDU_CLASS_COACH = EduClassCoach.EDU_CLASS_COACH;
-
-    /**
-     * 班级学生关联表
-     */
-    public final EduClassStudent EDU_CLASS_STUDENT = EduClassStudent.EDU_CLASS_STUDENT;
-
-    /**
-     * 教室表
-     */
-    public final EduClassroom EDU_CLASSROOM = EduClassroom.EDU_CLASSROOM;
-
-    /**
-     * 教练表
-     */
-    public final EduCoach EDU_COACH = EduCoach.EDU_COACH;
-
-    /**
-     * 教练资质表
-     */
-    public final EduCoachQualification EDU_COACH_QUALIFICATION = EduCoachQualification.EDU_COACH_QUALIFICATION;
-
-    /**
      * 课程表
      */
     public final EduCourse EDU_COURSE = EduCourse.EDU_COURSE;
 
     /**
-     * 课程分类表
+     * 课程上课记录表
      */
-    public final EduCourseCategory EDU_COURSE_CATEGORY = EduCourseCategory.EDU_COURSE_CATEGORY;
+    public final EduCourseRecord EDU_COURSE_RECORD = EduCourseRecord.EDU_COURSE_RECORD;
 
     /**
-     * 课程章节表
-     */
-    public final EduCourseChapter EDU_COURSE_CHAPTER = EduCourseChapter.EDU_COURSE_CHAPTER;
-
-    /**
-     * 课程课时表
-     */
-    public final EduCourseLesson EDU_COURSE_LESSON = EduCourseLesson.EDU_COURSE_LESSON;
-
-    /**
-     * 数据看板表
-     */
-    public final EduDashboard EDU_DASHBOARD = EduDashboard.EDU_DASHBOARD;
-
-    /**
-     * 数据导出记录表
-     */
-    public final EduDataExport EDU_DATA_EXPORT = EduDataExport.EDU_DATA_EXPORT;
-
-    /**
-     * 费用记录表
-     */
-    public final EduExpense EDU_EXPENSE = EduExpense.EDU_EXPENSE;
-
-    /**
-     * 费用类型表
-     */
-    public final EduExpenseType EDU_EXPENSE_TYPE = EduExpenseType.EDU_EXPENSE_TYPE;
-
-    /**
-     * 教育机构表
-     */
-    public final EduInstitution EDU_INSTITUTION = EduInstitution.EDU_INSTITUTION;
-
-    /**
-     * 发票表
-     */
-    public final EduInvoice EDU_INVOICE = EduInvoice.EDU_INVOICE;
-
-    /**
-     * 支付记录表
-     */
-    public final EduPayment EDU_PAYMENT = EduPayment.EDU_PAYMENT;
-
-    /**
-     * 排课表
-     */
-    public final EduSchedule EDU_SCHEDULE = EduSchedule.EDU_SCHEDULE;
-
-    /**
-     * 统计报表表
-     */
-    public final EduStatisticsReport EDU_STATISTICS_REPORT = EduStatisticsReport.EDU_STATISTICS_REPORT;
-
-    /**
-     * 学生表
+     * 学员表
      */
     public final EduStudent EDU_STUDENT = EduStudent.EDU_STUDENT;
 
     /**
-     * 系统配置表
+     * 学员转班记录表
      */
-    public final SysConfig SYS_CONFIG = SysConfig.SYS_CONFIG;
+    public final EduStudentClassTransfer EDU_STUDENT_CLASS_TRANSFER = EduStudentClassTransfer.EDU_STUDENT_CLASS_TRANSFER;
 
     /**
-     * 字典数据表
+     * 学员课程关系表
      */
-    public final SysDictData SYS_DICT_DATA = SysDictData.SYS_DICT_DATA;
+    public final EduStudentCourse EDU_STUDENT_COURSE = EduStudentCourse.EDU_STUDENT_COURSE;
 
     /**
-     * 字典类型表
+     * 学员课程操作记录表
      */
-    public final SysDictType SYS_DICT_TYPE = SysDictType.SYS_DICT_TYPE;
+    public final EduStudentCourseOperation EDU_STUDENT_COURSE_OPERATION = EduStudentCourseOperation.EDU_STUDENT_COURSE_OPERATION;
 
     /**
-     * 系统日志表
+     * 学生课程操作记录表
      */
-    public final SysLog SYS_LOG = SysLog.SYS_LOG;
+    public final EduStudentCourseOperationRecord EDU_STUDENT_COURSE_OPERATION_RECORD = EduStudentCourseOperationRecord.EDU_STUDENT_COURSE_OPERATION_RECORD;
 
     /**
-     * 登录日志表
+     * 学员课程记录表
      */
-    public final SysLoginLog SYS_LOGIN_LOG = SysLoginLog.SYS_LOGIN_LOG;
+    public final EduStudentCourseRecord EDU_STUDENT_COURSE_RECORD = EduStudentCourseRecord.EDU_STUDENT_COURSE_RECORD;
 
     /**
-     * 通知公告表
+     * 学员转课记录表
      */
-    public final SysNotice SYS_NOTICE = SysNotice.SYS_NOTICE;
+    public final EduStudentCourseTransfer EDU_STUDENT_COURSE_TRANSFER = EduStudentCourseTransfer.EDU_STUDENT_COURSE_TRANSFER;
 
     /**
-     * 操作日志表
+     * 学员缴费记录表
      */
-    public final SysOperationLog SYS_OPERATION_LOG = SysOperationLog.SYS_OPERATION_LOG;
+    public final EduStudentPayment EDU_STUDENT_PAYMENT = EduStudentPayment.EDU_STUDENT_PAYMENT;
 
     /**
-     * 系统权限表
+     * 学员退费记录表
      */
-    public final SysPermission SYS_PERMISSION = SysPermission.SYS_PERMISSION;
+    public final EduStudentRefund EDU_STUDENT_REFUND = EduStudentRefund.EDU_STUDENT_REFUND;
+
+    /**
+     * 校区表
+     */
+    public final SysCampus SYS_CAMPUS = SysCampus.SYS_CAMPUS;
+
+    /**
+     * 教练表
+     */
+    public final SysCoach SYS_COACH = SysCoach.SYS_COACH;
+
+    /**
+     * 教练证书表
+     */
+    public final SysCoachCertification SYS_COACH_CERTIFICATION = SysCoachCertification.SYS_COACH_CERTIFICATION;
+
+    /**
+     * 教练课程关联表
+     */
+    public final SysCoachCourse SYS_COACH_COURSE = SysCoachCourse.SYS_COACH_COURSE;
+
+    /**
+     * 教练薪资表
+     */
+    public final SysCoachSalary SYS_COACH_SALARY = SysCoachSalary.SYS_COACH_SALARY;
+
+    /**
+     * 机构表
+     */
+    public final SysInstitution SYS_INSTITUTION = SysInstitution.SYS_INSTITUTION;
 
     /**
      * 系统角色表
@@ -240,36 +162,23 @@ public class Lesson extends SchemaImpl {
     @Override
     public final List<Table<?>> getTables() {
         return Arrays.<Table<?>>asList(
-            EduAttendance.EDU_ATTENDANCE,
-            EduCampus.EDU_CAMPUS,
-            EduClass.EDU_CLASS,
-            EduClassCoach.EDU_CLASS_COACH,
-            EduClassStudent.EDU_CLASS_STUDENT,
-            EduClassroom.EDU_CLASSROOM,
-            EduCoach.EDU_COACH,
-            EduCoachQualification.EDU_COACH_QUALIFICATION,
             EduCourse.EDU_COURSE,
-            EduCourseCategory.EDU_COURSE_CATEGORY,
-            EduCourseChapter.EDU_COURSE_CHAPTER,
-            EduCourseLesson.EDU_COURSE_LESSON,
-            EduDashboard.EDU_DASHBOARD,
-            EduDataExport.EDU_DATA_EXPORT,
-            EduExpense.EDU_EXPENSE,
-            EduExpenseType.EDU_EXPENSE_TYPE,
-            EduInstitution.EDU_INSTITUTION,
-            EduInvoice.EDU_INVOICE,
-            EduPayment.EDU_PAYMENT,
-            EduSchedule.EDU_SCHEDULE,
-            EduStatisticsReport.EDU_STATISTICS_REPORT,
+            EduCourseRecord.EDU_COURSE_RECORD,
             EduStudent.EDU_STUDENT,
-            SysConfig.SYS_CONFIG,
-            SysDictData.SYS_DICT_DATA,
-            SysDictType.SYS_DICT_TYPE,
-            SysLog.SYS_LOG,
-            SysLoginLog.SYS_LOGIN_LOG,
-            SysNotice.SYS_NOTICE,
-            SysOperationLog.SYS_OPERATION_LOG,
-            SysPermission.SYS_PERMISSION,
+            EduStudentClassTransfer.EDU_STUDENT_CLASS_TRANSFER,
+            EduStudentCourse.EDU_STUDENT_COURSE,
+            EduStudentCourseOperation.EDU_STUDENT_COURSE_OPERATION,
+            EduStudentCourseOperationRecord.EDU_STUDENT_COURSE_OPERATION_RECORD,
+            EduStudentCourseRecord.EDU_STUDENT_COURSE_RECORD,
+            EduStudentCourseTransfer.EDU_STUDENT_COURSE_TRANSFER,
+            EduStudentPayment.EDU_STUDENT_PAYMENT,
+            EduStudentRefund.EDU_STUDENT_REFUND,
+            SysCampus.SYS_CAMPUS,
+            SysCoach.SYS_COACH,
+            SysCoachCertification.SYS_COACH_CERTIFICATION,
+            SysCoachCourse.SYS_COACH_COURSE,
+            SysCoachSalary.SYS_COACH_SALARY,
+            SysInstitution.SYS_INSTITUTION,
             SysRole.SYS_ROLE,
             SysRolePermission.SYS_ROLE_PERMISSION,
             SysUser.SYS_USER);
