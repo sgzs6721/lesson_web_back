@@ -1,0 +1,44 @@
+name: lesson_web_back
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'bg-league-common/**'
+      - 'bg-league-core/**'
+      - 'bg-league-web/**'
+
+jobs:
+  lesson-web:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: JDK 8
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 8
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+      - name: Build application lesson-web
+        run: mvn clean compile && mvn install -Dmaven.test.skip=true -P pro
+      - name: Scp lesson-web-0.0.1-SNAPSHOT.jar To Server
+        uses: garygrossgarten/github-action-scp@release
+        with:
+          local: ${{ github.workspace }}/lesson-web/target/bg-league-web-0.0.1-SNAPSHOT.jar
+          remote: /var/www/lesson_web_back/bg-league-web-0.0.1-SNAPSHOT.jar
+          host: ${{ secrets.VPS_PRO_SERVER }}
+          username: ${{ secrets.VPS_SERVER_USERNAME }}
+          password: ${{ secrets.VPS_SERVER_PWD }}
+      - name: Run Java Service Of bg-league-web
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          script: ps -aux | grep -E "bg-league-web" | grep -v "grep" | awk '{print $2}' | xargs kill -9
+          host: ${{ secrets.VPS_PRO_SERVER }}
+          username: ${{ secrets.VPS_SERVER_USERNAME }}
+          password: ${{ secrets.VPS_SERVER_PWD }}
