@@ -19,11 +19,6 @@ public class UserRegisterRequest {
     @NotBlank(message = "密码不能为空")
     @Size(min = 6, max = 20, message = "密码长度必须在6-20位之间")
     private String password;
-    
-    /**
-     * 真实姓名
-     */
-
 
     /**
      * 机构名称

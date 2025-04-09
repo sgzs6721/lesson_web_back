@@ -13,7 +13,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
     "com.lesson.model",
     "com.lesson.common",
     "com.lesson.config",
-    "com.lesson.interceptor"
+    "com.lesson.interceptor",
+    "com.lesson.utils"
 })
 public class LessonApplication {
     public static void main(String[] args) {

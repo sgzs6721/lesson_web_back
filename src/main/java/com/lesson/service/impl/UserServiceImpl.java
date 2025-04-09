@@ -12,6 +12,7 @@ import com.lesson.repository.tables.records.SysRoleRecord;
 import com.lesson.repository.tables.records.SysUserRecord;
 import com.lesson.request.user.*;
 import com.lesson.service.UserService;
+import com.lesson.utils.JwtUtil;
 import com.lesson.vo.PageResult;
 import com.lesson.vo.role.RoleVO;
 import com.lesson.vo.user.UserListVO;
@@ -41,6 +42,7 @@ public class UserServiceImpl implements UserService {
     private final SysRoleModel roleModel;
     private final SysInstitutionModel institutionModel;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
     @Override
     public Long createUser(String phone, String password, String realName, Long institutionId, Long roleId) {
@@ -109,31 +111,43 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserLoginVO login(UserLoginRequest request) {
-        // 验证用户登录并获取用户信息
-        UserLoginVO loginResult = userModel.validateLogin(
-            request.getPhone(),
-            request.getPassword(),
-            passwordEncoder
-        );
-
-        if (loginResult == null) {
-            throw new BusinessException("用户名或密码错误");
+        // 根据手机号查询用户
+        SysUserRecord user = userModel.getByPhone(request.getPhone());
+        if (user == null) {
+            throw new BusinessException("用户不存在");
         }
 
-        // 获取角色信息
-        String roleName = roleModel.getRoleNameById(loginResult.getRoleId());
-        if (roleName == null) {
-            throw new BusinessException("用户角色不存在");
+        // 验证密码
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new BusinessException("密码错误");
         }
-        loginResult.setRoleName(roleName);
-        
+
+        // 获取用户角色
+        List<RoleVO> roles = roleModel.getUserRoles(user.getId());
+        if (roles == null || roles.isEmpty()) {
+            throw new BusinessException("用户未分配角色");
+        }
+
+        // 获取机构信息
+        SysInstitutionRecord institution = institutionModel.getById(user.getInstitutionId());
+        if (institution == null) {
+            throw new BusinessException("用户所属机构不存在");
+        }
+
         // 生成token
-        loginResult.setToken("temp-token-" + System.currentTimeMillis());
+        String token = jwtUtil.generateToken(user.getId(), institution.getId());
 
-        // 更新最后登录时间
-        userModel.updateLastLoginTime(loginResult.getUserId());
+        // 构建返回结果
+        UserLoginVO loginVO = new UserLoginVO();
+        loginVO.setUserId(user.getId());
+        loginVO.setPhone(user.getPhone());
+        loginVO.setRealName(user.getRealName());
+        loginVO.setRoleId(roles.get(0).getId());
+        loginVO.setRoleName(roles.get(0).getName());
+        loginVO.setInstitutionId(institution.getId());
+        loginVO.setToken(token);
 
-        return loginResult;
+        return loginVO;
     }
 
     @Override
