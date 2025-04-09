@@ -104,7 +104,7 @@ public class UserServiceImpl implements UserService {
             passwordEncoder
         );
 
-        return UserRegisterVO.of(userId);
+        return UserRegisterVO.of(userId, request.getManagerPhone());
     }
 
     @Override

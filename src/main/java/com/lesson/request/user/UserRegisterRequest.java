@@ -12,9 +12,7 @@ import lombok.Data;
  */
 @Data
 public class UserRegisterRequest {
-    
 
-    
     /**
      * 密码
      */
