@@ -33,7 +33,6 @@ com/lesson/repository/tables/records/EduCourseRecord.class
 com/lesson/repository/tables/EduStudentRefund.class
 com/lesson/enums/CampusStatus.class
 com/lesson/repository/tables/SysInstitution.class
-com/lesson/controller/CoachController.class
 com/lesson/model/SysUserModel.class
 com/lesson/repository/tables/records/SysCoachCertificationRecord.class
 com/lesson/model/Coach.class
