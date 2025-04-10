@@ -23,8 +23,8 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
       - name: Build application lesson_web_back
-        run: mvn clean compile && mvn install -Dmaven.test.skip=true -P dev
-      - name: Scp lesson_web_back-1.0-SNAPSHOT.jar To HW Server
+        run: mvn clean compile && mvn install -Dmaven.test.skip=true
+      - name: Scp jar To HW Server
         uses: garygrossgarten/github-action-scp@release
         with:
           local: ${{ github.workspace }}/target/lesson_web_back-1.0-SNAPSHOT.jar
