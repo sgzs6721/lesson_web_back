@@ -31,8 +31,8 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           source: ${{ github.workspace }}/target/lesson_web_back-1.0-SNAPSHOT.jar
-          target: /root/lesson/lesson_web_back-1.0-SNAPSHOT.jar
-          strip_components: 3
+          target: /root/lesson
+          strip_components: 2
       - name: Run Java Service Of lesson-web-back on HW Server
         uses: fifsky/ssh-action@master
         with:
