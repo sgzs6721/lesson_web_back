@@ -27,12 +27,12 @@ jobs:
       - name: Scp lesson_web_back-1.0-SNAPSHOT.jar To HW Server
         uses: garygrossgarten/github-action-scp@release
         with:
-          local: ${{ github.workspace }}/lesson_web_back/target/lesson_web_back-1.0-SNAPSHOT.jar
+          local: ${{ github.workspace }}/target/lesson_web_back-1.0-SNAPSHOT.jar
           remote: lesson/lesson_web_back-1.0-SNAPSHOT.jar
           host: ${{ secrets.HW_TEST_SERVER }}
           username: ${{ secrets.HW_SERVER_USERNAME }}
           password: ${{ secrets.HW_SERVER_PWD }}
-      - name: Run Java Service Of bg-league-admin on HW Server
+      - name: Run Java Service Of lesson-web-back on HW Server
         uses: fifsky/ssh-action@master
         with:
           command: supervisorctl status lesson-web-back | awk '{print $2}' | while read line; do if [ $line == 'RUNNING' ]; then supervisorctl restart lesson-web-back;else supervisorctl start lesson-web-back; fi done
