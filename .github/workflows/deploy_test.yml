@@ -1,0 +1,42 @@
+name: deploy_dev_admin
+on:
+  push:
+    branches:
+      - test
+
+
+jobs:
+  test-lesson-web-back:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: JDK 8
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 8
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+      - name: Build application lesson_web_back
+        run: mvn clean compile && mvn install -Dmaven.test.skip=true -P dev
+      - name: Scp bg-league-admin-0.0.1-SNAPSHOT.jar To HW Server
+        uses: garygrossgarten/github-action-scp@release
+        with:
+          local: ${{ github.workspace }}/bg-league-admin/target/bg-league-admin-0.0.1-SNAPSHOT.jar
+          remote: data/bg-league-admin-0.0.1-SNAPSHOT.jar
+          host: ${{ secrets.HW_TEST_SERVER }}
+          username: ${{ secrets.HW_SERVER_USERNAME }}
+          password: ${{ secrets.HW_SERVER_PWD }}
+      - name: Run Java Service Of bg-league-admin on HW Server
+        uses: fifsky/ssh-action@master
+        with:
+          command: supervisorctl status bg-league-admin | awk '{print $2}' | while read line; do if [ $line == 'RUNNING' ]; then supervisorctl restart bg-league-admin;else supervisorctl start bg-league-admin; fi done
+          host: ${{ secrets.HW_TEST_SERVER }}
+          user: ${{ secrets.HW_SERVER_USERNAME }}
+          pass: ${{ secrets.HW_SERVER_PWD }}
+          args: "-tt"
