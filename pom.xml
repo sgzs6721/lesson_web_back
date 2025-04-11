@@ -26,7 +26,41 @@
         <hutool.version>5.7.22</hutool.version>
         <mapstruct.version>1.5.3.Final</mapstruct.version>
         <spring-boot.version>2.7.0</spring-boot.version>
+        <!-- 环境变量 -->
+        <db.url>jdbc:mysql://localhost:3306/lesson</db.url>
+        <db.user>lesson</db.user>
+        <db.password>Kate@890217</db.password>
     </properties>
+
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <db.url>jdbc:mysql://localhost:3306/lesson</db.url>
+                <db.user>lesson</db.user>
+                <db.password>Kate@890217</db.password>
+            </properties>
+        </profile>
+        <profile>
+            <id>test</id>
+            <properties>
+                <db.url>jdbc:mysql://121.36.91.199:3306/lesson</db.url>
+                <db.user>lesson</db.user>
+                <db.password>Kate@890217</db.password>
+            </properties>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <db.url>jdbc:mysql://prod-server:3306/lesson</db.url>
+                <db.user>lesson_prod</db.user>
+                <db.password>prod_password</db.password>
+            </properties>
+        </profile>
+    </profiles>
 
     <dependencies>
         <!-- Spring Boot Starters -->
@@ -183,9 +217,9 @@
                     <artifactId>flyway-maven-plugin</artifactId>
                     <version>7.14.0</version>
                     <configuration>
-                        <url><![CDATA[jdbc:mysql://localhost:3306/lesson?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai]]></url>
-                        <user>lesson</user>
-                        <password>Kate@890217</password>
+                        <url><![CDATA[${db.url}?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai]]></url>
+                        <user>${db.user}</user>
+                        <password>${db.password}</password>
                         <initSql>SET GLOBAL time_zone = '+8:00';</initSql>
                         <locations>
                             <location>filesystem:src/main/resources/db/migration</location>
@@ -208,9 +242,9 @@
                 <artifactId>flyway-maven-plugin</artifactId>
                 <version>7.14.0</version>
                 <configuration>
-                    <url><![CDATA[jdbc:mysql://localhost:3306/lesson?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai]]></url>
-                    <user>lesson</user>
-                    <password>Kate@890217</password>
+                    <url><![CDATA[${db.url}?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai]]></url>
+                    <user>${db.user}</user>
+                    <password>${db.password}</password>
                     <initSql>SET GLOBAL time_zone = '+8:00';</initSql>
                     <locations>
                         <location>filesystem:src/main/resources/db/migration</location>
@@ -246,9 +280,9 @@
                 <configuration>
                     <jdbc>
                         <driver>com.mysql.cj.jdbc.Driver</driver>
-                        <url><![CDATA[jdbc:mysql://localhost:3306/lesson?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai]]></url>
-                        <user>lesson</user>
-                        <password>Kate@890217</password>
+                        <url><![CDATA[${db.url}?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai]]></url>
+                        <user>${db.user}</user>
+                        <password>${db.password}</password>
                     </jdbc>
                     <generator>
                         <database>

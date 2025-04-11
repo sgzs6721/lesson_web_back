@@ -20,7 +20,6 @@ import org.jooq.impl.UpdatableRecordImpl;
  * 教练表
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-
 public class SysCoachRecord extends UpdatableRecordImpl<SysCoachRecord> implements Record15<Long, String, String, Integer, String, String, String, LocalDate, Integer, String, Long, Long, LocalDateTime, LocalDateTime, Byte> {
 
     private static final long serialVersionUID = 1L;

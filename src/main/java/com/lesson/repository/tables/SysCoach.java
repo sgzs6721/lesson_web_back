@@ -64,7 +64,6 @@ public class SysCoach extends TableImpl<SysCoachRecord> {
     /**
      * The column <code>lesson.sys_coach.gender</code>. 性别
      */
-
     public final TableField<SysCoachRecord, String> GENDER = createField(DSL.name("gender"), SQLDataType.VARCHAR(20).nullable(false), this, "性别");
 
     /**
@@ -100,7 +99,6 @@ public class SysCoach extends TableImpl<SysCoachRecord> {
     /**
      * The column <code>lesson.sys_coach.status</code>. 状态：在职/休假中/离职
      */
-
     public final TableField<SysCoachRecord, String> STATUS = createField(DSL.name("status"), SQLDataType.VARCHAR(20).nullable(false), this, "状态：在职/休假中/离职");
 
     /**
@@ -212,7 +210,6 @@ public class SysCoach extends TableImpl<SysCoachRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-
     public Row15<Long, String, String, Integer, String, String, String, LocalDate, Integer, String, Long, Long, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
         return (Row15) super.fieldsRow();
     }
