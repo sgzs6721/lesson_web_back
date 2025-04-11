@@ -20,7 +20,7 @@ import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row18;
+import org.jooq.Row16;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -113,19 +113,9 @@ public class EduCourse extends TableImpl<EduCourseRecord> {
     public final TableField<EduCourseRecord, Long> CAMPUS_ID = createField(DSL.name("campus_id"), SQLDataType.BIGINT.nullable(false), this, "校区ID");
 
     /**
-     * The column <code>lesson.edu_course.campus_name</code>. 校区名称
-     */
-    public final TableField<EduCourseRecord, String> CAMPUS_NAME = createField(DSL.name("campus_name"), SQLDataType.VARCHAR(100).nullable(false), this, "校区名称");
-
-    /**
      * The column <code>lesson.edu_course.institution_id</code>. 机构ID
      */
     public final TableField<EduCourseRecord, Long> INSTITUTION_ID = createField(DSL.name("institution_id"), SQLDataType.BIGINT.nullable(false), this, "机构ID");
-
-    /**
-     * The column <code>lesson.edu_course.institution_name</code>. 机构名称
-     */
-    public final TableField<EduCourseRecord, String> INSTITUTION_NAME = createField(DSL.name("institution_name"), SQLDataType.VARCHAR(100).nullable(false), this, "机构名称");
 
     /**
      * The column <code>lesson.edu_course.created_time</code>. 创建时间
@@ -227,11 +217,11 @@ public class EduCourse extends TableImpl<EduCourseRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row18 type methods
+    // Row16 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row18<Long, String, String, String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, Long, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
-        return (Row18) super.fieldsRow();
+    public Row16<Long, String, String, String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, Long, String, String, Long, Long, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
+        return (Row16) super.fieldsRow();
     }
 }

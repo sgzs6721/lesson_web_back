@@ -242,9 +242,7 @@ public class EduCourseModel {
         detailRecord.setCoachId(record.get(EDU_COURSE.COACH_ID));
         detailRecord.setCoachName(record.get(EDU_COURSE.COACH_NAME));
         detailRecord.setCampusId(record.get(EDU_COURSE.CAMPUS_ID));
-        detailRecord.setCampusName(record.get(EDU_COURSE.CAMPUS_NAME));
         detailRecord.setInstitutionId(record.get(EDU_COURSE.INSTITUTION_ID));
-        detailRecord.setInstitutionName(record.get(EDU_COURSE.INSTITUTION_NAME));
         detailRecord.setDescription(record.get(EDU_COURSE.DESCRIPTION));
         detailRecord.setCreatedTime(record.get(EDU_COURSE.CREATED_TIME));
         detailRecord.setUpdateTime(record.get(EDU_COURSE.UPDATE_TIME));

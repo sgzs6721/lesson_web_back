@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 
 import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record14;
-import org.jooq.Row14;
+import org.jooq.Record13;
+import org.jooq.Row13;
 import org.jooq.impl.UpdatableRecordImpl;
 
 
@@ -20,7 +20,7 @@ import org.jooq.impl.UpdatableRecordImpl;
  * 课程上课记录表
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class EduCourseRecordRecord extends UpdatableRecordImpl<EduCourseRecordRecord> implements Record14<Long, Long, Long, String, LocalDateTime, LocalDateTime, BigDecimal, String, Long, String, Long, LocalDateTime, LocalDateTime, Integer> {
+public class EduCourseRecordRecord extends UpdatableRecordImpl<EduCourseRecordRecord> implements Record13<Long, Long, Long, String, LocalDateTime, LocalDateTime, BigDecimal, String, Long, Long, LocalDateTime, LocalDateTime, Integer> {
 
     private static final long serialVersionUID = 1L;
 
@@ -151,73 +151,59 @@ public class EduCourseRecordRecord extends UpdatableRecordImpl<EduCourseRecordRe
     }
 
     /**
-     * Setter for <code>lesson.edu_course_record.campus_name</code>. 校区名称
-     */
-    public void setCampusName(String value) {
-        set(9, value);
-    }
-
-    /**
-     * Getter for <code>lesson.edu_course_record.campus_name</code>. 校区名称
-     */
-    public String getCampusName() {
-        return (String) get(9);
-    }
-
-    /**
      * Setter for <code>lesson.edu_course_record.institution_id</code>. 机构ID
      */
     public void setInstitutionId(Long value) {
-        set(10, value);
+        set(9, value);
     }
 
     /**
      * Getter for <code>lesson.edu_course_record.institution_id</code>. 机构ID
      */
     public Long getInstitutionId() {
-        return (Long) get(10);
+        return (Long) get(9);
     }
 
     /**
      * Setter for <code>lesson.edu_course_record.created_time</code>. 创建时间
      */
     public void setCreatedTime(LocalDateTime value) {
-        set(11, value);
+        set(10, value);
     }
 
     /**
      * Getter for <code>lesson.edu_course_record.created_time</code>. 创建时间
      */
     public LocalDateTime getCreatedTime() {
-        return (LocalDateTime) get(11);
+        return (LocalDateTime) get(10);
     }
 
     /**
      * Setter for <code>lesson.edu_course_record.update_time</code>. 更新时间
      */
     public void setUpdateTime(LocalDateTime value) {
-        set(12, value);
+        set(11, value);
     }
 
     /**
      * Getter for <code>lesson.edu_course_record.update_time</code>. 更新时间
      */
     public LocalDateTime getUpdateTime() {
-        return (LocalDateTime) get(12);
+        return (LocalDateTime) get(11);
     }
 
     /**
      * Setter for <code>lesson.edu_course_record.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public void setDeleted(Integer value) {
-        set(13, value);
+        set(12, value);
     }
 
     /**
      * Getter for <code>lesson.edu_course_record.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public Integer getDeleted() {
-        return (Integer) get(13);
+        return (Integer) get(12);
     }
 
     // -------------------------------------------------------------------------
@@ -230,17 +216,17 @@ public class EduCourseRecordRecord extends UpdatableRecordImpl<EduCourseRecordRe
     }
 
     // -------------------------------------------------------------------------
-    // Record14 type implementation
+    // Record13 type implementation
     // -------------------------------------------------------------------------
 
     @Override
-    public Row14<Long, Long, Long, String, LocalDateTime, LocalDateTime, BigDecimal, String, Long, String, Long, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
-        return (Row14) super.fieldsRow();
+    public Row13<Long, Long, Long, String, LocalDateTime, LocalDateTime, BigDecimal, String, Long, Long, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
+        return (Row13) super.fieldsRow();
     }
 
     @Override
-    public Row14<Long, Long, Long, String, LocalDateTime, LocalDateTime, BigDecimal, String, Long, String, Long, LocalDateTime, LocalDateTime, Integer> valuesRow() {
-        return (Row14) super.valuesRow();
+    public Row13<Long, Long, Long, String, LocalDateTime, LocalDateTime, BigDecimal, String, Long, Long, LocalDateTime, LocalDateTime, Integer> valuesRow() {
+        return (Row13) super.valuesRow();
     }
 
     @Override
@@ -289,27 +275,22 @@ public class EduCourseRecordRecord extends UpdatableRecordImpl<EduCourseRecordRe
     }
 
     @Override
-    public Field<String> field10() {
-        return EduCourseRecord.EDU_COURSE_RECORD.CAMPUS_NAME;
-    }
-
-    @Override
-    public Field<Long> field11() {
+    public Field<Long> field10() {
         return EduCourseRecord.EDU_COURSE_RECORD.INSTITUTION_ID;
     }
 
     @Override
-    public Field<LocalDateTime> field12() {
+    public Field<LocalDateTime> field11() {
         return EduCourseRecord.EDU_COURSE_RECORD.CREATED_TIME;
     }
 
     @Override
-    public Field<LocalDateTime> field13() {
+    public Field<LocalDateTime> field12() {
         return EduCourseRecord.EDU_COURSE_RECORD.UPDATE_TIME;
     }
 
     @Override
-    public Field<Integer> field14() {
+    public Field<Integer> field13() {
         return EduCourseRecord.EDU_COURSE_RECORD.DELETED;
     }
 
@@ -359,27 +340,22 @@ public class EduCourseRecordRecord extends UpdatableRecordImpl<EduCourseRecordRe
     }
 
     @Override
-    public String component10() {
-        return getCampusName();
-    }
-
-    @Override
-    public Long component11() {
+    public Long component10() {
         return getInstitutionId();
     }
 
     @Override
-    public LocalDateTime component12() {
+    public LocalDateTime component11() {
         return getCreatedTime();
     }
 
     @Override
-    public LocalDateTime component13() {
+    public LocalDateTime component12() {
         return getUpdateTime();
     }
 
     @Override
-    public Integer component14() {
+    public Integer component13() {
         return getDeleted();
     }
 
@@ -429,27 +405,22 @@ public class EduCourseRecordRecord extends UpdatableRecordImpl<EduCourseRecordRe
     }
 
     @Override
-    public String value10() {
-        return getCampusName();
-    }
-
-    @Override
-    public Long value11() {
+    public Long value10() {
         return getInstitutionId();
     }
 
     @Override
-    public LocalDateTime value12() {
+    public LocalDateTime value11() {
         return getCreatedTime();
     }
 
     @Override
-    public LocalDateTime value13() {
+    public LocalDateTime value12() {
         return getUpdateTime();
     }
 
     @Override
-    public Integer value14() {
+    public Integer value13() {
         return getDeleted();
     }
 
@@ -508,37 +479,31 @@ public class EduCourseRecordRecord extends UpdatableRecordImpl<EduCourseRecordRe
     }
 
     @Override
-    public EduCourseRecordRecord value10(String value) {
-        setCampusName(value);
-        return this;
-    }
-
-    @Override
-    public EduCourseRecordRecord value11(Long value) {
+    public EduCourseRecordRecord value10(Long value) {
         setInstitutionId(value);
         return this;
     }
 
     @Override
-    public EduCourseRecordRecord value12(LocalDateTime value) {
+    public EduCourseRecordRecord value11(LocalDateTime value) {
         setCreatedTime(value);
         return this;
     }
 
     @Override
-    public EduCourseRecordRecord value13(LocalDateTime value) {
+    public EduCourseRecordRecord value12(LocalDateTime value) {
         setUpdateTime(value);
         return this;
     }
 
     @Override
-    public EduCourseRecordRecord value14(Integer value) {
+    public EduCourseRecordRecord value13(Integer value) {
         setDeleted(value);
         return this;
     }
 
     @Override
-    public EduCourseRecordRecord values(Long value1, Long value2, Long value3, String value4, LocalDateTime value5, LocalDateTime value6, BigDecimal value7, String value8, Long value9, String value10, Long value11, LocalDateTime value12, LocalDateTime value13, Integer value14) {
+    public EduCourseRecordRecord values(Long value1, Long value2, Long value3, String value4, LocalDateTime value5, LocalDateTime value6, BigDecimal value7, String value8, Long value9, Long value10, LocalDateTime value11, LocalDateTime value12, Integer value13) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -552,7 +517,6 @@ public class EduCourseRecordRecord extends UpdatableRecordImpl<EduCourseRecordRe
         value11(value11);
         value12(value12);
         value13(value13);
-        value14(value14);
         return this;
     }
 
@@ -570,7 +534,7 @@ public class EduCourseRecordRecord extends UpdatableRecordImpl<EduCourseRecordRe
     /**
      * Create a detached, initialised EduCourseRecordRecord
      */
-    public EduCourseRecordRecord(Long id, Long courseId, Long coachId, String coachName, LocalDateTime startTime, LocalDateTime endTime, BigDecimal hours, String note, Long campusId, String campusName, Long institutionId, LocalDateTime createdTime, LocalDateTime updateTime, Integer deleted) {
+    public EduCourseRecordRecord(Long id, Long courseId, Long coachId, String coachName, LocalDateTime startTime, LocalDateTime endTime, BigDecimal hours, String note, Long campusId, Long institutionId, LocalDateTime createdTime, LocalDateTime updateTime, Integer deleted) {
         super(EduCourseRecord.EDU_COURSE_RECORD);
 
         setId(id);
@@ -582,7 +546,6 @@ public class EduCourseRecordRecord extends UpdatableRecordImpl<EduCourseRecordRe
         setHours(hours);
         setNote(note);
         setCampusId(campusId);
-        setCampusName(campusName);
         setInstitutionId(institutionId);
         setCreatedTime(createdTime);
         setUpdateTime(updateTime);

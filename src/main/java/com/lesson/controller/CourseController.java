@@ -37,7 +37,7 @@ public class CourseController {
      */
     @Operation(summary = "创建课程", 
                description = "创建新课程，需要指定课程名称、类型、价格等信息")
-    @PostMapping
+    @PostMapping("/create")
     public Result<Long> createCourse(@Validated @RequestBody CourseCreateRequest request) {
         Long id = courseService.createCourse(request);
         return Result.success(id);

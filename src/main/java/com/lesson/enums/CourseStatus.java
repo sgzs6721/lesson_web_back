@@ -1,6 +1,5 @@
 package com.lesson.enums;
 
-import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 @Getter
@@ -10,7 +9,6 @@ public enum CourseStatus {
     SUSPENDED("已暂停"),
     TERMINATED("已终止");
     
-    @JsonValue
     private final String description;
     
     CourseStatus(String description) {

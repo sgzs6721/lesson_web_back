@@ -20,7 +20,7 @@ import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row14;
+import org.jooq.Row13;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -96,11 +96,6 @@ public class EduCourseRecord extends TableImpl<EduCourseRecordRecord> {
      * The column <code>lesson.edu_course_record.campus_id</code>. 校区ID
      */
     public final TableField<EduCourseRecordRecord, Long> CAMPUS_ID = createField(DSL.name("campus_id"), SQLDataType.BIGINT.nullable(false), this, "校区ID");
-
-    /**
-     * The column <code>lesson.edu_course_record.campus_name</code>. 校区名称
-     */
-    public final TableField<EduCourseRecordRecord, String> CAMPUS_NAME = createField(DSL.name("campus_name"), SQLDataType.VARCHAR(100).nullable(false), this, "校区名称");
 
     /**
      * The column <code>lesson.edu_course_record.institution_id</code>. 机构ID
@@ -207,11 +202,11 @@ public class EduCourseRecord extends TableImpl<EduCourseRecordRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row14 type methods
+    // Row13 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row14<Long, Long, Long, String, LocalDateTime, LocalDateTime, BigDecimal, String, Long, String, Long, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
-        return (Row14) super.fieldsRow();
+    public Row13<Long, Long, Long, String, LocalDateTime, LocalDateTime, BigDecimal, String, Long, Long, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
+        return (Row13) super.fieldsRow();
     }
 }

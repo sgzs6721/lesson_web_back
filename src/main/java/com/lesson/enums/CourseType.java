@@ -1,15 +1,12 @@
 package com.lesson.enums;
 
-import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 @Getter
 public enum CourseType {
-    PRIVATE("私教课"),
-    GROUP("团体课"),
-    ONLINE("线上课");
+    SPORT("体育运动");
     
-    @JsonValue
+
     private final String description;
     
     CourseType(String description) {

@@ -20,11 +20,11 @@ public class CourseCreateRequest {
 
     @NotNull(message = "课程类型不能为空")
     @ApiModelProperty("课程类型")
-    private CourseType type;
+    private CourseType type = CourseType.SPORT;
 
     @NotNull(message = "课程状态不能为空")
     @ApiModelProperty("课程状态")
-    private CourseStatus status;
+    private CourseStatus status = CourseStatus.PUBLISHED;
 
     @NotNull(message = "单次课时不能为空")
     @Positive(message = "单次课时必须大于0")
@@ -41,7 +41,7 @@ public class CourseCreateRequest {
     @ApiModelProperty("课程单价")
     private BigDecimal price;
 
-    @NotBlank(message = "教练ID不能为空")
+    @NotNull(message = "教练ID不能为空")
     @ApiModelProperty("教练ID")
     private Long coachId;
 
