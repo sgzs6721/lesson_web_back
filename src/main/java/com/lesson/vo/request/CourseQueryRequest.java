@@ -1,58 +1,39 @@
 package com.lesson.vo.request;
 
 import com.lesson.enums.CourseStatus;
-import com.lesson.enums.CourseType;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
+@Schema(description = "课程查询请求")
 public class CourseQueryRequest {
-    /**
-     * 关键词（课程名称或描述）
-     */
+    @Schema(description = "关键词（课程名称或描述）")
     private String keyword;
 
-    /**
-     * 课程类型
-     */
-    private CourseType type;
+    @Schema(description = "课程类型ID（系统常量ID）")
+    private Long typeId;
 
-    /**
-     * 课程状态
-     */
+    @Schema(description = "课程状态")
     private CourseStatus status;
 
-    /**
-     * 教练ID
-     */
+    @Schema(description = "教练ID")
     private Long coachId;
 
-    /**
-     * 校区ID
-     */
+    @Schema(description = "校区ID")
     private Long campusId;
 
-    /**
-     * 机构ID
-     */
+    @Schema(description = "机构ID")
     private Long institutionId;
 
-    /**
-     * 排序字段
-     */
+    @Schema(description = "排序字段")
     private String sortField;
 
-    /**
-     * 排序方向：asc-升序，desc-降序
-     */
+    @Schema(description = "排序方向：asc-升序，desc-降序")
     private String sortOrder;
 
-    /**
-     * 页码
-     */
+    @Schema(description = "页码", defaultValue = "1")
     private Integer pageNum = 1;
 
-    /**
-     * 每页大小
-     */
+    @Schema(description = "每页大小", defaultValue = "10")
     private Integer pageSize = 10;
 } 

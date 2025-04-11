@@ -1,5 +1,6 @@
 package com.lesson.model;
 
+import com.lesson.common.enums.RoleEnum;
 import com.lesson.repository.tables.records.SysRoleRecord;
 import com.lesson.vo.role.RoleVO;
 import lombok.RequiredArgsConstructor;
@@ -128,4 +129,34 @@ public class SysRoleModel {
                         .and(SYS_ROLE.DELETED.eq( 0))
         );
     }
-} 
+
+    /**
+     * 根据角色编码获取角色ID
+     *
+     * @param roleName 角色编码
+     * @return 角色ID
+     */
+    public Long getRoleIdByCode(String roleName) {
+        return dsl.select(SYS_ROLE.ID)
+            .from(SYS_ROLE)
+            .where(SYS_ROLE.ROLE_NAME.eq(roleName))
+            .and(SYS_ROLE.DELETED.eq(0))
+            .fetchOneInto(Long.class);
+    }
+
+    /**
+     * 根据角色ID获取角色枚举
+     *
+     * @param roleId 角色ID
+     * @return 角色枚举
+     */
+    public RoleEnum getRoleEnumById(Long roleId) {
+        String roleName = dsl.select(SYS_ROLE.ROLE_NAME)
+            .from(SYS_ROLE)
+            .where(SYS_ROLE.ID.eq(roleId))
+            .and(SYS_ROLE.DELETED.eq(0))
+            .fetchOneInto(String.class);
+        
+        return RoleEnum.fromName(roleName);
+    }
+}

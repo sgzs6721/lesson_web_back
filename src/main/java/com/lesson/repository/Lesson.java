@@ -20,6 +20,7 @@ import com.lesson.repository.tables.SysCoach;
 import com.lesson.repository.tables.SysCoachCertification;
 import com.lesson.repository.tables.SysCoachCourse;
 import com.lesson.repository.tables.SysCoachSalary;
+import com.lesson.repository.tables.SysConstant;
 import com.lesson.repository.tables.SysInstitution;
 import com.lesson.repository.tables.SysRole;
 import com.lesson.repository.tables.SysRolePermission;
@@ -127,6 +128,11 @@ public class Lesson extends SchemaImpl {
     public final SysCoachSalary SYS_COACH_SALARY = SysCoachSalary.SYS_COACH_SALARY;
 
     /**
+     * 系统常量表
+     */
+    public final SysConstant SYS_CONSTANT = SysConstant.SYS_CONSTANT;
+
+    /**
      * 机构表
      */
     public final SysInstitution SYS_INSTITUTION = SysInstitution.SYS_INSTITUTION;
@@ -178,6 +184,7 @@ public class Lesson extends SchemaImpl {
             SysCoachCertification.SYS_COACH_CERTIFICATION,
             SysCoachCourse.SYS_COACH_COURSE,
             SysCoachSalary.SYS_COACH_SALARY,
+            SysConstant.SYS_CONSTANT,
             SysInstitution.SYS_INSTITUTION,
             SysRole.SYS_ROLE,
             SysRolePermission.SYS_ROLE_PERMISSION,

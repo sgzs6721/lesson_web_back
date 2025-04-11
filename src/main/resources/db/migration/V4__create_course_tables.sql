@@ -2,7 +2,7 @@
 CREATE TABLE `edu_course` (
     `id` bigint(20) NOT NULL COMMENT '课程ID',
     `name` varchar(100) NOT NULL COMMENT '课程名称',
-    `type` varchar(50) NOT NULL COMMENT '课程类型：PRIVATE-私教课，GROUP-团体课，ONLINE-线上课',
+    `type_id` bigint(20) NOT NULL COMMENT '课程类型(关联sys_constant表ID)',
     `status` varchar(20) NOT NULL COMMENT '状态：DRAFT-草稿，PUBLISHED-已发布，SUSPENDED-已暂停，TERMINATED-已终止',
     `unit_hours` decimal(10,2) NOT NULL DEFAULT '1.00' COMMENT '每次消耗课时数',
     `total_hours` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '总课时数',
@@ -18,7 +18,7 @@ CREATE TABLE `edu_course` (
     `deleted` tinyint(4) NOT NULL DEFAULT '0' COMMENT '是否删除：0-未删除，1-已删除',
     PRIMARY KEY (`id`),
     KEY `idx_name` (`name`),
-    KEY `idx_type` (`type`),
+    KEY `idx_type_id` (`type_id`),
     KEY `idx_status` (`status`),
     KEY `idx_coach_id` (`coach_id`),
     KEY `idx_campus_id` (`campus_id`),

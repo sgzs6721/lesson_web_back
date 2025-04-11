@@ -1,5 +1,6 @@
 package com.lesson.request.user;
 
+import com.lesson.common.enums.RoleEnum;
 import com.lesson.common.enums.UserStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -43,11 +44,11 @@ public class UserUpdateRequest {
     private String password;
 
     /**
-     * 角色ID
+     * 角色
      */
-    @NotNull(message = "角色ID不能为空")
-    @Schema(description = "角色ID", required = true)
-    private Long roleId;
+    @NotNull(message = "角色不能为空")
+    @Schema(description = "角色（SUPER_ADMIN-超级管理员，COLLABORATOR-协同管理员，CAMPUS_ADMIN-校区管理员）", required = true)
+    private RoleEnum role;
 
     /**
      * 校区ID，系统管理员可为空

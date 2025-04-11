@@ -20,6 +20,7 @@ import com.lesson.repository.tables.SysCoach;
 import com.lesson.repository.tables.SysCoachCertification;
 import com.lesson.repository.tables.SysCoachCourse;
 import com.lesson.repository.tables.SysCoachSalary;
+import com.lesson.repository.tables.SysConstant;
 import com.lesson.repository.tables.SysInstitution;
 import com.lesson.repository.tables.SysRole;
 import com.lesson.repository.tables.SysRolePermission;
@@ -111,6 +112,11 @@ public class Tables {
      * 教练薪资表
      */
     public static final SysCoachSalary SYS_COACH_SALARY = SysCoachSalary.SYS_COACH_SALARY;
+
+    /**
+     * 系统常量表
+     */
+    public static final SysConstant SYS_CONSTANT = SysConstant.SYS_CONSTANT;
 
     /**
      * 机构表

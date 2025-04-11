@@ -63,9 +63,9 @@ public class EduCourse extends TableImpl<EduCourseRecord> {
     public final TableField<EduCourseRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(100).nullable(false), this, "课程名称");
 
     /**
-     * The column <code>lesson.edu_course.type</code>. 课程类型：PRIVATE-私教课，GROUP-团体课，ONLINE-线上课
+     * The column <code>lesson.edu_course.type_id</code>. 课程类型(关联sys_constant表ID)
      */
-    public final TableField<EduCourseRecord, String> TYPE = createField(DSL.name("type"), SQLDataType.VARCHAR(50).nullable(false), this, "课程类型：PRIVATE-私教课，GROUP-团体课，ONLINE-线上课");
+    public final TableField<EduCourseRecord, Long> TYPE_ID = createField(DSL.name("type_id"), SQLDataType.BIGINT.nullable(false), this, "课程类型(关联sys_constant表ID)");
 
     /**
      * The column <code>lesson.edu_course.status</code>. 状态：DRAFT-草稿，PUBLISHED-已发布，SUSPENDED-已暂停，TERMINATED-已终止
@@ -172,7 +172,7 @@ public class EduCourse extends TableImpl<EduCourseRecord> {
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.EDU_COURSE_IDX_CAMPUS_ID, Indexes.EDU_COURSE_IDX_COACH_ID, Indexes.EDU_COURSE_IDX_INSTITUTION_ID, Indexes.EDU_COURSE_IDX_NAME, Indexes.EDU_COURSE_IDX_STATUS, Indexes.EDU_COURSE_IDX_TYPE);
+        return Arrays.<Index>asList(Indexes.EDU_COURSE_IDX_CAMPUS_ID, Indexes.EDU_COURSE_IDX_COACH_ID, Indexes.EDU_COURSE_IDX_INSTITUTION_ID, Indexes.EDU_COURSE_IDX_NAME, Indexes.EDU_COURSE_IDX_STATUS, Indexes.EDU_COURSE_IDX_TYPE_ID);
     }
 
     @Override
@@ -221,7 +221,7 @@ public class EduCourse extends TableImpl<EduCourseRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Row16<Long, String, String, String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, Long, String, String, Long, Long, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
+    public Row16<Long, String, Long, String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, Long, String, String, Long, Long, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
         return (Row16) super.fieldsRow();
     }
 }

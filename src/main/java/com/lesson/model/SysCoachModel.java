@@ -1,5 +1,6 @@
 package com.lesson.model;
 
+import com.lesson.common.exception.BusinessException;
 import com.lesson.common.enums.CoachStatus;
 import com.lesson.common.enums.Gender;
 import com.lesson.model.record.CoachDetailRecord;
@@ -511,5 +512,27 @@ public class SysCoachModel {
             detailRecord.setInstitutionId(record.get(SYS_COACH.INSTITUTION_ID));
             return detailRecord;
         });
+    }
+
+    /**
+     * 验证教练是否存在且属于指定校区和机构
+     */
+    public void validateCoach(Long coachId, Long campusId, Long institutionId) {
+        SysCoachRecord coach = dsl.selectFrom(SYS_COACH)
+            .where(SYS_COACH.ID.eq(coachId))
+            .and(SYS_COACH.DELETED.eq(0))
+            .fetchOne();
+            
+        if (coach == null) {
+            throw new BusinessException("教练不存在: " + coachId);
+        }
+        
+        if (!institutionId.equals(coach.getInstitutionId())) {
+            throw new BusinessException("教练不属于当前机构: " + coachId);
+        }
+        
+        if (!campusId.equals(coach.getCampusId())) {
+            throw new BusinessException("教练不属于所选校区: " + coachId);
+        }
     }
 }

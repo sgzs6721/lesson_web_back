@@ -1,251 +1,174 @@
 package com.lesson.model;
 
 import com.lesson.enums.CourseStatus;
-import com.lesson.enums.CourseType;
 import com.lesson.model.record.CourseDetailRecord;
 import lombok.RequiredArgsConstructor;
-import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.Result;
-import org.jooq.SelectConditionStep;
+import org.jooq.*;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
-import static com.lesson.repository.Tables.EDU_COURSE;
+import static com.lesson.repository.tables.EduCourse.EDU_COURSE;
+import static com.lesson.repository.tables.SysCoachCourse.SYS_COACH_COURSE;
 
 @Repository
 @RequiredArgsConstructor
 public class EduCourseModel {
-    
     private final DSLContext dsl;
-    
-    /**
-     * 创建课程
-     */
-    public Long createCourse(String name, CourseType type, CourseStatus status,
-                             BigDecimal unitHours, BigDecimal totalHours, BigDecimal price,
-                             Long coachId, String coachName,
-                             Long campusId,
-                             Long institutionId,
-                             String description) {
-        return dsl.insertInto(EDU_COURSE)
-               .set(EDU_COURSE.NAME, name)
-               .set(EDU_COURSE.TYPE, type.name())
-               .set(EDU_COURSE.STATUS, status.name())
-               .set(EDU_COURSE.UNIT_HOURS, unitHours)
-               .set(EDU_COURSE.TOTAL_HOURS, totalHours)
-               .set(EDU_COURSE.CONSUMED_HOURS, BigDecimal.ZERO)
-               .set(EDU_COURSE.PRICE, price)
-               .set(EDU_COURSE.COACH_ID, coachId)
-               .set(EDU_COURSE.COACH_NAME, coachName)
-               .set(EDU_COURSE.CAMPUS_ID, campusId)
-               .set(EDU_COURSE.INSTITUTION_ID, institutionId)
-               .set(EDU_COURSE.DESCRIPTION, description)
-               .set(EDU_COURSE.DELETED, Integer.valueOf(0))
-               .returning(EDU_COURSE.ID)
-               .fetchOne()
-               .get(EDU_COURSE.ID);
-    }
-    
-    /**
-     * 更新课程
-     */
-    public void updateCourse(Long id, String name, CourseType type, CourseStatus status,
+
+    public Long createCourse(String name, Long typeId, CourseStatus status,
                            BigDecimal unitHours, BigDecimal totalHours, BigDecimal price,
-                             Long coachId, String coachName,
-                           Long campusId, String campusName,
-                           Long institutionId, String institutionName,
-                           String description) {
+                           Long campusId, Long institutionId, String description) {
+        return dsl.insertInto(EDU_COURSE)
+                 .set(EDU_COURSE.NAME, name)
+                 .set(EDU_COURSE.TYPE_ID, typeId)
+                 .set(EDU_COURSE.STATUS, status.name())
+                 .set(EDU_COURSE.UNIT_HOURS, unitHours)
+                 .set(EDU_COURSE.TOTAL_HOURS, totalHours)
+                 .set(EDU_COURSE.PRICE, price)
+                 .set(EDU_COURSE.CAMPUS_ID, campusId)
+                 .set(EDU_COURSE.INSTITUTION_ID, institutionId)
+                 .set(EDU_COURSE.DESCRIPTION, description)
+                 .returning(EDU_COURSE.ID)
+                 .fetchOne()
+                 .getId();
+    }
+
+    public void createCourseCoachRelation(Long courseId, Long coachId) {
+        dsl.insertInto(SYS_COACH_COURSE)
+           .set(SYS_COACH_COURSE.COACH_ID, coachId)
+           .set(SYS_COACH_COURSE.COURSE_ID, courseId)
+           .set(SYS_COACH_COURSE.DELETED, 0)
+           .execute();
+    }
+
+    public void updateCourse(Long id, String name, Long typeId,
+                           BigDecimal unitHours, BigDecimal totalHours, BigDecimal price,
+                           Long campusId, String description) {
         dsl.update(EDU_COURSE)
            .set(EDU_COURSE.NAME, name)
-           .set(EDU_COURSE.TYPE, type.name())
-           .set(EDU_COURSE.STATUS, status.name())
+           .set(EDU_COURSE.TYPE_ID, typeId)
            .set(EDU_COURSE.UNIT_HOURS, unitHours)
            .set(EDU_COURSE.TOTAL_HOURS, totalHours)
            .set(EDU_COURSE.PRICE, price)
-           .set(EDU_COURSE.COACH_ID, coachId)
-           .set(EDU_COURSE.COACH_NAME, coachName)
            .set(EDU_COURSE.CAMPUS_ID, campusId)
-           .set(EDU_COURSE.INSTITUTION_ID, institutionId)
            .set(EDU_COURSE.DESCRIPTION, description)
            .where(EDU_COURSE.ID.eq(id))
-           .and(EDU_COURSE.DELETED.eq(0))
            .execute();
     }
-    
-    /**
-     * 删除课程
-     */
+
+    public void deleteCourseCoachRelations(Long courseId) {
+        dsl.update(SYS_COACH_COURSE)
+           .set(SYS_COACH_COURSE.DELETED, 1)
+           .where(SYS_COACH_COURSE.COURSE_ID.eq(courseId))
+           .and(SYS_COACH_COURSE.DELETED.eq(0))
+           .execute();
+    }
+
     public void deleteCourse(Long id) {
         dsl.update(EDU_COURSE)
            .set(EDU_COURSE.DELETED, 1)
            .where(EDU_COURSE.ID.eq(id))
-           .and(EDU_COURSE.DELETED.eq(0))
            .execute();
     }
-    
-    /**
-     * 更新课程状态
-     */
+
     public void updateCourseStatus(Long id, CourseStatus status) {
         dsl.update(EDU_COURSE)
            .set(EDU_COURSE.STATUS, status.name())
            .where(EDU_COURSE.ID.eq(id))
-           .and(EDU_COURSE.DELETED.eq(0))
            .execute();
     }
-    
-    /**
-     * 获取课程详情
-     */
+
     public CourseDetailRecord getCourseById(Long id) {
-        Record record = dsl.select()
-                          .from(EDU_COURSE)
-                          .where(EDU_COURSE.ID.eq(id))
-                          .and(EDU_COURSE.DELETED.eq( 0))
-                          .fetchOne();
-                          
-        if (record == null) {
-            return null;
-        }
-        
-        return convertToDetailRecord(record);
+        return dsl.select()
+                 .from(EDU_COURSE)
+                 .where(EDU_COURSE.ID.eq(id))
+                 .and(EDU_COURSE.DELETED.eq(0))
+                 .fetchOneInto(CourseDetailRecord.class);
     }
-    
-    /**
-     * 分页查询课程列表
-     */
-    public List<CourseDetailRecord> listCourses(String keyword, CourseType type, CourseStatus status,
-                                                Long coachId, Long campusId, Long institutionId,
+
+    public List<CourseDetailRecord> listCourses(String keyword, Long typeId, CourseStatus status,
+                                              Long coachId, Long campusId, Long institutionId,
                                               String sortField, String sortOrder,
                                               int pageNum, int pageSize) {
-        SelectConditionStep<Record> query = createBaseQuery(keyword, type, status, coachId, campusId, institutionId);
-        
-        // 排序
-        if ("totalHours".equals(sortField)) {
-            if ("desc".equals(sortOrder)) {
-                query.orderBy(EDU_COURSE.TOTAL_HOURS.desc());
-            } else {
-                query.orderBy(EDU_COURSE.TOTAL_HOURS.asc());
-            }
-        } else if ("consumedHours".equals(sortField)) {
-            if ("desc".equals(sortOrder)) {
-                query.orderBy(EDU_COURSE.CONSUMED_HOURS.desc());
-            } else {
-                query.orderBy(EDU_COURSE.CONSUMED_HOURS.asc());
-            }
-        } else if ("price".equals(sortField)) {
-            if ("desc".equals(sortOrder)) {
-                query.orderBy(EDU_COURSE.PRICE.desc());
-            } else {
-                query.orderBy(EDU_COURSE.PRICE.asc());
-            }
-        } else {
-            query.orderBy(EDU_COURSE.CREATED_TIME.desc());
-        }
-        
-        // 分页
-        Result<Record> result = query
-                .limit(pageSize)
-                .offset((pageNum - 1) * pageSize)
-                .fetch();
-                
-        List<CourseDetailRecord> records = new ArrayList<>();
-        for (Record record : result) {
-            records.add(convertToDetailRecord(record));
-        }
-        
-        return records;
-    }
-    
-    /**
-     * 统计课程总数
-     */
-    public long countCourses(String keyword, CourseType type, CourseStatus status,
-                             Long coachId, Long campusId, Long institutionId) {
-        SelectConditionStep<Record> query = createBaseQuery(keyword, type, status, coachId, campusId, institutionId);
-        return query.fetchCount();
-    }
-    
-    /**
-     * 判断课程是否存在
-     */
-    public boolean existsById(Long id) {
-        return dsl.fetchExists(
-            dsl.selectOne()
-               .from(EDU_COURSE)
-               .where(EDU_COURSE.ID.eq(id))
-               .and(EDU_COURSE.DELETED.eq( 0))
-        );
-    }
-    
-    /**
-     * 创建基础查询
-     */
-    private SelectConditionStep<Record> createBaseQuery(String keyword, CourseType type, CourseStatus status,
-                                                        Long coachId, Long campusId, Long institutionId) {
         SelectConditionStep<Record> query = dsl.select()
-                                        .from(EDU_COURSE)
-                                        .where(EDU_COURSE.DELETED.eq( 0));
+                      .from(EDU_COURSE)
+                      .where(EDU_COURSE.DELETED.eq(0));
         
-        // 关键词过滤
-        if (keyword != null && !keyword.isEmpty()) {
-            query.and(EDU_COURSE.NAME.like("%" + keyword + "%")
-                  .or(EDU_COURSE.DESCRIPTION.like("%" + keyword + "%")));
+        if (StringUtils.hasText(keyword)) {
+            query.and(EDU_COURSE.NAME.like("%" + keyword + "%"));
         }
-        
-        // 类型过滤
-        if (type != null) {
-            query.and(EDU_COURSE.TYPE.eq(type.name()));
+        if (typeId != null) {
+            query.and(EDU_COURSE.TYPE_ID.eq(typeId));
         }
-        
-        // 状态过滤
         if (status != null) {
             query.and(EDU_COURSE.STATUS.eq(status.name()));
         }
-        
-        // 教练过滤
-        if (coachId != null) {
-            query.and(EDU_COURSE.COACH_ID.eq(coachId));
-        }
-        
-        // 校区过滤
         if (campusId != null) {
             query.and(EDU_COURSE.CAMPUS_ID.eq(campusId));
         }
-        
-        // 机构过滤
         if (institutionId != null) {
             query.and(EDU_COURSE.INSTITUTION_ID.eq(institutionId));
         }
         
-        return query;
+        if (StringUtils.hasText(sortField) && StringUtils.hasText(sortOrder)) {
+            query.orderBy(getSortField(sortField, sortOrder));
+        }
+        
+        query.limit(pageSize).offset((pageNum - 1) * pageSize);
+        
+        return query.fetchInto(CourseDetailRecord.class);
     }
-    
-    /**
-     * 转换为详情记录
-     */
-    private CourseDetailRecord convertToDetailRecord(Record record) {
-        CourseDetailRecord detailRecord = new CourseDetailRecord();
-        detailRecord.setId(record.get(EDU_COURSE.ID));
-        detailRecord.setName(record.get(EDU_COURSE.NAME));
-        detailRecord.setType(CourseType.valueOf(record.get(EDU_COURSE.TYPE)));
-        detailRecord.setStatus(CourseStatus.valueOf(record.get(EDU_COURSE.STATUS)));
-        detailRecord.setUnitHours(record.get(EDU_COURSE.UNIT_HOURS));
-        detailRecord.setTotalHours(record.get(EDU_COURSE.TOTAL_HOURS));
-        detailRecord.setConsumedHours(record.get(EDU_COURSE.CONSUMED_HOURS));
-        detailRecord.setPrice(record.get(EDU_COURSE.PRICE));
-        detailRecord.setCoachId(record.get(EDU_COURSE.COACH_ID));
-        detailRecord.setCoachName(record.get(EDU_COURSE.COACH_NAME));
-        detailRecord.setCampusId(record.get(EDU_COURSE.CAMPUS_ID));
-        detailRecord.setInstitutionId(record.get(EDU_COURSE.INSTITUTION_ID));
-        detailRecord.setDescription(record.get(EDU_COURSE.DESCRIPTION));
-        detailRecord.setCreatedTime(record.get(EDU_COURSE.CREATED_TIME));
-        detailRecord.setUpdateTime(record.get(EDU_COURSE.UPDATE_TIME));
-        return detailRecord;
+
+    public long countCourses(String keyword, Long typeId, CourseStatus status,
+                           Long coachId, Long campusId, Long institutionId) {
+        SelectConditionStep<Record1<Integer>> query = dsl.selectCount()
+                      .from(EDU_COURSE)
+                      .where(EDU_COURSE.DELETED.eq(0));
+        
+        if (StringUtils.hasText(keyword)) {
+            query.and(EDU_COURSE.NAME.like("%" + keyword + "%"));
+        }
+        if (typeId!=null) {
+            query.and(EDU_COURSE.TYPE_ID.eq(typeId));
+        }
+        if (status != null) {
+            query.and(EDU_COURSE.STATUS.eq(status.name()));
+        }
+        if (campusId != null) {
+            query.and(EDU_COURSE.CAMPUS_ID.eq(campusId));
+        }
+        if (institutionId != null) {
+            query.and(EDU_COURSE.INSTITUTION_ID.eq(institutionId));
+        }
+        
+        return query.fetchOne(0, Long.class);
     }
-} 
+
+    private SortField<?> getSortField(String field, String order) {
+        Field<?> sortField;
+        switch (field) {
+            case "name":
+                sortField = EDU_COURSE.NAME;
+                break;
+            case "type":
+                sortField = EDU_COURSE.TYPE_ID;
+                break;
+            case "status":
+                sortField = EDU_COURSE.STATUS;
+                break;
+            case "createTime":
+                sortField = EDU_COURSE.CREATED_TIME;
+                break;
+            default:
+                sortField = EDU_COURSE.ID;
+                break;
+        }
+        
+        return "desc".equalsIgnoreCase(order) ? sortField.desc() : sortField.asc();
+    }
+
+    // 删除validateCoach方法
+}

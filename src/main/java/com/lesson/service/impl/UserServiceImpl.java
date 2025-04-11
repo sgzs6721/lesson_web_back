@@ -1,5 +1,6 @@
 package com.lesson.service.impl;
 
+import com.lesson.common.enums.RoleEnum;
 import com.lesson.common.enums.UserStatus;
 import com.lesson.common.exception.BusinessException;
 import com.lesson.constant.RoleConstant;
@@ -163,31 +164,31 @@ public class UserServiceImpl implements UserService {
       // 从请求中获取机构ID
       Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
       if (institutionId == null) {
-        // 如果请求中没有机构ID，则使用默认值
         institutionId = 1L;
+      }
+
+      // 将角色枚举转换为角色ID列表
+      List<Long> roleIds = null;
+      if (request.getRoles() != null && !request.getRoles().isEmpty()) {
+        roleIds = request.getRoles().stream()
+            .map(role -> roleModel.getRoleIdByCode(role.getName()))
+            .filter(id -> id != null)
+            .collect(Collectors.toList());
       }
 
       // 查询总数
       long total = userModel.countUsers(
           request.getKeyword(),
-          request.getRoleIds(),
+          roleIds,
           request.getCampusIds(),
           request.getStatus(),
           institutionId
       );
 
-      // 判断当前用户是否是校区管理员
-      boolean isCampusAdmin = false;
-      List<RoleVO> userRoles = getCurrentUserRoles();
-      if (userRoles != null && !userRoles.isEmpty()) {
-          isCampusAdmin = userRoles.stream()
-              .anyMatch(role -> RoleConstant.ROLE_CAMPUS_ADMIN.equals(role.getName()));
-      }
-
       // 查询用户基本信息
       Result<Record> userRecords = userModel.listUsers(
           request.getKeyword(),
-          request.getRoleIds(),
+          roleIds,
           request.getStatus(),
           institutionId,
           request.getPageNum(),
@@ -266,7 +267,6 @@ public class UserServiceImpl implements UserService {
       // 从请求中获取机构ID
       Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
       if (institutionId == null) {
-        // 如果请求中没有机构ID，则使用默认值
         institutionId = 1L;
       }
 
@@ -275,18 +275,19 @@ public class UserServiceImpl implements UserService {
         throw new BusinessException("手机号已存在");
       }
 
-      String roleName = roleModel.getRoleNameById(request.getRoleId());
-      if (roleName == null) {
-        throw new BusinessException("角色不存在");
-      }
-
       // 不允许创建超级管理员
-      if (RoleConstant.ROLE_SUPER_ADMIN.equals(roleName)) {
+      if (RoleEnum.SUPER_ADMIN == request.getRole()) {
         throw new BusinessException("不允许创建超级管理员角色");
       }
 
+      // 获取角色ID
+      Long roleId = roleModel.getRoleIdByCode(request.getRole().getName());
+      if (roleId == null) {
+        throw new BusinessException("角色不存在");
+      }
+
       // 校区管理员角色
-      if (RoleConstant.ROLE_CAMPUS_ADMIN.equals(roleName)) {
+      if (RoleEnum.CAMPUS_ADMIN == request.getRole()) {
         // 校区管理员必须指定校区ID
         if (request.getCampusId() == null || request.getCampusId() <= 0) {
           throw new BusinessException("校区管理员必须指定所属校区");
@@ -298,9 +299,10 @@ public class UserServiceImpl implements UserService {
             request.getPassword(),
             request.getRealName(),
             institutionId,
-            request.getRoleId(),
+            roleId,
             request.getCampusId(),
-            passwordEncoder,request.getStatus()
+            passwordEncoder,
+            request.getStatus()
         );
       } else {
         // 其他角色
@@ -310,12 +312,12 @@ public class UserServiceImpl implements UserService {
             request.getPassword(),
             request.getRealName(),
             institutionId,
-            request.getRoleId(),
+            roleId,
             -1L, // 非校区管理员的校区ID默认为-1
-            passwordEncoder, request.getStatus()
+            passwordEncoder,
+            request.getStatus()
         );
       }
-
     } catch (BusinessException e) {
       throw e;
     } catch (Exception e) {
@@ -339,22 +341,23 @@ public class UserServiceImpl implements UserService {
           throw new BusinessException("用户不存在或无权操作该用户");
       }
 
-      // 获取现有用户的角色名称和目标角色名称
-      String currentRoleName = roleModel.getRoleNameById(existingUser.getRoleId());
-      String targetRoleName = roleModel.getRoleNameById(request.getRoleId());
-      if (targetRoleName == null) {
+      // 获取现有用户的角色和目标角色ID
+      RoleEnum currentRole = roleModel.getRoleEnumById(existingUser.getRoleId());
+      Long targetRoleId = roleModel.getRoleIdByCode(request.getRole().getName());
+      
+      if (targetRoleId == null) {
           throw new BusinessException("目标角色不存在");
       }
 
       // 如果当前用户是超级管理员，只允许修改基本信息，不允许修改角色
-      if (RoleConstant.ROLE_SUPER_ADMIN.equals(currentRoleName) 
-          && !existingUser.getRoleId().equals(request.getRoleId())) {
+      if (RoleEnum.SUPER_ADMIN == currentRole 
+          && !existingUser.getRoleId().equals(targetRoleId)) {
           throw new BusinessException("超级管理员不允许变更角色");
       }
 
       // 如果当前用户不是超级管理员，不允许将其修改为超级管理员
-      if (!RoleConstant.ROLE_SUPER_ADMIN.equals(currentRoleName) 
-          && RoleConstant.ROLE_SUPER_ADMIN.equals(targetRoleName)) {
+      if (RoleEnum.SUPER_ADMIN != currentRole 
+          && RoleEnum.SUPER_ADMIN == request.getRole()) {
           throw new BusinessException("不允许修改为超级管理员角色");
       }
 
@@ -367,7 +370,7 @@ public class UserServiceImpl implements UserService {
       Long campusId = request.getCampusId();
 
       // 校区管理员角色
-      if (RoleConstant.ROLE_CAMPUS_ADMIN.equals(targetRoleName)) {
+      if (RoleEnum.CAMPUS_ADMIN == request.getRole()) {
           // 校区管理员必须指定校区ID
           if (campusId == null || campusId <= 0) {
               throw new BusinessException("校区管理员必须指定所属校区");
@@ -383,7 +386,7 @@ public class UserServiceImpl implements UserService {
           request.getId(),
           request.getRealName(),
           request.getPhone(),
-          request.getRoleId(),
+          targetRoleId,
           institutionId,
           campusId,
           request.getPassword(),
