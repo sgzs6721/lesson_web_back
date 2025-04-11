@@ -1,7 +1,7 @@
 package com.lesson.request.coach;
 
-import com.lesson.enums.CoachStatus;
-import com.lesson.enums.Gender;
+import com.lesson.common.enums.CoachStatus;
+import com.lesson.common.enums.Gender;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -29,7 +29,7 @@ public class CoachCreateRequest {
      * 性别
      */
     @NotNull(message = "性别不能为空")
-    @Schema(description = "性别", required = true, example = "male")
+    @Schema(description = "性别", required = true, example = "MALE")
     private Gender gender;
     
     /**
@@ -88,7 +88,7 @@ public class CoachCreateRequest {
      * 状态：在职/休假中/离职
      */
     @NotNull(message = "状态不能为空")
-    @Schema(description = "状态", required = true, example = "active")
+    @Schema(description = "状态", required = true, example = "ACTIVE")
     private CoachStatus status;
     
     /**
@@ -97,13 +97,7 @@ public class CoachCreateRequest {
     @NotNull(message = "校区ID不能为空")
     @Schema(description = "所属校区ID", required = true, example = "1")
     private Long campusId;
-    
-    /**
-     * 所属机构ID
-     */
-    @NotNull(message = "机构ID不能为空")
-    @Schema(description = "所属机构ID", required = true, example = "1")
-    private Long institutionId;
+
     
     /**
      * 基本工资
@@ -150,4 +144,7 @@ public class CoachCreateRequest {
     @DecimalMin(value = "0", message = "分红不能为负数")
     @Schema(description = "分红", example = "2000")
     private BigDecimal dividend;
+
+    @NotNull(message = "机构ID不能为空")
+    private Long institutionId;
 } 

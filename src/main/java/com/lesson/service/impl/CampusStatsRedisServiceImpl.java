@@ -1,9 +1,11 @@
 package com.lesson.service.impl;
 
 import com.lesson.service.CampusStatsRedisService;
-import lombok.RequiredArgsConstructor;
+ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
+
+import org.springframework.beans.factory.annotation.Autowired;
+ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.TimeUnit;
@@ -13,48 +15,64 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class CampusStatsRedisServiceImpl implements CampusStatsRedisService {
 
-    private final RedisTemplate<String, Object> redisTemplate;
-    
-    private static final String TEACHER_COUNT_KEY = "campus:stats:teacher:count:";
-    private static final String STUDENT_COUNT_KEY = "campus:stats:student:count:";
-    private static final String LESSON_COUNT_KEY = "campus:stats:lesson:count:";
+    private static final String TEACHER_COUNT_KEY = "campus:stats:teacher_count:%d:%d";
+    private static final String STUDENT_COUNT_KEY = "campus:stats:student_count:%d:%d";
+    private static final String LESSON_COUNT_KEY = "campus:stats:lesson_count:%d:%d";
+    private static final long CACHE_EXPIRE_HOURS = 24;
 
-    private static final long CACHE_EXPIRE_TIME = 1; // 缓存过期时间，单位：小时
-    
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
+
+    @Override
+    public void incrementTeacherCount(Long institutionId, Long campusId) {
+        String key = String.format(TEACHER_COUNT_KEY, institutionId, campusId);
+        redisTemplate.opsForValue().increment(key);
+        redisTemplate.expire(key, CACHE_EXPIRE_HOURS, TimeUnit.HOURS);
+    }
+
+    @Override
+    public void decrementTeacherCount(Long institutionId, Long campusId) {
+        String key = String.format(TEACHER_COUNT_KEY, institutionId, campusId);
+        redisTemplate.opsForValue().decrement(key);
+        redisTemplate.expire(key, CACHE_EXPIRE_HOURS, TimeUnit.HOURS);
+    }
+
+    @Override
+    public Long getTeacherCount(Long institutionId, Long campusId) {
+        String key = String.format(TEACHER_COUNT_KEY, institutionId, campusId);
+        Object value = redisTemplate.opsForValue().get(key);
+        return value != null ? Long.valueOf(value.toString()) : null;
+    }
+
+    @Override
+    public void setTeacherCount(Long institutionId, Long campusId, Long count) {
+        String key = String.format(TEACHER_COUNT_KEY, institutionId, campusId);
+        redisTemplate.opsForValue().set(key, count, CACHE_EXPIRE_HOURS, TimeUnit.HOURS);
+    }
+
+    @Override
+    public void deleteTeacherCount(Long institutionId, Long campusId) {
+        String key = String.format(TEACHER_COUNT_KEY, institutionId, campusId);
+        redisTemplate.delete(key);
+    }
+
     @Override
     public Integer getCoachCount(Long institutionId, Long campusId) {
-        String key = TEACHER_COUNT_KEY + campusId;
-        try {
-            Object value = redisTemplate.opsForValue().get(key);
-            return value != null ? (Integer) value : null;
-        } catch (Exception e) {
-            log.error("从Redis获取校区教练员数量失败，校区ID：{}", campusId, e);
-            return null;
-        }
-    }
-    
-    @Override
-    public Integer getStudentCount(Long institutionId, Long campusId) {
-        String key = STUDENT_COUNT_KEY + campusId;
-        try {
-            Object value = redisTemplate.opsForValue().get(key);
-            return value != null ? (Integer) value : null;
-        } catch (Exception e) {
-            log.error("从Redis获取校区学员数量失败，校区ID：{}", campusId, e);
-            return null;
-        }
-    }
-    
-    @Override
-    public Integer getLessonCount(Long institutionId, Long campusId) {
-        String key = LESSON_COUNT_KEY + campusId;
-        try {
-            Object value = redisTemplate.opsForValue().get(key);
-            return value != null ? (Integer) value : null;
-        } catch (Exception e) {
-            log.error("从Redis获取校区课时数量失败，校区ID：{}", campusId, e);
-            return null;
-        }
+        Long count = getTeacherCount(institutionId, campusId);
+        return count != null ? count.intValue() : null;
     }
 
-} 
+    @Override
+    public Integer getStudentCount(Long institutionId, Long campusId) {
+        String key = String.format(STUDENT_COUNT_KEY, institutionId, campusId);
+        Object value = redisTemplate.opsForValue().get(key);
+        return value != null ? Integer.valueOf(value.toString()) : null;
+    }
+
+    @Override
+    public Integer getLessonCount(Long institutionId, Long campusId) {
+        String key = String.format(LESSON_COUNT_KEY, institutionId, campusId);
+        Object value = redisTemplate.opsForValue().get(key);
+        return value != null ? Integer.valueOf(value.toString()) : null;
+    }
+}

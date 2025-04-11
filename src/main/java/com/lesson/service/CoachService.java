@@ -22,7 +22,7 @@ public interface CoachService {
      * @param request 创建教练请求
      * @return 教练ID
      */
-    String createCoach(CoachCreateRequest request);
+    Long createCoach(CoachCreateRequest request);
     
     /**
      * 更新教练

@@ -13,8 +13,10 @@ import java.util.Map;
 
 @Component
 public class JwtUtil {
-    private static final long EXPIRE_TIME = 24 * 60 * 60 * 1000; // 24小时
-    private static final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    private static final long EXPIRE_TIME = 7 * 24 * 60 * 60 * 1000; // 7天
+    // 使用固定的密钥
+    private static final String SECRET_KEY = "your-secret-key-here-must-be-at-least-256-bits-long";
+    private static final Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
 
     /**
      * 生成token

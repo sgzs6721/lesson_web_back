@@ -1,7 +1,7 @@
 package com.lesson.request.coach;
 
-import com.lesson.enums.CoachStatus;
-import com.lesson.enums.Gender;
+import com.lesson.common.enums.CoachStatus;
+import com.lesson.common.enums.Gender;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 

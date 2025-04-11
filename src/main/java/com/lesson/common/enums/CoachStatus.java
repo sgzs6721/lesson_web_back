@@ -1,4 +1,4 @@
-package com.lesson.enums;
+package com.lesson.common.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -7,6 +7,7 @@ import lombok.Getter;
 /**
  * 教练状态枚举
  */
+@Getter
 public enum CoachStatus {
     /**
      * 在职

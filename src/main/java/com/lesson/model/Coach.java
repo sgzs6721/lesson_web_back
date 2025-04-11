@@ -1,7 +1,7 @@
 package com.lesson.model;
 
-import com.lesson.enums.CoachStatus;
-import com.lesson.enums.Gender;
+import com.lesson.common.enums.CoachStatus;
+import com.lesson.common.enums.Gender;
 import lombok.Data;
 
 import java.time.LocalDate;

@@ -1,6 +1,6 @@
 -- 创建教练表
 CREATE TABLE `sys_coach` (
-    `id` varchar(20) NOT NULL COMMENT '教练ID，格式：C10000',
+    `id` varchar(20) NOT NULL COMMENT '教练ID',
     `name` varchar(50) NOT NULL COMMENT '姓名',
     `gender` enum('male', 'female') NOT NULL COMMENT '性别',
     `age` int(11) NOT NULL COMMENT '年龄',

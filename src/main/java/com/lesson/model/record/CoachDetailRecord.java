@@ -1,5 +1,7 @@
 package com.lesson.model.record;
 
+import com.lesson.common.enums.CoachStatus;
+import com.lesson.common.enums.Gender;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -25,7 +27,7 @@ public class CoachDetailRecord {
     /**
      * 性别
      */
-    private String gender;
+    private Gender gender;
     
     /**
      * 年龄
@@ -60,7 +62,7 @@ public class CoachDetailRecord {
     /**
      * 状态
      */
-    private String status;
+    private CoachStatus status;
     
     /**
      * 所属校区ID
