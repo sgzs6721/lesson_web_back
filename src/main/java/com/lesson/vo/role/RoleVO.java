@@ -7,21 +7,21 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * 角色视图对象
+ * 角色信息VO
  */
 @Data
-@Schema(description = "角色VO")
+@Schema(description = "角色信息响应")
 public class RoleVO {
     /**
-     * ID
+     * 角色ID
      */
-    @Schema(description = "角色ID")
+    @Schema(description = "角色ID", example = "1")
     private Long id;
 
     /**
      * 角色名称
      */
-    @Schema(description = "角色名称")
+    @Schema(description = "角色名称", example = "校区管理员")
     private String name;
 
     /**
@@ -32,7 +32,7 @@ public class RoleVO {
     /**
      * 角色描述
      */
-    @Schema(description = "角色描述")
+    @Schema(description = "角色描述", example = "负责管理校区的日常运营")
     private String description;
 
     /**
@@ -48,13 +48,13 @@ public class RoleVO {
     /**
      * 是否是超级管理员
      */
-    @Schema(description = "是否超级管理员")
+    @Schema(description = "是否是超级管理员", example = "false")
     private boolean superAdmin;
 
     /**
      * 权限列表
      */
-    @Schema(description = "权限列表")
+    @Schema(description = "角色拥有的权限列表", example = "[\"user:create\", \"user:update\"]")
     private List<String> permissions;
 
     /**

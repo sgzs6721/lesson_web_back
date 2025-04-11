@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * 角色管理接口
  */
-@Tag(name = "角色管理")
+@Tag(name = "角色管理", description = "角色管理相关接口")
 @RestController
 @RequestMapping("/api/roles")
 @RequiredArgsConstructor
@@ -31,7 +31,8 @@ public class RoleController {
      *
      * @return 角色列表
      */
-    @Operation(summary = "获取可分配的角色列表")
+    @Operation(summary = "获取可分配的角色列表", 
+               description = "获取当前用户可分配的角色列表，不同用户角色可见范围不同")
     @GetMapping("/assignable")
     public Result<List<RoleVO>> listAssignableRoles() {
         return Result.success(roleService.listAssignableRoles());
@@ -42,7 +43,8 @@ public class RoleController {
      *
      * @return 角色列表
      */
-    @Operation(summary = "获取所有角色列表")
+    @Operation(summary = "获取所有角色列表", 
+               description = "获取系统中所有角色的列表（需要超级管理员权限）")
     @GetMapping
     public Result<List<RoleVO>> getAllRoles() {
         return Result.success(roleService.getAllRoles());
@@ -54,7 +56,8 @@ public class RoleController {
      * @param request 创建角色请求
      * @return 新创建的角色ID
      */
-    @Operation(summary = "创建角色")
+    @Operation(summary = "创建角色", 
+               description = "创建新角色，需要指定角色名称和描述（需要超级管理员权限）")
     @PostMapping
     public Result<Long> createRole(@RequestBody CreateRoleRequest request) {
         return Result.success(roleService.createRole(request.getRoleName(), request.getDescription()));

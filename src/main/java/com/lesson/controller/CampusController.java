@@ -26,7 +26,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/campus")
 @RequiredArgsConstructor
-@Tag(name = "校区管理")
+@Tag(name = "校区管理", description = "校区管理相关接口")
 public class CampusController {
 
     private final CampusService campusService;
@@ -39,11 +39,7 @@ public class CampusController {
      */
     @PostMapping("/create")
     @Operation(summary = "创建校区", 
-               description = "创建一个新的校区",
-               responses = {
-                   @ApiResponse(responseCode = "200", description = "创建成功", 
-                               content = @Content(schema = @Schema(implementation = Long.class)))
-               })
+               description = "创建新校区，需要指定校区名称、地址、租金等信息")
     public Result<Long> create(@RequestBody @Validated CampusCreateRequest request) {
         return Result.success(campusService.createCampus(request));
     }
@@ -56,10 +52,7 @@ public class CampusController {
      */
     @PostMapping("/update")
     @Operation(summary = "更新校区", 
-               description = "根据ID更新校区信息",
-               responses = {
-                   @ApiResponse(responseCode = "200", description = "更新成功")
-               })
+               description = "更新校区信息，包括名称、地址、租金等")
     public Result<Void> update(@RequestBody @Validated CampusUpdateRequest request) {
         campusService.updateCampus(request);
         return Result.success(null);
@@ -73,10 +66,7 @@ public class CampusController {
      */
     @PostMapping("/delete")
     @Operation(summary = "删除校区", 
-               description = "根据ID删除校区（逻辑删除）",
-               responses = {
-                   @ApiResponse(responseCode = "200", description = "删除成功")
-               })
+               description = "根据校区ID删除校区（逻辑删除）")
     public Result<Void> delete(
             @Parameter(description = "校区ID", required = true) @RequestParam Long id) {
         campusService.deleteCampus(id);
@@ -91,12 +81,8 @@ public class CampusController {
      */
     @GetMapping("/detail")
     @Operation(summary = "获取校区详情", 
-               description = "根据ID获取校区详细信息",
-               responses = {
-                   @ApiResponse(responseCode = "200", description = "获取成功", 
-                               content = @Content(schema = @Schema(implementation = CampusVO.class)))
-               })
-    public Result<CampusVO> get(
+               description = "根据校区ID获取校区详细信息")
+    public Result<CampusVO> getDetail(
             @Parameter(description = "校区ID", required = true) @RequestParam Long id) {
         return Result.success(campusService.getCampus(id));
     }
@@ -104,16 +90,12 @@ public class CampusController {
     /**
      * 查询校区列表
      * 
-     * @param request 查询校区请求参数
+     * @param request 查询参数
      * @return 校区列表分页结果
      */
     @GetMapping("/list")
     @Operation(summary = "查询校区列表", 
-               description = "根据条件分页查询校区列表",
-               responses = {
-                   @ApiResponse(responseCode = "200", description = "查询成功", 
-                               content = @Content(schema = @Schema(implementation = PageResult.class)))
-               })
+               description = "根据条件分页查询校区列表，支持按名称、状态等条件筛选")
     public Result<PageResult<CampusVO>> list(@Validated CampusQueryRequest request) {
         return Result.success(campusService.listCampuses(request));
     }
@@ -139,17 +121,13 @@ public class CampusController {
     }
 
     /**
-     * 获取校区简单列表
+     * 获取校区简单列表（不分页）
      * 
      * @return 校区简单信息列表
      */
     @GetMapping("/simple/list")
     @Operation(summary = "获取校区简单列表", 
-               description = "获取所有校区的ID和名称列表",
-               responses = {
-                   @ApiResponse(responseCode = "200", description = "获取成功", 
-                               content = @Content(schema = @Schema(implementation = CampusSimpleVO.class)))
-               })
+               description = "获取所有校区的简要信息列表，用于下拉选择等场景")
     public Result<List<CampusSimpleVO>> listSimple() {
         return Result.success(campusService.listSimpleCampuses());
     }

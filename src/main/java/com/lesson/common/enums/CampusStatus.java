@@ -8,7 +8,7 @@ import lombok.Getter;
 @Getter
 public enum CampusStatus {
     CLOSED(0, "已关闭"),
-    OPEN(1, "营业中");
+    OPERATING(1, "营业中");
 
     private final Integer code;
     private final String desc;
@@ -38,5 +38,17 @@ public enum CampusStatus {
      */
     public static CampusStatus fromInteger(Integer code) {
         return getByCode(code);
+    }
+
+    public static CampusStatus fromCode(Integer code) {
+        if (code == null) {
+            return null;
+        }
+        for (CampusStatus status : values()) {
+            if (status.getCode().equals(code)) {
+                return status;
+            }
+        }
+        return null;
     }
 } 

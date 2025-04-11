@@ -7,14 +7,15 @@ import com.lesson.model.record.CampusDetailRecord;
 import com.lesson.request.campus.CampusCreateRequest;
 import com.lesson.request.campus.CampusQueryRequest;
 import com.lesson.request.campus.CampusUpdateRequest;
+import com.lesson.service.CampusService;
+import com.lesson.service.CampusStatsRedisService;
 import com.lesson.vo.CampusVO;
 import com.lesson.vo.CampusSimpleVO;
 import com.lesson.vo.PageResult;
-import com.lesson.service.CampusService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -31,38 +32,7 @@ public class CampusServiceImpl implements CampusService {
 
     private final SysCampusModel campusModel;
     private final HttpServletRequest httpServletRequest; // 注入HttpServletRequest
-
-    /**
-     * 转换数据库记录为VO
-     */
-    private CampusVO convertToVO(CampusDetailRecord record) {
-        if (record == null) {
-            return null;
-        }
-        
-        CampusVO vo = new CampusVO();
-        
-        // 设置基本信息
-        vo.setId(record.getId());
-        vo.setName(record.getName());
-        vo.setAddress(record.getAddress());
-        vo.setStatus(CampusStatus.getByCode(record.getStatus()));
-        //vo.setContactPhone(record.getContactPhone());
-        vo.setManagerName(record.getUserName());
-        vo.setMonthlyRent(record.getMonthlyRent());
-        vo.setPropertyFee(record.getPropertyFee());
-        vo.setUtilityFee(record.getUtilityFee());
-        vo.setCreatedTime(record.getCreatedTime());
-        vo.setUpdateTime(record.getUpdateTime());
-        
-        // 设置用户相关信息
-        vo.setUserCount(record.getUserCount());
-        vo.setStudentCount(record.getStudentCount());
-        vo.setTeacherCount(record.getTeacherCount());
-        vo.setPendingLessonCount(record.getPendingLessonCount());
-        
-        return vo;
-    }
+    private final CampusStatsRedisService campusStatsRedisService;
  
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -126,52 +96,101 @@ public class CampusServiceImpl implements CampusService {
 
     @Override
     public CampusVO getCampus(Long id) {
-        try {
-            CampusDetailRecord record = campusModel.getCampus(id);
-            if (record == null) {
-                throw new BusinessException("校区不存在或已删除");
-            }
-            return convertToVO(record);
-        } catch (RuntimeException e) {
-            throw new BusinessException(e.getMessage());
+        // 从请求中获取机构ID
+        Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
+        if (institutionId == null) {
+            // 如果请求中没有机构ID，则使用默认值
+            institutionId = 1L;
         }
+
+        // 获取校区基本信息
+        CampusDetailRecord record = campusModel.getCampusDetail(id);
+        if (record == null) {
+            throw new BusinessException("校区不存在");
+        }
+
+        // 转换为VO
+        CampusVO campusVO = new CampusVO();
+        campusVO.setId(record.getId());
+        campusVO.setName(record.getName());
+        campusVO.setAddress(record.getAddress());
+        campusVO.setStatus(CampusStatus.fromCode(record.getStatus()));
+        campusVO.setMonthlyRent(record.getMonthlyRent());
+        campusVO.setPropertyFee(record.getPropertyFee());
+        campusVO.setUtilityFee(record.getUtilityFee());
+        campusVO.setCreatedTime(record.getCreatedTime());
+        campusVO.setUpdateTime(record.getUpdateTime());
+
+        // 从Redis获取统计数据
+        Integer coachCount = campusStatsRedisService.getCoachCount(institutionId, id);
+        Integer studentCount = campusStatsRedisService.getStudentCount(institutionId, id);
+        Integer lessonCount = campusStatsRedisService.getLessonCount(institutionId, id);
+
+        // TODO 如果Redis中没有数据，则从数据库查询并更新Redis
+        campusVO.setCoachCount(coachCount);
+        campusVO.setStudentCount(studentCount);
+        campusVO.setPendingLessonCount(lessonCount);
+
+        return campusVO;
     }
 
     @Override
     public PageResult<CampusVO> listCampuses(CampusQueryRequest request) {
-        try {
-            CampusStatus status = request.getStatus() != null ? CampusStatus.fromInteger(request.getStatus()) : null;
-            
-            // 查询总数
-            long total = campusModel.countCampuses(request.getKeyword(), status);
-            
-            // 创建分页结果
-            PageResult<CampusVO> result = new PageResult<>();
-            result.setTotal(total);
-            
-            if (total > 0) {
-                // 查询列表数据
-                List<CampusDetailRecord> records = campusModel.listCampuses(
-                    request.getKeyword(),
-                    status,
-                    request.getPageNum(),
-                    request.getPageSize()
-                );
-                
-                // 转换为VO列表
-                List<CampusVO> voList = records.stream()
-                    .map(this::convertToVO)
-                    .collect(Collectors.toList());
-                
-                result.setList(voList);
-            } else {
-                result.setList(new ArrayList<>());
-            }
-            
-            return result;
-        } catch (RuntimeException e) {
-            throw new BusinessException(e.getMessage());
+        // 从请求中获取机构ID
+        Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
+        if (institutionId == null) {
+            // 如果请求中没有机构ID，则使用默认值
+            institutionId = 1L;
         }
+
+        // 获取校区基本信息列表
+        List<CampusDetailRecord> records = campusModel.listCampuses(
+            request.getKeyword(),
+            request.getStatus(),
+            institutionId,
+            request.getPageNum(),
+            request.getPageSize()
+        );
+
+        // 转换为VO列表
+        Long finalInstitutionId = institutionId;
+        List<CampusVO> campusList = records.stream().map(record -> {
+            CampusVO campusVO = new CampusVO();
+            campusVO.setId(record.getId());
+            campusVO.setName(record.getName());
+            campusVO.setAddress(record.getAddress());
+            campusVO.setStatus(CampusStatus.fromCode(record.getStatus()));
+            campusVO.setMonthlyRent(record.getMonthlyRent());
+            campusVO.setPropertyFee(record.getPropertyFee());
+            campusVO.setUtilityFee(record.getUtilityFee());
+            campusVO.setCreatedTime(record.getCreatedTime());
+            campusVO.setUpdateTime(record.getUpdateTime());
+            campusVO.setManagerName(record.getManagerName());
+            campusVO.setManagerPhone(record.getManagerPhone());
+
+            // 从Redis获取统计数据
+            Long campusId = record.getId();
+            Integer coachCount = campusStatsRedisService.getCoachCount(finalInstitutionId, campusId);
+            Integer studentCount = campusStatsRedisService.getStudentCount(finalInstitutionId, campusId);
+            Integer lessonCount = campusStatsRedisService.getLessonCount(finalInstitutionId, campusId);
+
+            // TODO 如果Redis中没有数据，则从数据库查询并更新Redis
+
+            campusVO.setCoachCount(coachCount);
+            campusVO.setStudentCount(studentCount);
+            campusVO.setPendingLessonCount(lessonCount);
+
+            return campusVO;
+        }).collect(Collectors.toList());
+
+        // 获取总记录数
+        long total = campusModel.countCampuses(
+            request.getKeyword(),
+            request.getStatus(),
+            institutionId
+        );
+
+        return PageResult.of(campusList, total, request.getPageNum(), request.getPageSize());
     }
 
     @Override
@@ -195,7 +214,13 @@ public class CampusServiceImpl implements CampusService {
     @Override
     public List<CampusSimpleVO> listSimpleCampuses() {
         try {
-            List<CampusDetailRecord> records = campusModel.listCampuses(null, null, 1, Integer.MAX_VALUE);
+            // 从请求中获取机构ID
+            Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
+            if (institutionId == null) {
+                // 如果请求中没有机构ID，则使用默认值
+                institutionId = 1L;
+            }
+            List<CampusDetailRecord> records = campusModel.listCampuses(null, null, institutionId, 1, Integer.MAX_VALUE);
             return records.stream()
                 .map(record -> {
                     CampusSimpleVO vo = new CampusSimpleVO();

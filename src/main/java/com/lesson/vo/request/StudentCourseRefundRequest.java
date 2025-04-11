@@ -15,6 +15,13 @@ import java.math.BigDecimal;
 public class StudentCourseRefundRequest {
 
     /**
+     * 原课程ID
+     */
+    @NotBlank(message = "原课程ID不能为空")
+    @Schema(description = "原课程ID")
+    private String sourceCourseId;
+
+    /**
      * 退费金额
      */
     @NotNull(message = "退费金额不能为空")

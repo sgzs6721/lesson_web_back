@@ -2,6 +2,7 @@ package com.lesson.model;
 
 import com.lesson.common.enums.CampusStatus;
 import com.lesson.model.record.CampusDetailRecord;
+import com.lesson.repository.Tables;
 import com.lesson.repository.tables.records.SysCampusRecord;
 import lombok.RequiredArgsConstructor;
 import org.jooq.*;
@@ -84,74 +85,50 @@ public class SysCampusModel {
     }
 
     /**
-     * 获取校区详情，包含用户信息
+     * 获取校区详情
      */
-    public CampusDetailRecord getCampus(Long id) {
-        Record record = dsl.select(
-                SYS_CAMPUS.asterisk(),
-                DSL.count(SYS_USER.ID).as("user_count"),
-                DSL.groupConcat(SYS_USER.REAL_NAME).as("user_names"),
-                DSL.groupConcat(SYS_USER.PHONE).as("user_phones"),
-                DSL.count(DSL.when(SYS_USER.ROLE_ID.eq(3L), 1).otherwise(0)).as("student_count"),
-                DSL.count(DSL.when(SYS_USER.ROLE_ID.eq(2L), 1).otherwise(0)).as("teacher_count"),
-                DSL.field(DSL.select(DSL.count())
-                        .from("student_course")
-                        .where("student_course.campus_id = sys_campus.id")
-                        .and("student_course.status = 0")).as("pending_lesson_count")
+    public CampusDetailRecord getCampusDetail(Long campusId) {
+        return dsl.select(
+                SYS_CAMPUS.ID,
+                SYS_CAMPUS.NAME,
+                SYS_CAMPUS.ADDRESS,
+                SYS_CAMPUS.STATUS,
+                SYS_CAMPUS.MONTHLY_RENT,
+                SYS_CAMPUS.PROPERTY_FEE,
+                SYS_CAMPUS.UTILITY_FEE,
+                SYS_CAMPUS.CREATED_TIME,
+                SYS_CAMPUS.UPDATE_TIME,
+                SYS_USER.REAL_NAME.as("managerName"),
+                SYS_USER.PHONE.as("managerPhone")
             )
             .from(SYS_CAMPUS)
-            .leftJoin(SYS_USER)
-            .on(SYS_CAMPUS.ID.eq(SYS_USER.CAMPUS_ID))
-            .and(SYS_USER.DELETED.eq((byte) 0))
-            .where(SYS_CAMPUS.ID.eq(id))
+            .leftJoin(SYS_USER).on(SYS_CAMPUS.ID.eq(SYS_USER.CAMPUS_ID))
+            .where(SYS_CAMPUS.ID.eq(campusId))
             .and(SYS_CAMPUS.DELETED.eq((byte) 0))
-            .groupBy(SYS_CAMPUS.fields())
-            .fetchOne();
-
-        if (record == null) {
-            return null;
-        }
-
-        CampusDetailRecord detailRecord = new CampusDetailRecord();
-        // 复制基础字段
-        detailRecord.from(record.into(SYS_CAMPUS));
-        // 设置额外字段
-        detailRecord.setUserCount(record.get("user_count", Integer.class));
-        detailRecord.setUserName(record.get("user_names", String.class));
-        detailRecord.setUserPhone(record.get("user_phones", String.class));
-        detailRecord.setStudentCount(record.get("student_count", Integer.class));
-        detailRecord.setTeacherCount(record.get("teacher_count", Integer.class));
-        detailRecord.setPendingLessonCount(record.get("pending_lesson_count", Integer.class));
-
-        return detailRecord;
+            .and(SYS_USER.ROLE_ID.eq(2L)) // 只查询校区管理员
+            .fetchOneInto(CampusDetailRecord.class);
     }
 
     /**
      * 查询校区列表
      */
-    public List<CampusDetailRecord> listCampuses(String keyword, CampusStatus status, Integer pageNum, Integer pageSize) {
+    public List<CampusDetailRecord> listCampuses(String keyword, CampusStatus status, Long institutionId, Integer pageNum, Integer pageSize) {
         SelectConditionStep<Record> query = dsl.select(
                 SYS_CAMPUS.asterisk(),
-                DSL.count(SYS_USER.ID).as("user_count"),
-                DSL.groupConcat(SYS_USER.REAL_NAME).as("user_name"),
-                DSL.groupConcat(SYS_USER.PHONE).as("user_phone"),
-                DSL.count(DSL.when(SYS_USER.ROLE_ID.eq(3L), 1).otherwise(0)).as("student_count"),
-                DSL.count(DSL.when(SYS_USER.ROLE_ID.eq(2L), 1).otherwise(0)).as("teacher_count"),
-                DSL.field(DSL.select(DSL.count())
-                        .from("student_course")
-                        .where("student_course.campus_id = sys_campus.id")
-                        .and("student_course.status = 0")).as("pending_lesson_count")
+                DSL.groupConcat(SYS_USER.REAL_NAME).as("manager_name"),
+                DSL.groupConcat(SYS_USER.PHONE).as("manager_phone")
             )
             .from(SYS_CAMPUS)
             .leftJoin(SYS_USER)
             .on(SYS_CAMPUS.ID.eq(SYS_USER.CAMPUS_ID))
             .and(SYS_USER.DELETED.eq((byte) 0))
-            .where(SYS_CAMPUS.DELETED.eq((byte) 0));
+            .and(SYS_USER.ROLE_ID.eq(2L)) // 只查询校区管理员
+            .where(SYS_CAMPUS.DELETED.eq((byte) 0))
+            .and(SYS_CAMPUS.INSTITUTION_ID.eq(institutionId));
 
         if (StringUtils.hasText(keyword)) {
             query.and(SYS_CAMPUS.NAME.like("%" + keyword + "%")
                     .or(SYS_CAMPUS.ADDRESS.like("%" + keyword + "%")));
-                    //.or(SYS_CAMPUS.CONTACT_PHONE.like("%" + keyword + "%")));
         }
 
         if (status != null) {
@@ -170,13 +147,9 @@ public class SysCampusModel {
             CampusDetailRecord detailRecord = new CampusDetailRecord();
             // 复制基础字段
             detailRecord.from(record.into(SYS_CAMPUS));
-            // 设置额外字段
-            detailRecord.setUserCount(record.get("user_count", Integer.class));
-            detailRecord.setUserName(record.get("user_name", String.class));
-            detailRecord.setUserPhone(record.get("user_phone", String.class));
-            detailRecord.setStudentCount(record.get("student_count", Integer.class));
-            detailRecord.setTeacherCount(record.get("teacher_count", Integer.class));
-            detailRecord.setPendingLessonCount(record.get("pending_lesson_count", Integer.class));
+            // 设置管理员信息
+            detailRecord.setManagerName(record.get("manager_name", String.class));
+            detailRecord.setManagerPhone(record.get("manager_phone", String.class));
             return detailRecord;
         }).collect(Collectors.toList());
     }
@@ -184,15 +157,15 @@ public class SysCampusModel {
     /**
      * 获取校区总数
      */
-    public long countCampuses(String keyword, CampusStatus status) {
+    public long countCampuses(String keyword, CampusStatus status, Long institutionId) {
         SelectConditionStep<Record1<Integer>> query = dsl.selectCount()
                 .from(SYS_CAMPUS)
-                .where(SYS_CAMPUS.DELETED.eq((byte) 0));
+                .where(SYS_CAMPUS.DELETED.eq((byte) 0))
+                .and(SYS_CAMPUS.INSTITUTION_ID.eq(institutionId));
 
         if (StringUtils.hasText(keyword)) {
             query.and(SYS_CAMPUS.NAME.like("%" + keyword + "%")
                     .or(SYS_CAMPUS.ADDRESS.like("%" + keyword + "%")));
-                    //.or(SYS_CAMPUS.CONTACT_PHONE.like("%" + keyword + "%")));
         }
 
         if (status != null) {

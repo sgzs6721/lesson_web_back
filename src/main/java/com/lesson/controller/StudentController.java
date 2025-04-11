@@ -11,9 +11,9 @@ import com.lesson.vo.request.StudentQueryRequest;
 import com.lesson.vo.request.StudentUpdateRequest;
 import com.lesson.vo.response.StudentDetailVO;
 import com.lesson.vo.response.StudentListVO;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
@@ -23,11 +23,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * 学员管理控制器
+ * 学员管理接口
  */
 @RestController
 @RequestMapping("/api/students")
-@Api(tags = "学员管理接口")
+@Tag(name = "学员管理", description = "学员管理相关接口")
 @RequiredArgsConstructor
 public class StudentController {
 
@@ -40,9 +40,10 @@ public class StudentController {
      * @return 学员ID
      */
     @PostMapping
-    @ApiOperation("创建学员")
+    @Operation(summary = "创建学员", 
+               description = "创建新学员，需要指定学员基本信息")
     public Result<String> createStudent(
-            @ApiParam("创建学员请求") @RequestBody @Valid StudentCreateRequest request) {
+            @Parameter(description = "创建学员请求") @RequestBody @Valid StudentCreateRequest request) {
         EduStudentRecord record = new EduStudentRecord();
         BeanUtils.copyProperties(request, record);
         String id = studentModel.createStudent(record);
@@ -52,15 +53,16 @@ public class StudentController {
     /**
      * 更新学员信息
      *
-     * @param id      学员ID
+     * @param id 学员ID
      * @param request 更新学员请求
      * @return 操作结果
      */
     @PutMapping("/{id}")
-    @ApiOperation("更新学员信息")
+    @Operation(summary = "更新学员信息", 
+               description = "更新学员基本信息")
     public Result<Void> updateStudent(
-            @ApiParam("学员ID") @PathVariable String id,
-            @ApiParam("更新学员请求") @RequestBody @Valid StudentUpdateRequest request) {
+            @Parameter(description = "学员ID", required = true) @PathVariable String id,
+            @Parameter(description = "更新学员请求") @RequestBody @Valid StudentUpdateRequest request) {
         EduStudentRecord record = new EduStudentRecord();
         BeanUtils.copyProperties(request, record);
         record.setId(id);
@@ -75,9 +77,10 @@ public class StudentController {
      * @return 操作结果
      */
     @DeleteMapping("/{id}")
-    @ApiOperation("删除学员")
+    @Operation(summary = "删除学员", 
+               description = "根据学员ID删除学员（逻辑删除）")
     public Result<Void> deleteStudent(
-            @ApiParam("学员ID") @PathVariable String id) {
+            @Parameter(description = "学员ID", required = true) @PathVariable String id) {
         studentModel.deleteStudent(id);
         return Result.success();
     }
@@ -85,16 +88,17 @@ public class StudentController {
     /**
      * 更新学员状态
      *
-     * @param id     学员ID
+     * @param id 学员ID
      * @param status 状态
      * @return 操作结果
      */
     @PutMapping("/{id}/status")
-    @ApiOperation("更新学员状态")
+    @Operation(summary = "更新学员状态", 
+               description = "更新学员状态，可选值：STUDYING-在读，GRADUATED-已毕业，DROPPED-已退学")
     public Result<Void> updateStudentStatus(
-            @ApiParam("学员ID") @PathVariable String id,
-            @ApiParam("学员状态") @RequestParam StudentStatus status) {
-        //studentModel.updateStudentStatus(id, status);
+            @Parameter(description = "学员ID", required = true) @PathVariable String id,
+            @Parameter(description = "学员状态", required = true) @RequestParam StudentStatus status) {
+        studentModel.updateStatus(id, status);
         return Result.success();
     }
 
@@ -105,25 +109,27 @@ public class StudentController {
      * @return 学员详情
      */
     @GetMapping("/{id}")
-    @ApiOperation("获取学员详情")
-    public Result<StudentDetailVO> getStudentById(
-            @ApiParam("学员ID") @PathVariable String id) {
-        return studentModel.getStudentById(id)
-                .map(this::convertToDetailVO)
-                .map(Result::success)
-                .orElse(Result.failed("学员不存在"));
+    @Operation(summary = "获取学员详情", 
+               description = "根据学员ID获取学员详细信息")
+    public Result<StudentDetailVO> getStudentDetail(
+            @Parameter(description = "学员ID", required = true) @PathVariable String id) {
+        StudentDetailRecord detail = studentModel.getStudentById(id)
+                .orElseThrow(() -> new IllegalArgumentException("学员不存在"));
+        StudentDetailVO vo = new StudentDetailVO();
+        BeanUtils.copyProperties(detail, vo);
+        return Result.success(vo);
     }
 
     /**
      * 查询学员列表
      *
-     * @param request 查询请求
-     * @return 学员列表
+     * @param request 查询参数
+     * @return 学员列表分页结果
      */
     @GetMapping
-    @ApiOperation("查询学员列表")
-    public Result<PageResult<StudentListVO>> listStudents(
-            @ApiParam("查询请求") StudentQueryRequest request) {
+    @Operation(summary = "查询学员列表", 
+               description = "根据条件分页查询学员列表，支持按姓名、手机号、状态等条件筛选")
+    public Result<PageResult<StudentListVO>> listStudents(@Valid StudentQueryRequest request) {
         List<StudentDetailRecord> records = studentModel.listStudents(
                 request.getKeyword(),
                 request.getStatus(),
@@ -132,30 +138,19 @@ public class StudentController {
                 request.getOffset(),
                 request.getLimit()
         );
-        
         long total = studentModel.countStudents(
                 request.getKeyword(),
                 request.getStatus(),
                 request.getCampusId(),
                 request.getInstitutionId()
         );
-        
         List<StudentListVO> list = records.stream()
-                .map(this::convertToListVO)
+                .map(record -> {
+                    StudentListVO vo = new StudentListVO();
+                    BeanUtils.copyProperties(record, vo);
+                    return vo;
+                })
                 .collect(Collectors.toList());
-        
-        return Result.success(new PageResult<>(list, total));
-    }
-
-    private StudentDetailVO convertToDetailVO(StudentDetailRecord record) {
-        StudentDetailVO vo = new StudentDetailVO();
-        BeanUtils.copyProperties(record, vo);
-        return vo;
-    }
-
-    private StudentListVO convertToListVO(StudentDetailRecord record) {
-        StudentListVO vo = new StudentListVO();
-        BeanUtils.copyProperties(record, vo);
-        return vo;
+        return Result.success(new PageResult<StudentListVO>(list, total));
     }
 } 

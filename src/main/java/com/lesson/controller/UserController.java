@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 /**
  * 用户管理接口
  */
-@Tag(name = "用户管理", description = "用户相关接口")
+@Tag(name = "用户管理", description = "用户管理相关接口")
 @RestController
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
@@ -37,11 +37,7 @@ public class UserController {
      */
     @GetMapping("/list")
     @Operation(summary = "查询用户列表", 
-               description = "根据条件分页查询用户列表",
-               responses = {
-                   @ApiResponse(responseCode = "200", description = "查询成功", 
-                           content = @Content(schema = @Schema(implementation = PageResult.class)))
-               })
+               description = "根据条件分页查询用户列表，支持按姓名、手机号、角色等条件筛选")
     @RequirePermission("user:list")
     public Result<PageResult<UserListVO>> list(@Validated UserQueryRequest request) {
         return Result.success(userService.listUsers(request));
@@ -55,11 +51,7 @@ public class UserController {
      */
     @PostMapping("/create")
     @Operation(summary = "创建用户", 
-               description = "创建一个新的用户",
-               responses = {
-                   @ApiResponse(responseCode = "200", description = "创建成功", 
-                           content = @Content(schema = @Schema(implementation = Long.class)))
-               })
+               description = "创建新用户，需要指定用户角色和所属机构/校区")
     @RequirePermission("user:create")
     public Result<Long> create(@RequestBody @Validated UserCreateRequest request) {
         return Result.success(userService.createUser(request));
@@ -73,10 +65,7 @@ public class UserController {
      */
     @PostMapping("/update")
     @Operation(summary = "更新用户", 
-               description = "根据用户ID更新用户信息",
-               responses = {
-                   @ApiResponse(responseCode = "200", description = "更新成功")
-               })
+               description = "更新用户信息，包括姓名、手机号、角色等")
     @RequirePermission("user:update")
     public Result<Void> update(@RequestBody @Validated UserUpdateRequest request) {
         userService.updateUser(request);
@@ -91,12 +80,9 @@ public class UserController {
      */
     @PostMapping("/delete")
     @Operation(summary = "删除用户", 
-               description = "根据用户ID删除用户",
-               responses = {
-                   @ApiResponse(responseCode = "200", description = "删除成功")
-               })
+               description = "根据用户ID删除用户（逻辑删除）")
     @RequirePermission("user:delete")
-    public Result<Void> delete(@RequestParam Long id) {
+    public Result<Void> delete(@Parameter(description = "用户ID", required = true) @RequestParam Long id) {
         userService.deleteUser(id);
         return Result.success(null);
     }
@@ -110,12 +96,11 @@ public class UserController {
      */
     @PostMapping("/updateStatus")
     @Operation(summary = "更新用户状态", 
-               description = "根据用户ID更新用户状态",
-               responses = {
-                   @ApiResponse(responseCode = "200", description = "更新成功")
-               })
+               description = "启用或禁用用户")
     @RequirePermission("user:update")
-    public Result<Void> updateStatus(@RequestParam Long id, @RequestParam Integer status) {
+    public Result<Void> updateStatus(
+            @Parameter(description = "用户ID", required = true) @RequestParam Long id,
+            @Parameter(description = "用户状态（0-禁用，1-启用）", required = true) @RequestParam Integer status) {
         userService.updateStatus(id, status);
         return Result.success(null);
     }

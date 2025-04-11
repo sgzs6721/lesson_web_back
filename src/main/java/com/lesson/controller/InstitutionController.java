@@ -15,7 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * 机构管理接口
  */
-@Tag(name = "机构管理", description = "机构相关接口")
+
+@Tag(name = "机构管理", description = "机构管理相关接口")
 @RestController
 @RequestMapping("/api/institution")
 @RequiredArgsConstructor
@@ -29,7 +30,8 @@ public class InstitutionController {
      * @param id 机构ID
      * @return 机构详情VO
      */
-    @Operation(summary = "获取机构详情", description = "根据机构ID获取机构详情，包含校区列表以及校区负责人信息")
+    @Operation(summary = "获取机构详情", 
+               description = "根据机构ID获取机构详细信息，包含基本信息、校区列表及负责人信息")
     @GetMapping("/detail")
     public Result<InstitutionDetailVO> getInstitutionDetail(
             @Parameter(description = "机构ID", required = true) @RequestParam Long id) {
