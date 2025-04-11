@@ -246,7 +246,7 @@
                 <configuration>
                     <jdbc>
                         <driver>com.mysql.cj.jdbc.Driver</driver>
-                        <url>jdbc:mysql://localhost:3306/lesson?useUnicode=true&amp;characterEncoding=utf8&amp;serverTimezone=Asia/Shanghai</url>
+                        <url><![CDATA[jdbc:mysql://localhost:3306/lesson?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai]]></url>
                         <user>lesson</user>
                         <password>Kate@890217</password>
                     </jdbc>
