@@ -44,12 +44,6 @@ public class UserCreateRequest {
     private Long roleId;
 
     /**
-     * 机构ID，系统管理员可为空
-     */
-    @Schema(description = "所属机构ID（超级管理员可为空）", example = "1")
-    private Long institutionId;
-
-    /**
      * 校区ID，系统管理员可为空
      */
     @Schema(description = "所属校区ID（校区管理员必填）", example = "1")

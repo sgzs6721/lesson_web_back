@@ -50,12 +50,6 @@ public class UserUpdateRequest {
     private Long roleId;
 
     /**
-     * 机构ID，校区管理员可为空
-     */
-    @Schema(description = "机构ID，校区管理员可为空")
-    private Long institutionId;
-
-    /**
      * 校区ID，系统管理员可为空
      */
     @Schema(description = "校区ID，校区管理员必填")

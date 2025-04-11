@@ -54,7 +54,6 @@ public interface CampusStatsRedisService {
     void deleteTeacherCount(Long institutionId, Long campusId);
 
     /**
->>>>>>> 71cacb7 (优化机构类型枚举，更新用户模型以支持校区ID，添加根据机构ID查询校区列表的方法，调整用户注册和更新请求，确保角色和机构ID的有效性。)
      * 获取校区教师数量
      */
     Integer getCoachCount(Long institutionId, Long campusId);

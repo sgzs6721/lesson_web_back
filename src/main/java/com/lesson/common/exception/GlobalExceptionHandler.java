@@ -18,6 +18,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public Result<Void> handleException(Exception e) {
         log.error("系统异常", e);
-        return Result.error("系统异常，请稍后重试");
+        // 返回具体的错误信息而不是固定文本
+        return Result.error(e.getMessage() != null ? e.getMessage() : "未知错误");
     }
 } 

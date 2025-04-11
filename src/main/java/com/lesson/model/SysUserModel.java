@@ -1,8 +1,10 @@
 package com.lesson.model;
 
 import com.lesson.common.enums.UserStatus;
+import com.lesson.constant.RoleConstant;
 import com.lesson.repository.tables.records.SysUserRecord;
 import com.lesson.vo.user.UserLoginVO;
+import com.lesson.vo.user.UserVO;
 import lombok.RequiredArgsConstructor;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -169,23 +171,41 @@ public class SysUserModel {
      * @param roleIds 角色ID列表
      * @param campusIds 校区ID列表
      * @param status 状态
+     * @param institutionId 机构ID
+     * @param isCampusAdmin 是否是校区管理员
      * @param pageNum 页码
      * @param pageSize 每页记录数
      * @return 用户记录结果
      */
     public Result<Record> listUsers(String keyword, List<Long> roleIds, List<Long> campusIds, 
-                               Integer status, Integer pageNum, Integer pageSize) {
-        SelectWhereStep<Record> query = dsl.select(
-                SYS_USER.asterisk(),
-                SYS_ROLE.ROLE_NAME,
-                SYS_CAMPUS.NAME.as("campus_name")
-            )
-            .from(SYS_USER)
-            .leftJoin(SYS_ROLE).on(SYS_USER.ROLE_ID.eq(SYS_ROLE.ID).and(SYS_ROLE.DELETED.eq(0)))
-            .leftJoin(SYS_CAMPUS).on(SYS_USER.CAMPUS_ID.eq(SYS_CAMPUS.ID).and(SYS_CAMPUS.DELETED.eq(0)));
+                               UserStatus status, Long institutionId, boolean isCampusAdmin,
+                               Integer pageNum, Integer pageSize) {
+        SelectWhereStep<Record> query;
+
+        if (isCampusAdmin) {
+            // 校区管理员可以看到校区信息
+            query = dsl.select(
+                    SYS_USER.asterisk(),
+                    SYS_ROLE.ROLE_NAME,
+                    SYS_CAMPUS.NAME.as("campus_name")
+                )
+                .from(SYS_USER)
+                .leftJoin(SYS_ROLE).on(SYS_USER.ROLE_ID.eq(SYS_ROLE.ID).and(SYS_ROLE.DELETED.eq(0)))
+                .leftJoin(SYS_CAMPUS).on(SYS_USER.CAMPUS_ID.eq(SYS_CAMPUS.ID).and(SYS_CAMPUS.DELETED.eq(0)));
+        } else {
+            // 非校区管理员不显示校区信息
+            query = dsl.select(
+                    SYS_USER.asterisk(),
+                    SYS_ROLE.ROLE_NAME,
+                    DSL.val((String)null).as("campus_name")  // 明确指定返回String类型的null值
+                )
+                .from(SYS_USER)
+                .leftJoin(SYS_ROLE).on(SYS_USER.ROLE_ID.eq(SYS_ROLE.ID).and(SYS_ROLE.DELETED.eq(0)));
+        }
         
         // 构建查询条件
-        Condition conditions = SYS_USER.DELETED.eq(0);
+        Condition conditions = SYS_USER.DELETED.eq(0)
+            .and(SYS_USER.INSTITUTION_ID.eq(institutionId));
         
         // 关键字搜索
         if (StringUtils.hasText(keyword)) {
@@ -208,7 +228,7 @@ public class SysUserModel {
         
         // 状态过滤
         if (status != null) {
-            conditions = conditions.and(SYS_USER.STATUS.eq(status));
+            conditions = conditions.and(SYS_USER.STATUS.eq(status.getCode()));
         }
         
         // 应用条件并分页
@@ -223,10 +243,12 @@ public class SysUserModel {
     /**
      * 统计符合条件的用户数
      */
-    public long countUsers(String keyword, List<Long> roleIds, List<Long> campusIds, Integer status) {
+    public long countUsers(String keyword, List<Long> roleIds, List<Long> campusIds,
+                          UserStatus status, Long institutionId) {
         SelectConditionStep<Record1<Integer>> query = dsl.selectCount()
             .from(SYS_USER)
-            .where(SYS_USER.DELETED.eq(0));
+            .where(SYS_USER.DELETED.eq(0))
+            .and(SYS_USER.INSTITUTION_ID.eq(institutionId));  // 添加机构ID条件
         
         // 关键字搜索
         if (StringUtils.hasText(keyword)) {
@@ -249,7 +271,7 @@ public class SysUserModel {
         
         // 状态过滤
         if (status != null) {
-            query = query.and(SYS_USER.STATUS.eq(status));
+            query = query.and(SYS_USER.STATUS.eq(status.getCode()));
         }
         
         return query.fetchOne(0, long.class);
@@ -392,4 +414,42 @@ public class SysUserModel {
                 .and(SYS_USER.STATUS.eq(1))
                 .fetch();
     }
-} 
+
+    /**
+     * 根据ID和机构ID获取用户
+     *
+     * @param id 用户ID
+     * @param institutionId 机构ID
+     * @return 用户记录
+     */
+    public SysUserRecord getByIdAndInstitutionId(Long id, Long institutionId) {
+        return dsl.selectFrom(SYS_USER)
+                .where(SYS_USER.ID.eq(id))
+                .and(SYS_USER.INSTITUTION_ID.eq(institutionId))
+                .and(SYS_USER.DELETED.eq(0))
+                .fetchOne();
+    }
+
+    /**
+     * 根据校区ID列表和机构ID查询管理员信息
+     *
+     * @param campusIds 校区ID列表
+     * @param institutionId 机构ID
+     * @return 管理员信息列表
+     */
+    public List<UserVO> findManagersByCampusIds(List<Long> campusIds, Long institutionId) {
+        return dsl.select(
+                SYS_USER.ID,
+                SYS_USER.REAL_NAME,
+                SYS_USER.PHONE,
+                SYS_USER.CAMPUS_ID
+            )
+            .from(SYS_USER)
+            .join(SYS_ROLE).on(SYS_USER.ROLE_ID.eq(SYS_ROLE.ID))
+            .where(SYS_USER.CAMPUS_ID.in(campusIds))
+            .and(SYS_USER.INSTITUTION_ID.eq(institutionId))
+            .and(SYS_USER.DELETED.eq(0))
+            .and(SYS_ROLE.ROLE_NAME.eq(RoleConstant.ROLE_CAMPUS_ADMIN))
+            .fetchInto(UserVO.class);
+    }
+}

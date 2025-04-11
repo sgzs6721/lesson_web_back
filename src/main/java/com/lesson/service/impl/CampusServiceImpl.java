@@ -3,6 +3,7 @@ package com.lesson.service.impl;
 import com.lesson.common.exception.BusinessException;
 import com.lesson.common.enums.CampusStatus;
 import com.lesson.model.SysCampusModel;
+import com.lesson.model.SysUserModel;
 import com.lesson.model.record.CampusDetailRecord;
 import com.lesson.request.campus.CampusCreateRequest;
 import com.lesson.request.campus.CampusQueryRequest;
@@ -12,14 +13,15 @@ import com.lesson.service.CampusStatsRedisService;
 import com.lesson.vo.CampusVO;
 import com.lesson.vo.CampusSimpleVO;
 import com.lesson.vo.PageResult;
+import com.lesson.vo.user.UserVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -31,6 +33,7 @@ import java.util.stream.Collectors;
 public class CampusServiceImpl implements CampusService {
 
     private final SysCampusModel campusModel;
+    private final SysUserModel userModel;
     private final HttpServletRequest httpServletRequest; // 注入HttpServletRequest
     private final CampusStatsRedisService campusStatsRedisService;
  
@@ -103,33 +106,33 @@ public class CampusServiceImpl implements CampusService {
             institutionId = 1L;
         }
 
-        // 获取校区基本信息
-        CampusDetailRecord record = campusModel.getCampusDetail(id);
+        // 1. 获取校区基本信息
+        CampusDetailRecord record = campusModel.getCampusDetail(id, institutionId);
         if (record == null) {
             throw new BusinessException("校区不存在");
         }
 
         // 转换为VO
         CampusVO campusVO = new CampusVO();
-        campusVO.setId(record.getId());
-        campusVO.setName(record.getName());
-        campusVO.setAddress(record.getAddress());
+        BeanUtils.copyProperties(record, campusVO);
         campusVO.setStatus(CampusStatus.fromCode(record.getStatus()));
-        campusVO.setMonthlyRent(record.getMonthlyRent());
-        campusVO.setPropertyFee(record.getPropertyFee());
-        campusVO.setUtilityFee(record.getUtilityFee());
-        campusVO.setCreatedTime(record.getCreatedTime());
-        campusVO.setUpdateTime(record.getUpdateTime());
 
-        // 从Redis获取统计数据
+        // 2. 获取校区管理员信息
+        List<UserVO> managers = userModel.findManagersByCampusIds(Collections.singletonList(id), institutionId);
+        if (!managers.isEmpty()) {
+            UserVO manager = managers.get(0); // 只取第一个管理员
+            campusVO.setManagerName(manager.getRealName());
+            campusVO.setManagerPhone(manager.getPhone());
+        }
+
+        // 3. 从Redis获取统计数据
         Integer coachCount = campusStatsRedisService.getCoachCount(institutionId, id);
         Integer studentCount = campusStatsRedisService.getStudentCount(institutionId, id);
         Integer lessonCount = campusStatsRedisService.getLessonCount(institutionId, id);
 
-        // TODO 如果Redis中没有数据，则从数据库查询并更新Redis
-        campusVO.setCoachCount(coachCount);
-        campusVO.setStudentCount(studentCount);
-        campusVO.setPendingLessonCount(lessonCount);
+        campusVO.setCoachCount(coachCount != null ? coachCount : 0);
+        campusVO.setStudentCount(studentCount != null ? studentCount : 0);
+        campusVO.setPendingLessonCount(lessonCount != null ? lessonCount : 0);
 
         return campusVO;
     }
@@ -143,8 +146,8 @@ public class CampusServiceImpl implements CampusService {
             institutionId = 1L;
         }
 
-        // 获取校区基本信息列表
-        List<CampusDetailRecord> records = campusModel.listCampuses(
+        // 1. 获取校区基本信息列表
+        List<CampusDetailRecord> campusRecords = campusModel.listCampuses(
             request.getKeyword(),
             request.getStatus(),
             institutionId,
@@ -152,21 +155,36 @@ public class CampusServiceImpl implements CampusService {
             request.getPageSize()
         );
 
-        // 转换为VO列表
+        // 2. 获取校区管理员信息
+        List<Long> campusIds = campusRecords.stream()
+                .map(CampusDetailRecord::getId)
+                .collect(Collectors.toList());
+
+        Map<Long, UserVO> campusManagerMap = new HashMap<>();
+        if (!campusIds.isEmpty()) {
+            // 查询这些校区的管理员信息
+            List<UserVO> managers = userModel.findManagersByCampusIds(campusIds, institutionId);
+            // 构建校区ID到管理员信息的映射，只取每个校区的第一个管理员
+            managers.forEach(manager -> {
+                if (!campusManagerMap.containsKey(manager.getCampusId())) {
+                    campusManagerMap.put(manager.getCampusId(), manager);
+                }
+            });
+        }
+
+        // 3. 组装最终结果
         Long finalInstitutionId = institutionId;
-        List<CampusVO> campusList = records.stream().map(record -> {
+        List<CampusVO> campusList = campusRecords.stream().map(record -> {
             CampusVO campusVO = new CampusVO();
-            campusVO.setId(record.getId());
-            campusVO.setName(record.getName());
-            campusVO.setAddress(record.getAddress());
-            campusVO.setStatus(CampusStatus.fromCode(record.getStatus()));
-            campusVO.setMonthlyRent(record.getMonthlyRent());
-            campusVO.setPropertyFee(record.getPropertyFee());
-            campusVO.setUtilityFee(record.getUtilityFee());
-            campusVO.setCreatedTime(record.getCreatedTime());
-            campusVO.setUpdateTime(record.getUpdateTime());
-            campusVO.setManagerName(record.getManagerName());
-            campusVO.setManagerPhone(record.getManagerPhone());
+            // 设置基本信息
+            BeanUtils.copyProperties(record, campusVO);
+
+            // 设置管理员信息
+            UserVO manager = campusManagerMap.get(record.getId());
+            if (manager != null) {
+                campusVO.setManagerName(manager.getRealName());
+                campusVO.setManagerPhone(manager.getPhone());
+            }
 
             // 从Redis获取统计数据
             Long campusId = record.getId();
@@ -174,16 +192,14 @@ public class CampusServiceImpl implements CampusService {
             Integer studentCount = campusStatsRedisService.getStudentCount(finalInstitutionId, campusId);
             Integer lessonCount = campusStatsRedisService.getLessonCount(finalInstitutionId, campusId);
 
-            // TODO 如果Redis中没有数据，则从数据库查询并更新Redis
-
-            campusVO.setCoachCount(coachCount);
-            campusVO.setStudentCount(studentCount);
-            campusVO.setPendingLessonCount(lessonCount);
+            campusVO.setCoachCount(coachCount != null ? coachCount : 0);
+            campusVO.setStudentCount(studentCount != null ? studentCount : 0);
+            campusVO.setPendingLessonCount(lessonCount != null ? lessonCount : 0);
 
             return campusVO;
         }).collect(Collectors.toList());
 
-        // 获取总记录数
+        // 4. 获取总记录数
         long total = campusModel.countCampuses(
             request.getKeyword(),
             request.getStatus(),

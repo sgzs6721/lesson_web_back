@@ -12,6 +12,7 @@ import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.lesson.repository.Tables.*;
@@ -87,7 +88,7 @@ public class SysCampusModel {
     /**
      * 获取校区详情
      */
-    public CampusDetailRecord getCampusDetail(Long campusId) {
+    public CampusDetailRecord getCampusDetail(Long campusId, Long institutionId) {
         return dsl.select(
                 SYS_CAMPUS.ID,
                 SYS_CAMPUS.NAME,
@@ -97,15 +98,12 @@ public class SysCampusModel {
                 SYS_CAMPUS.PROPERTY_FEE,
                 SYS_CAMPUS.UTILITY_FEE,
                 SYS_CAMPUS.CREATED_TIME,
-                SYS_CAMPUS.UPDATE_TIME,
-                SYS_USER.REAL_NAME.as("managerName"),
-                SYS_USER.PHONE.as("managerPhone")
+                SYS_CAMPUS.UPDATE_TIME
             )
             .from(SYS_CAMPUS)
-            .leftJoin(SYS_USER).on(SYS_CAMPUS.ID.eq(SYS_USER.CAMPUS_ID))
             .where(SYS_CAMPUS.ID.eq(campusId))
-            .and(SYS_USER.DELETED.eq( 0))
-            .and(SYS_CAMPUS.DELETED.eq( 0))
+            .and(SYS_CAMPUS.INSTITUTION_ID.eq(institutionId))
+            .and(SYS_CAMPUS.DELETED.eq(0))
             .fetchOneInto(CampusDetailRecord.class);
     }
 
@@ -113,16 +111,9 @@ public class SysCampusModel {
      * 查询校区列表
      */
     public List<CampusDetailRecord> listCampuses(String keyword, CampusStatus status, Long institutionId, Integer pageNum, Integer pageSize) {
-        SelectConditionStep<Record> query = dsl.select(
-                SYS_CAMPUS.asterisk(),
-                DSL.groupConcat(SYS_USER.REAL_NAME).as("manager_name"),
-                DSL.groupConcat(SYS_USER.PHONE).as("manager_phone")
-            )
+        SelectConditionStep<Record> query = dsl.select(SYS_CAMPUS.asterisk())
             .from(SYS_CAMPUS)
-            .leftJoin(SYS_USER)
-            .on(SYS_CAMPUS.ID.eq(SYS_USER.CAMPUS_ID))
-            .and(SYS_USER.DELETED.eq( 0))
-            .where(SYS_CAMPUS.DELETED.eq( 0))
+            .where(SYS_CAMPUS.DELETED.eq(0))
             .and(SYS_CAMPUS.INSTITUTION_ID.eq(institutionId));
 
         if (StringUtils.hasText(keyword)) {
@@ -134,23 +125,11 @@ public class SysCampusModel {
             query.and(SYS_CAMPUS.STATUS.eq(status.getCode()));
         }
 
-        List<Record> records = query
-                .groupBy(SYS_CAMPUS.fields())
-                .orderBy(SYS_CAMPUS.CREATED_TIME.desc())
-                .limit(pageSize)
-                .offset((pageNum - 1) * pageSize)
-                .fetch();
-
-        // 转换为 List<CampusDetailRecord>
-        return records.stream().map(record -> {
-            CampusDetailRecord detailRecord = new CampusDetailRecord();
-            // 复制基础字段
-            detailRecord.from(record.into(SYS_CAMPUS));
-            // 设置管理员信息
-            detailRecord.setManagerName(record.get("manager_name", String.class));
-            detailRecord.setManagerPhone(record.get("manager_phone", String.class));
-            return detailRecord;
-        }).collect(Collectors.toList());
+        return query
+            .orderBy(SYS_CAMPUS.CREATED_TIME.desc())
+            .limit(pageSize)
+            .offset((pageNum - 1) * pageSize)
+            .fetchInto(CampusDetailRecord.class);
     }
 
     /**

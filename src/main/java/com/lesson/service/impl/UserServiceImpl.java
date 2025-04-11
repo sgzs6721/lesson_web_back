@@ -25,7 +25,7 @@ import org.jooq.Result;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -41,6 +41,7 @@ public class UserServiceImpl implements UserService {
   private final SysInstitutionModel institutionModel;
   private final PasswordEncoder passwordEncoder;
   private final JwtUtil jwtUtil;
+  private final HttpServletRequest httpServletRequest;  // 添加 HttpServletRequest
 
   @Override
   public Long createUser(String phone, String password, String realName, Long institutionId, Long roleId, UserStatus status) {
@@ -134,6 +135,9 @@ public class UserServiceImpl implements UserService {
       throw new BusinessException("用户所属机构不存在");
     }
 
+    // 更新最后登录时间
+    userModel.updateLastLoginTime(user.getId());
+
     // 生成token
     String token = jwtUtil.generateToken(user.getId(), institution.getId());
 
@@ -153,20 +157,38 @@ public class UserServiceImpl implements UserService {
   @Override
   public PageResult<UserListVO> listUsers(UserQueryRequest request) {
     try {
+      // 从请求中获取机构ID
+      Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
+      if (institutionId == null) {
+        // 如果请求中没有机构ID，则使用默认值
+        institutionId = 1L;
+      }
+
       // 查询总数
       long total = userModel.countUsers(
           request.getKeyword(),
           request.getRoleIds(),
           request.getCampusIds(),
-          Objects.isNull(request.getStatus()) ? UserStatus.ENABLED.getCode() : request.getStatus().getCode()
+          request.getStatus(),
+          institutionId
       );
+
+      // 判断当前用户是否是校区管理员
+      boolean isCampusAdmin = false;
+      List<RoleVO> userRoles = getCurrentUserRoles();
+      if (userRoles != null && !userRoles.isEmpty()) {
+          isCampusAdmin = userRoles.stream()
+              .anyMatch(role -> RoleConstant.ROLE_CAMPUS_ADMIN.equals(role.getName()));
+      }
 
       // 查询列表数据
       Result<Record> records = userModel.listUsers(
           request.getKeyword(),
           request.getRoleIds(),
           request.getCampusIds(),
-          Objects.isNull(request.getStatus()) ? UserStatus.ENABLED.getCode() : request.getStatus().getCode(),
+          request.getStatus(),
+          institutionId,
+          isCampusAdmin,
           request.getPageNum(),
           request.getPageSize()
       );
@@ -224,6 +246,13 @@ public class UserServiceImpl implements UserService {
   @Transactional(rollbackFor = Exception.class)
   public Long createUser(UserCreateRequest request) {
     try {
+      // 从请求中获取机构ID
+      Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
+      if (institutionId == null) {
+        // 如果请求中没有机构ID，则使用默认值
+        institutionId = 1L;
+      }
+
       // 检查手机号是否已存在
       if (userModel.existsByPhone(request.getPhone())) {
         throw new BusinessException("手机号已存在");
@@ -246,9 +275,6 @@ public class UserServiceImpl implements UserService {
           throw new BusinessException("校区管理员必须指定所属校区");
         }
 
-        // 根据校区ID获取机构ID
-        Long institutionId = request.getInstitutionId();
-
         // 调用已有的createUser方法
         return userModel.createUser(
             request.getPhone(),
@@ -261,16 +287,12 @@ public class UserServiceImpl implements UserService {
         );
       } else {
         // 其他角色
-        if (request.getInstitutionId() == null) {
-          throw new BusinessException("机构ID不能为空");
-        }
-
         // 调用已有的createUser方法，校区ID默认为-1L
         return userModel.createUser(
             request.getPhone(),
             request.getPassword(),
             request.getRealName(),
-            request.getInstitutionId(),
+            institutionId,
             request.getRoleId(),
             -1L, // 非校区管理员的校区ID默认为-1
             passwordEncoder, request.getStatus()
@@ -288,10 +310,16 @@ public class UserServiceImpl implements UserService {
   @Transactional(rollbackFor = Exception.class)
   public void updateUser(UserUpdateRequest request) {
     try {
-      // 检查用户是否存在
-      SysUserRecord existingUser = userModel.getById(request.getId());
+      // 从请求中获取机构ID
+      Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
+      if (institutionId == null) {
+          institutionId = 1L;
+      }
+
+      // 检查用户是否存在且属于当前机构
+      SysUserRecord existingUser = userModel.getByIdAndInstitutionId(request.getId(), institutionId);
       if (existingUser == null) {
-        throw new BusinessException("用户不存在");
+          throw new BusinessException("用户不存在或无权操作该用户");
       }
 
       // 如果手机号变更，检查是否存在冲突
@@ -310,8 +338,6 @@ public class UserServiceImpl implements UserService {
       if (RoleConstant.ROLE_SUPER_ADMIN.equals(roleName)) {
         throw new BusinessException("不允许创建超级管理员角色");
       }
-
-      Long institutionId = request.getInstitutionId();
       Long campusId = request.getCampusId();
 
       // 校区管理员角色
@@ -322,9 +348,6 @@ public class UserServiceImpl implements UserService {
         }
       } else {
         // 其他角色
-        if (institutionId == null) {
-          throw new BusinessException("机构ID不能为空");
-        }
         // 非校区管理员的校区ID默认为-1
         campusId = -1L;
       }
@@ -352,10 +375,16 @@ public class UserServiceImpl implements UserService {
   @Transactional(rollbackFor = Exception.class)
   public void deleteUser(Long id) {
     try {
-      // 检查用户是否存在
-      SysUserRecord user = userModel.getById(id);
+      // 从请求中获取机构ID
+      Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
+      if (institutionId == null) {
+          institutionId = 1L;
+      }
+
+      // 检查用户是否存在且属于当前机构
+      SysUserRecord user = userModel.getByIdAndInstitutionId(id, institutionId);
       if (user == null) {
-        throw new BusinessException("用户不存在");
+          throw new BusinessException("用户不存在或无权操作该用户");
       }
 
       // 删除用户

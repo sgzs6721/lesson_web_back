@@ -3,6 +3,7 @@ package com.lesson.vo;
 import com.lesson.common.enums.CampusStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -58,13 +59,15 @@ public class CampusVO {
     /**
      * 创建时间
      */
-    @Schema(description = "校区创建时间", example = "2024-01-01 12:00:00")
+    @Schema(description = "创建时间", example = "2024-01-01 12:00:00")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime createdTime;
 
     /**
      * 更新时间
      */
-    @Schema(description = "校区最后更新时间", example = "2024-01-01 12:00:00")
+    @Schema(description = "更新时间", example = "2024-01-01 12:00:00")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime updateTime;
 
     /**
