@@ -339,22 +339,22 @@ public class UserServiceImpl implements UserService {
           throw new BusinessException("用户不存在或无权操作该用户");
       }
 
-      // 获取现有用户的角色名称
+      // 获取现有用户的角色名称和目标角色名称
       String currentRoleName = roleModel.getRoleNameById(existingUser.getRoleId());
-
-      // 如果当前用户是超级管理员，不允许修改
-      if (RoleConstant.ROLE_SUPER_ADMIN.equals(currentRoleName)) {
-          throw new BusinessException("不允许修改超级管理员用户");
-      }
-
-      // 获取目标角色名称
       String targetRoleName = roleModel.getRoleNameById(request.getRoleId());
       if (targetRoleName == null) {
-          throw new BusinessException("角色不存在");
+          throw new BusinessException("目标角色不存在");
       }
 
-      // 不允许将用户修改为超级管理员
-      if (RoleConstant.ROLE_SUPER_ADMIN.equals(targetRoleName)) {
+      // 如果当前用户是超级管理员，只允许修改基本信息，不允许修改角色
+      if (RoleConstant.ROLE_SUPER_ADMIN.equals(currentRoleName) 
+          && !existingUser.getRoleId().equals(request.getRoleId())) {
+          throw new BusinessException("超级管理员不允许变更角色");
+      }
+
+      // 如果当前用户不是超级管理员，不允许将其修改为超级管理员
+      if (!RoleConstant.ROLE_SUPER_ADMIN.equals(currentRoleName) 
+          && RoleConstant.ROLE_SUPER_ADMIN.equals(targetRoleName)) {
           throw new BusinessException("不允许修改为超级管理员角色");
       }
 
