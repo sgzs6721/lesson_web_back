@@ -22,7 +22,7 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
       - name: Build application lesson_web_back
-        run: mvn flyway:clean -Dflyway.url="jdbc:mysql://${{ secrets.HW_TEST_SERVER }}:3306/lesson?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai" -Dflyway.user="lesson" -Dflyway.password="${{ secrets.MYSQL_PASS }}" && mvn flyway:repair -Dflyway.url="jdbc:mysql://${{ secrets.HW_TEST_SERVER }}:3306/lesson?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai" -Dflyway.user="lesson" -Dflyway.password="${{ secrets.MYSQL_PASS }}" && mvn flyway:migrate -Dflyway.url="jdbc:mysql://${{ secrets.HW_TEST_SERVER }}:3306/lesson?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai" -Dflyway.user="lesson" -Dflyway.password="${{ secrets.MYSQL_PASS }}" && mvn jooq-codegen:generate -Dflyway.url="jdbc:mysql://${{ secrets.HW_TEST_SERVER }}:3306/lesson?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai" -Dflyway.user="lesson" -Dflyway.password="${{ secrets.MYSQL_PASS }}" && mvn clean compile && mvn install -Dmaven.test.skip=true
+        run: mvn flyway:clean -P test && mvn flyway:repair -P test && mvn flyway:migrate -P test && mvn jooq-codegen:generate -P test && mvn clean compile -P test && mvn install -P test -Dmaven.test.skip=true
       - name: Scp jar To HW Server
         uses: appleboy/scp-action@master
         with:
