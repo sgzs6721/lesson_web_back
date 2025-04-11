@@ -165,78 +165,41 @@ public class SysUserModel {
     }
 
     /**
-     * 查询用户列表
-     * 
-     * @param keyword 搜索关键字
-     * @param roleIds 角色ID列表
-     * @param campusIds 校区ID列表
-     * @param status 状态
-     * @param institutionId 机构ID
-     * @param isCampusAdmin 是否是校区管理员
-     * @param pageNum 页码
-     * @param pageSize 每页记录数
-     * @return 用户记录结果
+     * 查询用户列表（不包含校区信息）
      */
-    public Result<Record> listUsers(String keyword, List<Long> roleIds, List<Long> campusIds, 
-                               UserStatus status, Long institutionId, boolean isCampusAdmin,
-                               Integer pageNum, Integer pageSize) {
-        SelectWhereStep<Record> query;
+    public Result<Record> listUsers(String keyword, List<Long> roleIds,
+                                  UserStatus status, Long institutionId,
+                                  Integer pageNum, Integer pageSize) {
+        SelectWhereStep<Record> query = dsl.select(
+                SYS_USER.asterisk(),
+                SYS_ROLE.ROLE_NAME
+            )
+            .from(SYS_USER)
+            .leftJoin(SYS_ROLE).on(SYS_USER.ROLE_ID.eq(SYS_ROLE.ID).and(SYS_ROLE.DELETED.eq(0)));
 
-        if (isCampusAdmin) {
-            // 校区管理员可以看到校区信息
-            query = dsl.select(
-                    SYS_USER.asterisk(),
-                    SYS_ROLE.ROLE_NAME,
-                    SYS_CAMPUS.NAME.as("campus_name")
-                )
-                .from(SYS_USER)
-                .leftJoin(SYS_ROLE).on(SYS_USER.ROLE_ID.eq(SYS_ROLE.ID).and(SYS_ROLE.DELETED.eq(0)))
-                .leftJoin(SYS_CAMPUS).on(SYS_USER.CAMPUS_ID.eq(SYS_CAMPUS.ID).and(SYS_CAMPUS.DELETED.eq(0)));
-        } else {
-            // 非校区管理员不显示校区信息
-            query = dsl.select(
-                    SYS_USER.asterisk(),
-                    SYS_ROLE.ROLE_NAME,
-                    DSL.val((String)null).as("campus_name")  // 明确指定返回String类型的null值
-                )
-                .from(SYS_USER)
-                .leftJoin(SYS_ROLE).on(SYS_USER.ROLE_ID.eq(SYS_ROLE.ID).and(SYS_ROLE.DELETED.eq(0)));
-        }
-        
         // 构建查询条件
         Condition conditions = SYS_USER.DELETED.eq(0)
             .and(SYS_USER.INSTITUTION_ID.eq(institutionId));
-        
-        // 关键字搜索
-        if (StringUtils.hasText(keyword)) {
+
+        if (keyword != null && !keyword.isEmpty()) {
             conditions = conditions.and(
                 SYS_USER.REAL_NAME.like("%" + keyword + "%")
                 .or(SYS_USER.PHONE.like("%" + keyword + "%"))
-                .or(SYS_USER.ID.cast(String.class).like("%" + keyword + "%"))
             );
         }
-        
-        // 角色过滤
+
         if (roleIds != null && !roleIds.isEmpty()) {
             conditions = conditions.and(SYS_USER.ROLE_ID.in(roleIds));
         }
-        
-        // 校区过滤
-        if (campusIds != null && !campusIds.isEmpty()) {
-            conditions = conditions.and(SYS_USER.CAMPUS_ID.in(campusIds));
-        }
-        
-        // 状态过滤
+
         if (status != null) {
             conditions = conditions.and(SYS_USER.STATUS.eq(status.getCode()));
         }
-        
-        // 应用条件并分页
-        return query
-            .where(conditions)
+
+        return query.where(conditions)
             .orderBy(SYS_USER.CREATED_TIME.desc())
-            .limit(pageSize)
-            .offset((pageNum - 1) * pageSize)
+            .offset((pageNum - 1) * pageSize)  // 使用 offset() 设置偏移量
+            .limit(pageSize)                    // 使用 limit() 设置每页数量
             .fetch();
     }
     

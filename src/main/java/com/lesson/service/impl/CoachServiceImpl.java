@@ -230,13 +230,19 @@ public class CoachServiceImpl implements CoachService {
     @Override
     public PageResult<CoachVO> listCoaches(CoachQueryRequest request) {
         try {
+            // 从token中获取机构ID
+            Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
+            if (institutionId == null) {
+                throw new BusinessException("机构ID不能为空");
+            }
+
             // 查询总数
             long total = coachModel.countCoaches(
                     request.getKeyword(),
                     request.getStatus(),
                     request.getJobTitle(),
                     request.getCampusId(),
-                    request.getInstitutionId()
+                institutionId
             );
 
             // 创建分页结果
@@ -250,7 +256,7 @@ public class CoachServiceImpl implements CoachService {
                         request.getStatus(),
                         request.getJobTitle(),
                         request.getCampusId(),
-                        request.getInstitutionId(),
+                        institutionId,  // 使用从token中获取的机构ID
                         request.getSortField(),
                         request.getSortOrder(),
                         request.getPage(),

@@ -36,13 +36,7 @@ public class CoachQueryRequest extends PageRequest {
      */
     @Schema(description = "所属校区ID", example = "1")
     private Long campusId;
-    
-    /**
-     * 所属机构ID
-     */
-    @Schema(description = "所属机构ID", example = "1")
-    private Long institutionId;
-    
+
     /**
      * 排序字段
      */

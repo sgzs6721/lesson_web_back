@@ -21,6 +21,7 @@ import com.lesson.vo.user.UserLoginVO;
 import com.lesson.vo.user.UserRegisterVO;
 import lombok.RequiredArgsConstructor;
 import org.jooq.Record;
+import org.jooq.Record3;
 import org.jooq.Result;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -39,6 +40,7 @@ public class UserServiceImpl implements UserService {
   private final SysUserModel userModel;
   private final SysRoleModel roleModel;
   private final SysInstitutionModel institutionModel;
+  private final SysCampusModel campusModel;
   private final PasswordEncoder passwordEncoder;
   private final JwtUtil jwtUtil;
   private final HttpServletRequest httpServletRequest;  // 添加 HttpServletRequest
@@ -147,8 +149,9 @@ public class UserServiceImpl implements UserService {
     loginVO.setPhone(user.getPhone());
     loginVO.setRealName(user.getRealName());
     loginVO.setRoleId(roles.get(0).getId());
-    loginVO.setRoleName(roles.get(0).getName());
+    loginVO.setRoleName(roles.get(0).getName());  // 设置角色名称
     loginVO.setInstitutionId(institution.getId());
+    loginVO.setCampusId(user.getCampusId());      // 设置校区ID
     loginVO.setToken(token);
 
     return loginVO;
@@ -181,21 +184,42 @@ public class UserServiceImpl implements UserService {
               .anyMatch(role -> RoleConstant.ROLE_CAMPUS_ADMIN.equals(role.getName()));
       }
 
-      // 查询列表数据
-      Result<Record> records = userModel.listUsers(
+      // 查询用户基本信息
+      Result<Record> userRecords = userModel.listUsers(
           request.getKeyword(),
           request.getRoleIds(),
-          request.getCampusIds(),
           request.getStatus(),
           institutionId,
-          isCampusAdmin,
           request.getPageNum(),
           request.getPageSize()
       );
 
+      // 获取所有用户ID
+      List<Long> userIds = userRecords.stream()
+          .map(record -> record.get("id", Long.class))
+          .collect(Collectors.toList());
+
+      // 查询用户对应的校区信息
+      Map<Long, UserListVO.CampusInfo> userCampusMap = new HashMap<>();
+      if (!userIds.isEmpty()) {
+          Result<Record3<Long, Long, String>> campusRecords = campusModel.findCampusByUserIds(userIds);
+          for (Record3<Long, Long, String> record : campusRecords) {
+              UserListVO.CampusInfo campusInfo = new UserListVO.CampusInfo();
+              campusInfo.setId(record.value2());  // campus_id
+              campusInfo.setName(record.value3()); // name
+              userCampusMap.put(record.value1(), campusInfo); // user_id -> campusInfo
+          }
+      }
+
       // 转换为VO
-      List<UserListVO> users = records.stream()
-          .map(this::convertToListVO)
+      List<UserListVO> users = userRecords.stream()
+          .map(record -> {
+              UserListVO vo = convertToBasicUserVO(record);
+              // 设置校区信息
+              vo.setCampus(userCampusMap.getOrDefault(vo.getId(),
+                  new UserListVO.CampusInfo())); // 使用内部类
+              return vo;
+          })
           .collect(Collectors.toList());
 
       // 创建分页结果
@@ -210,9 +234,9 @@ public class UserServiceImpl implements UserService {
   }
 
   /**
-   * 将数据库记录转换为UserListVO
+   * 将数据库记录转换为基本的UserListVO（不包含校区信息）
    */
-  private UserListVO convertToListVO(Record record) {
+  private UserListVO convertToBasicUserVO(Record record) {
     UserListVO vo = new UserListVO();
     vo.setId(record.get("id", Long.class));
     vo.setRealName(record.get("real_name", String.class));
@@ -223,12 +247,6 @@ public class UserServiceImpl implements UserService {
     roleInfo.setId(record.get("role_id", Long.class));
     roleInfo.setName(record.get("role_name", String.class));
     vo.setRole(roleInfo);
-
-    // 设置校区信息
-    UserListVO.CampusInfo campusInfo = new UserListVO.CampusInfo();
-    campusInfo.setId(record.get("campus_id", Long.class));
-    campusInfo.setName(record.get("campus_name", String.class));
-    vo.setCampus(campusInfo);
 
     // 设置状态
     Integer status = record.get("status", Integer.class);
@@ -321,34 +339,43 @@ public class UserServiceImpl implements UserService {
           throw new BusinessException("用户不存在或无权操作该用户");
       }
 
+      // 获取现有用户的角色名称
+      String currentRoleName = roleModel.getRoleNameById(existingUser.getRoleId());
+
+      // 如果当前用户是超级管理员，不允许修改
+      if (RoleConstant.ROLE_SUPER_ADMIN.equals(currentRoleName)) {
+          throw new BusinessException("不允许修改超级管理员用户");
+      }
+
+      // 获取目标角色名称
+      String targetRoleName = roleModel.getRoleNameById(request.getRoleId());
+      if (targetRoleName == null) {
+          throw new BusinessException("角色不存在");
+      }
+
+      // 不允许将用户修改为超级管理员
+      if (RoleConstant.ROLE_SUPER_ADMIN.equals(targetRoleName)) {
+          throw new BusinessException("不允许修改为超级管理员角色");
+      }
+
       // 如果手机号变更，检查是否存在冲突
       if (!existingUser.getPhone().equals(request.getPhone())
           && userModel.existsByPhone(request.getPhone())) {
-        throw new BusinessException("手机号已存在");
+          throw new BusinessException("手机号已存在");
       }
 
-      // 获取角色名称
-      String roleName = roleModel.getRoleNameById(request.getRoleId());
-      if (roleName == null) {
-        throw new BusinessException("角色不存在");
-      }
-
-      // 不允许修改为超级管理员
-      if (RoleConstant.ROLE_SUPER_ADMIN.equals(roleName)) {
-        throw new BusinessException("不允许创建超级管理员角色");
-      }
       Long campusId = request.getCampusId();
 
       // 校区管理员角色
-      if (RoleConstant.ROLE_CAMPUS_ADMIN.equals(roleName)) {
-        // 校区管理员必须指定校区ID
-        if (campusId == null || campusId <= 0) {
-          throw new BusinessException("校区管理员必须指定所属校区");
-        }
+      if (RoleConstant.ROLE_CAMPUS_ADMIN.equals(targetRoleName)) {
+          // 校区管理员必须指定校区ID
+          if (campusId == null || campusId <= 0) {
+              throw new BusinessException("校区管理员必须指定所属校区");
+          }
       } else {
-        // 其他角色
-        // 非校区管理员的校区ID默认为-1
-        campusId = -1L;
+          // 其他角色
+          // 非校区管理员的校区ID默认为-1
+          campusId = -1L;
       }
 
       // 更新用户

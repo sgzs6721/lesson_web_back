@@ -29,14 +29,17 @@ public class SysRoleModel {
      * @return 角色列表
      */
     public List<RoleVO> getUserRoles(Long userId) {
-        return dsl.select(SYS_ROLE.ID, SYS_ROLE.ROLE_NAME)
-                .from(SYS_ROLE)
-                .join(SYS_USER)
-                .on(SYS_ROLE.ID.eq(SYS_USER.ROLE_ID))
-                .where(SYS_USER.ID.eq(userId))
-                .and(SYS_USER.DELETED.eq(0))
-                .and(SYS_ROLE.DELETED.eq(0))
-                .fetchInto(RoleVO.class);
+        return dsl.select(
+                SYS_ROLE.ID,
+                SYS_ROLE.ROLE_NAME.as("name")  // 将 role_name 别名设为 name
+            )
+            .from(SYS_ROLE)
+            .join(SYS_USER)
+            .on(SYS_ROLE.ID.eq(SYS_USER.ROLE_ID))
+            .where(SYS_USER.ID.eq(userId))
+            .and(SYS_USER.DELETED.eq(0))
+            .and(SYS_ROLE.DELETED.eq(0))
+            .fetchInto(RoleVO.class);
     }
 
     /**

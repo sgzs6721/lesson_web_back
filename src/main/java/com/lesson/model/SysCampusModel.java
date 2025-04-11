@@ -193,4 +193,21 @@ public class SysCampusModel {
                 .orderBy(SYS_CAMPUS.CREATED_TIME.desc())
                 .fetch();
     }
+
+    /**
+     * 根据用户ID列表查询对应的校区信息
+     */
+    public Result<Record3<Long, Long, String>> findCampusByUserIds(List<Long> userIds) {
+        return dsl.select(
+                SYS_USER.ID.as("user_id"),
+                SYS_CAMPUS.ID.as("campus_id"),
+                SYS_CAMPUS.NAME
+            )
+            .from(SYS_USER)
+            .leftJoin(SYS_CAMPUS).on(SYS_USER.CAMPUS_ID.eq(SYS_CAMPUS.ID))
+            .where(SYS_USER.ID.in(userIds))
+            .and(SYS_USER.DELETED.eq(0))
+            .and(SYS_CAMPUS.DELETED.eq(0))
+            .fetch();
+    }
 }
