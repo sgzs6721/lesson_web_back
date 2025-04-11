@@ -12,6 +12,7 @@ import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.SelectConditionStep;
+import org.jooq.impl.DSL;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -78,7 +79,7 @@ public class SysCoachModel {
 
         try {
             // 创建教练记录
-            Long id = dsl.insertInto(SYS_COACH)
+            dsl.insertInto(SYS_COACH)
                     .set(SYS_COACH.NAME, name)
                     .set(SYS_COACH.STATUS, status.getCode())
                     .set(SYS_COACH.AGE, age)
@@ -90,10 +91,14 @@ public class SysCoachModel {
                     .set(SYS_COACH.GENDER, gender.getCode())
                     .set(SYS_COACH.CAMPUS_ID, campusId)
                     .set(SYS_COACH.INSTITUTION_ID, institutionId)
-                    .set(SYS_COACH.DELETED,  0)
-                    .returning(SYS_COACH.ID)
-                    .fetchOne()
-                    .get(SYS_COACH.ID);
+                    .set(SYS_COACH.DELETED, 0)
+                    .execute();
+
+            // 获取最后插入的ID
+            Long id = dsl.select(DSL.field("LAST_INSERT_ID()")).fetchOne(0, Long.class);
+            if (id == null || id == 0) {
+                throw new RuntimeException("创建教练失败: 获取到的ID无效");
+            }
 
             // 更新Redis缓存中的教练数量
             campusStatsRedisService.incrementTeacherCount(institutionId, campusId);

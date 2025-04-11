@@ -145,6 +145,4 @@ public class CoachCreateRequest {
     @Schema(description = "分红", example = "2000")
     private BigDecimal dividend;
 
-    @NotNull(message = "机构ID不能为空")
-    private Long institutionId;
 } 

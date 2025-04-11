@@ -35,12 +35,10 @@ public enum CoachStatus {
         this.description = description;
     }
 
-    @JsonValue
     public String getCode() {
         return code;
     }
 
-    @JsonCreator
     public static CoachStatus fromCode(String code) {
         for (CoachStatus status : CoachStatus.values()) {
             if (status.getCode().equals(code)) {

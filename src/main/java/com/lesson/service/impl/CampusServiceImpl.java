@@ -195,7 +195,7 @@ public class CampusServiceImpl implements CampusService {
             campusVO.setCoachCount(coachCount != null ? coachCount : 0);
             campusVO.setStudentCount(studentCount != null ? studentCount : 0);
             campusVO.setPendingLessonCount(lessonCount != null ? lessonCount : 0);
-
+            campusVO.setStatus(CampusStatus.fromCode(record.getStatus()));
             return campusVO;
         }).collect(Collectors.toList());
 
@@ -217,13 +217,20 @@ public class CampusServiceImpl implements CampusService {
             throw new BusinessException("状态值无效");
         }
 
+        // 从请求中获取机构ID
+        Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
+        if (institutionId == null) {
+            // 如果请求中没有机构ID，则使用默认值
+            institutionId = 1L;
+        }
+
         // 检查校区是否存在
-        if (!campusModel.existsById(id)) {
+        if (!campusModel.existsById(id, institutionId)) {
             throw new BusinessException("校区不存在");
         }
 
         // 更新状态
-        campusModel.updateStatus(id, status);
+        campusModel.updateStatus(id, institutionId, status);
     }
 
     @Override

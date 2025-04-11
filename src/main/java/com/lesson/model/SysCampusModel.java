@@ -156,11 +156,12 @@ public class SysCampusModel {
     /**
      * 更新校区状态
      */
-    public void updateStatus(Long id, CampusStatus status) {
+    public void updateStatus(Long id, Long institutionId, CampusStatus status) {
         int updated = dsl.update(SYS_CAMPUS)
                 .set(SYS_CAMPUS.STATUS, status.getCode())
                 .where(SYS_CAMPUS.ID.eq(id))
-                .and(SYS_CAMPUS.DELETED.eq( 0))
+                .and(SYS_CAMPUS.INSTITUTION_ID.eq(institutionId))
+                .and(SYS_CAMPUS.DELETED.eq(0))
                 .execute();
         if (updated == 0) {
             throw new RuntimeException("校区不存在或已删除");
@@ -170,11 +171,12 @@ public class SysCampusModel {
     /**
      * 检查校区是否存在
      */
-    public boolean existsById(Long id) {
+    public boolean existsById(Long id, Long institutionId) {
         return dsl.selectCount()
                 .from(SYS_CAMPUS)
                 .where(SYS_CAMPUS.ID.eq(id))
-                .and(SYS_CAMPUS.DELETED.eq( 0))
+                .and(SYS_CAMPUS.INSTITUTION_ID.eq(institutionId))
+                .and(SYS_CAMPUS.DELETED.eq(0))
                 .fetchOne(0, int.class) > 0;
     }
 

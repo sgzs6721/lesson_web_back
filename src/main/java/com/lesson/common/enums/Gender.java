@@ -30,12 +30,10 @@ public enum Gender {
         this.description = description;
     }
 
-    @JsonValue
     public String getCode() {
         return code;
     }
 
-    @JsonCreator
     public static Gender fromCode(String code) {
         for (Gender gender : Gender.values()) {
             if (gender.getCode().equals(code)) {
