@@ -20,7 +20,7 @@ import org.jooq.impl.UpdatableRecordImpl;
  * 学员退费记录表
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class EduStudentRefundRecord extends UpdatableRecordImpl<EduStudentRefundRecord> implements Record17<Long, String, String, String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, String, Long, String, Long, String, LocalDateTime, LocalDateTime, Byte> {
+public class EduStudentRefundRecord extends UpdatableRecordImpl<EduStudentRefundRecord> implements Record17<Long, String, String, String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, String, Long, String, Long, String, LocalDateTime, LocalDateTime, Integer> {
 
     private static final long serialVersionUID = 1L;
 
@@ -251,15 +251,15 @@ public class EduStudentRefundRecord extends UpdatableRecordImpl<EduStudentRefund
     /**
      * Setter for <code>lesson.edu_student_refund.deleted</code>. 是否删除：0-未删除，1-已删除
      */
-    public void setDeleted(Byte value) {
+    public void setDeleted(Integer value) {
         set(16, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_refund.deleted</code>. 是否删除：0-未删除，1-已删除
      */
-    public Byte getDeleted() {
-        return (Byte) get(16);
+    public Integer getDeleted() {
+        return (Integer) get(16);
     }
 
     // -------------------------------------------------------------------------
@@ -276,12 +276,12 @@ public class EduStudentRefundRecord extends UpdatableRecordImpl<EduStudentRefund
     // -------------------------------------------------------------------------
 
     @Override
-    public Row17<Long, String, String, String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, String, Long, String, Long, String, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
+    public Row17<Long, String, String, String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, String, Long, String, Long, String, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
         return (Row17) super.fieldsRow();
     }
 
     @Override
-    public Row17<Long, String, String, String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, String, Long, String, Long, String, LocalDateTime, LocalDateTime, Byte> valuesRow() {
+    public Row17<Long, String, String, String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, String, Long, String, Long, String, LocalDateTime, LocalDateTime, Integer> valuesRow() {
         return (Row17) super.valuesRow();
     }
 
@@ -366,7 +366,7 @@ public class EduStudentRefundRecord extends UpdatableRecordImpl<EduStudentRefund
     }
 
     @Override
-    public Field<Byte> field17() {
+    public Field<Integer> field17() {
         return EduStudentRefund.EDU_STUDENT_REFUND.DELETED;
     }
 
@@ -451,7 +451,7 @@ public class EduStudentRefundRecord extends UpdatableRecordImpl<EduStudentRefund
     }
 
     @Override
-    public Byte component17() {
+    public Integer component17() {
         return getDeleted();
     }
 
@@ -536,7 +536,7 @@ public class EduStudentRefundRecord extends UpdatableRecordImpl<EduStudentRefund
     }
 
     @Override
-    public Byte value17() {
+    public Integer value17() {
         return getDeleted();
     }
 
@@ -637,13 +637,13 @@ public class EduStudentRefundRecord extends UpdatableRecordImpl<EduStudentRefund
     }
 
     @Override
-    public EduStudentRefundRecord value17(Byte value) {
+    public EduStudentRefundRecord value17(Integer value) {
         setDeleted(value);
         return this;
     }
 
     @Override
-    public EduStudentRefundRecord values(Long value1, String value2, String value3, String value4, BigDecimal value5, BigDecimal value6, BigDecimal value7, BigDecimal value8, BigDecimal value9, String value10, Long value11, String value12, Long value13, String value14, LocalDateTime value15, LocalDateTime value16, Byte value17) {
+    public EduStudentRefundRecord values(Long value1, String value2, String value3, String value4, BigDecimal value5, BigDecimal value6, BigDecimal value7, BigDecimal value8, BigDecimal value9, String value10, Long value11, String value12, Long value13, String value14, LocalDateTime value15, LocalDateTime value16, Integer value17) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -678,7 +678,7 @@ public class EduStudentRefundRecord extends UpdatableRecordImpl<EduStudentRefund
     /**
      * Create a detached, initialised EduStudentRefundRecord
      */
-    public EduStudentRefundRecord(Long id, String studentId, String courseId, String courseName, BigDecimal refundHours, BigDecimal refundAmount, BigDecimal handlingFee, BigDecimal deductionAmount, BigDecimal actualRefund, String reason, Long campusId, String campusName, Long institutionId, String institutionName, LocalDateTime createdTime, LocalDateTime updateTime, Byte deleted) {
+    public EduStudentRefundRecord(Long id, String studentId, String courseId, String courseName, BigDecimal refundHours, BigDecimal refundAmount, BigDecimal handlingFee, BigDecimal deductionAmount, BigDecimal actualRefund, String reason, Long campusId, String campusName, Long institutionId, String institutionName, LocalDateTime createdTime, LocalDateTime updateTime, Integer deleted) {
         super(EduStudentRefund.EDU_STUDENT_REFUND);
 
         setId(id);

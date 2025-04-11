@@ -26,12 +26,12 @@ public class SysInstitutionModel {
     public Long createInstitution(String name, Integer type, String description, String managerName, String managerPhone) {
         SysInstitutionRecord institution = dsl.newRecord(SYS_INSTITUTION);
         institution.setName(name);
-        institution.setType(type.byteValue());
+        institution.setType(type);
         institution.setDescription(description);
         institution.setManagerName(managerName);
         institution.setManagerPhone(managerPhone);
         institution.setStatus(InstitutionStatusEnum.OPERATING.getCode());
-        institution.setDeleted((byte) 0);
+        institution.setDeleted(0);
         institution.store();
         return institution.getId();
     }
@@ -44,7 +44,7 @@ public class SysInstitutionModel {
      */
     public Long create(SysInstitutionRecord institution) {
         institution.setStatus(1);
-        institution.setDeleted((byte) 0);
+        institution.setDeleted(0);
         institution.store();
         return institution.getId();
     }
@@ -58,7 +58,7 @@ public class SysInstitutionModel {
     public SysInstitutionRecord getById(Long id) {
         return dsl.selectFrom(SYS_INSTITUTION)
                 .where(SYS_INSTITUTION.ID.eq(id))
-                .and(SYS_INSTITUTION.DELETED.eq((byte) 0))
+                .and(SYS_INSTITUTION.DELETED.eq(0))
                 .fetchOne();
     }
 } 

@@ -20,7 +20,7 @@ import org.jooq.impl.UpdatableRecordImpl;
  * 校区表
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class SysCampusRecord extends UpdatableRecordImpl<SysCampusRecord> implements Record11<Long, Long, String, String, Integer, BigDecimal, BigDecimal, BigDecimal, LocalDateTime, LocalDateTime, Byte> {
+public class SysCampusRecord extends UpdatableRecordImpl<SysCampusRecord> implements Record11<Long, Long, String, String, Integer, BigDecimal, BigDecimal, BigDecimal, LocalDateTime, LocalDateTime, Integer> {
 
     private static final long serialVersionUID = 1L;
 
@@ -167,15 +167,15 @@ public class SysCampusRecord extends UpdatableRecordImpl<SysCampusRecord> implem
     /**
      * Setter for <code>lesson.sys_campus.deleted</code>. 是否删除：0-未删除，1-已删除
      */
-    public void setDeleted(Byte value) {
+    public void setDeleted(Integer value) {
         set(10, value);
     }
 
     /**
      * Getter for <code>lesson.sys_campus.deleted</code>. 是否删除：0-未删除，1-已删除
      */
-    public Byte getDeleted() {
-        return (Byte) get(10);
+    public Integer getDeleted() {
+        return (Integer) get(10);
     }
 
     // -------------------------------------------------------------------------
@@ -192,12 +192,12 @@ public class SysCampusRecord extends UpdatableRecordImpl<SysCampusRecord> implem
     // -------------------------------------------------------------------------
 
     @Override
-    public Row11<Long, Long, String, String, Integer, BigDecimal, BigDecimal, BigDecimal, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
+    public Row11<Long, Long, String, String, Integer, BigDecimal, BigDecimal, BigDecimal, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
         return (Row11) super.fieldsRow();
     }
 
     @Override
-    public Row11<Long, Long, String, String, Integer, BigDecimal, BigDecimal, BigDecimal, LocalDateTime, LocalDateTime, Byte> valuesRow() {
+    public Row11<Long, Long, String, String, Integer, BigDecimal, BigDecimal, BigDecimal, LocalDateTime, LocalDateTime, Integer> valuesRow() {
         return (Row11) super.valuesRow();
     }
 
@@ -252,7 +252,7 @@ public class SysCampusRecord extends UpdatableRecordImpl<SysCampusRecord> implem
     }
 
     @Override
-    public Field<Byte> field11() {
+    public Field<Integer> field11() {
         return SysCampus.SYS_CAMPUS.DELETED;
     }
 
@@ -307,7 +307,7 @@ public class SysCampusRecord extends UpdatableRecordImpl<SysCampusRecord> implem
     }
 
     @Override
-    public Byte component11() {
+    public Integer component11() {
         return getDeleted();
     }
 
@@ -362,7 +362,7 @@ public class SysCampusRecord extends UpdatableRecordImpl<SysCampusRecord> implem
     }
 
     @Override
-    public Byte value11() {
+    public Integer value11() {
         return getDeleted();
     }
 
@@ -427,13 +427,13 @@ public class SysCampusRecord extends UpdatableRecordImpl<SysCampusRecord> implem
     }
 
     @Override
-    public SysCampusRecord value11(Byte value) {
+    public SysCampusRecord value11(Integer value) {
         setDeleted(value);
         return this;
     }
 
     @Override
-    public SysCampusRecord values(Long value1, Long value2, String value3, String value4, Integer value5, BigDecimal value6, BigDecimal value7, BigDecimal value8, LocalDateTime value9, LocalDateTime value10, Byte value11) {
+    public SysCampusRecord values(Long value1, Long value2, String value3, String value4, Integer value5, BigDecimal value6, BigDecimal value7, BigDecimal value8, LocalDateTime value9, LocalDateTime value10, Integer value11) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -462,7 +462,7 @@ public class SysCampusRecord extends UpdatableRecordImpl<SysCampusRecord> implem
     /**
      * Create a detached, initialised SysCampusRecord
      */
-    public SysCampusRecord(Long id, Long institutionId, String name, String address, Integer status, BigDecimal monthlyRent, BigDecimal propertyFee, BigDecimal utilityFee, LocalDateTime createdTime, LocalDateTime updateTime, Byte deleted) {
+    public SysCampusRecord(Long id, Long institutionId, String name, String address, Integer status, BigDecimal monthlyRent, BigDecimal propertyFee, BigDecimal utilityFee, LocalDateTime createdTime, LocalDateTime updateTime, Integer deleted) {
         super(SysCampus.SYS_CAMPUS);
 
         setId(id);

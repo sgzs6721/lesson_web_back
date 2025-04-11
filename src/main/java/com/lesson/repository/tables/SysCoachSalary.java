@@ -111,7 +111,7 @@ public class SysCoachSalary extends TableImpl<SysCoachSalaryRecord> {
     /**
      * The column <code>lesson.sys_coach_salary.deleted</code>. 是否删除：0-未删除，1-已删除
      */
-    public final TableField<SysCoachSalaryRecord, Byte> DELETED = createField(DSL.name("deleted"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "是否删除：0-未删除，1-已删除");
+    public final TableField<SysCoachSalaryRecord, Integer> DELETED = createField(DSL.name("deleted"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.inline("0", SQLDataType.INTEGER)), this, "是否删除：0-未删除，1-已删除");
 
     private SysCoachSalary(Name alias, Table<SysCoachSalaryRecord> aliased) {
         this(alias, aliased, null);
@@ -202,7 +202,7 @@ public class SysCoachSalary extends TableImpl<SysCoachSalaryRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Row12<Long, Long, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, LocalDate, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
+    public Row12<Long, Long, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, LocalDate, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
         return (Row12) super.fieldsRow();
     }
 }

@@ -21,7 +21,7 @@ import org.jooq.impl.UpdatableRecordImpl;
  * 教练薪资表
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class SysCoachSalaryRecord extends UpdatableRecordImpl<SysCoachSalaryRecord> implements Record12<Long, Long, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, LocalDate, LocalDateTime, LocalDateTime, Byte> {
+public class SysCoachSalaryRecord extends UpdatableRecordImpl<SysCoachSalaryRecord> implements Record12<Long, Long, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, LocalDate, LocalDateTime, LocalDateTime, Integer> {
 
     private static final long serialVersionUID = 1L;
 
@@ -182,15 +182,15 @@ public class SysCoachSalaryRecord extends UpdatableRecordImpl<SysCoachSalaryReco
     /**
      * Setter for <code>lesson.sys_coach_salary.deleted</code>. 是否删除：0-未删除，1-已删除
      */
-    public void setDeleted(Byte value) {
+    public void setDeleted(Integer value) {
         set(11, value);
     }
 
     /**
      * Getter for <code>lesson.sys_coach_salary.deleted</code>. 是否删除：0-未删除，1-已删除
      */
-    public Byte getDeleted() {
-        return (Byte) get(11);
+    public Integer getDeleted() {
+        return (Integer) get(11);
     }
 
     // -------------------------------------------------------------------------
@@ -207,12 +207,12 @@ public class SysCoachSalaryRecord extends UpdatableRecordImpl<SysCoachSalaryReco
     // -------------------------------------------------------------------------
 
     @Override
-    public Row12<Long, Long, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, LocalDate, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
+    public Row12<Long, Long, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, LocalDate, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
         return (Row12) super.fieldsRow();
     }
 
     @Override
-    public Row12<Long, Long, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, LocalDate, LocalDateTime, LocalDateTime, Byte> valuesRow() {
+    public Row12<Long, Long, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, LocalDate, LocalDateTime, LocalDateTime, Integer> valuesRow() {
         return (Row12) super.valuesRow();
     }
 
@@ -272,7 +272,7 @@ public class SysCoachSalaryRecord extends UpdatableRecordImpl<SysCoachSalaryReco
     }
 
     @Override
-    public Field<Byte> field12() {
+    public Field<Integer> field12() {
         return SysCoachSalary.SYS_COACH_SALARY.DELETED;
     }
 
@@ -332,7 +332,7 @@ public class SysCoachSalaryRecord extends UpdatableRecordImpl<SysCoachSalaryReco
     }
 
     @Override
-    public Byte component12() {
+    public Integer component12() {
         return getDeleted();
     }
 
@@ -392,7 +392,7 @@ public class SysCoachSalaryRecord extends UpdatableRecordImpl<SysCoachSalaryReco
     }
 
     @Override
-    public Byte value12() {
+    public Integer value12() {
         return getDeleted();
     }
 
@@ -463,13 +463,13 @@ public class SysCoachSalaryRecord extends UpdatableRecordImpl<SysCoachSalaryReco
     }
 
     @Override
-    public SysCoachSalaryRecord value12(Byte value) {
+    public SysCoachSalaryRecord value12(Integer value) {
         setDeleted(value);
         return this;
     }
 
     @Override
-    public SysCoachSalaryRecord values(Long value1, Long value2, BigDecimal value3, BigDecimal value4, BigDecimal value5, BigDecimal value6, BigDecimal value7, BigDecimal value8, LocalDate value9, LocalDateTime value10, LocalDateTime value11, Byte value12) {
+    public SysCoachSalaryRecord values(Long value1, Long value2, BigDecimal value3, BigDecimal value4, BigDecimal value5, BigDecimal value6, BigDecimal value7, BigDecimal value8, LocalDate value9, LocalDateTime value10, LocalDateTime value11, Integer value12) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -499,7 +499,7 @@ public class SysCoachSalaryRecord extends UpdatableRecordImpl<SysCoachSalaryReco
     /**
      * Create a detached, initialised SysCoachSalaryRecord
      */
-    public SysCoachSalaryRecord(Long id, Long coachId, BigDecimal baseSalary, BigDecimal socialInsurance, BigDecimal classFee, BigDecimal performanceBonus, BigDecimal commission, BigDecimal dividend, LocalDate effectiveDate, LocalDateTime createdTime, LocalDateTime updateTime, Byte deleted) {
+    public SysCoachSalaryRecord(Long id, Long coachId, BigDecimal baseSalary, BigDecimal socialInsurance, BigDecimal classFee, BigDecimal performanceBonus, BigDecimal commission, BigDecimal dividend, LocalDate effectiveDate, LocalDateTime createdTime, LocalDateTime updateTime, Integer deleted) {
         super(SysCoachSalary.SYS_COACH_SALARY);
 
         setId(id);

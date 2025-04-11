@@ -20,7 +20,7 @@ import org.jooq.impl.UpdatableRecordImpl;
  * 教练表
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class SysCoachRecord extends UpdatableRecordImpl<SysCoachRecord> implements Record15<Long, String, String, Integer, String, String, String, LocalDate, Integer, String, Long, Long, LocalDateTime, LocalDateTime, Byte> {
+public class SysCoachRecord extends UpdatableRecordImpl<SysCoachRecord> implements Record15<Long, String, String, Integer, String, String, String, LocalDate, Integer, String, Long, Long, LocalDateTime, LocalDateTime, Integer> {
 
     private static final long serialVersionUID = 1L;
 
@@ -223,15 +223,15 @@ public class SysCoachRecord extends UpdatableRecordImpl<SysCoachRecord> implemen
     /**
      * Setter for <code>lesson.sys_coach.deleted</code>. 是否删除：0-未删除，1-已删除
      */
-    public void setDeleted(Byte value) {
+    public void setDeleted(Integer value) {
         set(14, value);
     }
 
     /**
      * Getter for <code>lesson.sys_coach.deleted</code>. 是否删除：0-未删除，1-已删除
      */
-    public Byte getDeleted() {
-        return (Byte) get(14);
+    public Integer getDeleted() {
+        return (Integer) get(14);
     }
 
     // -------------------------------------------------------------------------
@@ -248,12 +248,12 @@ public class SysCoachRecord extends UpdatableRecordImpl<SysCoachRecord> implemen
     // -------------------------------------------------------------------------
 
     @Override
-    public Row15<Long, String, String, Integer, String, String, String, LocalDate, Integer, String, Long, Long, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
+    public Row15<Long, String, String, Integer, String, String, String, LocalDate, Integer, String, Long, Long, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
         return (Row15) super.fieldsRow();
     }
 
     @Override
-    public Row15<Long, String, String, Integer, String, String, String, LocalDate, Integer, String, Long, Long, LocalDateTime, LocalDateTime, Byte> valuesRow() {
+    public Row15<Long, String, String, Integer, String, String, String, LocalDate, Integer, String, Long, Long, LocalDateTime, LocalDateTime, Integer> valuesRow() {
         return (Row15) super.valuesRow();
     }
 
@@ -328,7 +328,7 @@ public class SysCoachRecord extends UpdatableRecordImpl<SysCoachRecord> implemen
     }
 
     @Override
-    public Field<Byte> field15() {
+    public Field<Integer> field15() {
         return SysCoach.SYS_COACH.DELETED;
     }
 
@@ -403,7 +403,7 @@ public class SysCoachRecord extends UpdatableRecordImpl<SysCoachRecord> implemen
     }
 
     @Override
-    public Byte component15() {
+    public Integer component15() {
         return getDeleted();
     }
 
@@ -478,7 +478,7 @@ public class SysCoachRecord extends UpdatableRecordImpl<SysCoachRecord> implemen
     }
 
     @Override
-    public Byte value15() {
+    public Integer value15() {
         return getDeleted();
     }
 
@@ -567,13 +567,13 @@ public class SysCoachRecord extends UpdatableRecordImpl<SysCoachRecord> implemen
     }
 
     @Override
-    public SysCoachRecord value15(Byte value) {
+    public SysCoachRecord value15(Integer value) {
         setDeleted(value);
         return this;
     }
 
     @Override
-    public SysCoachRecord values(Long value1, String value2, String value3, Integer value4, String value5, String value6, String value7, LocalDate value8, Integer value9, String value10, Long value11, Long value12, LocalDateTime value13, LocalDateTime value14, Byte value15) {
+    public SysCoachRecord values(Long value1, String value2, String value3, Integer value4, String value5, String value6, String value7, LocalDate value8, Integer value9, String value10, Long value11, Long value12, LocalDateTime value13, LocalDateTime value14, Integer value15) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -606,7 +606,7 @@ public class SysCoachRecord extends UpdatableRecordImpl<SysCoachRecord> implemen
     /**
      * Create a detached, initialised SysCoachRecord
      */
-    public SysCoachRecord(Long id, String name, String gender, Integer age, String phone, String avatar, String jobTitle, LocalDate hireDate, Integer experience, String status, Long campusId, Long institutionId, LocalDateTime createdTime, LocalDateTime updateTime, Byte deleted) {
+    public SysCoachRecord(Long id, String name, String gender, Integer age, String phone, String avatar, String jobTitle, LocalDate hireDate, Integer experience, String status, Long campusId, Long institutionId, LocalDateTime createdTime, LocalDateTime updateTime, Integer deleted) {
         super(SysCoach.SYS_COACH);
 
         setId(id);

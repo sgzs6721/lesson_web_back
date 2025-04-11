@@ -19,7 +19,7 @@ import org.jooq.impl.UpdatableRecordImpl;
  * 系统用户表
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class SysUserRecord extends UpdatableRecordImpl<SysUserRecord> implements Record13<Long, String, String, String, Long, Long, Long, String, Byte, LocalDateTime, LocalDateTime, LocalDateTime, Byte> {
+public class SysUserRecord extends UpdatableRecordImpl<SysUserRecord> implements Record13<Long, String, String, String, Long, Long, Long, String, Integer, LocalDateTime, LocalDateTime, LocalDateTime, Integer> {
 
     private static final long serialVersionUID = 1L;
 
@@ -138,15 +138,15 @@ public class SysUserRecord extends UpdatableRecordImpl<SysUserRecord> implements
     /**
      * Setter for <code>lesson.sys_user.status</code>. 状态：0-禁用，1-启用
      */
-    public void setStatus(Byte value) {
+    public void setStatus(Integer value) {
         set(8, value);
     }
 
     /**
      * Getter for <code>lesson.sys_user.status</code>. 状态：0-禁用，1-启用
      */
-    public Byte getStatus() {
-        return (Byte) get(8);
+    public Integer getStatus() {
+        return (Integer) get(8);
     }
 
     /**
@@ -194,15 +194,15 @@ public class SysUserRecord extends UpdatableRecordImpl<SysUserRecord> implements
     /**
      * Setter for <code>lesson.sys_user.deleted</code>. 是否删除：0-未删除，1-已删除
      */
-    public void setDeleted(Byte value) {
+    public void setDeleted(Integer value) {
         set(12, value);
     }
 
     /**
      * Getter for <code>lesson.sys_user.deleted</code>. 是否删除：0-未删除，1-已删除
      */
-    public Byte getDeleted() {
-        return (Byte) get(12);
+    public Integer getDeleted() {
+        return (Integer) get(12);
     }
 
     // -------------------------------------------------------------------------
@@ -219,12 +219,12 @@ public class SysUserRecord extends UpdatableRecordImpl<SysUserRecord> implements
     // -------------------------------------------------------------------------
 
     @Override
-    public Row13<Long, String, String, String, Long, Long, Long, String, Byte, LocalDateTime, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
+    public Row13<Long, String, String, String, Long, Long, Long, String, Integer, LocalDateTime, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
         return (Row13) super.fieldsRow();
     }
 
     @Override
-    public Row13<Long, String, String, String, Long, Long, Long, String, Byte, LocalDateTime, LocalDateTime, LocalDateTime, Byte> valuesRow() {
+    public Row13<Long, String, String, String, Long, Long, Long, String, Integer, LocalDateTime, LocalDateTime, LocalDateTime, Integer> valuesRow() {
         return (Row13) super.valuesRow();
     }
 
@@ -269,7 +269,7 @@ public class SysUserRecord extends UpdatableRecordImpl<SysUserRecord> implements
     }
 
     @Override
-    public Field<Byte> field9() {
+    public Field<Integer> field9() {
         return SysUser.SYS_USER.STATUS;
     }
 
@@ -289,7 +289,7 @@ public class SysUserRecord extends UpdatableRecordImpl<SysUserRecord> implements
     }
 
     @Override
-    public Field<Byte> field13() {
+    public Field<Integer> field13() {
         return SysUser.SYS_USER.DELETED;
     }
 
@@ -334,7 +334,7 @@ public class SysUserRecord extends UpdatableRecordImpl<SysUserRecord> implements
     }
 
     @Override
-    public Byte component9() {
+    public Integer component9() {
         return getStatus();
     }
 
@@ -354,7 +354,7 @@ public class SysUserRecord extends UpdatableRecordImpl<SysUserRecord> implements
     }
 
     @Override
-    public Byte component13() {
+    public Integer component13() {
         return getDeleted();
     }
 
@@ -399,7 +399,7 @@ public class SysUserRecord extends UpdatableRecordImpl<SysUserRecord> implements
     }
 
     @Override
-    public Byte value9() {
+    public Integer value9() {
         return getStatus();
     }
 
@@ -419,7 +419,7 @@ public class SysUserRecord extends UpdatableRecordImpl<SysUserRecord> implements
     }
 
     @Override
-    public Byte value13() {
+    public Integer value13() {
         return getDeleted();
     }
 
@@ -472,7 +472,7 @@ public class SysUserRecord extends UpdatableRecordImpl<SysUserRecord> implements
     }
 
     @Override
-    public SysUserRecord value9(Byte value) {
+    public SysUserRecord value9(Integer value) {
         setStatus(value);
         return this;
     }
@@ -496,13 +496,13 @@ public class SysUserRecord extends UpdatableRecordImpl<SysUserRecord> implements
     }
 
     @Override
-    public SysUserRecord value13(Byte value) {
+    public SysUserRecord value13(Integer value) {
         setDeleted(value);
         return this;
     }
 
     @Override
-    public SysUserRecord values(Long value1, String value2, String value3, String value4, Long value5, Long value6, Long value7, String value8, Byte value9, LocalDateTime value10, LocalDateTime value11, LocalDateTime value12, Byte value13) {
+    public SysUserRecord values(Long value1, String value2, String value3, String value4, Long value5, Long value6, Long value7, String value8, Integer value9, LocalDateTime value10, LocalDateTime value11, LocalDateTime value12, Integer value13) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -533,7 +533,7 @@ public class SysUserRecord extends UpdatableRecordImpl<SysUserRecord> implements
     /**
      * Create a detached, initialised SysUserRecord
      */
-    public SysUserRecord(Long id, String password, String realName, String phone, Long roleId, Long institutionId, Long campusId, String avatar, Byte status, LocalDateTime lastLoginTime, LocalDateTime createdTime, LocalDateTime updateTime, Byte deleted) {
+    public SysUserRecord(Long id, String password, String realName, String phone, Long roleId, Long institutionId, Long campusId, String avatar, Integer status, LocalDateTime lastLoginTime, LocalDateTime createdTime, LocalDateTime updateTime, Integer deleted) {
         super(SysUser.SYS_USER);
 
         setId(id);

@@ -94,7 +94,7 @@ public class SysUser extends TableImpl<SysUserRecord> {
     /**
      * The column <code>lesson.sys_user.status</code>. 状态：0-禁用，1-启用
      */
-    public final TableField<SysUserRecord, Byte> STATUS = createField(DSL.name("status"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("1", SQLDataType.TINYINT)), this, "状态：0-禁用，1-启用");
+    public final TableField<SysUserRecord, Integer> STATUS = createField(DSL.name("status"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.inline("1", SQLDataType.INTEGER)), this, "状态：0-禁用，1-启用");
 
     /**
      * The column <code>lesson.sys_user.last_login_time</code>. 最后登录时间
@@ -114,7 +114,7 @@ public class SysUser extends TableImpl<SysUserRecord> {
     /**
      * The column <code>lesson.sys_user.deleted</code>. 是否删除：0-未删除，1-已删除
      */
-    public final TableField<SysUserRecord, Byte> DELETED = createField(DSL.name("deleted"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "是否删除：0-未删除，1-已删除");
+    public final TableField<SysUserRecord, Integer> DELETED = createField(DSL.name("deleted"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.inline("0", SQLDataType.INTEGER)), this, "是否删除：0-未删除，1-已删除");
 
     private SysUser(Name alias, Table<SysUserRecord> aliased) {
         this(alias, aliased, null);
@@ -205,7 +205,7 @@ public class SysUser extends TableImpl<SysUserRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Row13<Long, String, String, String, Long, Long, Long, String, Byte, LocalDateTime, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
+    public Row13<Long, String, String, String, Long, Long, Long, String, Integer, LocalDateTime, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
         return (Row13) super.fieldsRow();
     }
 }

@@ -113,7 +113,7 @@ public class EduStudent extends TableImpl<EduStudentRecord> {
     /**
      * The column <code>lesson.edu_student.deleted</code>. 是否删除：0-未删除，1-已删除
      */
-    public final TableField<EduStudentRecord, Byte> DELETED = createField(DSL.name("deleted"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "是否删除：0-未删除，1-已删除");
+    public final TableField<EduStudentRecord, Integer> DELETED = createField(DSL.name("deleted"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.inline("0", SQLDataType.INTEGER)), this, "是否删除：0-未删除，1-已删除");
 
     private EduStudent(Name alias, Table<EduStudentRecord> aliased) {
         this(alias, aliased, null);
@@ -199,7 +199,7 @@ public class EduStudent extends TableImpl<EduStudentRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Row13<String, String, String, Integer, String, Long, String, Long, String, String, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
+    public Row13<String, String, String, Integer, String, Long, String, Long, String, String, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
         return (Row13) super.fieldsRow();
     }
 }

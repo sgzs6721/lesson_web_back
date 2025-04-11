@@ -19,7 +19,7 @@ import org.jooq.impl.UpdatableRecordImpl;
  * 系统角色表
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class SysRoleRecord extends UpdatableRecordImpl<SysRoleRecord> implements Record7<Long, String, String, Byte, LocalDateTime, LocalDateTime, Byte> {
+public class SysRoleRecord extends UpdatableRecordImpl<SysRoleRecord> implements Record7<Long, String, String, Integer, LocalDateTime, LocalDateTime, Integer> {
 
     private static final long serialVersionUID = 1L;
 
@@ -68,15 +68,15 @@ public class SysRoleRecord extends UpdatableRecordImpl<SysRoleRecord> implements
     /**
      * Setter for <code>lesson.sys_role.status</code>. 状态：0-禁用，1-启用
      */
-    public void setStatus(Byte value) {
+    public void setStatus(Integer value) {
         set(3, value);
     }
 
     /**
      * Getter for <code>lesson.sys_role.status</code>. 状态：0-禁用，1-启用
      */
-    public Byte getStatus() {
-        return (Byte) get(3);
+    public Integer getStatus() {
+        return (Integer) get(3);
     }
 
     /**
@@ -110,15 +110,15 @@ public class SysRoleRecord extends UpdatableRecordImpl<SysRoleRecord> implements
     /**
      * Setter for <code>lesson.sys_role.deleted</code>. 是否删除：0-未删除，1-已删除
      */
-    public void setDeleted(Byte value) {
+    public void setDeleted(Integer value) {
         set(6, value);
     }
 
     /**
      * Getter for <code>lesson.sys_role.deleted</code>. 是否删除：0-未删除，1-已删除
      */
-    public Byte getDeleted() {
-        return (Byte) get(6);
+    public Integer getDeleted() {
+        return (Integer) get(6);
     }
 
     // -------------------------------------------------------------------------
@@ -135,12 +135,12 @@ public class SysRoleRecord extends UpdatableRecordImpl<SysRoleRecord> implements
     // -------------------------------------------------------------------------
 
     @Override
-    public Row7<Long, String, String, Byte, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
+    public Row7<Long, String, String, Integer, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
         return (Row7) super.fieldsRow();
     }
 
     @Override
-    public Row7<Long, String, String, Byte, LocalDateTime, LocalDateTime, Byte> valuesRow() {
+    public Row7<Long, String, String, Integer, LocalDateTime, LocalDateTime, Integer> valuesRow() {
         return (Row7) super.valuesRow();
     }
 
@@ -160,7 +160,7 @@ public class SysRoleRecord extends UpdatableRecordImpl<SysRoleRecord> implements
     }
 
     @Override
-    public Field<Byte> field4() {
+    public Field<Integer> field4() {
         return SysRole.SYS_ROLE.STATUS;
     }
 
@@ -175,7 +175,7 @@ public class SysRoleRecord extends UpdatableRecordImpl<SysRoleRecord> implements
     }
 
     @Override
-    public Field<Byte> field7() {
+    public Field<Integer> field7() {
         return SysRole.SYS_ROLE.DELETED;
     }
 
@@ -195,7 +195,7 @@ public class SysRoleRecord extends UpdatableRecordImpl<SysRoleRecord> implements
     }
 
     @Override
-    public Byte component4() {
+    public Integer component4() {
         return getStatus();
     }
 
@@ -210,7 +210,7 @@ public class SysRoleRecord extends UpdatableRecordImpl<SysRoleRecord> implements
     }
 
     @Override
-    public Byte component7() {
+    public Integer component7() {
         return getDeleted();
     }
 
@@ -230,7 +230,7 @@ public class SysRoleRecord extends UpdatableRecordImpl<SysRoleRecord> implements
     }
 
     @Override
-    public Byte value4() {
+    public Integer value4() {
         return getStatus();
     }
 
@@ -245,7 +245,7 @@ public class SysRoleRecord extends UpdatableRecordImpl<SysRoleRecord> implements
     }
 
     @Override
-    public Byte value7() {
+    public Integer value7() {
         return getDeleted();
     }
 
@@ -268,7 +268,7 @@ public class SysRoleRecord extends UpdatableRecordImpl<SysRoleRecord> implements
     }
 
     @Override
-    public SysRoleRecord value4(Byte value) {
+    public SysRoleRecord value4(Integer value) {
         setStatus(value);
         return this;
     }
@@ -286,13 +286,13 @@ public class SysRoleRecord extends UpdatableRecordImpl<SysRoleRecord> implements
     }
 
     @Override
-    public SysRoleRecord value7(Byte value) {
+    public SysRoleRecord value7(Integer value) {
         setDeleted(value);
         return this;
     }
 
     @Override
-    public SysRoleRecord values(Long value1, String value2, String value3, Byte value4, LocalDateTime value5, LocalDateTime value6, Byte value7) {
+    public SysRoleRecord values(Long value1, String value2, String value3, Integer value4, LocalDateTime value5, LocalDateTime value6, Integer value7) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -317,7 +317,7 @@ public class SysRoleRecord extends UpdatableRecordImpl<SysRoleRecord> implements
     /**
      * Create a detached, initialised SysRoleRecord
      */
-    public SysRoleRecord(Long id, String roleName, String description, Byte status, LocalDateTime createdTime, LocalDateTime updateTime, Byte deleted) {
+    public SysRoleRecord(Long id, String roleName, String description, Integer status, LocalDateTime createdTime, LocalDateTime updateTime, Integer deleted) {
         super(SysRole.SYS_ROLE);
 
         setId(id);

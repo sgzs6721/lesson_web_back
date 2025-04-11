@@ -19,7 +19,7 @@ import org.jooq.impl.UpdatableRecordImpl;
  * 学员转班记录表
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class EduStudentClassTransferRecord extends UpdatableRecordImpl<EduStudentClassTransferRecord> implements Record14<Long, String, String, String, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime, Byte> {
+public class EduStudentClassTransferRecord extends UpdatableRecordImpl<EduStudentClassTransferRecord> implements Record14<Long, String, String, String, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime, Integer> {
 
     private static final long serialVersionUID = 1L;
 
@@ -208,15 +208,15 @@ public class EduStudentClassTransferRecord extends UpdatableRecordImpl<EduStuden
     /**
      * Setter for <code>lesson.edu_student_class_transfer.deleted</code>. 是否删除：0-未删除，1-已删除
      */
-    public void setDeleted(Byte value) {
+    public void setDeleted(Integer value) {
         set(13, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_class_transfer.deleted</code>. 是否删除：0-未删除，1-已删除
      */
-    public Byte getDeleted() {
-        return (Byte) get(13);
+    public Integer getDeleted() {
+        return (Integer) get(13);
     }
 
     // -------------------------------------------------------------------------
@@ -233,12 +233,12 @@ public class EduStudentClassTransferRecord extends UpdatableRecordImpl<EduStuden
     // -------------------------------------------------------------------------
 
     @Override
-    public Row14<Long, String, String, String, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
+    public Row14<Long, String, String, String, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
         return (Row14) super.fieldsRow();
     }
 
     @Override
-    public Row14<Long, String, String, String, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime, Byte> valuesRow() {
+    public Row14<Long, String, String, String, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime, Integer> valuesRow() {
         return (Row14) super.valuesRow();
     }
 
@@ -308,7 +308,7 @@ public class EduStudentClassTransferRecord extends UpdatableRecordImpl<EduStuden
     }
 
     @Override
-    public Field<Byte> field14() {
+    public Field<Integer> field14() {
         return EduStudentClassTransfer.EDU_STUDENT_CLASS_TRANSFER.DELETED;
     }
 
@@ -378,7 +378,7 @@ public class EduStudentClassTransferRecord extends UpdatableRecordImpl<EduStuden
     }
 
     @Override
-    public Byte component14() {
+    public Integer component14() {
         return getDeleted();
     }
 
@@ -448,7 +448,7 @@ public class EduStudentClassTransferRecord extends UpdatableRecordImpl<EduStuden
     }
 
     @Override
-    public Byte value14() {
+    public Integer value14() {
         return getDeleted();
     }
 
@@ -531,13 +531,13 @@ public class EduStudentClassTransferRecord extends UpdatableRecordImpl<EduStuden
     }
 
     @Override
-    public EduStudentClassTransferRecord value14(Byte value) {
+    public EduStudentClassTransferRecord value14(Integer value) {
         setDeleted(value);
         return this;
     }
 
     @Override
-    public EduStudentClassTransferRecord values(Long value1, String value2, String value3, String value4, String value5, String value6, String value7, Long value8, String value9, Long value10, String value11, LocalDateTime value12, LocalDateTime value13, Byte value14) {
+    public EduStudentClassTransferRecord values(Long value1, String value2, String value3, String value4, String value5, String value6, String value7, Long value8, String value9, Long value10, String value11, LocalDateTime value12, LocalDateTime value13, Integer value14) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -569,7 +569,7 @@ public class EduStudentClassTransferRecord extends UpdatableRecordImpl<EduStuden
     /**
      * Create a detached, initialised EduStudentClassTransferRecord
      */
-    public EduStudentClassTransferRecord(Long id, String studentId, String courseId, String courseName, String originalSchedule, String newSchedule, String reason, Long campusId, String campusName, Long institutionId, String institutionName, LocalDateTime createdTime, LocalDateTime updateTime, Byte deleted) {
+    public EduStudentClassTransferRecord(Long id, String studentId, String courseId, String courseName, String originalSchedule, String newSchedule, String reason, Long campusId, String campusName, Long institutionId, String institutionName, LocalDateTime createdTime, LocalDateTime updateTime, Integer deleted) {
         super(EduStudentClassTransfer.EDU_STUDENT_CLASS_TRANSFER);
 
         setId(id);

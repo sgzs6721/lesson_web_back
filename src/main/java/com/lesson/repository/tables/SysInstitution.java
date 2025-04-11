@@ -64,7 +64,7 @@ public class SysInstitution extends TableImpl<SysInstitutionRecord> {
     /**
      * The column <code>lesson.sys_institution.type</code>. 机构类型：1-培训机构，2-学校，3-教育集团
      */
-    public final TableField<SysInstitutionRecord, Byte> TYPE = createField(DSL.name("type"), SQLDataType.TINYINT.nullable(false), this, "机构类型：1-培训机构，2-学校，3-教育集团");
+    public final TableField<SysInstitutionRecord, Integer> TYPE = createField(DSL.name("type"), SQLDataType.INTEGER.nullable(false), this, "机构类型：1-培训机构，2-学校，3-教育集团");
 
     /**
      * The column <code>lesson.sys_institution.description</code>. 机构简介
@@ -99,7 +99,7 @@ public class SysInstitution extends TableImpl<SysInstitutionRecord> {
     /**
      * The column <code>lesson.sys_institution.deleted</code>. 是否删除：0-未删除，1-已删除
      */
-    public final TableField<SysInstitutionRecord, Byte> DELETED = createField(DSL.name("deleted"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "是否删除：0-未删除，1-已删除");
+    public final TableField<SysInstitutionRecord, Integer> DELETED = createField(DSL.name("deleted"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.inline("0", SQLDataType.INTEGER)), this, "是否删除：0-未删除，1-已删除");
 
     private SysInstitution(Name alias, Table<SysInstitutionRecord> aliased) {
         this(alias, aliased, null);
@@ -190,7 +190,7 @@ public class SysInstitution extends TableImpl<SysInstitutionRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Row10<Long, String, Byte, String, String, String, Integer, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
+    public Row10<Long, String, Integer, String, String, String, Integer, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
         return (Row10) super.fieldsRow();
     }
 }

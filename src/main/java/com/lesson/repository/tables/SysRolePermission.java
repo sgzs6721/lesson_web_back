@@ -79,7 +79,7 @@ public class SysRolePermission extends TableImpl<SysRolePermissionRecord> {
     /**
      * The column <code>lesson.sys_role_permission.deleted</code>. 是否删除：0-未删除，1-已删除
      */
-    public final TableField<SysRolePermissionRecord, Byte> DELETED = createField(DSL.name("deleted"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "是否删除：0-未删除，1-已删除");
+    public final TableField<SysRolePermissionRecord, Integer> DELETED = createField(DSL.name("deleted"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.inline("0", SQLDataType.INTEGER)), this, "是否删除：0-未删除，1-已删除");
 
     private SysRolePermission(Name alias, Table<SysRolePermissionRecord> aliased) {
         this(alias, aliased, null);
@@ -170,7 +170,7 @@ public class SysRolePermission extends TableImpl<SysRolePermissionRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Row6<Long, Long, String, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
+    public Row6<Long, Long, String, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
         return (Row6) super.fieldsRow();
     }
 }

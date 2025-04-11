@@ -124,7 +124,7 @@ public class SysCoach extends TableImpl<SysCoachRecord> {
     /**
      * The column <code>lesson.sys_coach.deleted</code>. 是否删除：0-未删除，1-已删除
      */
-    public final TableField<SysCoachRecord, Byte> DELETED = createField(DSL.name("deleted"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "是否删除：0-未删除，1-已删除");
+    public final TableField<SysCoachRecord, Integer> DELETED = createField(DSL.name("deleted"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.inline("0", SQLDataType.INTEGER)), this, "是否删除：0-未删除，1-已删除");
 
     private SysCoach(Name alias, Table<SysCoachRecord> aliased) {
         this(alias, aliased, null);
@@ -210,7 +210,7 @@ public class SysCoach extends TableImpl<SysCoachRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Row15<Long, String, String, Integer, String, String, String, LocalDate, Integer, String, Long, Long, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
+    public Row15<Long, String, String, Integer, String, String, String, LocalDate, Integer, String, Long, Long, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
         return (Row15) super.fieldsRow();
     }
 }

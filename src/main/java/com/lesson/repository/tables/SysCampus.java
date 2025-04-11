@@ -105,7 +105,7 @@ public class SysCampus extends TableImpl<SysCampusRecord> {
     /**
      * The column <code>lesson.sys_campus.deleted</code>. 是否删除：0-未删除，1-已删除
      */
-    public final TableField<SysCampusRecord, Byte> DELETED = createField(DSL.name("deleted"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "是否删除：0-未删除，1-已删除");
+    public final TableField<SysCampusRecord, Integer> DELETED = createField(DSL.name("deleted"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.inline("0", SQLDataType.INTEGER)), this, "是否删除：0-未删除，1-已删除");
 
     private SysCampus(Name alias, Table<SysCampusRecord> aliased) {
         this(alias, aliased, null);
@@ -196,7 +196,7 @@ public class SysCampus extends TableImpl<SysCampusRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Row11<Long, Long, String, String, Integer, BigDecimal, BigDecimal, BigDecimal, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
+    public Row11<Long, Long, String, String, Integer, BigDecimal, BigDecimal, BigDecimal, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
         return (Row11) super.fieldsRow();
     }
 }

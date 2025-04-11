@@ -360,15 +360,15 @@ public class EduStudentCourseOperationRecord extends UpdatableRecordImpl<EduStud
     /**
      * Setter for <code>lesson.edu_student_course_operation.deleted</code>. 是否删除：0-未删除，1-已删除
      */
-    public void setDeleted(Byte value) {
+    public void setDeleted(Integer value) {
         set(24, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_course_operation.deleted</code>. 是否删除：0-未删除，1-已删除
      */
-    public Byte getDeleted() {
-        return (Byte) get(24);
+    public Integer getDeleted() {
+        return (Integer) get(24);
     }
 
     // -------------------------------------------------------------------------
@@ -394,7 +394,7 @@ public class EduStudentCourseOperationRecord extends UpdatableRecordImpl<EduStud
     /**
      * Create a detached, initialised EduStudentCourseOperationRecord
      */
-    public EduStudentCourseOperationRecord(Long id, String studentId, String studentName, String courseId, String courseName, String operationType, String beforeStatus, String afterStatus, String sourceCourseId, String sourceCourseName, String targetCourseId, String targetCourseName, String sourceClassId, String sourceClassName, String targetClassId, String targetClassName, BigDecimal refundAmount, String refundMethod, String operationReason, String operatorId, String operatorName, LocalDateTime operationTime, LocalDateTime createdTime, LocalDateTime updateTime, Byte deleted) {
+    public EduStudentCourseOperationRecord(Long id, String studentId, String studentName, String courseId, String courseName, String operationType, String beforeStatus, String afterStatus, String sourceCourseId, String sourceCourseName, String targetCourseId, String targetCourseName, String sourceClassId, String sourceClassName, String targetClassId, String targetClassName, BigDecimal refundAmount, String refundMethod, String operationReason, String operatorId, String operatorName, LocalDateTime operationTime, LocalDateTime createdTime, LocalDateTime updateTime, Integer deleted) {
         super(EduStudentCourseOperation.EDU_STUDENT_COURSE_OPERATION);
 
         setId(id);

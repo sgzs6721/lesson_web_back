@@ -19,7 +19,7 @@ import org.jooq.impl.UpdatableRecordImpl;
  * 机构表
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class SysInstitutionRecord extends UpdatableRecordImpl<SysInstitutionRecord> implements Record10<Long, String, Byte, String, String, String, Integer, LocalDateTime, LocalDateTime, Byte> {
+public class SysInstitutionRecord extends UpdatableRecordImpl<SysInstitutionRecord> implements Record10<Long, String, Integer, String, String, String, Integer, LocalDateTime, LocalDateTime, Integer> {
 
     private static final long serialVersionUID = 1L;
 
@@ -54,15 +54,15 @@ public class SysInstitutionRecord extends UpdatableRecordImpl<SysInstitutionReco
     /**
      * Setter for <code>lesson.sys_institution.type</code>. 机构类型：1-培训机构，2-学校，3-教育集团
      */
-    public void setType(Byte value) {
+    public void setType(Integer value) {
         set(2, value);
     }
 
     /**
      * Getter for <code>lesson.sys_institution.type</code>. 机构类型：1-培训机构，2-学校，3-教育集团
      */
-    public Byte getType() {
-        return (Byte) get(2);
+    public Integer getType() {
+        return (Integer) get(2);
     }
 
     /**
@@ -152,15 +152,15 @@ public class SysInstitutionRecord extends UpdatableRecordImpl<SysInstitutionReco
     /**
      * Setter for <code>lesson.sys_institution.deleted</code>. 是否删除：0-未删除，1-已删除
      */
-    public void setDeleted(Byte value) {
+    public void setDeleted(Integer value) {
         set(9, value);
     }
 
     /**
      * Getter for <code>lesson.sys_institution.deleted</code>. 是否删除：0-未删除，1-已删除
      */
-    public Byte getDeleted() {
-        return (Byte) get(9);
+    public Integer getDeleted() {
+        return (Integer) get(9);
     }
 
     // -------------------------------------------------------------------------
@@ -177,12 +177,12 @@ public class SysInstitutionRecord extends UpdatableRecordImpl<SysInstitutionReco
     // -------------------------------------------------------------------------
 
     @Override
-    public Row10<Long, String, Byte, String, String, String, Integer, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
+    public Row10<Long, String, Integer, String, String, String, Integer, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
         return (Row10) super.fieldsRow();
     }
 
     @Override
-    public Row10<Long, String, Byte, String, String, String, Integer, LocalDateTime, LocalDateTime, Byte> valuesRow() {
+    public Row10<Long, String, Integer, String, String, String, Integer, LocalDateTime, LocalDateTime, Integer> valuesRow() {
         return (Row10) super.valuesRow();
     }
 
@@ -197,7 +197,7 @@ public class SysInstitutionRecord extends UpdatableRecordImpl<SysInstitutionReco
     }
 
     @Override
-    public Field<Byte> field3() {
+    public Field<Integer> field3() {
         return SysInstitution.SYS_INSTITUTION.TYPE;
     }
 
@@ -232,7 +232,7 @@ public class SysInstitutionRecord extends UpdatableRecordImpl<SysInstitutionReco
     }
 
     @Override
-    public Field<Byte> field10() {
+    public Field<Integer> field10() {
         return SysInstitution.SYS_INSTITUTION.DELETED;
     }
 
@@ -247,7 +247,7 @@ public class SysInstitutionRecord extends UpdatableRecordImpl<SysInstitutionReco
     }
 
     @Override
-    public Byte component3() {
+    public Integer component3() {
         return getType();
     }
 
@@ -282,7 +282,7 @@ public class SysInstitutionRecord extends UpdatableRecordImpl<SysInstitutionReco
     }
 
     @Override
-    public Byte component10() {
+    public Integer component10() {
         return getDeleted();
     }
 
@@ -297,7 +297,7 @@ public class SysInstitutionRecord extends UpdatableRecordImpl<SysInstitutionReco
     }
 
     @Override
-    public Byte value3() {
+    public Integer value3() {
         return getType();
     }
 
@@ -332,7 +332,7 @@ public class SysInstitutionRecord extends UpdatableRecordImpl<SysInstitutionReco
     }
 
     @Override
-    public Byte value10() {
+    public Integer value10() {
         return getDeleted();
     }
 
@@ -349,7 +349,7 @@ public class SysInstitutionRecord extends UpdatableRecordImpl<SysInstitutionReco
     }
 
     @Override
-    public SysInstitutionRecord value3(Byte value) {
+    public SysInstitutionRecord value3(Integer value) {
         setType(value);
         return this;
     }
@@ -391,13 +391,13 @@ public class SysInstitutionRecord extends UpdatableRecordImpl<SysInstitutionReco
     }
 
     @Override
-    public SysInstitutionRecord value10(Byte value) {
+    public SysInstitutionRecord value10(Integer value) {
         setDeleted(value);
         return this;
     }
 
     @Override
-    public SysInstitutionRecord values(Long value1, String value2, Byte value3, String value4, String value5, String value6, Integer value7, LocalDateTime value8, LocalDateTime value9, Byte value10) {
+    public SysInstitutionRecord values(Long value1, String value2, Integer value3, String value4, String value5, String value6, Integer value7, LocalDateTime value8, LocalDateTime value9, Integer value10) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -425,7 +425,7 @@ public class SysInstitutionRecord extends UpdatableRecordImpl<SysInstitutionReco
     /**
      * Create a detached, initialised SysInstitutionRecord
      */
-    public SysInstitutionRecord(Long id, String name, Byte type, String description, String managerName, String managerPhone, Integer status, LocalDateTime createdTime, LocalDateTime updateTime, Byte deleted) {
+    public SysInstitutionRecord(Long id, String name, Integer type, String description, String managerName, String managerPhone, Integer status, LocalDateTime createdTime, LocalDateTime updateTime, Integer deleted) {
         super(SysInstitution.SYS_INSTITUTION);
 
         setId(id);

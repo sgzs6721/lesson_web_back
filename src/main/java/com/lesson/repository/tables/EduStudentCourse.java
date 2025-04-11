@@ -151,7 +151,7 @@ public class EduStudentCourse extends TableImpl<EduStudentCourseRecord> {
     /**
      * The column <code>lesson.edu_student_course.deleted</code>. 是否删除：0-未删除，1-已删除
      */
-    public final TableField<EduStudentCourseRecord, Byte> DELETED = createField(DSL.name("deleted"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "是否删除：0-未删除，1-已删除");
+    public final TableField<EduStudentCourseRecord, Integer> DELETED = createField(DSL.name("deleted"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.inline("0", SQLDataType.INTEGER)), this, "是否删除：0-未删除，1-已删除");
 
     private EduStudentCourse(Name alias, Table<EduStudentCourseRecord> aliased) {
         this(alias, aliased, null);
@@ -242,7 +242,7 @@ public class EduStudentCourse extends TableImpl<EduStudentCourseRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Row20<Long, String, String, String, String, String, String, BigDecimal, BigDecimal, String, LocalDate, LocalDate, String, Long, String, Long, String, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
+    public Row20<Long, String, String, String, String, String, String, BigDecimal, BigDecimal, String, LocalDate, LocalDate, String, Long, String, Long, String, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
         return (Row20) super.fieldsRow();
     }
 }
