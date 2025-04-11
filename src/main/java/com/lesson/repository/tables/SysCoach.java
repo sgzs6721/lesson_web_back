@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
@@ -54,7 +55,7 @@ public class SysCoach extends TableImpl<SysCoachRecord> {
     /**
      * The column <code>lesson.sys_coach.id</code>. 教练ID
      */
-    public final TableField<SysCoachRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false), this, "教练ID");
+    public final TableField<SysCoachRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "教练ID");
 
     /**
      * The column <code>lesson.sys_coach.name</code>. 姓名
@@ -167,6 +168,11 @@ public class SysCoach extends TableImpl<SysCoachRecord> {
     @Override
     public List<Index> getIndexes() {
         return Arrays.<Index>asList(Indexes.SYS_COACH_IDX_CAMPUS_ID, Indexes.SYS_COACH_IDX_CREATED_TIME, Indexes.SYS_COACH_IDX_INSTITUTION_ID, Indexes.SYS_COACH_IDX_JOB_TITLE, Indexes.SYS_COACH_IDX_NAME, Indexes.SYS_COACH_IDX_PHONE, Indexes.SYS_COACH_IDX_STATUS);
+    }
+
+    @Override
+    public Identity<SysCoachRecord, Long> getIdentity() {
+        return (Identity<SysCoachRecord, Long>) super.getIdentity();
     }
 
     @Override

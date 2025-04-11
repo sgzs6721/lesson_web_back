@@ -15,7 +15,7 @@ public class CourseUpdateRequest {
      * 课程ID
      */
     @NotBlank(message = "课程ID不能为空")
-    private String id;
+    private Long id;
 
     /**
      * 课程名称
@@ -60,7 +60,7 @@ public class CourseUpdateRequest {
      * 教练ID
      */
     @NotBlank(message = "教练ID不能为空")
-    private String coachId;
+    private Long coachId;
 
     /**
      * 教练姓名

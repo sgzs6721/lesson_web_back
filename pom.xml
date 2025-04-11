@@ -280,12 +280,18 @@
                 <configuration>
                     <jdbc>
                         <driver>com.mysql.cj.jdbc.Driver</driver>
-                        <url><![CDATA[${db.url}?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai]]></url>
+                        <url>${db.url}</url>
                         <user>${db.user}</user>
                         <password>${db.password}</password>
                     </jdbc>
                     <generator>
                         <database>
+                            <forcedTypes>
+                                <forcedType>
+                                    <name>INTEGER</name>
+                                    <types>.*TINYINT.*</types>
+                                </forcedType>
+                            </forcedTypes>
                             <name>org.jooq.meta.mysql.MySQLDatabase</name>
                             <includes>edu_.*|sys_.*|student_course</includes>
                             <excludes></excludes>
@@ -294,29 +300,20 @@
                                     <inputSchema>lesson</inputSchema>
                                 </schema>
                             </schemata>
-                            <forcedTypes>
-                                <!-- 添加 TINYINT 到 INTEGER 的映射 -->
-                                <forcedType>
-                                    <name>INTEGER</name>
-                                    <includeTypes>TINYINT</includeTypes>
-                                </forcedType>
-                                <!-- 保留原有的 deleted 字段的 BOOLEAN 映射 -->
-                                <forcedType>
-                                    <name>BOOLEAN</name>
-                                    <includeTypes>TINYINT</includeTypes>
-                                    <includeExpression>.*\.deleted</includeExpression>
-                                </forcedType>
-                            </forcedTypes>
                         </database>
                         <target>
                             <packageName>com.lesson.repository</packageName>
                             <directory>src/main/java</directory>
                         </target>
-                        <strategy>
-                            <name>org.jooq.codegen.DefaultGeneratorStrategy</name>
-                        </strategy>
                     </generator>
                 </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>mysql</groupId>
+                        <artifactId>mysql-connector-java</artifactId>
+                        <version>${mysql.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
 
             <plugin>

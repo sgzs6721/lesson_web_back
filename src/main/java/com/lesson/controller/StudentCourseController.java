@@ -118,7 +118,7 @@ public class StudentCourseController {
                description = "将学员从一个课程转到另一个课程")
     public Result<Void> transferStudentCourse(
             @Parameter(description = "转课请求") @RequestBody @Valid StudentCourseTransferRequest request) {
-        studentCourseModel.transferCourse(Long.parseLong(request.getSourceCourseId()), request);
+        studentCourseModel.transferCourse(request.getSourceCourseId(), request);
         return Result.success();
     }
 
@@ -133,7 +133,7 @@ public class StudentCourseController {
                description = "将学员从一个班级转到另一个班级")
     public Result<Void> transferStudentClass(
             @Parameter(description = "转班请求") @RequestBody @Valid StudentCourseClassTransferRequest request) {
-        studentCourseModel.transferClass(Long.parseLong(request.getSourceClassId()), request);
+        studentCourseModel.transferClass(request.getSourceClassId(), request);
         return Result.success();
     }
 

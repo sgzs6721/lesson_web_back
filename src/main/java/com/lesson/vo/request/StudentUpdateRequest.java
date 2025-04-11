@@ -16,6 +16,9 @@ import javax.validation.constraints.Size;
 @ApiModel("更新学员请求")
 public class StudentUpdateRequest {
 
+    @NotBlank(message = "学员ID不能为空")
+    private Long id;
+
     /**
      * 学员姓名
      */

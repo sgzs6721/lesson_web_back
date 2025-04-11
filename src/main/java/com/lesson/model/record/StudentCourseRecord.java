@@ -20,12 +20,12 @@ public class StudentCourseRecord {
     /**
      * 学员ID
      */
-    private String studentId;
+    private Long studentId;
     
     /**
      * 课程ID
      */
-    private String courseId;
+    private Long courseId;
     
     /**
      * 课程名称
@@ -40,7 +40,7 @@ public class StudentCourseRecord {
     /**
      * 教练ID
      */
-    private String coachId;
+    private Long coachId;
     
     /**
      * 教练姓名

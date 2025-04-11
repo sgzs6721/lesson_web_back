@@ -13,7 +13,7 @@ public class StudentDetailRecord {
     /**
      * 学员ID
      */
-    private String id;
+    private Long id;
     
     /**
      * 学员姓名

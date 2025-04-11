@@ -1,6 +1,6 @@
 -- 学员表
 CREATE TABLE `edu_student` (
-    `id` varchar(32) NOT NULL COMMENT '学员ID',
+    `id` bigint(20) NOT NULL COMMENT '学员ID',
     `name` varchar(50) NOT NULL COMMENT '学员姓名',
     `gender` varchar(10) NOT NULL COMMENT '性别：MALE-男，FEMALE-女',
     `age` int NOT NULL COMMENT '年龄',
@@ -24,11 +24,11 @@ CREATE TABLE `edu_student` (
 -- 学员课程关系表
 CREATE TABLE `edu_student_course` (
     `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '记录ID',
-    `student_id` varchar(32) NOT NULL COMMENT '学员ID',
-    `course_id` varchar(32) NOT NULL COMMENT '课程ID',
+    `student_id` bigint(20) NOT NULL COMMENT '学员ID',
+    `course_id` bigint(20) NOT NULL COMMENT '课程ID',
     `course_name` varchar(100) NOT NULL COMMENT '课程名称',
     `course_type` varchar(50) NOT NULL COMMENT '课程类型',
-    `coach_id` varchar(32) NOT NULL COMMENT '教练ID',
+    `coach_id` bigint(20) NOT NULL COMMENT '教练ID',
     `coach_name` varchar(50) NOT NULL COMMENT '教练姓名',
     `total_hours` decimal(10,2) NOT NULL COMMENT '总课时数',
     `consumed_hours` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '已消耗课时数',
@@ -55,9 +55,9 @@ CREATE TABLE `edu_student_course` (
 -- 学员课程记录表
 CREATE TABLE `edu_student_course_record` (
     `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '记录ID',
-    `student_id` varchar(32) NOT NULL COMMENT '学员ID',
-    `course_id` varchar(32) NOT NULL COMMENT '课程ID',
-    `coach_id` varchar(32) NOT NULL COMMENT '教练ID',
+    `student_id` bigint(20) NOT NULL COMMENT '学员ID',
+    `course_id` bigint(20) NOT NULL COMMENT '课程ID',
+    `coach_id` bigint(20) NOT NULL COMMENT '教练ID',
     `coach_name` varchar(50) NOT NULL COMMENT '教练姓名',
     `course_date` date NOT NULL COMMENT '上课日期',
     `start_time` time NOT NULL COMMENT '开始时间',

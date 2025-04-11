@@ -25,7 +25,7 @@ public interface CoachService {
     Long createCoach(CoachCreateRequest request);
     
     /**
-     * 更新教练
+     * 更新教练信息（包括基本信息和薪资信息）
      *
      * @param request 更新教练请求
      */
@@ -42,9 +42,11 @@ public interface CoachService {
      * 获取教练详情
      *
      * @param id 教练ID
-     * @return 教练详情
+     * @param campusId 校区ID
+     * @param institutionId 机构ID
+     * @return 教练详情VO
      */
-    CoachDetailVO getCoachDetail(Long id);
+    CoachDetailVO getCoachDetail(Long id, Long campusId);
     
     /**
      * 分页查询教练列表
@@ -61,14 +63,6 @@ public interface CoachService {
      * @param status 状态
      */
     void updateStatus(Long id, String status);
-    
-    /**
-     * 更新教练薪资
-     *
-     * @param id      教练ID
-     * @param request 薪资更新请求
-     */
-    void updateSalary(Long id, CoachSalaryUpdateRequest request);
     
     /**
      * 获取教练简单信息列表
@@ -91,5 +85,5 @@ public interface CoachService {
      * @param id        教练ID
      * @param courseIds 课程ID列表
      */
-    void updateCoachCourses(Long id, List<String> courseIds);
-} 
+    void updateCoachCourses(Long id, List<Long> courseIds);
+}

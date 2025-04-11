@@ -43,7 +43,7 @@ public class CourseCreateRequest {
 
     @NotBlank(message = "教练ID不能为空")
     @ApiModelProperty("教练ID")
-    private String coachId;
+    private Long coachId;
 
     @NotBlank(message = "教练姓名不能为空")
     @ApiModelProperty("教练姓名")
@@ -53,18 +53,6 @@ public class CourseCreateRequest {
     @ApiModelProperty("校区ID")
     private Long campusId;
 
-    @NotBlank(message = "校区名称不能为空")
-    @ApiModelProperty("校区名称")
-    private String campusName;
-
-    @NotNull(message = "机构ID不能为空")
-    @ApiModelProperty("机构ID")
-    private Long institutionId;
-
-    @NotBlank(message = "机构名称不能为空")
-    @ApiModelProperty("机构名称")
-    private String institutionName;
-
     @ApiModelProperty("课程描述")
     private String description;
-} 
+}

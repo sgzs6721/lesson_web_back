@@ -24,7 +24,7 @@ public class StudentCourseOperationRecordVO {
      * 学员ID
      */
     @Schema(description = "学员ID")
-    private String studentId;
+    private Long studentId;
 
     /**
      * 学员姓名
@@ -36,7 +36,7 @@ public class StudentCourseOperationRecordVO {
      * 课程ID
      */
     @Schema(description = "课程ID")
-    private String courseId;
+    private Long courseId;
 
     /**
      * 课程名称
@@ -66,7 +66,7 @@ public class StudentCourseOperationRecordVO {
      * 原课程ID
      */
     @Schema(description = "原课程ID")
-    private String sourceCourseId;
+    private Long sourceCourseId;
 
     /**
      * 原课程名称
@@ -78,7 +78,7 @@ public class StudentCourseOperationRecordVO {
      * 目标课程ID
      */
     @Schema(description = "目标课程ID")
-    private String targetCourseId;
+    private Long targetCourseId;
 
     /**
      * 目标课程名称
@@ -90,7 +90,7 @@ public class StudentCourseOperationRecordVO {
      * 原班级ID
      */
     @Schema(description = "原班级ID")
-    private String sourceClassId;
+    private Long sourceClassId;
 
     /**
      * 原班级名称
@@ -102,7 +102,7 @@ public class StudentCourseOperationRecordVO {
      * 目标班级ID
      */
     @Schema(description = "目标班级ID")
-    private String targetClassId;
+    private Long targetClassId;
 
     /**
      * 目标班级名称
@@ -132,7 +132,7 @@ public class StudentCourseOperationRecordVO {
      * 操作人ID
      */
     @Schema(description = "操作人ID")
-    private String operatorId;
+    private Long operatorId;
 
     /**
      * 操作人姓名

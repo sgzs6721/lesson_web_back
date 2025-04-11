@@ -9,6 +9,7 @@ import com.lesson.request.coach.CoachCreateRequest;
 import com.lesson.request.coach.CoachQueryRequest;
 import com.lesson.request.coach.CoachSalaryUpdateRequest;
 import com.lesson.request.coach.CoachUpdateRequest;
+import com.lesson.service.CampusStatsRedisService;
 import com.lesson.service.CoachService;
 import com.lesson.vo.*;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,8 +32,8 @@ import java.util.stream.Collectors;
 public class CoachServiceImpl implements CoachService {
 
   private final HttpServletRequest httpServletRequest; // 注入HttpServletRequest
-
   private final SysCoachModel coachModel;
+  private final CampusStatsRedisService campusStatsRedisService;
 
     /**
      * 转换为教练VO
@@ -56,7 +58,7 @@ public class CoachServiceImpl implements CoachService {
         vo.setCampusName(record.getCampusName());
         vo.setInstitutionId(record.getInstitutionId());
         vo.setInstitutionName(record.getInstitutionName());
-        vo.setCertifications(record.getCertifications());
+        vo.setCertifications(record.getCertifications());  // 设置证书列表
 
         return vo;
     }
@@ -86,18 +88,16 @@ public class CoachServiceImpl implements CoachService {
         vo.setInstitutionName(record.getInstitutionName());
         vo.setCertifications(record.getCertifications());
 
-        // 设置薪资信息
-        if (record.getBaseSalary() != null) {
-            CoachDetailVO.SalaryInfo salaryInfo = new CoachDetailVO.SalaryInfo();
-            salaryInfo.setBaseSalary(record.getBaseSalary());
-            salaryInfo.setSocialInsurance(record.getSocialInsurance());
-            salaryInfo.setClassFee(record.getClassFee());
-            salaryInfo.setPerformanceBonus(record.getPerformanceBonus());
-            salaryInfo.setCommission(record.getCommission());
-            salaryInfo.setDividend(record.getDividend());
-            salaryInfo.setEffectiveDate(record.getEffectiveDate());
-            vo.setSalary(salaryInfo);
-        }
+        // 始终创建薪资信息对象
+        CoachDetailVO.SalaryInfo salaryInfo = new CoachDetailVO.SalaryInfo();
+        salaryInfo.setBaseSalary(record.getBaseSalary());
+        salaryInfo.setSocialInsurance(record.getSocialInsurance());
+        salaryInfo.setClassFee(record.getClassFee());
+        salaryInfo.setPerformanceBonus(record.getPerformanceBonus());
+        salaryInfo.setCommission(record.getCommission());
+        salaryInfo.setDividend(record.getDividend());
+        salaryInfo.setEffectiveDate(record.getEffectiveDate());
+        vo.setSalary(salaryInfo);
 
         return vo;
     }
@@ -144,6 +144,9 @@ public class CoachServiceImpl implements CoachService {
                 coachModel.addCertifications(coachId, request.getCertifications());
             }
 
+            // 更新Redis缓存中的教练数量
+            campusStatsRedisService.incrementTeacherCount(institutionId, request.getCampusId());
+
             return coachId;
         } catch (RuntimeException e) {
             log.error("创建教练失败", e);
@@ -166,7 +169,7 @@ public class CoachServiceImpl implements CoachService {
             }
 
             // 获取现有教练信息
-            CoachDetailRecord coach = coachModel.getCoach(request.getId());
+            CoachDetailRecord coach = coachModel.getCoach(request.getId(), request.getCampusId(), institutionId);
             if (coach == null) {
                 throw new BusinessException("教练不存在或已删除");
             }
@@ -189,12 +192,29 @@ public class CoachServiceImpl implements CoachService {
                     request.getExperience() != null ? request.getExperience() : coach.getExperience(),
                     request.getGender(),
                     request.getCampusId() != null ? request.getCampusId() : coach.getCampusId(),
-                    institutionId  // 使用从请求中获取的机构ID
+                    institutionId
             );
 
             // 更新证书
             if (request.getCertifications() != null) {
                 coachModel.addCertifications(request.getId(), request.getCertifications());
+            }
+
+            // 更新薪资信息（如果有提供薪资相关字段）
+            if (request.getBaseSalary() != null || request.getSocialInsurance() != null ||
+                request.getClassFee() != null || request.getPerformanceBonus() != null ||
+                request.getCommission() != null || request.getDividend() != null) {
+                
+                coachModel.addSalary(
+                    request.getId(),
+                    request.getBaseSalary(),
+                    request.getSocialInsurance(),
+                    request.getClassFee(),
+                    request.getPerformanceBonus(),
+                    request.getCommission(),
+                    request.getDividend(),
+                    LocalDate.now()  // 使用当前日期作为薪资调整生效日期
+                );
             }
         } catch (RuntimeException e) {
             log.error("更新教练失败", e);
@@ -214,9 +234,14 @@ public class CoachServiceImpl implements CoachService {
     }
 
     @Override
-    public CoachDetailVO getCoachDetail(Long id) {
+    public CoachDetailVO getCoachDetail(Long id, Long campusId) {
         try {
-            CoachDetailRecord record = coachModel.getCoach(id);
+          // 从token中获取机构ID
+          Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
+          if (institutionId == null) {
+            throw new BusinessException("机构ID不能为空");
+          }
+            CoachDetailRecord record = coachModel.getCoach(id, campusId, institutionId);
             if (record == null) {
                 throw new BusinessException("教练不存在或已删除");
             }
@@ -303,31 +328,6 @@ public class CoachServiceImpl implements CoachService {
         }
     }
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void updateSalary(Long id, CoachSalaryUpdateRequest request) {
-        try {
-            // 检查教练是否存在
-            if (!coachModel.existsById(id)) {
-                throw new BusinessException("教练不存在");
-            }
-
-            // 添加新的薪资记录
-            coachModel.addSalary(
-                    id,
-                    request.getBaseSalary(),
-                    request.getSocialInsurance(),
-                    request.getClassFee(),
-                    request.getPerformanceBonus(),
-                    request.getCommission(),
-                    request.getDividend(),
-                    request.getEffectiveDate()
-            );
-        } catch (RuntimeException e) {
-            log.error("更新教练薪资失败", e);
-            throw new BusinessException(e.getMessage());
-        }
-    }
 
     @Override
     public List<CoachSimpleVO> listSimpleCoaches() {
@@ -365,7 +365,7 @@ public class CoachServiceImpl implements CoachService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateCoachCourses(Long id, List<String> courseIds) {
+    public void updateCoachCourses(Long id, List<Long> courseIds) {
         try {
             // 检查教练是否存在
             if (!coachModel.existsById(id)) {

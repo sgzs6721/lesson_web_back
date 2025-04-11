@@ -46,7 +46,7 @@ public class StudentCourseRefundRequest {
      */
     @NotBlank(message = "操作人ID不能为空")
     @Schema(description = "操作人ID")
-    private String operatorId;
+    private Long operatorId;
 
     /**
      * 操作人姓名

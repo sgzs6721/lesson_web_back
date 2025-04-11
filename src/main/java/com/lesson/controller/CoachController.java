@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -28,7 +29,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/coach")
 @RequiredArgsConstructor
-@Tag(name = "教练管理")
+@Tag(name = "教练管理", description = "教练相关接口")
 public class CoachController {
 
     private final CoachService coachService;
@@ -53,13 +54,12 @@ public class CoachController {
     /**
      * 更新教练
      *
-     * @param id 教练ID
      * @param request 更新教练请求参数
      * @return 无
      */
     @PostMapping("/update")
     @Operation(summary = "更新教练",
-               description = "根据ID更新教练信息",
+               description = "更新教练信息（包括基本信息和薪资信息）",
                responses = {
                    @ApiResponse(responseCode = "200", description = "更新成功")
                })
@@ -88,20 +88,14 @@ public class CoachController {
 
     /**
      * 获取教练详情
-     *
-     * @param id 教练ID
-     * @return 教练详情VO
      */
     @GetMapping("/detail")
-    @Operation(summary = "获取教练详情",
-               description = "根据ID获取教练详细信息",
-               responses = {
-                   @ApiResponse(responseCode = "200", description = "获取成功",
-                               content = @Content(schema = @Schema(implementation = CoachDetailVO.class)))
-               })
+    @Operation(summary = "获取教练详情")
     public Result<CoachDetailVO> getDetail(
-            @Parameter(description = "教练ID", required = true) @RequestParam Long id) {
-         return Result.success(coachService.getCoachDetail(id));
+            @Parameter(description = "教练ID", required = true) @RequestParam Long id,
+            @Parameter(description = "校区ID", required = true) @RequestParam Long campusId,
+            HttpServletRequest request) {
+        return Result.success(coachService.getCoachDetail(id, campusId));
     }
 
     /**
@@ -112,7 +106,7 @@ public class CoachController {
      */
     @GetMapping("/list")
     @Operation(summary = "查询教练列表",
-               description = "根据条件分页查询教练列表",
+               description = "根据条件分页查询教练列表（校区ID为必传参数）",
                responses = {
                    @ApiResponse(responseCode = "200", description = "查询成功",
                                content = @Content(schema = @Schema(implementation = PageResult.class)))
@@ -142,25 +136,7 @@ public class CoachController {
         return Result.success(null);
     }
 
-    /**
-     * 更新教练薪资
-     *
-     * @param id 教练ID
-     * @param request 薪资更新请求参数
-     * @return 无
-     */
-    @PostMapping("/updateSalary")
-    @Operation(summary = "更新教练薪资",
-               description = "根据ID更新教练薪资信息",
-               responses = {
-                   @ApiResponse(responseCode = "200", description = "更新成功")
-               })
-    public Result<Void> updateSalary(
-            @Parameter(description = "教练ID", required = true) @RequestParam Long id,
-             @RequestBody @Validated CoachSalaryUpdateRequest request) {
-        coachService.updateSalary(id, request);
-        return Result.success(null);
-    }
+    // 删除 updateSalary 接口，因为已经合并到 update 接口中
 
     /**
      * 获取教练简单列表
@@ -211,7 +187,7 @@ public class CoachController {
                })
     public Result<Void> updateCoachCourses(
             @Parameter(description = "教练ID", required = true) @RequestParam Long id,
-             @RequestBody List<String> courseIds) {
+             @RequestBody List<Long> courseIds) {
         coachService.updateCoachCourses(id, courseIds);
         return Result.success(null);
     }

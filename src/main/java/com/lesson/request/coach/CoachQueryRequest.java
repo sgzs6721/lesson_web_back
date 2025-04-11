@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * 查询教练请求
  */
@@ -34,7 +36,8 @@ public class CoachQueryRequest extends PageRequest {
     /**
      * 所属校区ID
      */
-    @Schema(description = "所属校区ID", example = "1")
+    @NotNull(message = "校区ID不能为空")
+    @Schema(description = "所属校区ID", required = true, example = "1")
     private Long campusId;
 
     /**

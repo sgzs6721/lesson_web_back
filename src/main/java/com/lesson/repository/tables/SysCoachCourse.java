@@ -64,7 +64,7 @@ public class SysCoachCourse extends TableImpl<SysCoachCourseRecord> {
     /**
      * The column <code>lesson.sys_coach_course.course_id</code>. 关联课程ID
      */
-    public final TableField<SysCoachCourseRecord, String> COURSE_ID = createField(DSL.name("course_id"), SQLDataType.VARCHAR(20).nullable(false), this, "关联课程ID");
+    public final TableField<SysCoachCourseRecord, Long> COURSE_ID = createField(DSL.name("course_id"), SQLDataType.BIGINT.nullable(false), this, "关联课程ID");
 
     /**
      * The column <code>lesson.sys_coach_course.created_time</code>. 创建时间
@@ -170,7 +170,7 @@ public class SysCoachCourse extends TableImpl<SysCoachCourseRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Row6<Long, Long, String, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
+    public Row6<Long, Long, Long, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
         return (Row6) super.fieldsRow();
     }
 }

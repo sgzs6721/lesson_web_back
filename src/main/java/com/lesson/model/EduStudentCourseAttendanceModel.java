@@ -88,7 +88,7 @@ public class EduStudentCourseAttendanceModel {
      * @param limit        限制
      * @return 上课记录列表
      */
-    public List<StudentCourseAttendanceRecord> listAttendances(String studentId, String courseId, String coachId,
+    public List<StudentCourseAttendanceRecord> listAttendances(Long studentId, Long courseId, Long coachId,
                                                               Long campusId, Long institutionId, int offset, int limit) {
         SelectConditionStep<Record> query = createBaseQuery(studentId, courseId, coachId, campusId, institutionId);
         return query.orderBy(Tables.EDU_STUDENT_COURSE_RECORD.COURSE_DATE.desc(),
@@ -109,26 +109,26 @@ public class EduStudentCourseAttendanceModel {
      * @param institutionId 机构ID
      * @return 上课记录数量
      */
-    public long countAttendances(String studentId, String courseId, String coachId,
+    public long countAttendances(Long studentId, Long courseId, Long coachId,
                                Long campusId, Long institutionId) {
         SelectConditionStep<Record> query = createBaseQuery(studentId, courseId, coachId, campusId, institutionId);
         return query.fetchCount();
     }
 
-    private SelectConditionStep<Record> createBaseQuery(String studentId, String courseId, String coachId,
+    private SelectConditionStep<Record> createBaseQuery(Long studentId, Long courseId, Long coachId,
                                                       Long campusId, Long institutionId) {
         org.jooq.Condition conditions = DSL.noCondition();
         conditions = conditions.and(Tables.EDU_STUDENT_COURSE_RECORD.DELETED.eq( 0));
 
-        if (studentId != null && !studentId.isEmpty()) {
+        if (studentId != null) {
             conditions = conditions.and(Tables.EDU_STUDENT_COURSE_RECORD.STUDENT_ID.eq(studentId));
         }
 
-        if (courseId != null && !courseId.isEmpty()) {
+        if (courseId != null) {
             conditions = conditions.and(Tables.EDU_STUDENT_COURSE_RECORD.COURSE_ID.eq(courseId));
         }
 
-        if (coachId != null && !coachId.isEmpty()) {
+        if (coachId != null) {
             conditions = conditions.and(Tables.EDU_STUDENT_COURSE_RECORD.COACH_ID.eq(coachId));
         }
 

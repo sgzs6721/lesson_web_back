@@ -20,7 +20,7 @@ import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row15;
+import org.jooq.Row14;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -60,12 +60,12 @@ public class EduCourseRecord extends TableImpl<EduCourseRecordRecord> {
     /**
      * The column <code>lesson.edu_course_record.course_id</code>. 课程ID
      */
-    public final TableField<EduCourseRecordRecord, String> COURSE_ID = createField(DSL.name("course_id"), SQLDataType.VARCHAR(32).nullable(false), this, "课程ID");
+    public final TableField<EduCourseRecordRecord, Long> COURSE_ID = createField(DSL.name("course_id"), SQLDataType.BIGINT.nullable(false), this, "课程ID");
 
     /**
      * The column <code>lesson.edu_course_record.coach_id</code>. 教练ID
      */
-    public final TableField<EduCourseRecordRecord, String> COACH_ID = createField(DSL.name("coach_id"), SQLDataType.VARCHAR(32).nullable(false), this, "教练ID");
+    public final TableField<EduCourseRecordRecord, Long> COACH_ID = createField(DSL.name("coach_id"), SQLDataType.BIGINT.nullable(false), this, "教练ID");
 
     /**
      * The column <code>lesson.edu_course_record.coach_name</code>. 教练姓名
@@ -106,11 +106,6 @@ public class EduCourseRecord extends TableImpl<EduCourseRecordRecord> {
      * The column <code>lesson.edu_course_record.institution_id</code>. 机构ID
      */
     public final TableField<EduCourseRecordRecord, Long> INSTITUTION_ID = createField(DSL.name("institution_id"), SQLDataType.BIGINT.nullable(false), this, "机构ID");
-
-    /**
-     * The column <code>lesson.edu_course_record.institution_name</code>. 机构名称
-     */
-    public final TableField<EduCourseRecordRecord, String> INSTITUTION_NAME = createField(DSL.name("institution_name"), SQLDataType.VARCHAR(100).nullable(false), this, "机构名称");
 
     /**
      * The column <code>lesson.edu_course_record.created_time</code>. 创建时间
@@ -212,11 +207,11 @@ public class EduCourseRecord extends TableImpl<EduCourseRecordRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row15 type methods
+    // Row14 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row15<Long, String, String, String, LocalDateTime, LocalDateTime, BigDecimal, String, Long, String, Long, String, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
-        return (Row15) super.fieldsRow();
+    public Row14<Long, Long, Long, String, LocalDateTime, LocalDateTime, BigDecimal, String, Long, String, Long, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
+        return (Row14) super.fieldsRow();
     }
 }

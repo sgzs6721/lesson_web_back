@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
@@ -54,7 +55,7 @@ public class EduCourse extends TableImpl<EduCourseRecord> {
     /**
      * The column <code>lesson.edu_course.id</code>. 课程ID
      */
-    public final TableField<EduCourseRecord, String> ID = createField(DSL.name("id"), SQLDataType.VARCHAR(32).nullable(false), this, "课程ID");
+    public final TableField<EduCourseRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "课程ID");
 
     /**
      * The column <code>lesson.edu_course.name</code>. 课程名称
@@ -94,7 +95,7 @@ public class EduCourse extends TableImpl<EduCourseRecord> {
     /**
      * The column <code>lesson.edu_course.coach_id</code>. 上课教练ID
      */
-    public final TableField<EduCourseRecord, String> COACH_ID = createField(DSL.name("coach_id"), SQLDataType.VARCHAR(32).nullable(false), this, "上课教练ID");
+    public final TableField<EduCourseRecord, Long> COACH_ID = createField(DSL.name("coach_id"), SQLDataType.BIGINT.nullable(false), this, "上课教练ID");
 
     /**
      * The column <code>lesson.edu_course.coach_name</code>. 教练姓名
@@ -185,6 +186,11 @@ public class EduCourse extends TableImpl<EduCourseRecord> {
     }
 
     @Override
+    public Identity<EduCourseRecord, Long> getIdentity() {
+        return (Identity<EduCourseRecord, Long>) super.getIdentity();
+    }
+
+    @Override
     public UniqueKey<EduCourseRecord> getPrimaryKey() {
         return Keys.KEY_EDU_COURSE_PRIMARY;
     }
@@ -225,7 +231,7 @@ public class EduCourse extends TableImpl<EduCourseRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Row18<String, String, String, String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
+    public Row18<Long, String, String, String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, Long, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
         return (Row18) super.fieldsRow();
     }
 }

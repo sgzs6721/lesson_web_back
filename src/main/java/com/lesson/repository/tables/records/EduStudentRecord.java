@@ -19,22 +19,22 @@ import org.jooq.impl.UpdatableRecordImpl;
  * 学员表
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class EduStudentRecord extends UpdatableRecordImpl<EduStudentRecord> implements Record13<String, String, String, Integer, String, Long, String, Long, String, String, LocalDateTime, LocalDateTime, Integer> {
+public class EduStudentRecord extends UpdatableRecordImpl<EduStudentRecord> implements Record13<Long, String, String, Integer, String, Long, String, Long, String, String, LocalDateTime, LocalDateTime, Integer> {
 
     private static final long serialVersionUID = 1L;
 
     /**
      * Setter for <code>lesson.edu_student.id</code>. 学员ID
      */
-    public void setId(String value) {
+    public void setId(Long value) {
         set(0, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student.id</code>. 学员ID
      */
-    public String getId() {
-        return (String) get(0);
+    public Long getId() {
+        return (Long) get(0);
     }
 
     /**
@@ -210,7 +210,7 @@ public class EduStudentRecord extends UpdatableRecordImpl<EduStudentRecord> impl
     // -------------------------------------------------------------------------
 
     @Override
-    public Record1<String> key() {
+    public Record1<Long> key() {
         return (Record1) super.key();
     }
 
@@ -219,17 +219,17 @@ public class EduStudentRecord extends UpdatableRecordImpl<EduStudentRecord> impl
     // -------------------------------------------------------------------------
 
     @Override
-    public Row13<String, String, String, Integer, String, Long, String, Long, String, String, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
+    public Row13<Long, String, String, Integer, String, Long, String, Long, String, String, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
         return (Row13) super.fieldsRow();
     }
 
     @Override
-    public Row13<String, String, String, Integer, String, Long, String, Long, String, String, LocalDateTime, LocalDateTime, Integer> valuesRow() {
+    public Row13<Long, String, String, Integer, String, Long, String, Long, String, String, LocalDateTime, LocalDateTime, Integer> valuesRow() {
         return (Row13) super.valuesRow();
     }
 
     @Override
-    public Field<String> field1() {
+    public Field<Long> field1() {
         return EduStudent.EDU_STUDENT.ID;
     }
 
@@ -294,7 +294,7 @@ public class EduStudentRecord extends UpdatableRecordImpl<EduStudentRecord> impl
     }
 
     @Override
-    public String component1() {
+    public Long component1() {
         return getId();
     }
 
@@ -359,7 +359,7 @@ public class EduStudentRecord extends UpdatableRecordImpl<EduStudentRecord> impl
     }
 
     @Override
-    public String value1() {
+    public Long value1() {
         return getId();
     }
 
@@ -424,7 +424,7 @@ public class EduStudentRecord extends UpdatableRecordImpl<EduStudentRecord> impl
     }
 
     @Override
-    public EduStudentRecord value1(String value) {
+    public EduStudentRecord value1(Long value) {
         setId(value);
         return this;
     }
@@ -502,7 +502,7 @@ public class EduStudentRecord extends UpdatableRecordImpl<EduStudentRecord> impl
     }
 
     @Override
-    public EduStudentRecord values(String value1, String value2, String value3, Integer value4, String value5, Long value6, String value7, Long value8, String value9, String value10, LocalDateTime value11, LocalDateTime value12, Integer value13) {
+    public EduStudentRecord values(Long value1, String value2, String value3, Integer value4, String value5, Long value6, String value7, Long value8, String value9, String value10, LocalDateTime value11, LocalDateTime value12, Integer value13) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -533,7 +533,7 @@ public class EduStudentRecord extends UpdatableRecordImpl<EduStudentRecord> impl
     /**
      * Create a detached, initialised EduStudentRecord
      */
-    public EduStudentRecord(String id, String name, String gender, Integer age, String phone, Long campusId, String campusName, Long institutionId, String institutionName, String status, LocalDateTime createdTime, LocalDateTime updateTime, Integer deleted) {
+    public EduStudentRecord(Long id, String name, String gender, Integer age, String phone, Long campusId, String campusName, Long institutionId, String institutionName, String status, LocalDateTime createdTime, LocalDateTime updateTime, Integer deleted) {
         super(EduStudent.EDU_STUDENT);
 
         setId(id);

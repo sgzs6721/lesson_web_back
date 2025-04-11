@@ -116,7 +116,7 @@ public class EduStudentCourseModel {
      * @param limit        限制
      * @return 学员课程列表
      */
-    public List<StudentCourseRecord> listStudentCourses(String studentId, String courseId, StudentStatus status,
+    public List<StudentCourseRecord> listStudentCourses(Long studentId, Long courseId, StudentStatus status,
                                                        Long campusId, Long institutionId, int offset, int limit) {
         SelectConditionStep<Record> query = createBaseQuery(studentId, courseId, status, campusId, institutionId);
         return query.orderBy(Tables.EDU_STUDENT_COURSE.CREATED_TIME.desc())
@@ -136,7 +136,7 @@ public class EduStudentCourseModel {
      * @param institutionId 机构ID
      * @return 学员课程数量
      */
-    public long countStudentCourses(String studentId, String courseId, StudentStatus status,
+    public long countStudentCourses(Long studentId, Long courseId, StudentStatus status,
                                   Long campusId, Long institutionId) {
         SelectConditionStep<Record> query = createBaseQuery(studentId, courseId, status, campusId, institutionId);
         return query.fetchCount();
@@ -237,8 +237,8 @@ public class EduStudentCourseModel {
         }
         
         // 更新班级信息
-        String beforeClassId = record.getFixedSchedule(); // 假设固定排课时间字段存储班级ID
-        record.setFixedSchedule(request.getTargetClassId());
+        //String beforeClassId = record.getFixedSchedule(); // 假设固定排课时间字段存储班级ID
+        //record.setFixedSchedule(request.getTargetClassId());
         record.setUpdateTime(LocalDateTime.now());
         record.update();
         
@@ -251,8 +251,8 @@ public class EduStudentCourseModel {
         operationRecord.setOperationType(OperationType.TRANSFER_CLASS.name());
         operationRecord.setBeforeStatus(record.getStatus());
         operationRecord.setAfterStatus(record.getStatus());
-        operationRecord.setSourceClassId(beforeClassId);
-        operationRecord.setSourceClassName(getClassName(beforeClassId));
+        //operationRecord.setSourceClassId(beforeClassId);
+        //operationRecord.setSourceClassName(getClassName(beforeClassId));
         operationRecord.setTargetClassId(request.getTargetClassId());
         operationRecord.setTargetClassName(request.getTargetClassName());
         operationRecord.setOperationReason(request.getTransferReason());
@@ -327,15 +327,15 @@ public class EduStudentCourseModel {
      * @param limit         限制
      * @return 操作记录列表
      */
-    public List<StudentCourseOperationRecordVO> listOperationRecords(String studentId, String courseId,
+    public List<StudentCourseOperationRecordVO> listOperationRecords(Long studentId, Long courseId,
                                                                     OperationType operationType, int offset, int limit) {
         org.jooq.Condition conditions = DSL.noCondition();
         
-        if (studentId != null && !studentId.isEmpty()) {
+        if (studentId != null) {
             conditions = conditions.and(Tables.EDU_STUDENT_COURSE_OPERATION.STUDENT_ID.eq(studentId));
         }
         
-        if (courseId != null && !courseId.isEmpty()) {
+        if (courseId != null) {
             conditions = conditions.and(Tables.EDU_STUDENT_COURSE_OPERATION.COURSE_ID.eq(courseId));
         }
         
@@ -360,14 +360,14 @@ public class EduStudentCourseModel {
      * @param operationType 操作类型
      * @return 操作记录数量
      */
-    public long countOperationRecords(String studentId, String courseId, OperationType operationType) {
+    public long countOperationRecords(Long studentId, Long courseId, OperationType operationType) {
         org.jooq.Condition conditions = DSL.noCondition();
         
-        if (studentId != null && !studentId.isEmpty()) {
+        if (studentId != null) {
             conditions = conditions.and(Tables.EDU_STUDENT_COURSE_OPERATION.STUDENT_ID.eq(studentId));
         }
         
-        if (courseId != null && !courseId.isEmpty()) {
+        if (courseId != null) {
             conditions = conditions.and(Tables.EDU_STUDENT_COURSE_OPERATION.COURSE_ID.eq(courseId));
         }
         
@@ -381,18 +381,18 @@ public class EduStudentCourseModel {
                 .fetchOne(0, Long.class);
     }
 
-    private SelectConditionStep<Record> createBaseQuery(String studentId, String courseId,
+    private SelectConditionStep<Record> createBaseQuery(Long studentId, Long courseId,
                                                       StudentStatus status, Long campusId,
                                                       Long institutionId) {
         SelectConditionStep<Record> query = dsl.select()
                 .from(EduStudentCourse.EDU_STUDENT_COURSE)
                 .where(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq( 0));
 
-        if (studentId != null && !studentId.isEmpty()) {
+        if (studentId != null) {
             query = query.and(EduStudentCourse.EDU_STUDENT_COURSE.STUDENT_ID.eq(studentId));
         }
 
-        if (courseId != null && !courseId.isEmpty()) {
+        if (courseId != null) {
             query = query.and(EduStudentCourse.EDU_STUDENT_COURSE.COURSE_ID.eq(courseId));
         }
 
@@ -471,7 +471,7 @@ public class EduStudentCourseModel {
      * @param studentId 学员ID
      * @return 学员姓名
      */
-    private String getStudentName(String studentId) {
+    private String getStudentName(Long studentId) {
         return dsl.select(Tables.EDU_STUDENT.NAME)
                 .from(Tables.EDU_STUDENT)
                 .where(Tables.EDU_STUDENT.ID.eq(studentId))
@@ -484,8 +484,8 @@ public class EduStudentCourseModel {
      * @param classId 班级ID
      * @return 班级名称
      */
-    private String getClassName(String classId) {
-        if (classId == null || classId.isEmpty()) {
+    private String getClassName(Long classId) {
+        if (classId == null) {
             return null;
         }
         return dsl.select(EduCourse.EDU_COURSE.NAME)

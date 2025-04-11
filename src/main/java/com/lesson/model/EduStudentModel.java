@@ -31,11 +31,10 @@ public class EduStudentModel {
      * @param record 学员记录
      * @return 学员ID
      */
-    public String createStudent(EduStudentRecord record) {
-        record.setId(DSL.using(dsl.configuration()).nextval("student_id_seq").toString());
+    public Long createStudent(EduStudentRecord record) {
         record.setCreatedTime(LocalDateTime.now());
         record.setUpdateTime(LocalDateTime.now());
-        record.setDeleted( 0);
+        record.setDeleted(0);
         dsl.attach(record);
         record.store();
         return record.getId();
@@ -57,7 +56,7 @@ public class EduStudentModel {
      *
      * @param id 学员ID
      */
-    public void deleteStudent(String id) {
+    public void deleteStudent(Long id) {
         dsl.update(Tables.EDU_STUDENT)
                 .set(Tables.EDU_STUDENT.DELETED,  1)
                 .set(Tables.EDU_STUDENT.UPDATE_TIME, LocalDateTime.now())
@@ -68,7 +67,7 @@ public class EduStudentModel {
     /**
      * 更新学员状态
      */
-    public void updateStatus(String id, StudentStatus status) {
+    public void updateStatus(Long id, StudentStatus status) {
         EduStudentRecord record = dsl.selectFrom(Tables.EDU_STUDENT)
                 .where(Tables.EDU_STUDENT.ID.eq(id))
                 .and(Tables.EDU_STUDENT.DELETED.eq( 0))
@@ -112,7 +111,7 @@ public class EduStudentModel {
     /**
      * 查询学员
      */
-    public StudentDetailRecord getById(String id) {
+    public StudentDetailRecord getById(Long id) {
         Record record = dsl.select()
                 .from(Tables.EDU_STUDENT)
                 .where(Tables.EDU_STUDENT.ID.eq(id))
@@ -128,7 +127,7 @@ public class EduStudentModel {
      * @param id 学员ID
      * @return 学员详情
      */
-    public Optional<StudentDetailRecord> getStudentById(String id) {
+    public Optional<StudentDetailRecord> getStudentById(Long id) {
         return dsl.select()
                 .from(Tables.EDU_STUDENT)
                 .where(Tables.EDU_STUDENT.ID.eq(id))
@@ -182,7 +181,7 @@ public class EduStudentModel {
      * @param id 学员ID
      * @return 是否存在
      */
-    public boolean existsById(String id) {
+    public boolean existsById(Long id) {
         return dsl.fetchExists(
                 dsl.selectFrom(Tables.EDU_STUDENT)
                         .where(Tables.EDU_STUDENT.ID.eq(id))

@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class CourseDetailRecord {
-    private String id;
+    private Long id;
     private String name;
     private CourseType type;
     private CourseStatus status;
@@ -17,7 +17,7 @@ public class CourseDetailRecord {
     private BigDecimal totalHours;
     private BigDecimal consumedHours;
     private BigDecimal price;
-    private String coachId;
+    private Long coachId;
     private String coachName;
     private Long campusId;
     private String campusName;

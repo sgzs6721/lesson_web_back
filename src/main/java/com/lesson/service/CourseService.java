@@ -15,7 +15,7 @@ public interface CourseService {
      * @param request 创建课程请求
      * @return 课程ID
      */
-    String createCourse(CourseCreateRequest request);
+    Long createCourse(CourseCreateRequest request);
 
     /**
      * 更新课程
@@ -29,7 +29,7 @@ public interface CourseService {
      *
      * @param id 课程ID
      */
-    void deleteCourse(String id);
+    void deleteCourse(Long id);
 
     /**
      * 更新课程状态
@@ -37,7 +37,7 @@ public interface CourseService {
      * @param id     课程ID
      * @param status 课程状态
      */
-    void updateCourseStatus(String id, CourseStatus status);
+    void updateCourseStatus(Long id, CourseStatus status);
 
     /**
      * 获取课程详情
@@ -45,7 +45,7 @@ public interface CourseService {
      * @param id 课程ID
      * @return 课程详情
      */
-    CourseVO getCourseById(String id);
+    CourseVO getCourseById(Long id);
 
     /**
      * 分页查询课程列表

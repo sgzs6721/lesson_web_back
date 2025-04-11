@@ -145,7 +145,7 @@ public class EduStudentCourseOperationRecord extends TableImpl<EduStudentCourseO
     /**
      * The column <code>lesson.edu_student_course_operation_record.deleted</code>. 是否删除：0-未删除，1-已删除
      */
-    public final TableField<EduStudentCourseOperationRecordRecord, Byte> DELETED = createField(DSL.name("deleted"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "是否删除：0-未删除，1-已删除");
+    public final TableField<EduStudentCourseOperationRecordRecord, Integer> DELETED = createField(DSL.name("deleted"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.inline("0", SQLDataType.INTEGER)), this, "是否删除：0-未删除，1-已删除");
 
     /**
      * The column <code>lesson.edu_student_course_operation_record.created_time</code>. 创建时间
@@ -246,7 +246,7 @@ public class EduStudentCourseOperationRecord extends TableImpl<EduStudentCourseO
     // -------------------------------------------------------------------------
 
     @Override
-    public Row21<Long, Long, String, Long, String, String, String, String, Long, Long, Long, Long, BigDecimal, String, String, Long, String, LocalDateTime, Byte, LocalDateTime, LocalDateTime> fieldsRow() {
+    public Row21<Long, Long, String, Long, String, String, String, String, Long, Long, Long, Long, BigDecimal, String, String, Long, String, LocalDateTime, Integer, LocalDateTime, LocalDateTime> fieldsRow() {
         return (Row21) super.fieldsRow();
     }
 }

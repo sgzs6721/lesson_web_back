@@ -38,8 +38,8 @@ public class CourseController {
     @Operation(summary = "创建课程", 
                description = "创建新课程，需要指定课程名称、类型、价格等信息")
     @PostMapping
-    public Result<String> createCourse(@Validated @RequestBody CourseCreateRequest request) {
-        String id = courseService.createCourse(request);
+    public Result<Long> createCourse(@Validated @RequestBody CourseCreateRequest request) {
+        Long id = courseService.createCourse(request);
         return Result.success(id);
     }
 
@@ -67,7 +67,7 @@ public class CourseController {
                description = "根据课程ID删除课程（逻辑删除）")
     @DeleteMapping("/{id}")
     public Result<Void> deleteCourse(
-            @Parameter(description = "课程ID", required = true) @PathVariable String id) {
+            @Parameter(description = "课程ID", required = true) @PathVariable Long id) {
         courseService.deleteCourse(id);
         return Result.success();
     }
@@ -83,7 +83,7 @@ public class CourseController {
                description = "更新课程状态，可选值：DRAFT-草稿，PUBLISHED-已发布，CLOSED-已关闭")
     @PutMapping("/{id}/status")
     public Result<Void> updateCourseStatus(
-            @Parameter(description = "课程ID", required = true) @PathVariable String id,
+            @Parameter(description = "课程ID", required = true) @PathVariable Long id,
             @Parameter(description = "课程状态", required = true) @RequestParam CourseStatus status) {
         courseService.updateCourseStatus(id, status);
         return Result.success();
@@ -99,7 +99,7 @@ public class CourseController {
                description = "根据课程ID获取课程详细信息")
     @GetMapping("/{id}")
     public Result<CourseVO> getCourseById(
-            @Parameter(description = "课程ID", required = true) @PathVariable String id) {
+            @Parameter(description = "课程ID", required = true) @PathVariable Long id) {
         CourseVO course = courseService.getCourseById(id);
         return Result.success(course);
     }

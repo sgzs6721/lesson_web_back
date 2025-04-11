@@ -59,7 +59,7 @@ public class EduStudentCourseOperation extends TableImpl<EduStudentCourseOperati
     /**
      * The column <code>lesson.edu_student_course_operation.student_id</code>. 学员ID
      */
-    public final TableField<EduStudentCourseOperationRecord, String> STUDENT_ID = createField(DSL.name("student_id"), SQLDataType.VARCHAR(32).nullable(false), this, "学员ID");
+    public final TableField<EduStudentCourseOperationRecord, Long> STUDENT_ID = createField(DSL.name("student_id"), SQLDataType.BIGINT.nullable(false), this, "学员ID");
 
     /**
      * The column <code>lesson.edu_student_course_operation.student_name</code>. 学员姓名
@@ -69,7 +69,7 @@ public class EduStudentCourseOperation extends TableImpl<EduStudentCourseOperati
     /**
      * The column <code>lesson.edu_student_course_operation.course_id</code>. 课程ID
      */
-    public final TableField<EduStudentCourseOperationRecord, String> COURSE_ID = createField(DSL.name("course_id"), SQLDataType.VARCHAR(32).nullable(false), this, "课程ID");
+    public final TableField<EduStudentCourseOperationRecord, Long> COURSE_ID = createField(DSL.name("course_id"), SQLDataType.BIGINT.nullable(false), this, "课程ID");
 
     /**
      * The column <code>lesson.edu_student_course_operation.course_name</code>. 课程名称
@@ -94,7 +94,7 @@ public class EduStudentCourseOperation extends TableImpl<EduStudentCourseOperati
     /**
      * The column <code>lesson.edu_student_course_operation.source_course_id</code>. 原课程ID
      */
-    public final TableField<EduStudentCourseOperationRecord, String> SOURCE_COURSE_ID = createField(DSL.name("source_course_id"), SQLDataType.VARCHAR(32), this, "原课程ID");
+    public final TableField<EduStudentCourseOperationRecord, Long> SOURCE_COURSE_ID = createField(DSL.name("source_course_id"), SQLDataType.BIGINT, this, "原课程ID");
 
     /**
      * The column <code>lesson.edu_student_course_operation.source_course_name</code>. 原课程名称
@@ -104,7 +104,7 @@ public class EduStudentCourseOperation extends TableImpl<EduStudentCourseOperati
     /**
      * The column <code>lesson.edu_student_course_operation.target_course_id</code>. 目标课程ID
      */
-    public final TableField<EduStudentCourseOperationRecord, String> TARGET_COURSE_ID = createField(DSL.name("target_course_id"), SQLDataType.VARCHAR(32), this, "目标课程ID");
+    public final TableField<EduStudentCourseOperationRecord, Long> TARGET_COURSE_ID = createField(DSL.name("target_course_id"), SQLDataType.BIGINT, this, "目标课程ID");
 
     /**
      * The column <code>lesson.edu_student_course_operation.target_course_name</code>. 目标课程名称
@@ -114,7 +114,7 @@ public class EduStudentCourseOperation extends TableImpl<EduStudentCourseOperati
     /**
      * The column <code>lesson.edu_student_course_operation.source_class_id</code>. 原班级ID
      */
-    public final TableField<EduStudentCourseOperationRecord, String> SOURCE_CLASS_ID = createField(DSL.name("source_class_id"), SQLDataType.VARCHAR(32), this, "原班级ID");
+    public final TableField<EduStudentCourseOperationRecord, Long> SOURCE_CLASS_ID = createField(DSL.name("source_class_id"), SQLDataType.BIGINT, this, "原班级ID");
 
     /**
      * The column <code>lesson.edu_student_course_operation.source_class_name</code>. 原班级名称
@@ -124,7 +124,7 @@ public class EduStudentCourseOperation extends TableImpl<EduStudentCourseOperati
     /**
      * The column <code>lesson.edu_student_course_operation.target_class_id</code>. 目标班级ID
      */
-    public final TableField<EduStudentCourseOperationRecord, String> TARGET_CLASS_ID = createField(DSL.name("target_class_id"), SQLDataType.VARCHAR(32), this, "目标班级ID");
+    public final TableField<EduStudentCourseOperationRecord, Long> TARGET_CLASS_ID = createField(DSL.name("target_class_id"), SQLDataType.BIGINT, this, "目标班级ID");
 
     /**
      * The column <code>lesson.edu_student_course_operation.target_class_name</code>. 目标班级名称
@@ -149,7 +149,7 @@ public class EduStudentCourseOperation extends TableImpl<EduStudentCourseOperati
     /**
      * The column <code>lesson.edu_student_course_operation.operator_id</code>. 操作人ID
      */
-    public final TableField<EduStudentCourseOperationRecord, String> OPERATOR_ID = createField(DSL.name("operator_id"), SQLDataType.VARCHAR(32).nullable(false), this, "操作人ID");
+    public final TableField<EduStudentCourseOperationRecord, Long> OPERATOR_ID = createField(DSL.name("operator_id"), SQLDataType.BIGINT.nullable(false), this, "操作人ID");
 
     /**
      * The column <code>lesson.edu_student_course_operation.operator_name</code>. 操作人姓名

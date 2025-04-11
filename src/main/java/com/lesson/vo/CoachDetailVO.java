@@ -4,6 +4,7 @@ import com.lesson.common.enums.CoachStatus;
 import com.lesson.common.enums.Gender;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -62,6 +63,7 @@ public class CoachDetailVO {
      * 入职日期
      */
     @Schema(description = "入职日期", example = "2023-01-01")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate hireDate;
     
     /**
@@ -159,6 +161,7 @@ public class CoachDetailVO {
          * 生效日期
          */
         @Schema(description = "生效日期", example = "2023-01-01")
+        @JsonFormat(pattern = "yyyy-MM-dd")
         private LocalDate effectiveDate;
     }
 } 

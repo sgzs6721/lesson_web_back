@@ -38,15 +38,15 @@ public class EduStudentCourseOperationRecord extends UpdatableRecordImpl<EduStud
     /**
      * Setter for <code>lesson.edu_student_course_operation.student_id</code>. 学员ID
      */
-    public void setStudentId(String value) {
+    public void setStudentId(Long value) {
         set(1, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_course_operation.student_id</code>. 学员ID
      */
-    public String getStudentId() {
-        return (String) get(1);
+    public Long getStudentId() {
+        return (Long) get(1);
     }
 
     /**
@@ -66,15 +66,15 @@ public class EduStudentCourseOperationRecord extends UpdatableRecordImpl<EduStud
     /**
      * Setter for <code>lesson.edu_student_course_operation.course_id</code>. 课程ID
      */
-    public void setCourseId(String value) {
+    public void setCourseId(Long value) {
         set(3, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_course_operation.course_id</code>. 课程ID
      */
-    public String getCourseId() {
-        return (String) get(3);
+    public Long getCourseId() {
+        return (Long) get(3);
     }
 
     /**
@@ -136,15 +136,15 @@ public class EduStudentCourseOperationRecord extends UpdatableRecordImpl<EduStud
     /**
      * Setter for <code>lesson.edu_student_course_operation.source_course_id</code>. 原课程ID
      */
-    public void setSourceCourseId(String value) {
+    public void setSourceCourseId(Long value) {
         set(8, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_course_operation.source_course_id</code>. 原课程ID
      */
-    public String getSourceCourseId() {
-        return (String) get(8);
+    public Long getSourceCourseId() {
+        return (Long) get(8);
     }
 
     /**
@@ -164,15 +164,15 @@ public class EduStudentCourseOperationRecord extends UpdatableRecordImpl<EduStud
     /**
      * Setter for <code>lesson.edu_student_course_operation.target_course_id</code>. 目标课程ID
      */
-    public void setTargetCourseId(String value) {
+    public void setTargetCourseId(Long value) {
         set(10, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_course_operation.target_course_id</code>. 目标课程ID
      */
-    public String getTargetCourseId() {
-        return (String) get(10);
+    public Long getTargetCourseId() {
+        return (Long) get(10);
     }
 
     /**
@@ -192,15 +192,15 @@ public class EduStudentCourseOperationRecord extends UpdatableRecordImpl<EduStud
     /**
      * Setter for <code>lesson.edu_student_course_operation.source_class_id</code>. 原班级ID
      */
-    public void setSourceClassId(String value) {
+    public void setSourceClassId(Long value) {
         set(12, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_course_operation.source_class_id</code>. 原班级ID
      */
-    public String getSourceClassId() {
-        return (String) get(12);
+    public Long getSourceClassId() {
+        return (Long) get(12);
     }
 
     /**
@@ -220,15 +220,15 @@ public class EduStudentCourseOperationRecord extends UpdatableRecordImpl<EduStud
     /**
      * Setter for <code>lesson.edu_student_course_operation.target_class_id</code>. 目标班级ID
      */
-    public void setTargetClassId(String value) {
+    public void setTargetClassId(Long value) {
         set(14, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_course_operation.target_class_id</code>. 目标班级ID
      */
-    public String getTargetClassId() {
-        return (String) get(14);
+    public Long getTargetClassId() {
+        return (Long) get(14);
     }
 
     /**
@@ -290,15 +290,15 @@ public class EduStudentCourseOperationRecord extends UpdatableRecordImpl<EduStud
     /**
      * Setter for <code>lesson.edu_student_course_operation.operator_id</code>. 操作人ID
      */
-    public void setOperatorId(String value) {
+    public void setOperatorId(Long value) {
         set(19, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_course_operation.operator_id</code>. 操作人ID
      */
-    public String getOperatorId() {
-        return (String) get(19);
+    public Long getOperatorId() {
+        return (Long) get(19);
     }
 
     /**
@@ -394,7 +394,7 @@ public class EduStudentCourseOperationRecord extends UpdatableRecordImpl<EduStud
     /**
      * Create a detached, initialised EduStudentCourseOperationRecord
      */
-    public EduStudentCourseOperationRecord(Long id, String studentId, String studentName, String courseId, String courseName, String operationType, String beforeStatus, String afterStatus, String sourceCourseId, String sourceCourseName, String targetCourseId, String targetCourseName, String sourceClassId, String sourceClassName, String targetClassId, String targetClassName, BigDecimal refundAmount, String refundMethod, String operationReason, String operatorId, String operatorName, LocalDateTime operationTime, LocalDateTime createdTime, LocalDateTime updateTime, Integer deleted) {
+    public EduStudentCourseOperationRecord(Long id, Long studentId, String studentName, Long courseId, String courseName, String operationType, String beforeStatus, String afterStatus, Long sourceCourseId, String sourceCourseName, Long targetCourseId, String targetCourseName, Long sourceClassId, String sourceClassName, Long targetClassId, String targetClassName, BigDecimal refundAmount, String refundMethod, String operationReason, Long operatorId, String operatorName, LocalDateTime operationTime, LocalDateTime createdTime, LocalDateTime updateTime, Integer deleted) {
         super(EduStudentCourseOperation.EDU_STUDENT_COURSE_OPERATION);
 
         setId(id);

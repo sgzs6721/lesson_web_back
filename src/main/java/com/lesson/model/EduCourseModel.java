@@ -26,42 +26,37 @@ public class EduCourseModel {
     /**
      * 创建课程
      */
-    public String createCourse(String name, CourseType type, CourseStatus status,
+    public Long createCourse(String name, CourseType type, CourseStatus status,
                              BigDecimal unitHours, BigDecimal totalHours, BigDecimal price,
-                             String coachId, String coachName,
-                             Long campusId, String campusName,
-                             Long institutionId, String institutionName,
+                             Long coachId, String coachName,
+                             Long campusId,
+                             Long institutionId,
                              String description) {
-        String id = UUID.randomUUID().toString().replace("-", "");
-        
-        dsl.insertInto(EDU_COURSE)
-           .set(EDU_COURSE.ID, id)
-           .set(EDU_COURSE.NAME, name)
-           .set(EDU_COURSE.TYPE, type.name())
-           .set(EDU_COURSE.STATUS, status.name())
-           .set(EDU_COURSE.UNIT_HOURS, unitHours)
-           .set(EDU_COURSE.TOTAL_HOURS, totalHours)
-           .set(EDU_COURSE.CONSUMED_HOURS, BigDecimal.ZERO)
-           .set(EDU_COURSE.PRICE, price)
-           .set(EDU_COURSE.COACH_ID, coachId)
-           .set(EDU_COURSE.COACH_NAME, coachName)
-           .set(EDU_COURSE.CAMPUS_ID, campusId)
-           .set(EDU_COURSE.CAMPUS_NAME, campusName)
-           .set(EDU_COURSE.INSTITUTION_ID, institutionId)
-           .set(EDU_COURSE.INSTITUTION_NAME, institutionName)
-           .set(EDU_COURSE.DESCRIPTION, description)
-           .set(EDU_COURSE.DELETED, 0)
-           .execute();
-           
-        return id;
+        return dsl.insertInto(EDU_COURSE)
+               .set(EDU_COURSE.NAME, name)
+               .set(EDU_COURSE.TYPE, type.name())
+               .set(EDU_COURSE.STATUS, status.name())
+               .set(EDU_COURSE.UNIT_HOURS, unitHours)
+               .set(EDU_COURSE.TOTAL_HOURS, totalHours)
+               .set(EDU_COURSE.CONSUMED_HOURS, BigDecimal.ZERO)
+               .set(EDU_COURSE.PRICE, price)
+               .set(EDU_COURSE.COACH_ID, coachId)
+               .set(EDU_COURSE.COACH_NAME, coachName)
+               .set(EDU_COURSE.CAMPUS_ID, campusId)
+               .set(EDU_COURSE.INSTITUTION_ID, institutionId)
+               .set(EDU_COURSE.DESCRIPTION, description)
+               .set(EDU_COURSE.DELETED, Integer.valueOf(0))
+               .returning(EDU_COURSE.ID)
+               .fetchOne()
+               .get(EDU_COURSE.ID);
     }
     
     /**
      * 更新课程
      */
-    public void updateCourse(String id, String name, CourseType type, CourseStatus status,
+    public void updateCourse(Long id, String name, CourseType type, CourseStatus status,
                            BigDecimal unitHours, BigDecimal totalHours, BigDecimal price,
-                           String coachId, String coachName,
+                             Long coachId, String coachName,
                            Long campusId, String campusName,
                            Long institutionId, String institutionName,
                            String description) {
@@ -75,9 +70,7 @@ public class EduCourseModel {
            .set(EDU_COURSE.COACH_ID, coachId)
            .set(EDU_COURSE.COACH_NAME, coachName)
            .set(EDU_COURSE.CAMPUS_ID, campusId)
-           .set(EDU_COURSE.CAMPUS_NAME, campusName)
            .set(EDU_COURSE.INSTITUTION_ID, institutionId)
-           .set(EDU_COURSE.INSTITUTION_NAME, institutionName)
            .set(EDU_COURSE.DESCRIPTION, description)
            .where(EDU_COURSE.ID.eq(id))
            .and(EDU_COURSE.DELETED.eq(0))
@@ -87,7 +80,7 @@ public class EduCourseModel {
     /**
      * 删除课程
      */
-    public void deleteCourse(String id) {
+    public void deleteCourse(Long id) {
         dsl.update(EDU_COURSE)
            .set(EDU_COURSE.DELETED, 1)
            .where(EDU_COURSE.ID.eq(id))
@@ -98,7 +91,7 @@ public class EduCourseModel {
     /**
      * 更新课程状态
      */
-    public void updateCourseStatus(String id, CourseStatus status) {
+    public void updateCourseStatus(Long id, CourseStatus status) {
         dsl.update(EDU_COURSE)
            .set(EDU_COURSE.STATUS, status.name())
            .where(EDU_COURSE.ID.eq(id))
@@ -109,7 +102,7 @@ public class EduCourseModel {
     /**
      * 获取课程详情
      */
-    public CourseDetailRecord getCourseById(String id) {
+    public CourseDetailRecord getCourseById(Long id) {
         Record record = dsl.select()
                           .from(EDU_COURSE)
                           .where(EDU_COURSE.ID.eq(id))
@@ -127,7 +120,7 @@ public class EduCourseModel {
      * 分页查询课程列表
      */
     public List<CourseDetailRecord> listCourses(String keyword, CourseType type, CourseStatus status,
-                                              String coachId, Long campusId, Long institutionId,
+                                                Long coachId, Long campusId, Long institutionId,
                                               String sortField, String sortOrder,
                                               int pageNum, int pageSize) {
         SelectConditionStep<Record> query = createBaseQuery(keyword, type, status, coachId, campusId, institutionId);
@@ -173,7 +166,7 @@ public class EduCourseModel {
      * 统计课程总数
      */
     public long countCourses(String keyword, CourseType type, CourseStatus status,
-                           String coachId, Long campusId, Long institutionId) {
+                             Long coachId, Long campusId, Long institutionId) {
         SelectConditionStep<Record> query = createBaseQuery(keyword, type, status, coachId, campusId, institutionId);
         return query.fetchCount();
     }
@@ -181,7 +174,7 @@ public class EduCourseModel {
     /**
      * 判断课程是否存在
      */
-    public boolean existsById(String id) {
+    public boolean existsById(Long id) {
         return dsl.fetchExists(
             dsl.selectOne()
                .from(EDU_COURSE)
@@ -194,7 +187,7 @@ public class EduCourseModel {
      * 创建基础查询
      */
     private SelectConditionStep<Record> createBaseQuery(String keyword, CourseType type, CourseStatus status,
-                                                String coachId, Long campusId, Long institutionId) {
+                                                        Long coachId, Long campusId, Long institutionId) {
         SelectConditionStep<Record> query = dsl.select()
                                         .from(EDU_COURSE)
                                         .where(EDU_COURSE.DELETED.eq( 0));
@@ -216,7 +209,7 @@ public class EduCourseModel {
         }
         
         // 教练过滤
-        if (coachId != null && !coachId.isEmpty()) {
+        if (coachId != null) {
             query.and(EDU_COURSE.COACH_ID.eq(coachId));
         }
         

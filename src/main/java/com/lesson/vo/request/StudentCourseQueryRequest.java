@@ -16,13 +16,13 @@ public class StudentCourseQueryRequest {
      * 学员ID
      */
     @ApiModelProperty("学员ID")
-    private String studentId;
+    private Long studentId;
 
     /**
      * 课程ID
      */
     @ApiModelProperty("课程ID")
-    private String courseId;
+    private Long courseId;
 
     /**
      * 学员课程状态

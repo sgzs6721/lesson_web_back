@@ -66,7 +66,7 @@ public class EduStudentCourseTransfer extends TableImpl<EduStudentCourseTransfer
     /**
      * The column <code>lesson.edu_student_course_transfer.original_course_id</code>. 原课程ID
      */
-    public final TableField<EduStudentCourseTransferRecord, String> ORIGINAL_COURSE_ID = createField(DSL.name("original_course_id"), SQLDataType.VARCHAR(32).nullable(false), this, "原课程ID");
+    public final TableField<EduStudentCourseTransferRecord, Long> ORIGINAL_COURSE_ID = createField(DSL.name("original_course_id"), SQLDataType.BIGINT.nullable(false), this, "原课程ID");
 
     /**
      * The column <code>lesson.edu_student_course_transfer.original_course_name</code>. 原课程名称
@@ -76,7 +76,7 @@ public class EduStudentCourseTransfer extends TableImpl<EduStudentCourseTransfer
     /**
      * The column <code>lesson.edu_student_course_transfer.target_course_id</code>. 目标课程ID
      */
-    public final TableField<EduStudentCourseTransferRecord, String> TARGET_COURSE_ID = createField(DSL.name("target_course_id"), SQLDataType.VARCHAR(32).nullable(false), this, "目标课程ID");
+    public final TableField<EduStudentCourseTransferRecord, Long> TARGET_COURSE_ID = createField(DSL.name("target_course_id"), SQLDataType.BIGINT.nullable(false), this, "目标课程ID");
 
     /**
      * The column <code>lesson.edu_student_course_transfer.target_course_name</code>. 目标课程名称
@@ -227,7 +227,7 @@ public class EduStudentCourseTransfer extends TableImpl<EduStudentCourseTransfer
     // -------------------------------------------------------------------------
 
     @Override
-    public Row17<Long, String, String, String, String, String, BigDecimal, BigDecimal, LocalDate, String, Long, String, Long, String, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
+    public Row17<Long, String, Long, String, Long, String, BigDecimal, BigDecimal, LocalDate, String, Long, String, Long, String, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
         return (Row17) super.fieldsRow();
     }
 }

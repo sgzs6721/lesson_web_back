@@ -60,7 +60,7 @@ CREATE TABLE `sys_coach_salary` (
 CREATE TABLE `sys_coach_course` (
     `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
     `coach_id` bigint(20) NOT NULL COMMENT '关联教练ID',
-    `course_id` varchar(20) NOT NULL COMMENT '关联课程ID',
+    `course_id` bigint(20) NOT NULL COMMENT '关联课程ID',
     `created_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     `deleted` tinyint(4) NOT NULL DEFAULT '0' COMMENT '是否删除：0-未删除，1-已删除',

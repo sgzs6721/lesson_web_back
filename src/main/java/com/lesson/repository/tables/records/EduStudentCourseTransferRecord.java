@@ -21,7 +21,7 @@ import org.jooq.impl.UpdatableRecordImpl;
  * 学员转课记录表
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class EduStudentCourseTransferRecord extends UpdatableRecordImpl<EduStudentCourseTransferRecord> implements Record17<Long, String, String, String, String, String, BigDecimal, BigDecimal, LocalDate, String, Long, String, Long, String, LocalDateTime, LocalDateTime, Integer> {
+public class EduStudentCourseTransferRecord extends UpdatableRecordImpl<EduStudentCourseTransferRecord> implements Record17<Long, String, Long, String, Long, String, BigDecimal, BigDecimal, LocalDate, String, Long, String, Long, String, LocalDateTime, LocalDateTime, Integer> {
 
     private static final long serialVersionUID = 1L;
 
@@ -56,15 +56,15 @@ public class EduStudentCourseTransferRecord extends UpdatableRecordImpl<EduStude
     /**
      * Setter for <code>lesson.edu_student_course_transfer.original_course_id</code>. 原课程ID
      */
-    public void setOriginalCourseId(String value) {
+    public void setOriginalCourseId(Long value) {
         set(2, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_course_transfer.original_course_id</code>. 原课程ID
      */
-    public String getOriginalCourseId() {
-        return (String) get(2);
+    public Long getOriginalCourseId() {
+        return (Long) get(2);
     }
 
     /**
@@ -84,15 +84,15 @@ public class EduStudentCourseTransferRecord extends UpdatableRecordImpl<EduStude
     /**
      * Setter for <code>lesson.edu_student_course_transfer.target_course_id</code>. 目标课程ID
      */
-    public void setTargetCourseId(String value) {
+    public void setTargetCourseId(Long value) {
         set(4, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_course_transfer.target_course_id</code>. 目标课程ID
      */
-    public String getTargetCourseId() {
-        return (String) get(4);
+    public Long getTargetCourseId() {
+        return (Long) get(4);
     }
 
     /**
@@ -277,12 +277,12 @@ public class EduStudentCourseTransferRecord extends UpdatableRecordImpl<EduStude
     // -------------------------------------------------------------------------
 
     @Override
-    public Row17<Long, String, String, String, String, String, BigDecimal, BigDecimal, LocalDate, String, Long, String, Long, String, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
+    public Row17<Long, String, Long, String, Long, String, BigDecimal, BigDecimal, LocalDate, String, Long, String, Long, String, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
         return (Row17) super.fieldsRow();
     }
 
     @Override
-    public Row17<Long, String, String, String, String, String, BigDecimal, BigDecimal, LocalDate, String, Long, String, Long, String, LocalDateTime, LocalDateTime, Integer> valuesRow() {
+    public Row17<Long, String, Long, String, Long, String, BigDecimal, BigDecimal, LocalDate, String, Long, String, Long, String, LocalDateTime, LocalDateTime, Integer> valuesRow() {
         return (Row17) super.valuesRow();
     }
 
@@ -297,7 +297,7 @@ public class EduStudentCourseTransferRecord extends UpdatableRecordImpl<EduStude
     }
 
     @Override
-    public Field<String> field3() {
+    public Field<Long> field3() {
         return EduStudentCourseTransfer.EDU_STUDENT_COURSE_TRANSFER.ORIGINAL_COURSE_ID;
     }
 
@@ -307,7 +307,7 @@ public class EduStudentCourseTransferRecord extends UpdatableRecordImpl<EduStude
     }
 
     @Override
-    public Field<String> field5() {
+    public Field<Long> field5() {
         return EduStudentCourseTransfer.EDU_STUDENT_COURSE_TRANSFER.TARGET_COURSE_ID;
     }
 
@@ -382,7 +382,7 @@ public class EduStudentCourseTransferRecord extends UpdatableRecordImpl<EduStude
     }
 
     @Override
-    public String component3() {
+    public Long component3() {
         return getOriginalCourseId();
     }
 
@@ -392,7 +392,7 @@ public class EduStudentCourseTransferRecord extends UpdatableRecordImpl<EduStude
     }
 
     @Override
-    public String component5() {
+    public Long component5() {
         return getTargetCourseId();
     }
 
@@ -467,7 +467,7 @@ public class EduStudentCourseTransferRecord extends UpdatableRecordImpl<EduStude
     }
 
     @Override
-    public String value3() {
+    public Long value3() {
         return getOriginalCourseId();
     }
 
@@ -477,7 +477,7 @@ public class EduStudentCourseTransferRecord extends UpdatableRecordImpl<EduStude
     }
 
     @Override
-    public String value5() {
+    public Long value5() {
         return getTargetCourseId();
     }
 
@@ -554,7 +554,7 @@ public class EduStudentCourseTransferRecord extends UpdatableRecordImpl<EduStude
     }
 
     @Override
-    public EduStudentCourseTransferRecord value3(String value) {
+    public EduStudentCourseTransferRecord value3(Long value) {
         setOriginalCourseId(value);
         return this;
     }
@@ -566,7 +566,7 @@ public class EduStudentCourseTransferRecord extends UpdatableRecordImpl<EduStude
     }
 
     @Override
-    public EduStudentCourseTransferRecord value5(String value) {
+    public EduStudentCourseTransferRecord value5(Long value) {
         setTargetCourseId(value);
         return this;
     }
@@ -644,7 +644,7 @@ public class EduStudentCourseTransferRecord extends UpdatableRecordImpl<EduStude
     }
 
     @Override
-    public EduStudentCourseTransferRecord values(Long value1, String value2, String value3, String value4, String value5, String value6, BigDecimal value7, BigDecimal value8, LocalDate value9, String value10, Long value11, String value12, Long value13, String value14, LocalDateTime value15, LocalDateTime value16, Integer value17) {
+    public EduStudentCourseTransferRecord values(Long value1, String value2, Long value3, String value4, Long value5, String value6, BigDecimal value7, BigDecimal value8, LocalDate value9, String value10, Long value11, String value12, Long value13, String value14, LocalDateTime value15, LocalDateTime value16, Integer value17) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -679,7 +679,7 @@ public class EduStudentCourseTransferRecord extends UpdatableRecordImpl<EduStude
     /**
      * Create a detached, initialised EduStudentCourseTransferRecord
      */
-    public EduStudentCourseTransferRecord(Long id, String studentId, String originalCourseId, String originalCourseName, String targetCourseId, String targetCourseName, BigDecimal transferHours, BigDecimal compensationFee, LocalDate validUntil, String reason, Long campusId, String campusName, Long institutionId, String institutionName, LocalDateTime createdTime, LocalDateTime updateTime, Integer deleted) {
+    public EduStudentCourseTransferRecord(Long id, String studentId, Long originalCourseId, String originalCourseName, Long targetCourseId, String targetCourseName, BigDecimal transferHours, BigDecimal compensationFee, LocalDate validUntil, String reason, Long campusId, String campusName, Long institutionId, String institutionName, LocalDateTime createdTime, LocalDateTime updateTime, Integer deleted) {
         super(EduStudentCourseTransfer.EDU_STUDENT_COURSE_TRANSFER);
 
         setId(id);

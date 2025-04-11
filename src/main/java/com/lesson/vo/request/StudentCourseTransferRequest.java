@@ -21,14 +21,14 @@ public class StudentCourseTransferRequest {
      */
     @NotBlank(message = "原课程ID不能为空")
     @Schema(description = "原课程ID")
-    private String sourceCourseId;
+    private Long sourceCourseId;
 
     /**
      * 目标课程ID
      */
     @NotBlank(message = "目标课程ID不能为空")
     @Schema(description = "目标课程ID")
-    private String targetCourseId;
+    private Long targetCourseId;
 
     /**
      * 目标课程名称
@@ -51,7 +51,7 @@ public class StudentCourseTransferRequest {
      */
     @NotBlank(message = "目标教练ID不能为空")
     @Schema(description = "目标教练ID")
-    private String targetCoachId;
+    private Long targetCoachId;
 
     /**
      * 目标教练姓名
@@ -100,7 +100,7 @@ public class StudentCourseTransferRequest {
      */
     @NotBlank(message = "操作人ID不能为空")
     @Schema(description = "操作人ID")
-    private String operatorId;
+    private Long operatorId;
 
     /**
      * 操作人姓名

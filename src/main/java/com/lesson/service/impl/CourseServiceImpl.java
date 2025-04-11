@@ -1,5 +1,6 @@
 package com.lesson.service.impl;
 
+import com.lesson.common.exception.BusinessException;
 import com.lesson.enums.CourseStatus;
 import com.lesson.model.EduCourseModel;
 import com.lesson.model.record.CourseDetailRecord;
@@ -13,6 +14,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,11 +22,18 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CourseServiceImpl implements CourseService {
 
+    private final HttpServletRequest httpServletRequest; // 注入HttpServletRequest
+
     private final EduCourseModel courseModel;
 
     @Override
     @Transactional
-    public String createCourse(CourseCreateRequest request) {
+    public Long createCourse(CourseCreateRequest request) {
+        // 从请求中获取机构ID
+        Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
+        if (institutionId == null) {
+            throw new BusinessException("机构ID不能为空");
+        }
         return courseModel.createCourse(
             request.getName(),
             request.getType(),
@@ -35,9 +44,7 @@ public class CourseServiceImpl implements CourseService {
             request.getCoachId(),
             request.getCoachName(),
             request.getCampusId(),
-            request.getCampusName(),
-            request.getInstitutionId(),
-            request.getInstitutionName(),
+            institutionId,
             request.getDescription()
         );
     }
@@ -65,18 +72,18 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     @Transactional
-    public void deleteCourse(String id) {
+    public void deleteCourse(Long id) {
         courseModel.deleteCourse(id);
     }
 
     @Override
     @Transactional
-    public void updateCourseStatus(String id, CourseStatus status) {
+    public void updateCourseStatus(Long id, CourseStatus status) {
         courseModel.updateCourseStatus(id, status);
     }
 
     @Override
-    public CourseVO getCourseById(String id) {
+    public CourseVO getCourseById(Long id) {
         CourseDetailRecord record = courseModel.getCourseById(id);
         if (record == null) {
             return null;

@@ -61,12 +61,12 @@ public class EduStudentCourse extends TableImpl<EduStudentCourseRecord> {
     /**
      * The column <code>lesson.edu_student_course.student_id</code>. 学员ID
      */
-    public final TableField<EduStudentCourseRecord, String> STUDENT_ID = createField(DSL.name("student_id"), SQLDataType.VARCHAR(32).nullable(false), this, "学员ID");
+    public final TableField<EduStudentCourseRecord, Long> STUDENT_ID = createField(DSL.name("student_id"), SQLDataType.BIGINT.nullable(false), this, "学员ID");
 
     /**
      * The column <code>lesson.edu_student_course.course_id</code>. 课程ID
      */
-    public final TableField<EduStudentCourseRecord, String> COURSE_ID = createField(DSL.name("course_id"), SQLDataType.VARCHAR(32).nullable(false), this, "课程ID");
+    public final TableField<EduStudentCourseRecord, Long> COURSE_ID = createField(DSL.name("course_id"), SQLDataType.BIGINT.nullable(false), this, "课程ID");
 
     /**
      * The column <code>lesson.edu_student_course.course_name</code>. 课程名称
@@ -81,7 +81,7 @@ public class EduStudentCourse extends TableImpl<EduStudentCourseRecord> {
     /**
      * The column <code>lesson.edu_student_course.coach_id</code>. 教练ID
      */
-    public final TableField<EduStudentCourseRecord, String> COACH_ID = createField(DSL.name("coach_id"), SQLDataType.VARCHAR(32).nullable(false), this, "教练ID");
+    public final TableField<EduStudentCourseRecord, Long> COACH_ID = createField(DSL.name("coach_id"), SQLDataType.BIGINT.nullable(false), this, "教练ID");
 
     /**
      * The column <code>lesson.edu_student_course.coach_name</code>. 教练姓名
@@ -242,7 +242,7 @@ public class EduStudentCourse extends TableImpl<EduStudentCourseRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Row20<Long, String, String, String, String, String, String, BigDecimal, BigDecimal, String, LocalDate, LocalDate, String, Long, String, Long, String, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
+    public Row20<Long, Long, Long, String, String, Long, String, BigDecimal, BigDecimal, String, LocalDate, LocalDate, String, Long, String, Long, String, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
         return (Row20) super.fieldsRow();
     }
 }

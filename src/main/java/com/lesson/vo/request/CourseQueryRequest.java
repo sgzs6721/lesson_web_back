@@ -24,7 +24,7 @@ public class CourseQueryRequest {
     /**
      * 教练ID
      */
-    private String coachId;
+    private Long coachId;
 
     /**
      * 校区ID

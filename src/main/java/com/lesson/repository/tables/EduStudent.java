@@ -53,7 +53,7 @@ public class EduStudent extends TableImpl<EduStudentRecord> {
     /**
      * The column <code>lesson.edu_student.id</code>. 学员ID
      */
-    public final TableField<EduStudentRecord, String> ID = createField(DSL.name("id"), SQLDataType.VARCHAR(32).nullable(false), this, "学员ID");
+    public final TableField<EduStudentRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false), this, "学员ID");
 
     /**
      * The column <code>lesson.edu_student.name</code>. 学员姓名
@@ -199,7 +199,7 @@ public class EduStudent extends TableImpl<EduStudentRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Row13<String, String, String, Integer, String, Long, String, Long, String, String, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
+    public Row13<Long, String, String, Integer, String, Long, String, Long, String, String, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
         return (Row13) super.fieldsRow();
     }
 }

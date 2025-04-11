@@ -62,17 +62,17 @@ public class EduStudentCourseRecord extends TableImpl<EduStudentCourseRecordReco
     /**
      * The column <code>lesson.edu_student_course_record.student_id</code>. 学员ID
      */
-    public final TableField<EduStudentCourseRecordRecord, String> STUDENT_ID = createField(DSL.name("student_id"), SQLDataType.VARCHAR(32).nullable(false), this, "学员ID");
+    public final TableField<EduStudentCourseRecordRecord, Long> STUDENT_ID = createField(DSL.name("student_id"), SQLDataType.BIGINT.nullable(false), this, "学员ID");
 
     /**
      * The column <code>lesson.edu_student_course_record.course_id</code>. 课程ID
      */
-    public final TableField<EduStudentCourseRecordRecord, String> COURSE_ID = createField(DSL.name("course_id"), SQLDataType.VARCHAR(32).nullable(false), this, "课程ID");
+    public final TableField<EduStudentCourseRecordRecord, Long> COURSE_ID = createField(DSL.name("course_id"), SQLDataType.BIGINT.nullable(false), this, "课程ID");
 
     /**
      * The column <code>lesson.edu_student_course_record.coach_id</code>. 教练ID
      */
-    public final TableField<EduStudentCourseRecordRecord, String> COACH_ID = createField(DSL.name("coach_id"), SQLDataType.VARCHAR(32).nullable(false), this, "教练ID");
+    public final TableField<EduStudentCourseRecordRecord, Long> COACH_ID = createField(DSL.name("coach_id"), SQLDataType.BIGINT.nullable(false), this, "教练ID");
 
     /**
      * The column <code>lesson.edu_student_course_record.coach_name</code>. 教练姓名
@@ -228,7 +228,7 @@ public class EduStudentCourseRecord extends TableImpl<EduStudentCourseRecordReco
     // -------------------------------------------------------------------------
 
     @Override
-    public Row17<Long, String, String, String, String, LocalDate, LocalTime, LocalTime, BigDecimal, String, Long, String, Long, String, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
+    public Row17<Long, Long, Long, Long, String, LocalDate, LocalTime, LocalTime, BigDecimal, String, Long, String, Long, String, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
         return (Row17) super.fieldsRow();
     }
 }

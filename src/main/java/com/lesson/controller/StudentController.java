@@ -42,11 +42,11 @@ public class StudentController {
     @PostMapping
     @Operation(summary = "创建学员", 
                description = "创建新学员，需要指定学员基本信息")
-    public Result<String> createStudent(
+    public Result<Long> createStudent(
             @Parameter(description = "创建学员请求") @RequestBody @Valid StudentCreateRequest request) {
         EduStudentRecord record = new EduStudentRecord();
         BeanUtils.copyProperties(request, record);
-        String id = studentModel.createStudent(record);
+        Long id = studentModel.createStudent(record);
         return Result.success(id);
     }
 
@@ -60,12 +60,10 @@ public class StudentController {
     @PutMapping("/{id}")
     @Operation(summary = "更新学员信息", 
                description = "更新学员基本信息")
-    public Result<Void> updateStudent(
-            @Parameter(description = "学员ID", required = true) @PathVariable String id,
-            @Parameter(description = "更新学员请求") @RequestBody @Valid StudentUpdateRequest request) {
+    public Result<Void> updateStudent(@Parameter(description = "更新学员请求") @RequestBody @Valid StudentUpdateRequest request) {
         EduStudentRecord record = new EduStudentRecord();
         BeanUtils.copyProperties(request, record);
-        record.setId(id);
+        record.setId(request.getId());
         studentModel.updateStudent(record);
         return Result.success();
     }
@@ -80,7 +78,7 @@ public class StudentController {
     @Operation(summary = "删除学员", 
                description = "根据学员ID删除学员（逻辑删除）")
     public Result<Void> deleteStudent(
-            @Parameter(description = "学员ID", required = true) @PathVariable String id) {
+            @Parameter(description = "学员ID", required = true) @PathVariable Long id) {
         studentModel.deleteStudent(id);
         return Result.success();
     }
@@ -96,7 +94,7 @@ public class StudentController {
     @Operation(summary = "更新学员状态", 
                description = "更新学员状态，可选值：STUDYING-在读，GRADUATED-已毕业，DROPPED-已退学")
     public Result<Void> updateStudentStatus(
-            @Parameter(description = "学员ID", required = true) @PathVariable String id,
+            @Parameter(description = "学员ID", required = true) @PathVariable Long id,
             @Parameter(description = "学员状态", required = true) @RequestParam StudentStatus status) {
         studentModel.updateStatus(id, status);
         return Result.success();
@@ -112,7 +110,7 @@ public class StudentController {
     @Operation(summary = "获取学员详情", 
                description = "根据学员ID获取学员详细信息")
     public Result<StudentDetailVO> getStudentDetail(
-            @Parameter(description = "学员ID", required = true) @PathVariable String id) {
+            @Parameter(description = "学员ID", required = true) @PathVariable Long id) {
         StudentDetailRecord detail = studentModel.getStudentById(id)
                 .orElseThrow(() -> new IllegalArgumentException("学员不存在"));
         StudentDetailVO vo = new StudentDetailVO();
