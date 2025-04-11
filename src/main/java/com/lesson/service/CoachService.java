@@ -44,7 +44,6 @@ public interface CoachService {
      *
      * @param id 教练ID
      * @param campusId 校区ID
-     * @param institutionId 机构ID
      * @return 教练详情VO
      */
     CoachDetailVO getCoachDetail(Long id, Long campusId);

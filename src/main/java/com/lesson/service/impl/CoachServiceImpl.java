@@ -6,6 +6,7 @@ import com.lesson.common.enums.Gender;
 import com.lesson.model.SysCoachModel;
 import com.lesson.model.record.CoachDetailRecord;
 import com.lesson.repository.tables.records.SysCoachCertificationRecord;
+import com.lesson.repository.tables.records.SysCoachSalaryRecord;
 import com.lesson.request.coach.CoachCreateRequest;
 import com.lesson.request.coach.CoachQueryRequest;
 import com.lesson.request.coach.CoachSalaryUpdateRequest;
@@ -69,6 +70,7 @@ public class CoachServiceImpl implements CoachService {
      */
     private CoachDetailVO convertToDetailVO(CoachDetailRecord record) {
         CoachDetailVO vo = new CoachDetailVO();
+        // 基本信息设置
         vo.setId(record.getId());
         vo.setName(record.getName());
         vo.setStatus(record.getStatus());
@@ -80,9 +82,17 @@ public class CoachServiceImpl implements CoachService {
         vo.setExperience(record.getExperience());
         vo.setGender(record.getGender());
         vo.setCampusId(record.getCampusId());
-        vo.setCampusName(record.getCampusName());
         vo.setInstitutionId(record.getInstitutionId());
-        vo.setInstitutionName(record.getInstitutionName());
+
+        // 设置薪资信息
+        CoachDetailVO.SalaryInfo salaryInfo = new CoachDetailVO.SalaryInfo();
+        salaryInfo.setBaseSalary(record.getBaseSalary());
+        salaryInfo.setSocialInsurance(record.getSocialInsurance());
+        salaryInfo.setClassFee(record.getClassFee());
+        salaryInfo.setPerformanceBonus(record.getPerformanceBonus());
+        salaryInfo.setCommission(record.getCommission());
+        salaryInfo.setDividend(record.getDividend());
+        vo.setSalary(salaryInfo);
         return vo;
     }
 
@@ -241,7 +251,22 @@ public class CoachServiceImpl implements CoachService {
             // 转换为VO并设置证书信息
             CoachDetailVO detailVO = convertToDetailVO(record);
             detailVO.setCertifications(certifications);
-            
+            // 获取最新的薪资信息
+          SysCoachSalaryRecord salaryRecord = coachModel.getLatestSalary(id);
+            if (salaryRecord != null) {
+                CoachDetailVO.SalaryInfo salaryInfo = new CoachDetailVO.SalaryInfo();
+                salaryInfo.setBaseSalary(salaryRecord.getBaseSalary());
+                salaryInfo.setSocialInsurance(salaryRecord.getSocialInsurance());
+                salaryInfo.setClassFee(salaryRecord.getClassFee());
+                salaryInfo.setPerformanceBonus(salaryRecord.getPerformanceBonus());
+                salaryInfo.setCommission(salaryRecord.getCommission());
+                salaryInfo.setDividend(salaryRecord.getDividend());
+                salaryInfo.setEffectiveDate(salaryRecord.getEffectiveDate());
+                detailVO.setSalary(salaryInfo);
+            } else {
+                // 如果没有薪资记录，至少设置一个空的薪资信息对象，避免NPE
+                detailVO.setSalary(new CoachDetailVO.SalaryInfo());
+            }
             return detailVO;
         } catch (RuntimeException e) {
             log.error("获取教练详情失败", e);

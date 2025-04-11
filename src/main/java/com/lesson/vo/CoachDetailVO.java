@@ -82,7 +82,7 @@ public class CoachDetailVO {
      * 状态
      */
     @Schema(description = "状态", example = "active")
-    private CoachStatus status;
+    private CoachStatus  status;
     
     /**
      * 所属校区ID
@@ -91,22 +91,10 @@ public class CoachDetailVO {
     private Long campusId;
     
     /**
-     * 所属校区名称
-     */
-    @Schema(description = "所属校区名称", example = "北京中关村校区")
-    private String campusName;
-    
-    /**
      * 所属机构ID
      */
     @Schema(description = "所属机构ID", example = "1")
     private Long institutionId;
-    
-    /**
-     * 所属机构名称
-     */
-    @Schema(description = "所属机构名称", example = "ABC健身")
-    private String institutionName;
     
     /**
      * 薪资信息
@@ -130,7 +118,7 @@ public class CoachDetailVO {
         /**
          * 社保费
          */
-        @Schema(description = "社保费", example = "1000")
+        @Schema(description = "社保", example = "1000")
         private BigDecimal socialInsurance;
         
         /**
@@ -161,7 +149,7 @@ public class CoachDetailVO {
          * 生效日期
          */
         @Schema(description = "生效日期", example = "2023-01-01")
-        @JsonFormat(pattern = "yyyy-MM-dd")
-        private LocalDate effectiveDate;
+        @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+        private LocalDate effectiveDate = LocalDate.now();
     }
 } 

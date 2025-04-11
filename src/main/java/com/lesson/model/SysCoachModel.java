@@ -275,10 +275,10 @@ public class SysCoachModel {
     public SysCoachSalaryRecord getLatestSalary(Long coachId) {
         return dsl.selectFrom(SYS_COACH_SALARY)
                 .where(SYS_COACH_SALARY.COACH_ID.eq(coachId))
-                .and(SYS_COACH_SALARY.DELETED.eq( 0))
+                .and(SYS_COACH_SALARY.DELETED.eq(0))
                 .orderBy(SYS_COACH_SALARY.EFFECTIVE_DATE.desc())
                 .limit(1)
-                .fetchOne();
+                .fetchOneInto(SysCoachSalaryRecord.class);
     }
 
     /**
