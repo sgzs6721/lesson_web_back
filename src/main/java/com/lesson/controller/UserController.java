@@ -2,6 +2,7 @@ package com.lesson.controller;
 
 import com.lesson.annotation.RequirePermission;
 import com.lesson.common.Result;
+import com.lesson.common.enums.UserStatus;
 import com.lesson.request.user.*;
 import com.lesson.service.RoleService;
 import com.lesson.service.UserService;
@@ -100,8 +101,9 @@ public class UserController {
     @RequirePermission("user:update")
     public Result<Void> updateStatus(
             @Parameter(description = "用户ID", required = true) @RequestParam Long id,
-            @Parameter(description = "用户状态（0-禁用，1-启用）", required = true) @RequestParam Integer status) {
-        userService.updateStatus(id, status);
+            @Parameter(description = "用户状态（DISABLED-禁用，ENABLED-启用）", required = true)
+            @RequestParam UserStatus status) {
+        userService.updateStatus(id, status.getCode());
         return Result.success(null);
     }
 

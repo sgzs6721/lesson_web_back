@@ -161,7 +161,7 @@ public class UserServiceImpl implements UserService {
           request.getKeyword(),
           request.getRoleIds(),
           request.getCampusIds(),
-          request.getStatus()
+          request.getStatus().getCode()
       );
 
       // 查询列表数据
@@ -169,7 +169,7 @@ public class UserServiceImpl implements UserService {
           request.getKeyword(),
           request.getRoleIds(),
           request.getCampusIds(),
-          request.getStatus(),
+          request.getStatus().getCode(),
           request.getPageNum(),
           request.getPageSize()
       );
