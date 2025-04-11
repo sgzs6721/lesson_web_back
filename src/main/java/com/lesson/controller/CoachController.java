@@ -1,15 +1,10 @@
 package com.lesson.controller;
 
 import com.lesson.common.Result;
-import com.lesson.common.enums.CoachStatus;
-<<<<<<< HEAD
 import com.lesson.request.coach.CoachCreateRequest;
 import com.lesson.request.coach.CoachQueryRequest;
-import com.lesson.request.coach.CoachSalaryUpdateRequest;
 import com.lesson.request.coach.CoachUpdateRequest;
-=======
-import com.lesson.request.coach.*;
->>>>>>> b941de5 (优化机构类型枚举，更新用户模型以支持校区ID，添加根据机构ID查询校区列表的方法，调整用户注册和更新请求，确保角色和机构ID的有效性。)
+import com.lesson.request.coach.UpdateStatusRequest;
 import com.lesson.service.CoachService;
 import com.lesson.vo.CoachDetailVO;
 import com.lesson.vo.CoachSimpleVO;
@@ -132,16 +127,9 @@ public class CoachController {
                responses = {
                    @ApiResponse(responseCode = "200", description = "更新成功")
                })
-<<<<<<< HEAD
-    public Result<Void> updateStatus(
-            @Parameter(description = "教练ID", required = true) @RequestParam Long id,
-             @Parameter(description = "状态：active-在职，vacation-休假中，resigned-离职", required = true)
-            @RequestParam CoachStatus status) {
-        coachService.updateStatus(id, status);
-=======
+
     public Result<Void> updateStatus(@RequestBody @Validated UpdateStatusRequest request) {
         coachService.updateStatus(request.getId(), request.getStatus());
->>>>>>> b941de5 (优化机构类型枚举，更新用户模型以支持校区ID，添加根据机构ID查询校区列表的方法，调整用户注册和更新请求，确保角色和机构ID的有效性。)
         return Result.success(null);
     }
 
