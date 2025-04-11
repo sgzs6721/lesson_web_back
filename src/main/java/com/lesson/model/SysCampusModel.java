@@ -104,6 +104,7 @@ public class SysCampusModel {
             .from(SYS_CAMPUS)
             .leftJoin(SYS_USER).on(SYS_CAMPUS.ID.eq(SYS_USER.CAMPUS_ID))
             .where(SYS_CAMPUS.ID.eq(campusId))
+            .and(SYS_USER.DELETED.eq( 0))
             .and(SYS_CAMPUS.DELETED.eq( 0))
             .fetchOneInto(CampusDetailRecord.class);
     }
