@@ -153,21 +153,32 @@ public class CoachServiceImpl implements CoachService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateCoach(Long id, CoachUpdateRequest request) {
+    public void updateCoach(CoachUpdateRequest request) {
         try {
-            if (!coachModel.existsById(id)) {
+            // 从请求中获取机构ID
+            Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
+            if (institutionId == null) {
+                throw new BusinessException("机构ID不能为空");
+            }
+
+            if (!coachModel.existsById(request.getId())) {
                 throw new BusinessException("教练不存在或已删除");
             }
 
             // 获取现有教练信息
-            CoachDetailRecord coach = coachModel.getCoach(id);
+            CoachDetailRecord coach = coachModel.getCoach(request.getId());
             if (coach == null) {
                 throw new BusinessException("教练不存在或已删除");
             }
 
+            // 验证教练是否属于当前机构
+            if (!institutionId.equals(coach.getInstitutionId())) {
+                throw new BusinessException("无权操作其他机构的教练信息");
+            }
+
             // 更新教练基本信息
             coachModel.updateCoach(
-                    id,
+                    request.getId(),
                     request.getName() != null ? request.getName() : coach.getName(),
                     request.getStatus(),
                     request.getAge() != null ? request.getAge() : coach.getAge(),
@@ -178,12 +189,12 @@ public class CoachServiceImpl implements CoachService {
                     request.getExperience() != null ? request.getExperience() : coach.getExperience(),
                     request.getGender(),
                     request.getCampusId() != null ? request.getCampusId() : coach.getCampusId(),
-                    request.getInstitutionId() != null ? request.getInstitutionId() : coach.getInstitutionId()
+                    institutionId  // 使用从请求中获取的机构ID
             );
 
             // 更新证书
             if (request.getCertifications() != null) {
-                coachModel.addCertifications(id, request.getCertifications());
+                coachModel.addCertifications(request.getId(), request.getCertifications());
             }
         } catch (RuntimeException e) {
             log.error("更新教练失败", e);

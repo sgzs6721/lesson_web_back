@@ -1,5 +1,6 @@
 package com.lesson.vo.user;
 
+import com.lesson.common.enums.UserStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -44,14 +45,8 @@ public class UserListVO {
     /**
      * 状态：0-禁用，1-启用
      */
-    @Schema(description = "状态：0-禁用，1-启用")
-    private Integer status;
-
-    /**
-     * 状态文本
-     */
-    @Schema(description = "状态文本")
-    private String statusText;
+    @Schema(description = "状态：DISABLED-禁用，ENABLED-启用")
+    private UserStatus status;
 
     /**
      * 创建时间

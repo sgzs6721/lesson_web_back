@@ -232,8 +232,7 @@ public class UserServiceImpl implements UserService {
 
     // 设置状态
     Integer status = record.get("status", Integer.class);
-    vo.setStatus(status);
-    vo.setStatusText(status == 1 ? "启用" : "禁用");
+    vo.setStatus(UserStatus.fromCode(status));
 
     // 设置时间
     vo.setCreatedTime(record.get("created_time", java.time.LocalDateTime.class));

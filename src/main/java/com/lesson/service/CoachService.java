@@ -27,10 +27,9 @@ public interface CoachService {
     /**
      * 更新教练
      *
-     * @param id      教练ID
      * @param request 更新教练请求
      */
-    void updateCoach(Long id, CoachUpdateRequest request);
+    void updateCoach(CoachUpdateRequest request);
     
     /**
      * 删除教练

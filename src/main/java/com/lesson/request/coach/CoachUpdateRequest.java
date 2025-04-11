@@ -15,6 +15,9 @@ import java.util.List;
 @Data
 @Schema(description = "更新教练请求")
 public class CoachUpdateRequest {
+
+    @NotNull(message = "ID不能为空")
+    private Long id;
     
     /**
      * 姓名
@@ -87,10 +90,5 @@ public class CoachUpdateRequest {
      */
     @Schema(description = "所属校区ID", example = "1")
     private Long campusId;
-    
-    /**
-     * 所属机构ID
-     */
-    @Schema(description = "所属机构ID", example = "1")
-    private Long institutionId;
+
 } 

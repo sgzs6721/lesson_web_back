@@ -63,10 +63,8 @@ public class CoachController {
                responses = {
                    @ApiResponse(responseCode = "200", description = "更新成功")
                })
-    public Result<Void> update(
-            @Parameter(description = "教练ID", required = true) @RequestParam Long id,
-            @RequestBody @Validated CoachUpdateRequest request) {
-        coachService.updateCoach(id, request);
+    public Result<Void> update(@RequestBody @Validated CoachUpdateRequest request) {
+        coachService.updateCoach(request);
         return Result.success(null);
     }
 
