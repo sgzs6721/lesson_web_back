@@ -50,8 +50,7 @@ public class CampusController {
 
     /**
      * 更新校区
-     * 
-     * @param id 校区ID
+     *
      * @param request 更新校区请求参数
      * @return 无
      */
@@ -61,10 +60,8 @@ public class CampusController {
                responses = {
                    @ApiResponse(responseCode = "200", description = "更新成功")
                })
-    public Result<Void> update(
-            @Parameter(description = "校区ID", required = true) @RequestParam Long id, 
-            @RequestBody @Validated CampusUpdateRequest request) {
-        campusService.updateCampus(id, request);
+    public Result<Void> update(@RequestBody @Validated CampusUpdateRequest request) {
+        campusService.updateCampus(request);
         return Result.success(null);
     }
 

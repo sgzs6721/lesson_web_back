@@ -75,6 +75,7 @@ public class Indexes {
     public static final Index EDU_COURSE_RECORD_IDX_INSTITUTION_ID = Internal.createIndex(DSL.name("idx_institution_id"), EduCourseRecord.EDU_COURSE_RECORD, new OrderField[] { EduCourseRecord.EDU_COURSE_RECORD.INSTITUTION_ID }, false);
     public static final Index EDU_STUDENT_IDX_INSTITUTION_ID = Internal.createIndex(DSL.name("idx_institution_id"), EduStudent.EDU_STUDENT, new OrderField[] { EduStudent.EDU_STUDENT.INSTITUTION_ID }, false);
     public static final Index EDU_STUDENT_COURSE_IDX_INSTITUTION_ID = Internal.createIndex(DSL.name("idx_institution_id"), EduStudentCourse.EDU_STUDENT_COURSE, new OrderField[] { EduStudentCourse.EDU_STUDENT_COURSE.INSTITUTION_ID }, false);
+    public static final Index SYS_CAMPUS_IDX_INSTITUTION_ID = Internal.createIndex(DSL.name("idx_institution_id"), SysCampus.SYS_CAMPUS, new OrderField[] { SysCampus.SYS_CAMPUS.INSTITUTION_ID }, false);
     public static final Index SYS_COACH_IDX_INSTITUTION_ID = Internal.createIndex(DSL.name("idx_institution_id"), SysCoach.SYS_COACH, new OrderField[] { SysCoach.SYS_COACH.INSTITUTION_ID }, false);
     public static final Index SYS_USER_IDX_INSTITUTION_ID = Internal.createIndex(DSL.name("idx_institution_id"), SysUser.SYS_USER, new OrderField[] { SysUser.SYS_USER.INSTITUTION_ID }, false);
     public static final Index SYS_COACH_IDX_JOB_TITLE = Internal.createIndex(DSL.name("idx_job_title"), SysCoach.SYS_COACH, new OrderField[] { SysCoach.SYS_COACH.JOB_TITLE }, false);

@@ -1,6 +1,6 @@
 package com.lesson.model;
 
-import com.lesson.enums.CampusStatus;
+import com.lesson.common.enums.CampusStatus;
 import com.lesson.model.record.CampusDetailRecord;
 import com.lesson.repository.tables.records.SysCampusRecord;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.lesson.repository.Tables.*;
-import static org.jooq.impl.DSL.*;
 
 @Component
 @RequiredArgsConstructor
@@ -24,17 +23,26 @@ public class SysCampusModel {
 
     /**
      * 创建校区
+     * @param name 校区名称
+     * @param address 校区地址
+     * @param monthlyRent 月租金
+     * @param propertyFee 物业费
+     * @param utilityFee 水电费
+     * @param status 校区状态
+     * @param institutionId 机构ID
+     * @return 校区ID
      */
-    public Long createCampus(String name, String address, String contactPhone, 
-                           BigDecimal monthlyRent, BigDecimal propertyFee, BigDecimal utilityFee, Boolean status) {
+    public Long createCampus(String name, String address,
+                           BigDecimal monthlyRent, BigDecimal propertyFee, BigDecimal utilityFee, 
+                           CampusStatus status, Long institutionId) {
         SysCampusRecord record = dsl.newRecord(SYS_CAMPUS);
         record.setName(name);
         record.setAddress(address);
-        //record.setContactPhone(contactPhone);
         record.setMonthlyRent(monthlyRent);
         record.setPropertyFee(propertyFee);
         record.setUtilityFee(utilityFee);
-        record.setStatus(status ? 1 : 0);
+        record.setStatus(status.getCode());
+        record.setInstitutionId(institutionId);
         record.store();
         return record.getId();
     }
@@ -42,8 +50,7 @@ public class SysCampusModel {
     /**
      * 更新校区
      */
-    public void updateCampus(Long id, String name, String address, CampusStatus status,
-                           String contactPhone, BigDecimal monthlyRent, 
+    public void updateCampus(Long id, Long institutionId, String name, String address, CampusStatus status,BigDecimal monthlyRent,
                            BigDecimal propertyFee, BigDecimal utilityFee) {
         SysCampusRecord record = dsl.selectFrom(SYS_CAMPUS)
                 .where(SYS_CAMPUS.ID.eq(id))
@@ -55,7 +62,7 @@ public class SysCampusModel {
         record.setName(name);
         record.setAddress(address);
         record.setStatus(status.getCode());
-        //record.setContactPhone(contactPhone);
+        record.setInstitutionId(institutionId);
         record.setMonthlyRent(monthlyRent);
         record.setPropertyFee(propertyFee);
         record.setUtilityFee(utilityFee);

@@ -1,5 +1,6 @@
 package com.lesson.request.campus;
 
+import com.lesson.common.enums.CampusStatus;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
@@ -11,6 +12,9 @@ import java.math.BigDecimal;
  */
 @Data
 public class CampusUpdateRequest {
+
+    @NotNull(message = "ID不能为空")
+    private Long id;
     /**
      * 校区名称
      */
@@ -27,17 +31,7 @@ public class CampusUpdateRequest {
      * 状态：0-已关闭，1-营业中
      */
     @NotNull(message = "状态不能为空")
-    private Integer status;
-
-    /**
-     * 联系人姓名
-     */
-    private String contactName;
-
-    /**
-     * 联系电话
-     */
-    private String contactPhone;
+    private CampusStatus status;
 
     /**
      * 月租金

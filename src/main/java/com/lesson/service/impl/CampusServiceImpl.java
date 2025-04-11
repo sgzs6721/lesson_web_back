@@ -1,10 +1,9 @@
 package com.lesson.service.impl;
 
 import com.lesson.common.exception.BusinessException;
-import com.lesson.enums.CampusStatus;
+import com.lesson.common.enums.CampusStatus;
 import com.lesson.model.SysCampusModel;
 import com.lesson.model.record.CampusDetailRecord;
-import com.lesson.repository.tables.records.SysCampusRecord;
 import com.lesson.request.campus.CampusCreateRequest;
 import com.lesson.request.campus.CampusQueryRequest;
 import com.lesson.request.campus.CampusUpdateRequest;
@@ -13,17 +12,14 @@ import com.lesson.vo.CampusSimpleVO;
 import com.lesson.vo.PageResult;
 import com.lesson.service.CampusService;
 import lombok.RequiredArgsConstructor;
-import org.jooq.Result;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static com.lesson.repository.Tables.SYS_CAMPUS;
 
 /**
  * 校区服务实现
@@ -34,6 +30,7 @@ import static com.lesson.repository.Tables.SYS_CAMPUS;
 public class CampusServiceImpl implements CampusService {
 
     private final SysCampusModel campusModel;
+    private final HttpServletRequest httpServletRequest; // 注入HttpServletRequest
 
     /**
      * 转换数据库记录为VO
@@ -71,14 +68,21 @@ public class CampusServiceImpl implements CampusService {
     @Transactional(rollbackFor = Exception.class)
     public Long createCampus(CampusCreateRequest request) {
         try {
+            // 从请求中获取机构ID
+            Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
+            if (institutionId == null) {
+                // 如果请求中没有机构ID，则使用默认值
+                institutionId = 1L;
+            }
+            
             return campusModel.createCampus(
                 request.getName(),
                 request.getAddress(),
-                request.getContactPhone(),
                 request.getMonthlyRent(),
                 request.getPropertyFee(),
                 request.getUtilityFee(),
-                request.getStatus()
+                request.getStatus(),
+                institutionId
             );
         } catch (RuntimeException e) {
             throw new BusinessException(e.getMessage());
@@ -87,18 +91,20 @@ public class CampusServiceImpl implements CampusService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateCampus(Long id, CampusUpdateRequest request) {
+    public void updateCampus(CampusUpdateRequest request) {
         try {
-            CampusStatus status = CampusStatus.fromInteger(request.getStatus());
-            if (status == null) {
-                throw new BusinessException("状态值无效");
+            // 从请求中获取机构ID
+            Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
+            if (institutionId == null) {
+                // 如果请求中没有机构ID，则使用默认值
+                institutionId = 1L;
             }
             campusModel.updateCampus(
-                id,
+                request.getId(),
+                institutionId,
                 request.getName(),
                 request.getAddress(),
-                status,
-                request.getContactPhone(),
+                request.getStatus(),
                 request.getMonthlyRent(),
                 request.getPropertyFee(),
                 request.getUtilityFee()

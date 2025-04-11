@@ -20,7 +20,7 @@ import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row10;
+import org.jooq.Row11;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -56,6 +56,11 @@ public class SysCampus extends TableImpl<SysCampusRecord> {
      * The column <code>lesson.sys_campus.id</code>. 主键ID
      */
     public final TableField<SysCampusRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "主键ID");
+
+    /**
+     * The column <code>lesson.sys_campus.institution_id</code>. 机构ID
+     */
+    public final TableField<SysCampusRecord, Long> INSTITUTION_ID = createField(DSL.name("institution_id"), SQLDataType.BIGINT.nullable(false).defaultValue(DSL.inline("1", SQLDataType.BIGINT)), this, "机构ID");
 
     /**
      * The column <code>lesson.sys_campus.name</code>. 校区名称
@@ -142,7 +147,7 @@ public class SysCampus extends TableImpl<SysCampusRecord> {
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.SYS_CAMPUS_IDX_CREATED_TIME, Indexes.SYS_CAMPUS_IDX_NAME, Indexes.SYS_CAMPUS_IDX_STATUS);
+        return Arrays.<Index>asList(Indexes.SYS_CAMPUS_IDX_CREATED_TIME, Indexes.SYS_CAMPUS_IDX_INSTITUTION_ID, Indexes.SYS_CAMPUS_IDX_NAME, Indexes.SYS_CAMPUS_IDX_STATUS);
     }
 
     @Override
@@ -187,11 +192,11 @@ public class SysCampus extends TableImpl<SysCampusRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row10 type methods
+    // Row11 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row10<Long, String, String, Integer, BigDecimal, BigDecimal, BigDecimal, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
-        return (Row10) super.fieldsRow();
+    public Row11<Long, Long, String, String, Integer, BigDecimal, BigDecimal, BigDecimal, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
+        return (Row11) super.fieldsRow();
     }
 }

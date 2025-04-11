@@ -1,12 +1,11 @@
 package com.lesson.vo;
 
-import com.lesson.enums.CampusStatus;
+import com.lesson.common.enums.CampusStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * 校区信息

@@ -1,5 +1,6 @@
 package com.lesson.request.campus;
 
+import com.lesson.common.enums.CampusStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -28,18 +29,6 @@ public class CampusCreateRequest {
     private String address;
 
     /**
-     * 联系人姓名
-     */
-    @Schema(description = "联系人姓名")
-    private String contactName;
-
-    /**
-     * 联系电话
-     */
-    @Schema(description = "联系电话")
-    private String contactPhone;
-
-    /**
      * 月租金
      */
     @NotNull(message = "月租金不能为空")
@@ -65,5 +54,5 @@ public class CampusCreateRequest {
      */
     @NotNull(message = "状态不能为空")
     @Schema(description = "状态：0-已关闭，1-营业中", required = true)
-    private Boolean status;
+    private CampusStatus status;
 } 

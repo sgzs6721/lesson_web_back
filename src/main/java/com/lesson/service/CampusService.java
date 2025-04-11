@@ -22,10 +22,9 @@ public interface CampusService {
     /**
      * 更新校区
      *
-     * @param id      校区ID
      * @param request 更新请求
      */
-    void updateCampus(Long id, CampusUpdateRequest request);
+    void updateCampus(CampusUpdateRequest request);
 
     /**
      * 删除校区
