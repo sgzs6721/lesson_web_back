@@ -26,10 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -161,7 +158,7 @@ public class UserServiceImpl implements UserService {
           request.getKeyword(),
           request.getRoleIds(),
           request.getCampusIds(),
-          request.getStatus().getCode()
+          Objects.isNull(request.getStatus()) ? UserStatus.ENABLED.getCode() : request.getStatus().getCode()
       );
 
       // 查询列表数据
@@ -169,7 +166,7 @@ public class UserServiceImpl implements UserService {
           request.getKeyword(),
           request.getRoleIds(),
           request.getCampusIds(),
-          request.getStatus().getCode(),
+          Objects.isNull(request.getStatus()) ? UserStatus.ENABLED.getCode() : request.getStatus().getCode(),
           request.getPageNum(),
           request.getPageSize()
       );
