@@ -8,19 +8,19 @@ import lombok.Getter;
 @Getter
 public enum InstitutionTypeEnum {
     /**
-     * 培训机构
+     * 教育培训机构
      */
-    TRAINING(1, "培训机构"),
+    EDUCATION(1, "教育培训"),
 
     /**
-     * 教育机构
+     * 体育培训机构
      */
-    EDUCATION(2, "教育机构"),
+    SPORTS(2, "体育培训"),
 
     /**
      * 其他机构
      */
-    OTHER(3, "其他机构");
+    OTHER(3, "其他");
 
     private final int code;
     private final String desc;

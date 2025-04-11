@@ -36,6 +36,12 @@ public class UserUpdateRequest {
     private String phone;
 
     /**
+     * 密码
+     */
+    @Schema(description = "密码，不修改密码时可不传")
+    private String password;
+
+    /**
      * 角色ID
      */
     @NotNull(message = "角色ID不能为空")
@@ -43,9 +49,15 @@ public class UserUpdateRequest {
     private Long roleId;
 
     /**
+     * 机构ID，校区管理员可为空
+     */
+    @Schema(description = "机构ID，校区管理员可为空")
+    private Long institutionId;
+
+    /**
      * 校区ID，系统管理员可为空
      */
-    @Schema(description = "校区ID，系统管理员可为空")
+    @Schema(description = "校区ID，校区管理员必填")
     private Long campusId;
 
     /**

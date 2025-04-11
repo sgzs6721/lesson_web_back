@@ -226,4 +226,18 @@ public class SysCampusModel {
                 .and(SYS_CAMPUS.DELETED.eq((byte) 0))
                 .fetchOne(0, int.class) > 0;
     }
+
+    /**
+     * 根据机构ID查询校区列表
+     * 
+     * @param institutionId 机构ID
+     * @return 校区列表
+     */
+    public List<SysCampusRecord> findByInstitutionId(Long institutionId) {
+        return dsl.selectFrom(SYS_CAMPUS)
+                .where(SYS_CAMPUS.INSTITUTION_ID.eq(institutionId))
+                .and(SYS_CAMPUS.DELETED.eq((byte) 0))
+                .orderBy(SYS_CAMPUS.CREATED_TIME.desc())
+                .fetch();
+    }
 }

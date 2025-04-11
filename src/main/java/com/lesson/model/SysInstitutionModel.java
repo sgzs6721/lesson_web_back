@@ -1,5 +1,6 @@
 package com.lesson.model;
 
+import com.lesson.common.enums.InstitutionStatusEnum;
 import com.lesson.repository.tables.records.SysInstitutionRecord;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
@@ -29,7 +30,7 @@ public class SysInstitutionModel {
         institution.setDescription(description);
         institution.setManagerName(managerName);
         institution.setManagerPhone(managerPhone);
-        institution.setStatus(1);
+        institution.setStatus(InstitutionStatusEnum.OPERATING.getCode());
         institution.setDeleted((byte) 0);
         institution.store();
         return institution.getId();

@@ -46,7 +46,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Long createUser(String phone, String password, String realName, Long institutionId, Long roleId) {
-        return userModel.createUser(phone, password, realName, institutionId, roleId, passwordEncoder);
+        return userModel.createUser(phone, password, realName, institutionId, roleId, -1L, passwordEncoder);
     }
 
     @Override
@@ -103,10 +103,11 @@ public class UserServiceImpl implements UserService {
             request.getManagerName(),
             institutionId,
             superAdminRoleId,  // 使用从数据库查询的超级管理员角色ID
+            -1L, // 超级管理员的校区ID设为-1
             passwordEncoder
         );
 
-        return UserRegisterVO.of(userId, request.getManagerPhone());
+        return UserRegisterVO.of(userId, request.getManagerPhone(), request.getManagerName(),request.getInstitutionName(), request.getInstitutionType(), request.getInstitutionDescription());
     }
 
     @Override
@@ -229,20 +230,53 @@ public class UserServiceImpl implements UserService {
                 throw new BusinessException("手机号已存在");
             }
             
-            // 检查机构ID是否有效
-            if (request.getInstitutionId() == null) {
-                throw new BusinessException("机构ID不能为空");
+            String roleName = roleModel.getRoleNameById(request.getRoleId());
+            if (roleName == null) {
+                throw new BusinessException("角色不存在");
             }
             
-            // 直接调用已有的createUser方法
-            return userModel.createUser(
-                request.getPhone(),
-                request.getPassword(),
-                request.getRealName(),
-                request.getInstitutionId(),
-                request.getRoleId(),
-                passwordEncoder
-            );
+            // 不允许创建超级管理员
+            if (RoleConstant.ROLE_SUPER_ADMIN.equals(roleName)) {
+                throw new BusinessException("不允许创建超级管理员角色");
+            }
+            
+            // 校区管理员角色
+            if (RoleConstant.ROLE_CAMPUS_ADMIN.equals(roleName)) {
+                // 校区管理员必须指定校区ID
+                if (request.getCampusId() == null || request.getCampusId() <= 0) {
+                    throw new BusinessException("校区管理员必须指定所属校区");
+                }
+                
+                // 根据校区ID获取机构ID
+                Long institutionId = request.getInstitutionId();
+                
+                // 调用已有的createUser方法
+                return userModel.createUser(
+                    request.getPhone(),
+                    request.getPassword(),
+                    request.getRealName(),
+                    institutionId,
+                    request.getRoleId(),
+                    request.getCampusId(),
+                    passwordEncoder
+                );
+            } else {
+                // 其他角色
+                if (request.getInstitutionId() == null) {
+                    throw new BusinessException("机构ID不能为空");
+                }
+                
+                // 调用已有的createUser方法，校区ID默认为-1L
+                return userModel.createUser(
+                    request.getPhone(),
+                    request.getPassword(),
+                    request.getRealName(),
+                    request.getInstitutionId(),
+                    request.getRoleId(),
+                    -1L, // 非校区管理员的校区ID默认为-1
+                    passwordEncoder
+                );
+            }
             
         } catch (BusinessException e) {
             throw e;
@@ -267,14 +301,46 @@ public class UserServiceImpl implements UserService {
                 throw new BusinessException("手机号已存在");
             }
             
+            // 获取角色名称
+            String roleName = roleModel.getRoleNameById(request.getRoleId());
+            if (roleName == null) {
+                throw new BusinessException("角色不存在");
+            }
+            
+            // 不允许修改为超级管理员
+            if (RoleConstant.ROLE_SUPER_ADMIN.equals(roleName)) {
+                throw new BusinessException("不允许创建超级管理员角色");
+            }
+            
+            Long institutionId = request.getInstitutionId();
+            Long campusId = request.getCampusId();
+            
+            // 校区管理员角色
+            if (RoleConstant.ROLE_CAMPUS_ADMIN.equals(roleName)) {
+                // 校区管理员必须指定校区ID
+                if (campusId == null || campusId <= 0) {
+                    throw new BusinessException("校区管理员必须指定所属校区");
+                }
+            } else {
+                // 其他角色
+                if (institutionId == null) {
+                    throw new BusinessException("机构ID不能为空");
+                }
+                // 非校区管理员的校区ID默认为-1
+                campusId = -1L;
+            }
+            
             // 更新用户
             userModel.updateUser(
                 request.getId(),
                 request.getRealName(),
                 request.getPhone(),
                 request.getRoleId(),
-                request.getCampusId(),
-                request.getStatus()
+                institutionId,
+                campusId,
+                request.getPassword(),
+                request.getStatus(),
+                passwordEncoder
             );
         } catch (BusinessException e) {
             throw e;

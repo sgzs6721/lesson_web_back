@@ -69,18 +69,19 @@ public class SysUserModel {
      * @param realName 真实姓名
      * @param institutionId 机构ID
      * @param roleId 角色ID
+     * @param campusId 校区ID
      * @param passwordEncoder 密码加密器
      * @return 用户ID
      */
     public Long createUser(String phone, String password, String realName,
-                         Long institutionId, Long roleId, PasswordEncoder passwordEncoder) {
+                         Long institutionId, Long roleId, Long campusId, PasswordEncoder passwordEncoder) {
         SysUserRecord user = dsl.newRecord(SYS_USER);
         user.setPhone(phone);
         user.setPassword(passwordEncoder.encode(password));
         user.setRealName(realName);
         user.setInstitutionId(institutionId);
         user.setRoleId(roleId);
-        user.setCampusId(-1L);
+        user.setCampusId(campusId);
         user.setStatus((byte) 1);
         user.setDeleted((byte) 0);
         user.setCreatedTime(LocalDateTime.now());
@@ -255,8 +256,20 @@ public class SysUserModel {
     
     /**
      * 更新用户
+     * 
+     * @param id 用户ID
+     * @param realName 真实姓名
+     * @param phone 手机号
+     * @param roleId 角色ID
+     * @param institutionId 机构ID
+     * @param campusId 校区ID
+     * @param password 密码，可为空
+     * @param status 状态
+     * @param passwordEncoder 密码加密器
      */
-    public void updateUser(Long id, String realName, String phone, Long roleId, Long campusId, Integer status) {
+    public void updateUser(Long id, String realName, String phone, Long roleId, 
+                          Long institutionId, Long campusId, String password,
+                          Integer status, PasswordEncoder passwordEncoder) {
         UpdateSetMoreStep<SysUserRecord> update = dsl.update(SYS_USER)
             .set(SYS_USER.REAL_NAME, realName)
             .set(SYS_USER.PHONE, phone)
@@ -264,8 +277,19 @@ public class SysUserModel {
             .set(SYS_USER.STATUS, status.byteValue())
             .set(SYS_USER.UPDATE_TIME, LocalDateTime.now());
         
+        // 设置机构ID
+        if (institutionId != null) {
+            update = update.set(SYS_USER.INSTITUTION_ID, institutionId);
+        }
+        
+        // 设置校区ID
         if (campusId != null) {
             update = update.set(SYS_USER.CAMPUS_ID, campusId);
+        }
+        
+        // 如果传入了密码，更新密码
+        if (StringUtils.hasText(password)) {
+            update = update.set(SYS_USER.PASSWORD, passwordEncoder.encode(password));
         }
         
         update.where(SYS_USER.ID.eq(id))
@@ -352,5 +376,19 @@ public class SysUserModel {
         loginVO.setToken(token);
 
         return loginVO;
+    }
+
+    /**
+     * 根据校区ID列表查询活跃用户
+     *
+     * @param campusIds 校区ID列表
+     * @return 用户记录列表
+     */
+    public List<SysUserRecord> findActiveByCampusIds(List<Long> campusIds) {
+        return dsl.selectFrom(SYS_USER)
+                .where(SYS_USER.CAMPUS_ID.in(campusIds))
+                .and(SYS_USER.DELETED.eq((byte) 0))
+                .and(SYS_USER.STATUS.eq((byte) 1))
+                .fetch();
     }
 } 

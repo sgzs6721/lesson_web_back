@@ -30,7 +30,7 @@ public class UserRegisterRequest {
      * 机构类型
      */
     @NotNull(message = "机构类型不能为空")
-    private InstitutionTypeEnum institutionType;
+    private InstitutionTypeEnum institutionType=InstitutionTypeEnum.SPORTS;
     
     /**
      * 机构简介
