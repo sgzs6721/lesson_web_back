@@ -184,8 +184,8 @@
                     <version>7.14.0</version>
                     <configuration>
                         <url><![CDATA[jdbc:mysql://localhost:3306/lesson?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai]]></url>
-                        <user>root</user>
-                        <password></password>
+                        <user>lesson</user>
+                        <password>Kate@890217</password>
                         <initSql>SET GLOBAL time_zone = '+8:00';</initSql>
                         <locations>
                             <location>filesystem:src/main/resources/db/migration</location>
@@ -209,8 +209,8 @@
                 <version>7.14.0</version>
                 <configuration>
                     <url><![CDATA[jdbc:mysql://localhost:3306/lesson?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai]]></url>
-                    <user>root</user>
-                    <password></password>
+                    <user>lesson</user>
+                    <password>Kate@890217</password>
                     <initSql>SET GLOBAL time_zone = '+8:00';</initSql>
                     <locations>
                         <location>filesystem:src/main/resources/db/migration</location>
@@ -247,8 +247,8 @@
                     <jdbc>
                         <driver>com.mysql.cj.jdbc.Driver</driver>
                         <url>jdbc:mysql://localhost:3306/lesson?useUnicode=true&amp;characterEncoding=utf8&amp;serverTimezone=Asia/Shanghai</url>
-                        <user>root</user>
-                        <password></password>
+                        <user>lesson</user>
+                        <password>Kate@890217</password>
                     </jdbc>
                     <generator>
                         <database>
