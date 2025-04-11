@@ -1,5 +1,6 @@
 package com.lesson.request.user;
 
+import com.lesson.common.enums.UserStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -55,9 +56,9 @@ public class UserCreateRequest {
     private Long campusId;
 
     /**
-     * 状态：0-禁用，1-启用
+     * 状态
      */
     @NotNull(message = "状态不能为空")
-    @Schema(description = "用户状态（0-禁用，1-启用）", required = true, example = "1")
-    private Integer status;
+    @Schema(description = "用户状态（DISABLED-禁用，ENABLED-启用）", required = true, example = "ENABLED")
+    private UserStatus status;
 } 

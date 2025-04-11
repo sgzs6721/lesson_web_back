@@ -1,5 +1,6 @@
 package com.lesson.service;
 
+import com.lesson.common.enums.UserStatus;
 import com.lesson.request.user.*;
 import com.lesson.vo.PageResult;
 import com.lesson.vo.role.RoleVO;
@@ -17,7 +18,7 @@ public interface UserService {
     /**
      * 创建用户
      */
-    Long createUser(String phone, String password, String realName, Long institutionId, Long roleId);
+    Long createUser(String phone, String password, String realName, Long institutionId, Long roleId, UserStatus status);
 
     /**
      * 获取当前用户的角色列表

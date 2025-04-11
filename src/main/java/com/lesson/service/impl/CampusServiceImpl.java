@@ -195,10 +195,9 @@ public class CampusServiceImpl implements CampusService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateStatus(Long id, Integer status) {
+    public void updateStatus(Long id, CampusStatus status) {
         // 参数校验
-        CampusStatus campusStatus = CampusStatus.fromInteger(status);
-        if (campusStatus == null) {
+        if (status == null) {
             throw new BusinessException("状态值无效");
         }
 
@@ -208,7 +207,7 @@ public class CampusServiceImpl implements CampusService {
         }
 
         // 更新状态
-        campusModel.updateStatus(id, campusStatus);
+        campusModel.updateStatus(id, status);
     }
 
     @Override

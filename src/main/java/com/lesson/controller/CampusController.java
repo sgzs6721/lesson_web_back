@@ -1,6 +1,7 @@
 package com.lesson.controller;
 
 import com.lesson.common.Result;
+import com.lesson.common.enums.CampusStatus;
 import com.lesson.request.campus.CampusCreateRequest;
 import com.lesson.request.campus.CampusQueryRequest;
 import com.lesson.request.campus.CampusUpdateRequest;
@@ -115,7 +116,7 @@ public class CampusController {
                })
     public Result<Void> updateStatus(
             @Parameter(description = "校区ID", required = true) @RequestParam Long id, 
-            @Parameter(description = "状态：0-已关闭，1-营业中", required = true) @RequestParam Integer status) {
+            @Parameter(description = "状态：0-已关闭，1-营业中", required = true) @RequestParam CampusStatus status) {
         campusService.updateStatus(id, status);
         return Result.success(null);
     }

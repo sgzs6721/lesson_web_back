@@ -1,5 +1,6 @@
 package com.lesson.service;
 
+import com.lesson.common.enums.CampusStatus;
 import com.lesson.request.campus.CampusCreateRequest;
 import com.lesson.request.campus.CampusQueryRequest;
 import com.lesson.request.campus.CampusUpdateRequest;
@@ -55,7 +56,7 @@ public interface CampusService {
      * @param id 校区ID
      * @param status 状态：0-已关闭，1-营业中
      */
-    void updateStatus(Long id, Integer status);
+    void updateStatus(Long id, CampusStatus status);
 
     /**
      * 获取校区简单列表

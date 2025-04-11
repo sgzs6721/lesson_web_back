@@ -1,5 +1,6 @@
 package com.lesson.model;
 
+import com.lesson.common.enums.UserStatus;
 import com.lesson.repository.tables.records.SysUserRecord;
 import com.lesson.vo.user.UserLoginVO;
 import lombok.RequiredArgsConstructor;
@@ -74,7 +75,7 @@ public class SysUserModel {
      * @return 用户ID
      */
     public Long createUser(String phone, String password, String realName,
-                         Long institutionId, Long roleId, Long campusId, PasswordEncoder passwordEncoder) {
+                           Long institutionId, Long roleId, Long campusId, PasswordEncoder passwordEncoder, UserStatus status) {
         SysUserRecord user = dsl.newRecord(SYS_USER);
         user.setPhone(phone);
         user.setPassword(passwordEncoder.encode(password));
@@ -82,7 +83,7 @@ public class SysUserModel {
         user.setInstitutionId(institutionId);
         user.setRoleId(roleId);
         user.setCampusId(campusId);
-        user.setStatus(1);
+        user.setStatus(status.getCode());
         user.setDeleted(0);
         user.setCreatedTime(LocalDateTime.now());
         user.setUpdateTime(LocalDateTime.now());
@@ -269,12 +270,12 @@ public class SysUserModel {
      */
     public void updateUser(Long id, String realName, String phone, Long roleId, 
                           Long institutionId, Long campusId, String password,
-                          Integer status, PasswordEncoder passwordEncoder) {
+                          UserStatus status, PasswordEncoder passwordEncoder) {
         UpdateSetMoreStep<SysUserRecord> update = dsl.update(SYS_USER)
             .set(SYS_USER.REAL_NAME, realName)
             .set(SYS_USER.PHONE, phone)
             .set(SYS_USER.ROLE_ID, roleId)
-            .set(SYS_USER.STATUS, status)
+            .set(SYS_USER.STATUS, status.getCode())
             .set(SYS_USER.UPDATE_TIME, LocalDateTime.now());
         
         // 设置机构ID
