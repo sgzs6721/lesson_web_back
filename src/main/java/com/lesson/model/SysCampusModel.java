@@ -105,7 +105,6 @@ public class SysCampusModel {
             .leftJoin(SYS_USER).on(SYS_CAMPUS.ID.eq(SYS_USER.CAMPUS_ID))
             .where(SYS_CAMPUS.ID.eq(campusId))
             .and(SYS_CAMPUS.DELETED.eq( 0))
-            .and(SYS_USER.ROLE_ID.eq(2L)) // 只查询校区管理员
             .fetchOneInto(CampusDetailRecord.class);
     }
 
@@ -122,7 +121,6 @@ public class SysCampusModel {
             .leftJoin(SYS_USER)
             .on(SYS_CAMPUS.ID.eq(SYS_USER.CAMPUS_ID))
             .and(SYS_USER.DELETED.eq( 0))
-            .and(SYS_USER.ROLE_ID.eq(2L)) // 只查询校区管理员
             .where(SYS_CAMPUS.DELETED.eq( 0))
             .and(SYS_CAMPUS.INSTITUTION_ID.eq(institutionId));
 
