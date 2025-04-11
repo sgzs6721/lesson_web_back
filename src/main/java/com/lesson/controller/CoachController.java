@@ -1,6 +1,7 @@
 package com.lesson.controller;
 
 import com.lesson.common.Result;
+import com.lesson.common.enums.CoachStatus;
 import com.lesson.request.coach.CoachCreateRequest;
 import com.lesson.request.coach.CoachQueryRequest;
 import com.lesson.request.coach.CoachSalaryUpdateRequest;
@@ -131,7 +132,7 @@ public class CoachController {
     public Result<Void> updateStatus(
             @Parameter(description = "教练ID", required = true) @RequestParam Long id,
              @Parameter(description = "状态：active-在职，vacation-休假中，resigned-离职", required = true)
-            @RequestParam String status) {
+            @RequestParam CoachStatus status) {
         coachService.updateStatus(id, status);
         return Result.success(null);
     }

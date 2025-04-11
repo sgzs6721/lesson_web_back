@@ -5,6 +5,7 @@ import com.lesson.common.enums.CoachStatus;
 import com.lesson.common.enums.Gender;
 import com.lesson.model.SysCoachModel;
 import com.lesson.model.record.CoachDetailRecord;
+import com.lesson.repository.tables.records.SysCoachCertificationRecord;
 import com.lesson.request.coach.CoachCreateRequest;
 import com.lesson.request.coach.CoachQueryRequest;
 import com.lesson.request.coach.CoachSalaryUpdateRequest;
@@ -67,38 +68,21 @@ public class CoachServiceImpl implements CoachService {
      * 转换为教练详情VO
      */
     private CoachDetailVO convertToDetailVO(CoachDetailRecord record) {
-        if (record == null) {
-            return null;
-        }
-
         CoachDetailVO vo = new CoachDetailVO();
         vo.setId(record.getId());
         vo.setName(record.getName());
-        vo.setGender(record.getGender());
+        vo.setStatus(record.getStatus());
         vo.setAge(record.getAge());
         vo.setPhone(record.getPhone());
         vo.setAvatar(record.getAvatar());
         vo.setJobTitle(record.getJobTitle());
         vo.setHireDate(record.getHireDate());
         vo.setExperience(record.getExperience());
-        vo.setStatus(record.getStatus());
+        vo.setGender(record.getGender());
         vo.setCampusId(record.getCampusId());
         vo.setCampusName(record.getCampusName());
         vo.setInstitutionId(record.getInstitutionId());
         vo.setInstitutionName(record.getInstitutionName());
-        vo.setCertifications(record.getCertifications());
-
-        // 始终创建薪资信息对象
-        CoachDetailVO.SalaryInfo salaryInfo = new CoachDetailVO.SalaryInfo();
-        salaryInfo.setBaseSalary(record.getBaseSalary());
-        salaryInfo.setSocialInsurance(record.getSocialInsurance());
-        salaryInfo.setClassFee(record.getClassFee());
-        salaryInfo.setPerformanceBonus(record.getPerformanceBonus());
-        salaryInfo.setCommission(record.getCommission());
-        salaryInfo.setDividend(record.getDividend());
-        salaryInfo.setEffectiveDate(record.getEffectiveDate());
-        vo.setSalary(salaryInfo);
-
         return vo;
     }
 
@@ -236,16 +220,29 @@ public class CoachServiceImpl implements CoachService {
     @Override
     public CoachDetailVO getCoachDetail(Long id, Long campusId) {
         try {
-          // 从token中获取机构ID
-          Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
-          if (institutionId == null) {
-            throw new BusinessException("机构ID不能为空");
-          }
+            // 从token中获取机构ID
+            Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
+            if (institutionId == null) {
+                throw new BusinessException("机构ID不能为空");
+            }
+            
+            // 获取教练基本信息
             CoachDetailRecord record = coachModel.getCoach(id, campusId, institutionId);
             if (record == null) {
                 throw new BusinessException("教练不存在或已删除");
             }
-            return convertToDetailVO(record);
+            
+            // 获取教练证书
+            List<SysCoachCertificationRecord> certificationRecords = coachModel.getCertifications(id);
+            List<String> certifications = certificationRecords.stream()
+                .map(SysCoachCertificationRecord::getCertificationName)
+                .collect(Collectors.toList());
+            
+            // 转换为VO并设置证书信息
+            CoachDetailVO detailVO = convertToDetailVO(record);
+            detailVO.setCertifications(certifications);
+            
+            return detailVO;
         } catch (RuntimeException e) {
             log.error("获取教练详情失败", e);
             throw new BusinessException(e.getMessage());
@@ -307,11 +304,10 @@ public class CoachServiceImpl implements CoachService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateStatus(Long id, String status) {
+    public void updateStatus(Long id, CoachStatus status) {
          try {
             // 参数校验
-            CoachStatus coachStatus = CoachStatus.fromCode(status);
-            if (coachStatus == null) {
+            if (status == null) {
                 throw new BusinessException("状态值无效");
             }
 
@@ -321,7 +317,7 @@ public class CoachServiceImpl implements CoachService {
             }
 
             // 更新状态
-            coachModel.updateStatus(id, coachStatus);
+            coachModel.updateStatus(id, status);
         } catch (RuntimeException e) {
             log.error("更新教练状态失败", e);
             throw new BusinessException(e.getMessage());

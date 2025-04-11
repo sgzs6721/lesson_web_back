@@ -1,5 +1,6 @@
 package com.lesson.service;
 
+import com.lesson.common.enums.CoachStatus;
 import com.lesson.request.coach.CoachCreateRequest;
 import com.lesson.request.coach.CoachQueryRequest;
 import com.lesson.request.coach.CoachSalaryUpdateRequest;
@@ -62,8 +63,8 @@ public interface CoachService {
      * @param id     教练ID
      * @param status 状态
      */
-    void updateStatus(Long id, String status);
-    
+    void updateStatus(Long id, CoachStatus status);
+
     /**
      * 获取教练简单信息列表
      *
