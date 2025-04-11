@@ -19,7 +19,7 @@ public class CoachVO {
      * 教练ID
      */
     @Schema(description = "教练ID", example = "C10000")
-    private String id;
+    private Long id;
     
     /**
      * 姓名

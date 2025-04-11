@@ -19,7 +19,7 @@ import org.jooq.impl.UpdatableRecordImpl;
  * 教练证书表
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class SysCoachCertificationRecord extends UpdatableRecordImpl<SysCoachCertificationRecord> implements Record6<Long, String, String, LocalDateTime, LocalDateTime, Byte> {
+public class SysCoachCertificationRecord extends UpdatableRecordImpl<SysCoachCertificationRecord> implements Record6<Long, Long, String, LocalDateTime, LocalDateTime, Byte> {
 
     private static final long serialVersionUID = 1L;
 
@@ -40,15 +40,15 @@ public class SysCoachCertificationRecord extends UpdatableRecordImpl<SysCoachCer
     /**
      * Setter for <code>lesson.sys_coach_certification.coach_id</code>. 关联教练ID
      */
-    public void setCoachId(String value) {
+    public void setCoachId(Long value) {
         set(1, value);
     }
 
     /**
      * Getter for <code>lesson.sys_coach_certification.coach_id</code>. 关联教练ID
      */
-    public String getCoachId() {
-        return (String) get(1);
+    public Long getCoachId() {
+        return (Long) get(1);
     }
 
     /**
@@ -121,12 +121,12 @@ public class SysCoachCertificationRecord extends UpdatableRecordImpl<SysCoachCer
     // -------------------------------------------------------------------------
 
     @Override
-    public Row6<Long, String, String, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
+    public Row6<Long, Long, String, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
         return (Row6) super.fieldsRow();
     }
 
     @Override
-    public Row6<Long, String, String, LocalDateTime, LocalDateTime, Byte> valuesRow() {
+    public Row6<Long, Long, String, LocalDateTime, LocalDateTime, Byte> valuesRow() {
         return (Row6) super.valuesRow();
     }
 
@@ -136,7 +136,7 @@ public class SysCoachCertificationRecord extends UpdatableRecordImpl<SysCoachCer
     }
 
     @Override
-    public Field<String> field2() {
+    public Field<Long> field2() {
         return SysCoachCertification.SYS_COACH_CERTIFICATION.COACH_ID;
     }
 
@@ -166,7 +166,7 @@ public class SysCoachCertificationRecord extends UpdatableRecordImpl<SysCoachCer
     }
 
     @Override
-    public String component2() {
+    public Long component2() {
         return getCoachId();
     }
 
@@ -196,7 +196,7 @@ public class SysCoachCertificationRecord extends UpdatableRecordImpl<SysCoachCer
     }
 
     @Override
-    public String value2() {
+    public Long value2() {
         return getCoachId();
     }
 
@@ -227,7 +227,7 @@ public class SysCoachCertificationRecord extends UpdatableRecordImpl<SysCoachCer
     }
 
     @Override
-    public SysCoachCertificationRecord value2(String value) {
+    public SysCoachCertificationRecord value2(Long value) {
         setCoachId(value);
         return this;
     }
@@ -257,7 +257,7 @@ public class SysCoachCertificationRecord extends UpdatableRecordImpl<SysCoachCer
     }
 
     @Override
-    public SysCoachCertificationRecord values(Long value1, String value2, String value3, LocalDateTime value4, LocalDateTime value5, Byte value6) {
+    public SysCoachCertificationRecord values(Long value1, Long value2, String value3, LocalDateTime value4, LocalDateTime value5, Byte value6) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -281,7 +281,7 @@ public class SysCoachCertificationRecord extends UpdatableRecordImpl<SysCoachCer
     /**
      * Create a detached, initialised SysCoachCertificationRecord
      */
-    public SysCoachCertificationRecord(Long id, String coachId, String certificationName, LocalDateTime createdTime, LocalDateTime updateTime, Byte deleted) {
+    public SysCoachCertificationRecord(Long id, Long coachId, String certificationName, LocalDateTime createdTime, LocalDateTime updateTime, Byte deleted) {
         super(SysCoachCertification.SYS_COACH_CERTIFICATION);
 
         setId(id);

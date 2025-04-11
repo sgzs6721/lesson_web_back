@@ -17,7 +17,7 @@ public class CoachDetailRecord {
     /**
      * 教练ID
      */
-    private String id;
+    private Long id;
     
     /**
      * 姓名

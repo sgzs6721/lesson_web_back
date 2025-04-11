@@ -20,22 +20,23 @@ import org.jooq.impl.UpdatableRecordImpl;
  * 教练表
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class SysCoachRecord extends UpdatableRecordImpl<SysCoachRecord> implements Record15<String, String, String, Integer, String, String, String, LocalDate, Integer, String, Long, Long, LocalDateTime, LocalDateTime, Byte> {
+
+public class SysCoachRecord extends UpdatableRecordImpl<SysCoachRecord> implements Record15<Long, String, String, Integer, String, String, String, LocalDate, Integer, String, Long, Long, LocalDateTime, LocalDateTime, Byte> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>lesson.sys_coach.id</code>. 教练ID，格式：C10000
+     * Setter for <code>lesson.sys_coach.id</code>. 教练ID
      */
-    public void setId(String value) {
+    public void setId(Long value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_coach.id</code>. 教练ID，格式：C10000
+     * Getter for <code>lesson.sys_coach.id</code>. 教练ID
      */
-    public String getId() {
-        return (String) get(0);
+    public Long getId() {
+        return (Long) get(0);
     }
 
     /**
@@ -239,7 +240,7 @@ public class SysCoachRecord extends UpdatableRecordImpl<SysCoachRecord> implemen
     // -------------------------------------------------------------------------
 
     @Override
-    public Record1<String> key() {
+    public Record1<Long> key() {
         return (Record1) super.key();
     }
 
@@ -248,17 +249,17 @@ public class SysCoachRecord extends UpdatableRecordImpl<SysCoachRecord> implemen
     // -------------------------------------------------------------------------
 
     @Override
-    public Row15<String, String, String, Integer, String, String, String, LocalDate, Integer, String, Long, Long, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
+    public Row15<Long, String, String, Integer, String, String, String, LocalDate, Integer, String, Long, Long, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
         return (Row15) super.fieldsRow();
     }
 
     @Override
-    public Row15<String, String, String, Integer, String, String, String, LocalDate, Integer, String, Long, Long, LocalDateTime, LocalDateTime, Byte> valuesRow() {
+    public Row15<Long, String, String, Integer, String, String, String, LocalDate, Integer, String, Long, Long, LocalDateTime, LocalDateTime, Byte> valuesRow() {
         return (Row15) super.valuesRow();
     }
 
     @Override
-    public Field<String> field1() {
+    public Field<Long> field1() {
         return SysCoach.SYS_COACH.ID;
     }
 
@@ -333,7 +334,7 @@ public class SysCoachRecord extends UpdatableRecordImpl<SysCoachRecord> implemen
     }
 
     @Override
-    public String component1() {
+    public Long component1() {
         return getId();
     }
 
@@ -408,7 +409,7 @@ public class SysCoachRecord extends UpdatableRecordImpl<SysCoachRecord> implemen
     }
 
     @Override
-    public String value1() {
+    public Long value1() {
         return getId();
     }
 
@@ -483,7 +484,7 @@ public class SysCoachRecord extends UpdatableRecordImpl<SysCoachRecord> implemen
     }
 
     @Override
-    public SysCoachRecord value1(String value) {
+    public SysCoachRecord value1(Long value) {
         setId(value);
         return this;
     }
@@ -573,7 +574,7 @@ public class SysCoachRecord extends UpdatableRecordImpl<SysCoachRecord> implemen
     }
 
     @Override
-    public SysCoachRecord values(String value1, String value2, String value3, Integer value4, String value5, String value6, String value7, LocalDate value8, Integer value9, String value10, Long value11, Long value12, LocalDateTime value13, LocalDateTime value14, Byte value15) {
+    public SysCoachRecord values(Long value1, String value2, String value3, Integer value4, String value5, String value6, String value7, LocalDate value8, Integer value9, String value10, Long value11, Long value12, LocalDateTime value13, LocalDateTime value14, Byte value15) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -606,7 +607,7 @@ public class SysCoachRecord extends UpdatableRecordImpl<SysCoachRecord> implemen
     /**
      * Create a detached, initialised SysCoachRecord
      */
-    public SysCoachRecord(String id, String name, String gender, Integer age, String phone, String avatar, String jobTitle, LocalDate hireDate, Integer experience, String status, Long campusId, Long institutionId, LocalDateTime createdTime, LocalDateTime updateTime, Byte deleted) {
+    public SysCoachRecord(Long id, String name, String gender, Integer age, String phone, String avatar, String jobTitle, LocalDate hireDate, Integer experience, String status, Long campusId, Long institutionId, LocalDateTime createdTime, LocalDateTime updateTime, Byte deleted) {
         super(SysCoach.SYS_COACH);
 
         setId(id);

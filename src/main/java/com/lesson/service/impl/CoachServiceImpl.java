@@ -129,7 +129,7 @@ public class CoachServiceImpl implements CoachService {
 
             // 创建教练薪资记录
             coachModel.addSalary(
-                coachId.toString(),
+                coachId,
                 request.getBaseSalary(),
                 request.getSocialInsurance(),
                 request.getClassFee(),
@@ -141,7 +141,7 @@ public class CoachServiceImpl implements CoachService {
 
             // 添加教练证书
             if (request.getCertifications() != null && !request.getCertifications().isEmpty()) {
-                coachModel.addCertifications(coachId.toString(), request.getCertifications());
+                coachModel.addCertifications(coachId, request.getCertifications());
             }
 
             return coachId;
@@ -153,7 +153,7 @@ public class CoachServiceImpl implements CoachService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateCoach(String id, CoachUpdateRequest request) {
+    public void updateCoach(Long id, CoachUpdateRequest request) {
         try {
             if (!coachModel.existsById(id)) {
                 throw new BusinessException("教练不存在或已删除");
@@ -193,7 +193,7 @@ public class CoachServiceImpl implements CoachService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void deleteCoach(String id) {
+    public void deleteCoach(Long id) {
         try {
             coachModel.deleteCoach(id);
         } catch (RuntimeException e) {
@@ -203,7 +203,7 @@ public class CoachServiceImpl implements CoachService {
     }
 
     @Override
-    public CoachDetailVO getCoachDetail(String id) {
+    public CoachDetailVO getCoachDetail(Long id) {
         try {
             CoachDetailRecord record = coachModel.getCoach(id);
             if (record == null) {
@@ -265,8 +265,8 @@ public class CoachServiceImpl implements CoachService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateStatus(String id, String status) {
-        try {
+    public void updateStatus(Long id, String status) {
+         try {
             // 参数校验
             CoachStatus coachStatus = CoachStatus.fromCode(status);
             if (coachStatus == null) {
@@ -288,7 +288,7 @@ public class CoachServiceImpl implements CoachService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateSalary(String id, CoachSalaryUpdateRequest request) {
+    public void updateSalary(Long id, CoachSalaryUpdateRequest request) {
         try {
             // 检查教练是否存在
             if (!coachModel.existsById(id)) {
@@ -332,8 +332,8 @@ public class CoachServiceImpl implements CoachService {
     }
 
     @Override
-    public List<String> getCoachCourses(String id) {
-        try {
+    public List<String> getCoachCourses(Long id) {
+         try {
             // 检查教练是否存在
             if (!coachModel.existsById(id)) {
                 throw new BusinessException("教练不存在");
@@ -348,7 +348,7 @@ public class CoachServiceImpl implements CoachService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateCoachCourses(String id, List<String> courseIds) {
+    public void updateCoachCourses(Long id, List<String> courseIds) {
         try {
             // 检查教练是否存在
             if (!coachModel.existsById(id)) {

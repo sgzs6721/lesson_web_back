@@ -105,32 +105,9 @@ public class SysCoachModel {
     }
 
     /**
-     * 生成教练ID
-     */
-    private String generateCoachId() {
-        // 查询最大ID
-        Record record = dsl.select(max(SYS_COACH.ID))
-                           .from(SYS_COACH)
-                           .fetchOne();
-
-        String maxId = record.get(max(SYS_COACH.ID));
-        int nextId = 10000;
-
-        if (maxId != null && maxId.startsWith("C")) {
-            try {
-                nextId = Integer.parseInt(maxId.substring(1)) + 1;
-            } catch (NumberFormatException e) {
-                // 解析失败使用默认值
-            }
-        }
-
-        return "C" + nextId;
-    }
-
-    /**
      * 更新教练
      */
-    public void updateCoach(String id, String name, CoachStatus status, Integer age,
+    public void updateCoach(Long id, String name, CoachStatus status, Integer age,
                             String phone, String avatar, String jobTitle, LocalDate hireDate,
                             Integer experience, Gender gender, Long campusId, Long institutionId) {
         // 获取原来的校区和机构ID
@@ -173,7 +150,7 @@ public class SysCoachModel {
     /**
      * 删除教练（逻辑删除）
      */
-    public void deleteCoach(String id) {
+    public void deleteCoach(Long id) {
         // 获取教练信息
         Record record = dsl.select(SYS_COACH.CAMPUS_ID, SYS_COACH.INSTITUTION_ID)
                         .from(SYS_COACH)
@@ -199,7 +176,7 @@ public class SysCoachModel {
     /**
      * 更新教练状态
      */
-    public void updateStatus(String id, CoachStatus status) {
+    public void updateStatus(Long id, CoachStatus status) {
         dsl.update(SYS_COACH)
                 .set(SYS_COACH.STATUS, status.getCode())
                 .where(SYS_COACH.ID.eq(id))
@@ -210,7 +187,7 @@ public class SysCoachModel {
     /**
      * 根据ID查询教练
      */
-    public CoachDetailRecord getCoach(String id) {
+    public CoachDetailRecord getCoach(Long id) {
         Record record = dsl.select(
                            SYS_COACH.fields())
                       .select(SYS_CAMPUS.NAME.as("campus_name"))
@@ -282,7 +259,7 @@ public class SysCoachModel {
     /**
      * 获取教练证书
      */
-    public List<SysCoachCertificationRecord> getCertifications(String coachId) {
+    public List<SysCoachCertificationRecord> getCertifications(Long coachId) {
         return dsl.selectFrom(SYS_COACH_CERTIFICATION)
                 .where(SYS_COACH_CERTIFICATION.COACH_ID.eq(coachId))
                 .and(SYS_COACH_CERTIFICATION.DELETED.eq((byte) 0))
@@ -292,7 +269,7 @@ public class SysCoachModel {
     /**
      * 获取最新的薪资信息
      */
-    public SysCoachSalaryRecord getLatestSalary(String coachId) {
+    public SysCoachSalaryRecord getLatestSalary(Long coachId) {
         return dsl.selectFrom(SYS_COACH_SALARY)
                 .where(SYS_COACH_SALARY.COACH_ID.eq(coachId))
                 .and(SYS_COACH_SALARY.DELETED.eq((byte) 0))
@@ -304,7 +281,7 @@ public class SysCoachModel {
     /**
      * 添加教练证书
      */
-    public void addCertifications(String coachId, List<String> certifications) {
+    public void addCertifications(Long coachId, List<String> certifications) {
         // 先删除已有证书
         dsl.update(SYS_COACH_CERTIFICATION)
            .set(SYS_COACH_CERTIFICATION.DELETED, (byte) 1)
@@ -327,7 +304,7 @@ public class SysCoachModel {
     /**
      * 添加教练薪资
      */
-    public void addSalary(String coachId, BigDecimal baseSalary, BigDecimal socialInsurance,
+    public void addSalary(Long coachId, BigDecimal baseSalary, BigDecimal socialInsurance,
                          BigDecimal classFee, BigDecimal performanceBonus, BigDecimal commission,
                          BigDecimal dividend, LocalDate effectiveDate) {
         dsl.insertInto(SYS_COACH_SALARY)
@@ -346,7 +323,8 @@ public class SysCoachModel {
     /**
      * 更新教练课程关联
      */
-    public void updateCoachCourses(String coachId, List<String> courseIds) {
+
+    public void updateCoachCourses(Long coachId, List<String> courseIds) {
         // 先删除已有关联
         dsl.update(SYS_COACH_COURSE)
            .set(SYS_COACH_COURSE.DELETED, (byte) 1)
@@ -369,7 +347,8 @@ public class SysCoachModel {
     /**
      * 获取教练关联的课程
      */
-    public List<String> getCoachCourses(String coachId) {
+
+    public List<String> getCoachCourses(Long coachId) {
         return dsl.select(SYS_COACH_COURSE.COURSE_ID)
                 .from(SYS_COACH_COURSE)
                 .where(SYS_COACH_COURSE.COACH_ID.eq(coachId))
@@ -477,7 +456,7 @@ public class SysCoachModel {
     /**
      * 判断教练是否存在
      */
-    public boolean existsById(String id) {
+    public boolean existsById(Long id) {
         return dsl.fetchExists(
             dsl.selectOne()
                .from(SYS_COACH)

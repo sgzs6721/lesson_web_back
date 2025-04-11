@@ -30,14 +30,14 @@ public interface CoachService {
      * @param id      教练ID
      * @param request 更新教练请求
      */
-    void updateCoach(String id, CoachUpdateRequest request);
+    void updateCoach(Long id, CoachUpdateRequest request);
     
     /**
      * 删除教练
      *
      * @param id 教练ID
      */
-    void deleteCoach(String id);
+    void deleteCoach(Long id);
     
     /**
      * 获取教练详情
@@ -45,7 +45,7 @@ public interface CoachService {
      * @param id 教练ID
      * @return 教练详情
      */
-    CoachDetailVO getCoachDetail(String id);
+    CoachDetailVO getCoachDetail(Long id);
     
     /**
      * 分页查询教练列表
@@ -61,7 +61,7 @@ public interface CoachService {
      * @param id     教练ID
      * @param status 状态
      */
-    void updateStatus(String id, String status);
+    void updateStatus(Long id, String status);
     
     /**
      * 更新教练薪资
@@ -69,7 +69,7 @@ public interface CoachService {
      * @param id      教练ID
      * @param request 薪资更新请求
      */
-    void updateSalary(String id, CoachSalaryUpdateRequest request);
+    void updateSalary(Long id, CoachSalaryUpdateRequest request);
     
     /**
      * 获取教练简单信息列表
@@ -84,7 +84,7 @@ public interface CoachService {
      * @param id 教练ID
      * @return 课程ID列表
      */
-    List<String> getCoachCourses(String id);
+    List<String> getCoachCourses(Long id);
     
     /**
      * 更新教练关联的课程
@@ -92,5 +92,5 @@ public interface CoachService {
      * @param id        教练ID
      * @param courseIds 课程ID列表
      */
-    void updateCoachCourses(String id, List<String> courseIds);
+    void updateCoachCourses(Long id, List<String> courseIds);
 } 

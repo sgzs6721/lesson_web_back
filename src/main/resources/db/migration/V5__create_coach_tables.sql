@@ -1,15 +1,15 @@
 -- 创建教练表
 CREATE TABLE `sys_coach` (
-    `id` varchar(20) NOT NULL COMMENT '教练ID',
-    `name` varchar(50) NOT NULL COMMENT '姓名',
-    `gender` enum('male', 'female') NOT NULL COMMENT '性别',
+    `id` bigint(20) NOT NULL COMMENT '教练ID',
+     `name` varchar(50) NOT NULL COMMENT '姓名',
+    `gender` varchar(20) NOT NULL COMMENT '性别',
     `age` int(11) NOT NULL COMMENT '年龄',
     `phone` varchar(20) NOT NULL COMMENT '联系电话',
     `avatar` varchar(255) DEFAULT NULL COMMENT '头像URL',
     `job_title` varchar(50) NOT NULL COMMENT '职位',
     `hire_date` date NOT NULL COMMENT '入职日期',
     `experience` int(11) NOT NULL COMMENT '教龄(年)',
-    `status` enum('active', 'vacation', 'resigned') NOT NULL COMMENT '状态：在职/休假中/离职',
+    `status` varchar(20) NOT NULL COMMENT '状态：在职/休假中/离职',
     `campus_id` bigint(20) NOT NULL COMMENT '所属校区ID',
     `institution_id` bigint(20) NOT NULL COMMENT '所属机构ID',
     `created_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -28,7 +28,7 @@ CREATE TABLE `sys_coach` (
 -- 创建教练证书表
 CREATE TABLE `sys_coach_certification` (
     `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-    `coach_id` varchar(20) NOT NULL COMMENT '关联教练ID',
+    `coach_id` bigint(20) NOT NULL COMMENT '关联教练ID',
     `certification_name` varchar(100) NOT NULL COMMENT '证书名称',
     `created_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -40,7 +40,7 @@ CREATE TABLE `sys_coach_certification` (
 -- 创建教练薪资表
 CREATE TABLE `sys_coach_salary` (
     `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-    `coach_id` varchar(20) NOT NULL COMMENT '关联教练ID',
+    `coach_id` bigint(20) NOT NULL COMMENT '关联教练ID',
     `base_salary` decimal(10, 2) NOT NULL COMMENT '基本工资',
     `social_insurance` decimal(10, 2) NOT NULL COMMENT '社保费',
     `class_fee` decimal(10, 2) NOT NULL COMMENT '课时费',
@@ -59,7 +59,7 @@ CREATE TABLE `sys_coach_salary` (
 -- 创建教练课程关联表
 CREATE TABLE `sys_coach_course` (
     `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-    `coach_id` varchar(20) NOT NULL COMMENT '关联教练ID',
+    `coach_id` bigint(20) NOT NULL COMMENT '关联教练ID',
     `course_id` varchar(20) NOT NULL COMMENT '关联课程ID',
     `created_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',

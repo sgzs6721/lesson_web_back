@@ -44,9 +44,9 @@ public class CoachController {
                description = "创建一个新的教练",
                responses = {
                    @ApiResponse(responseCode = "200", description = "创建成功",
-                               content = @Content(schema = @Schema(implementation = String.class)))
+                               content = @Content(schema = @Schema(implementation = Long.class)))
                })
-    public Result<String> create(@RequestBody @Validated CoachCreateRequest request) {
+    public Result<Long> create(@RequestBody @Validated CoachCreateRequest request) {
         return Result.success(coachService.createCoach(request));
     }
 
@@ -64,7 +64,7 @@ public class CoachController {
                    @ApiResponse(responseCode = "200", description = "更新成功")
                })
     public Result<Void> update(
-            @Parameter(description = "教练ID", required = true) @RequestParam String id,
+            @Parameter(description = "教练ID", required = true) @RequestParam Long id,
             @RequestBody @Validated CoachUpdateRequest request) {
         coachService.updateCoach(id, request);
         return Result.success(null);
@@ -83,8 +83,8 @@ public class CoachController {
                    @ApiResponse(responseCode = "200", description = "删除成功")
                })
     public Result<Void> delete(
-            @Parameter(description = "教练ID", required = true) @RequestParam String id) {
-        coachService.deleteCoach(id);
+            @Parameter(description = "教练ID", required = true) @RequestParam Long id) {
+         coachService.deleteCoach(id);
         return Result.success(null);
     }
 
@@ -102,8 +102,8 @@ public class CoachController {
                                content = @Content(schema = @Schema(implementation = CoachDetailVO.class)))
                })
     public Result<CoachDetailVO> getDetail(
-            @Parameter(description = "教练ID", required = true) @RequestParam String id) {
-        return Result.success(coachService.getCoachDetail(id));
+            @Parameter(description = "教练ID", required = true) @RequestParam Long id) {
+         return Result.success(coachService.getCoachDetail(id));
     }
 
     /**
@@ -137,8 +137,8 @@ public class CoachController {
                    @ApiResponse(responseCode = "200", description = "更新成功")
                })
     public Result<Void> updateStatus(
-            @Parameter(description = "教练ID", required = true) @RequestParam String id,
-            @Parameter(description = "状态：active-在职，vacation-休假中，resigned-离职", required = true)
+            @Parameter(description = "教练ID", required = true) @RequestParam Long id,
+             @Parameter(description = "状态：active-在职，vacation-休假中，resigned-离职", required = true)
             @RequestParam String status) {
         coachService.updateStatus(id, status);
         return Result.success(null);
@@ -158,8 +158,8 @@ public class CoachController {
                    @ApiResponse(responseCode = "200", description = "更新成功")
                })
     public Result<Void> updateSalary(
-            @Parameter(description = "教练ID", required = true) @RequestParam String id,
-            @RequestBody @Validated CoachSalaryUpdateRequest request) {
+            @Parameter(description = "教练ID", required = true) @RequestParam Long id,
+             @RequestBody @Validated CoachSalaryUpdateRequest request) {
         coachService.updateSalary(id, request);
         return Result.success(null);
     }
@@ -191,10 +191,10 @@ public class CoachController {
                description = "根据教练ID获取关联的课程ID列表",
                responses = {
                    @ApiResponse(responseCode = "200", description = "获取成功",
-                               content = @Content(schema = @Schema(implementation = String.class)))
+                               content = @Content(schema = @Schema(implementation = Long.class)))
                })
     public Result<List<String>> getCoachCourses(
-            @Parameter(description = "教练ID", required = true) @RequestParam String id) {
+            @Parameter(description = "教练ID", required = true) @RequestParam Long id) {
         return Result.success(coachService.getCoachCourses(id));
     }
 
@@ -212,8 +212,8 @@ public class CoachController {
                    @ApiResponse(responseCode = "200", description = "更新成功")
                })
     public Result<Void> updateCoachCourses(
-            @Parameter(description = "教练ID", required = true) @RequestParam String id,
-            @RequestBody List<String> courseIds) {
+            @Parameter(description = "教练ID", required = true) @RequestParam Long id,
+             @RequestBody List<String> courseIds) {
         coachService.updateCoachCourses(id, courseIds);
         return Result.success(null);
     }

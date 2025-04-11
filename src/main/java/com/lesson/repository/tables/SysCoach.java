@@ -52,9 +52,9 @@ public class SysCoach extends TableImpl<SysCoachRecord> {
     }
 
     /**
-     * The column <code>lesson.sys_coach.id</code>. 教练ID，格式：C10000
+     * The column <code>lesson.sys_coach.id</code>. 教练ID
      */
-    public final TableField<SysCoachRecord, String> ID = createField(DSL.name("id"), SQLDataType.VARCHAR(20).nullable(false), this, "教练ID，格式：C10000");
+    public final TableField<SysCoachRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false), this, "教练ID");
 
     /**
      * The column <code>lesson.sys_coach.name</code>. 姓名
@@ -64,7 +64,8 @@ public class SysCoach extends TableImpl<SysCoachRecord> {
     /**
      * The column <code>lesson.sys_coach.gender</code>. 性别
      */
-    public final TableField<SysCoachRecord, String> GENDER = createField(DSL.name("gender"), SQLDataType.VARCHAR.nullable(false), this, "性别");
+
+    public final TableField<SysCoachRecord, String> GENDER = createField(DSL.name("gender"), SQLDataType.VARCHAR(20).nullable(false), this, "性别");
 
     /**
      * The column <code>lesson.sys_coach.age</code>. 年龄
@@ -99,7 +100,8 @@ public class SysCoach extends TableImpl<SysCoachRecord> {
     /**
      * The column <code>lesson.sys_coach.status</code>. 状态：在职/休假中/离职
      */
-    public final TableField<SysCoachRecord, String> STATUS = createField(DSL.name("status"), SQLDataType.VARCHAR.nullable(false), this, "状态：在职/休假中/离职");
+
+    public final TableField<SysCoachRecord, String> STATUS = createField(DSL.name("status"), SQLDataType.VARCHAR(20).nullable(false), this, "状态：在职/休假中/离职");
 
     /**
      * The column <code>lesson.sys_coach.campus_id</code>. 所属校区ID
@@ -210,7 +212,8 @@ public class SysCoach extends TableImpl<SysCoachRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Row15<String, String, String, Integer, String, String, String, LocalDate, Integer, String, Long, Long, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
+
+    public Row15<Long, String, String, Integer, String, String, String, LocalDate, Integer, String, Long, Long, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
         return (Row15) super.fieldsRow();
     }
 }

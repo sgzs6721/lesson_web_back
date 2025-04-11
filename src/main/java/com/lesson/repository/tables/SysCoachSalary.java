@@ -61,7 +61,7 @@ public class SysCoachSalary extends TableImpl<SysCoachSalaryRecord> {
     /**
      * The column <code>lesson.sys_coach_salary.coach_id</code>. 关联教练ID
      */
-    public final TableField<SysCoachSalaryRecord, String> COACH_ID = createField(DSL.name("coach_id"), SQLDataType.VARCHAR(20).nullable(false), this, "关联教练ID");
+    public final TableField<SysCoachSalaryRecord, Long> COACH_ID = createField(DSL.name("coach_id"), SQLDataType.BIGINT.nullable(false), this, "关联教练ID");
 
     /**
      * The column <code>lesson.sys_coach_salary.base_salary</code>. 基本工资
@@ -202,7 +202,7 @@ public class SysCoachSalary extends TableImpl<SysCoachSalaryRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Row12<Long, String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, LocalDate, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
+    public Row12<Long, Long, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, LocalDate, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
         return (Row12) super.fieldsRow();
     }
 }

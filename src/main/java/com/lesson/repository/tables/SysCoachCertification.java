@@ -59,7 +59,7 @@ public class SysCoachCertification extends TableImpl<SysCoachCertificationRecord
     /**
      * The column <code>lesson.sys_coach_certification.coach_id</code>. 关联教练ID
      */
-    public final TableField<SysCoachCertificationRecord, String> COACH_ID = createField(DSL.name("coach_id"), SQLDataType.VARCHAR(20).nullable(false), this, "关联教练ID");
+    public final TableField<SysCoachCertificationRecord, Long> COACH_ID = createField(DSL.name("coach_id"), SQLDataType.BIGINT.nullable(false), this, "关联教练ID");
 
     /**
      * The column <code>lesson.sys_coach_certification.certification_name</code>. 证书名称
@@ -170,7 +170,7 @@ public class SysCoachCertification extends TableImpl<SysCoachCertificationRecord
     // -------------------------------------------------------------------------
 
     @Override
-    public Row6<Long, String, String, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
+    public Row6<Long, Long, String, LocalDateTime, LocalDateTime, Byte> fieldsRow() {
         return (Row6) super.fieldsRow();
     }
 }
