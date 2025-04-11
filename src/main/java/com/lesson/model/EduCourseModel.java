@@ -50,7 +50,7 @@ public class EduCourseModel {
            .set(EDU_COURSE.INSTITUTION_ID, institutionId)
            .set(EDU_COURSE.INSTITUTION_NAME, institutionName)
            .set(EDU_COURSE.DESCRIPTION, description)
-           .set(EDU_COURSE.DELETED, (byte) 0)
+           .set(EDU_COURSE.DELETED, 0)
            .execute();
            
         return id;
@@ -80,7 +80,7 @@ public class EduCourseModel {
            .set(EDU_COURSE.INSTITUTION_NAME, institutionName)
            .set(EDU_COURSE.DESCRIPTION, description)
            .where(EDU_COURSE.ID.eq(id))
-           .and(EDU_COURSE.DELETED.eq((byte) 0))
+           .and(EDU_COURSE.DELETED.eq(0))
            .execute();
     }
     
@@ -89,9 +89,9 @@ public class EduCourseModel {
      */
     public void deleteCourse(String id) {
         dsl.update(EDU_COURSE)
-           .set(EDU_COURSE.DELETED, (byte) 1)
+           .set(EDU_COURSE.DELETED, 1)
            .where(EDU_COURSE.ID.eq(id))
-           .and(EDU_COURSE.DELETED.eq((byte) 0))
+           .and(EDU_COURSE.DELETED.eq(0))
            .execute();
     }
     
@@ -102,7 +102,7 @@ public class EduCourseModel {
         dsl.update(EDU_COURSE)
            .set(EDU_COURSE.STATUS, status.name())
            .where(EDU_COURSE.ID.eq(id))
-           .and(EDU_COURSE.DELETED.eq((byte) 0))
+           .and(EDU_COURSE.DELETED.eq(0))
            .execute();
     }
     
@@ -113,7 +113,7 @@ public class EduCourseModel {
         Record record = dsl.select()
                           .from(EDU_COURSE)
                           .where(EDU_COURSE.ID.eq(id))
-                          .and(EDU_COURSE.DELETED.eq((byte) 0))
+                          .and(EDU_COURSE.DELETED.eq( 0))
                           .fetchOne();
                           
         if (record == null) {
@@ -186,7 +186,7 @@ public class EduCourseModel {
             dsl.selectOne()
                .from(EDU_COURSE)
                .where(EDU_COURSE.ID.eq(id))
-               .and(EDU_COURSE.DELETED.eq((byte) 0))
+               .and(EDU_COURSE.DELETED.eq( 0))
         );
     }
     
@@ -197,7 +197,7 @@ public class EduCourseModel {
                                                 String coachId, Long campusId, Long institutionId) {
         SelectConditionStep<Record> query = dsl.select()
                                         .from(EDU_COURSE)
-                                        .where(EDU_COURSE.DELETED.eq((byte) 0));
+                                        .where(EDU_COURSE.DELETED.eq( 0));
         
         // 关键词过滤
         if (keyword != null && !keyword.isEmpty()) {

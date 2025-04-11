@@ -34,8 +34,8 @@ public class SysRoleModel {
                 .join(SYS_USER)
                 .on(SYS_ROLE.ID.eq(SYS_USER.ROLE_ID))
                 .where(SYS_USER.ID.eq(userId))
-                .and(SYS_USER.DELETED.eq((byte) 0))
-                .and(SYS_ROLE.DELETED.eq((byte) 0))
+                .and(SYS_USER.DELETED.eq(0))
+                .and(SYS_ROLE.DELETED.eq(0))
                 .fetchInto(RoleVO.class);
     }
 
@@ -49,7 +49,7 @@ public class SysRoleModel {
         return dsl.select(SYS_ROLE_PERMISSION.PERMISSION)
                 .from(SYS_ROLE_PERMISSION)
                 .where(SYS_ROLE_PERMISSION.ROLE_ID.eq(roleId))
-                .and(SYS_ROLE_PERMISSION.DELETED.eq((byte) 0))
+                .and(SYS_ROLE_PERMISSION.DELETED.eq(0))
                 .fetchInto(String.class);
     }
 
@@ -63,7 +63,7 @@ public class SysRoleModel {
         return dsl.select(SYS_ROLE.ROLE_NAME)
                 .from(SYS_ROLE)
                 .where(SYS_ROLE.ID.eq(roleId))
-                .and(SYS_ROLE.DELETED.eq((byte) 0))
+                .and(SYS_ROLE.DELETED.eq(0))
                 .fetchOneInto(String.class);
     }
 
@@ -76,7 +76,7 @@ public class SysRoleModel {
         return dsl.select(SYS_ROLE.ID)
                 .from(SYS_ROLE)
                 .where(SYS_ROLE.ROLE_NAME.eq("超级管理员"))
-                .and(SYS_ROLE.DELETED.eq((byte) 0))
+                .and(SYS_ROLE.DELETED.eq(0))
                 .fetchOneInto(Long.class);
     }
 
@@ -89,7 +89,7 @@ public class SysRoleModel {
     public SysRoleRecord getById(Long id) {
         return dsl.selectFrom(SYS_ROLE)
                 .where(SYS_ROLE.ID.eq(id))
-                .and(SYS_ROLE.DELETED.eq((byte) 0))
+                .and(SYS_ROLE.DELETED.eq( 0))
                 .fetchOne();
     }
 
@@ -104,8 +104,8 @@ public class SysRoleModel {
         SysRoleRecord role = dsl.newRecord(SYS_ROLE);
         role.setRoleName(name);
         role.setDescription(description);
-        role.setStatus((byte) 1);
-        role.setDeleted((byte) 0);
+        role.setStatus(1);
+        role.setDeleted(0);
         role.setCreatedTime(LocalDateTime.now());
         role.setUpdateTime(LocalDateTime.now());
         role.store();
@@ -122,7 +122,7 @@ public class SysRoleModel {
         return dsl.fetchExists(
                 dsl.selectFrom(SYS_ROLE)
                         .where(SYS_ROLE.ID.eq(id))
-                        .and(SYS_ROLE.DELETED.eq((byte) 0))
+                        .and(SYS_ROLE.DELETED.eq( 0))
         );
     }
 } 

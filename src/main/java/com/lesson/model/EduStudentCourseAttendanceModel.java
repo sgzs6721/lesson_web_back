@@ -31,7 +31,7 @@ public class EduStudentCourseAttendanceModel {
     public Long createAttendance(EduStudentCourseRecordRecord record) {
         record.setCreatedTime(LocalDateTime.now());
         record.setUpdateTime(LocalDateTime.now());
-        record.setDeleted((byte) 0);
+        record.setDeleted(0);
         dsl.attach(record);
         record.store();
         return record.getId();
@@ -55,7 +55,7 @@ public class EduStudentCourseAttendanceModel {
      */
     public void deleteAttendance(Long id) {
         dsl.update(Tables.EDU_STUDENT_COURSE_RECORD)
-                .set(Tables.EDU_STUDENT_COURSE_RECORD.DELETED, (byte) 1)
+                .set(Tables.EDU_STUDENT_COURSE_RECORD.DELETED,  1)
                 .set(Tables.EDU_STUDENT_COURSE_RECORD.UPDATE_TIME, LocalDateTime.now())
                 .where(Tables.EDU_STUDENT_COURSE_RECORD.ID.eq(id))
                 .execute();
@@ -71,7 +71,7 @@ public class EduStudentCourseAttendanceModel {
         return dsl.select()
                 .from(Tables.EDU_STUDENT_COURSE_RECORD)
                 .where(Tables.EDU_STUDENT_COURSE_RECORD.ID.eq(id))
-                .and(Tables.EDU_STUDENT_COURSE_RECORD.DELETED.eq((byte) 0))
+                .and(Tables.EDU_STUDENT_COURSE_RECORD.DELETED.eq(0))
                 .fetchOptional()
                 .map(this::convertToDetailRecord);
     }
@@ -118,7 +118,7 @@ public class EduStudentCourseAttendanceModel {
     private SelectConditionStep<Record> createBaseQuery(String studentId, String courseId, String coachId,
                                                       Long campusId, Long institutionId) {
         org.jooq.Condition conditions = DSL.noCondition();
-        conditions = conditions.and(Tables.EDU_STUDENT_COURSE_RECORD.DELETED.eq((byte) 0));
+        conditions = conditions.and(Tables.EDU_STUDENT_COURSE_RECORD.DELETED.eq( 0));
 
         if (studentId != null && !studentId.isEmpty()) {
             conditions = conditions.and(Tables.EDU_STUDENT_COURSE_RECORD.STUDENT_ID.eq(studentId));

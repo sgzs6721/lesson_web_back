@@ -45,7 +45,7 @@ public class EduStudentCourseModel {
     public Long createStudentCourse(EduStudentCourseRecord record) {
         record.setCreatedTime(LocalDateTime.now());
         record.setUpdateTime(LocalDateTime.now());
-        record.setDeleted((byte) 0);
+        record.setDeleted( 0);
         dsl.attach(record);
         record.store();
         return record.getId();
@@ -69,7 +69,7 @@ public class EduStudentCourseModel {
      */
     public void deleteStudentCourse(Long id) {
         dsl.update(Tables.EDU_STUDENT_COURSE)
-                .set(Tables.EDU_STUDENT_COURSE.DELETED, (byte) 1)
+                .set(Tables.EDU_STUDENT_COURSE.DELETED, 1)
                 .set(Tables.EDU_STUDENT_COURSE.UPDATE_TIME, LocalDateTime.now())
                 .where(Tables.EDU_STUDENT_COURSE.ID.eq(id))
                 .execute();
@@ -99,7 +99,7 @@ public class EduStudentCourseModel {
         return dsl.select()
                 .from(Tables.EDU_STUDENT_COURSE)
                 .where(Tables.EDU_STUDENT_COURSE.ID.eq(id))
-                .and(Tables.EDU_STUDENT_COURSE.DELETED.eq((byte) 0))
+                .and(Tables.EDU_STUDENT_COURSE.DELETED.eq( 0))
                 .fetchOptional()
                 .map(this::convertToDetailRecord);
     }
@@ -154,7 +154,7 @@ public class EduStudentCourseModel {
         // 获取原课程信息
         EduStudentCourseRecord sourceRecord = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
                 .where(Tables.EDU_STUDENT_COURSE.ID.eq(id))
-                .and(Tables.EDU_STUDENT_COURSE.DELETED.eq((byte) 0))
+                .and(Tables.EDU_STUDENT_COURSE.DELETED.eq( 0))
                 .fetchOne();
         
         if (sourceRecord == null) {
@@ -180,7 +180,7 @@ public class EduStudentCourseModel {
         targetRecord.setInstitutionName(sourceRecord.getInstitutionName());
         targetRecord.setCreatedTime(LocalDateTime.now());
         targetRecord.setUpdateTime(LocalDateTime.now());
-        targetRecord.setDeleted((byte) 0);
+        targetRecord.setDeleted( 0);
         
         // 保存新课程记录
         dsl.attach(targetRecord);
@@ -229,7 +229,7 @@ public class EduStudentCourseModel {
         // 获取原课程信息
         EduStudentCourseRecord record = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
                 .where(Tables.EDU_STUDENT_COURSE.ID.eq(id))
-                .and(Tables.EDU_STUDENT_COURSE.DELETED.eq((byte) 0))
+                .and(Tables.EDU_STUDENT_COURSE.DELETED.eq( 0))
                 .fetchOne();
         
         if (record == null) {
@@ -280,7 +280,7 @@ public class EduStudentCourseModel {
         // 获取原课程信息
         EduStudentCourseRecord record = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
                 .where(Tables.EDU_STUDENT_COURSE.ID.eq(id))
-                .and(Tables.EDU_STUDENT_COURSE.DELETED.eq((byte) 0))
+                .and(Tables.EDU_STUDENT_COURSE.DELETED.eq( 0))
                 .fetchOne();
         
         if (record == null) {
@@ -386,7 +386,7 @@ public class EduStudentCourseModel {
                                                       Long institutionId) {
         SelectConditionStep<Record> query = dsl.select()
                 .from(EduStudentCourse.EDU_STUDENT_COURSE)
-                .where(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq((byte) 0));
+                .where(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq( 0));
 
         if (studentId != null && !studentId.isEmpty()) {
             query = query.and(EduStudentCourse.EDU_STUDENT_COURSE.STUDENT_ID.eq(studentId));
@@ -491,7 +491,7 @@ public class EduStudentCourseModel {
         return dsl.select(EduCourse.EDU_COURSE.NAME)
                 .from(EduCourse.EDU_COURSE)
                 .where(EduCourse.EDU_COURSE.ID.eq(classId))
-                .and(EduCourse.EDU_COURSE.DELETED.eq((byte) 0))
+                .and(EduCourse.EDU_COURSE.DELETED.eq( 0))
                 .fetchOne(0, String.class);
     }
 } 

@@ -55,7 +55,7 @@ public class SysCampusModel {
                            BigDecimal propertyFee, BigDecimal utilityFee) {
         SysCampusRecord record = dsl.selectFrom(SYS_CAMPUS)
                 .where(SYS_CAMPUS.ID.eq(id))
-                .and(SYS_CAMPUS.DELETED.eq((byte) 0))
+                .and(SYS_CAMPUS.DELETED.eq(0))
                 .fetchOne();
         if (record == null) {
             throw new RuntimeException("校区不存在或已删除");
@@ -75,9 +75,9 @@ public class SysCampusModel {
      */
     public void deleteCampus(Long id) {
         int updated = dsl.update(SYS_CAMPUS)
-                .set(SYS_CAMPUS.DELETED, (byte) 1)
+                .set(SYS_CAMPUS.DELETED,  1)
                 .where(SYS_CAMPUS.ID.eq(id))
-                .and(SYS_CAMPUS.DELETED.eq((byte) 0))
+                .and(SYS_CAMPUS.DELETED.eq( 0))
                 .execute();
         if (updated == 0) {
             throw new RuntimeException("校区不存在或已删除");
@@ -104,7 +104,7 @@ public class SysCampusModel {
             .from(SYS_CAMPUS)
             .leftJoin(SYS_USER).on(SYS_CAMPUS.ID.eq(SYS_USER.CAMPUS_ID))
             .where(SYS_CAMPUS.ID.eq(campusId))
-            .and(SYS_CAMPUS.DELETED.eq((byte) 0))
+            .and(SYS_CAMPUS.DELETED.eq( 0))
             .and(SYS_USER.ROLE_ID.eq(2L)) // 只查询校区管理员
             .fetchOneInto(CampusDetailRecord.class);
     }
@@ -121,9 +121,9 @@ public class SysCampusModel {
             .from(SYS_CAMPUS)
             .leftJoin(SYS_USER)
             .on(SYS_CAMPUS.ID.eq(SYS_USER.CAMPUS_ID))
-            .and(SYS_USER.DELETED.eq((byte) 0))
+            .and(SYS_USER.DELETED.eq( 0))
             .and(SYS_USER.ROLE_ID.eq(2L)) // 只查询校区管理员
-            .where(SYS_CAMPUS.DELETED.eq((byte) 0))
+            .where(SYS_CAMPUS.DELETED.eq( 0))
             .and(SYS_CAMPUS.INSTITUTION_ID.eq(institutionId));
 
         if (StringUtils.hasText(keyword)) {
@@ -160,7 +160,7 @@ public class SysCampusModel {
     public long countCampuses(String keyword, CampusStatus status, Long institutionId) {
         SelectConditionStep<Record1<Integer>> query = dsl.selectCount()
                 .from(SYS_CAMPUS)
-                .where(SYS_CAMPUS.DELETED.eq((byte) 0))
+                .where(SYS_CAMPUS.DELETED.eq( 0))
                 .and(SYS_CAMPUS.INSTITUTION_ID.eq(institutionId));
 
         if (StringUtils.hasText(keyword)) {
@@ -182,7 +182,7 @@ public class SysCampusModel {
         int updated = dsl.update(SYS_CAMPUS)
                 .set(SYS_CAMPUS.STATUS, status.getCode())
                 .where(SYS_CAMPUS.ID.eq(id))
-                .and(SYS_CAMPUS.DELETED.eq((byte) 0))
+                .and(SYS_CAMPUS.DELETED.eq( 0))
                 .execute();
         if (updated == 0) {
             throw new RuntimeException("校区不存在或已删除");
@@ -196,7 +196,7 @@ public class SysCampusModel {
         return dsl.selectCount()
                 .from(SYS_CAMPUS)
                 .where(SYS_CAMPUS.ID.eq(id))
-                .and(SYS_CAMPUS.DELETED.eq((byte) 0))
+                .and(SYS_CAMPUS.DELETED.eq( 0))
                 .fetchOne(0, int.class) > 0;
     }
 
@@ -209,7 +209,7 @@ public class SysCampusModel {
     public List<SysCampusRecord> findByInstitutionId(Long institutionId) {
         return dsl.selectFrom(SYS_CAMPUS)
                 .where(SYS_CAMPUS.INSTITUTION_ID.eq(institutionId))
-                .and(SYS_CAMPUS.DELETED.eq((byte) 0))
+                .and(SYS_CAMPUS.DELETED.eq( 0))
                 .orderBy(SYS_CAMPUS.CREATED_TIME.desc())
                 .fetch();
     }

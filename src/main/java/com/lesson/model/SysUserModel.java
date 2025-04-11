@@ -36,8 +36,8 @@ public class SysUserModel {
     public UserLoginVO validateLogin(String phone, String password, PasswordEncoder passwordEncoder) {
         SysUserRecord user = dsl.selectFrom(SYS_USER)
                 .where(SYS_USER.PHONE.eq(phone))
-                .and(SYS_USER.DELETED.eq((byte) 0))
-                .and(SYS_USER.STATUS.eq((byte) 1))
+                .and(SYS_USER.DELETED.eq(0))
+                .and(SYS_USER.STATUS.eq(1))
                 .fetchOne();
 
         if (user != null && passwordEncoder.matches(password, user.getPassword())) {
@@ -82,8 +82,8 @@ public class SysUserModel {
         user.setInstitutionId(institutionId);
         user.setRoleId(roleId);
         user.setCampusId(campusId);
-        user.setStatus((byte) 1);
-        user.setDeleted((byte) 0);
+        user.setStatus(1);
+        user.setDeleted(0);
         user.setCreatedTime(LocalDateTime.now());
         user.setUpdateTime(LocalDateTime.now());
         user.store();
@@ -101,13 +101,13 @@ public class SysUserModel {
         // 加密密码
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         // 设置默认状态为启用
-        user.setStatus((byte) 1);
+        user.setStatus(1);
         // 设置创建时间
         user.setCreatedTime(LocalDateTime.now());
         // 设置更新时间
         user.setUpdateTime(LocalDateTime.now());
         // 设置删除标记为未删除
-        user.setDeleted((byte) 0);
+        user.setDeleted(0);
 
         // 插入记录并返回ID
         user.store();
@@ -124,7 +124,7 @@ public class SysUserModel {
         return dsl.fetchExists(
                 dsl.selectFrom(SYS_USER)
                         .where(SYS_USER.PHONE.eq(phone))
-                        .and(SYS_USER.DELETED.eq((byte) 0))
+                        .and(SYS_USER.DELETED.eq(0))
         );
     }
 
@@ -137,7 +137,7 @@ public class SysUserModel {
     public SysUserRecord getById(Long id) {
         return dsl.selectFrom(SYS_USER)
                 .where(SYS_USER.ID.eq(id))
-                .and(SYS_USER.DELETED.eq((byte) 0))
+                .and(SYS_USER.DELETED.eq(0))
                 .fetchOne();
     }
 
@@ -147,7 +147,7 @@ public class SysUserModel {
     public SysUserRecord getByPhone(String phone) {
         return dsl.selectFrom(SYS_USER)
             .where(SYS_USER.PHONE.eq(phone))
-            .and(SYS_USER.DELETED.eq((byte) 0))
+            .and(SYS_USER.DELETED.eq(0))
             .fetchOne();
     }
 
@@ -180,11 +180,11 @@ public class SysUserModel {
                 SYS_CAMPUS.NAME.as("campus_name")
             )
             .from(SYS_USER)
-            .leftJoin(SYS_ROLE).on(SYS_USER.ROLE_ID.eq(SYS_ROLE.ID).and(SYS_ROLE.DELETED.eq((byte) 0)))
-            .leftJoin(SYS_CAMPUS).on(SYS_USER.CAMPUS_ID.eq(SYS_CAMPUS.ID).and(SYS_CAMPUS.DELETED.eq((byte) 0)));
+            .leftJoin(SYS_ROLE).on(SYS_USER.ROLE_ID.eq(SYS_ROLE.ID).and(SYS_ROLE.DELETED.eq(0)))
+            .leftJoin(SYS_CAMPUS).on(SYS_USER.CAMPUS_ID.eq(SYS_CAMPUS.ID).and(SYS_CAMPUS.DELETED.eq(0)));
         
         // 构建查询条件
-        Condition conditions = SYS_USER.DELETED.eq((byte) 0);
+        Condition conditions = SYS_USER.DELETED.eq(0);
         
         // 关键字搜索
         if (StringUtils.hasText(keyword)) {
@@ -207,7 +207,7 @@ public class SysUserModel {
         
         // 状态过滤
         if (status != null) {
-            conditions = conditions.and(SYS_USER.STATUS.eq(status.byteValue()));
+            conditions = conditions.and(SYS_USER.STATUS.eq(status));
         }
         
         // 应用条件并分页
@@ -225,7 +225,7 @@ public class SysUserModel {
     public long countUsers(String keyword, List<Long> roleIds, List<Long> campusIds, Integer status) {
         SelectConditionStep<Record1<Integer>> query = dsl.selectCount()
             .from(SYS_USER)
-            .where(SYS_USER.DELETED.eq((byte) 0));
+            .where(SYS_USER.DELETED.eq(0));
         
         // 关键字搜索
         if (StringUtils.hasText(keyword)) {
@@ -248,7 +248,7 @@ public class SysUserModel {
         
         // 状态过滤
         if (status != null) {
-            query = query.and(SYS_USER.STATUS.eq(status.byteValue()));
+            query = query.and(SYS_USER.STATUS.eq(status));
         }
         
         return query.fetchOne(0, long.class);
@@ -274,7 +274,7 @@ public class SysUserModel {
             .set(SYS_USER.REAL_NAME, realName)
             .set(SYS_USER.PHONE, phone)
             .set(SYS_USER.ROLE_ID, roleId)
-            .set(SYS_USER.STATUS, status.byteValue())
+            .set(SYS_USER.STATUS, status)
             .set(SYS_USER.UPDATE_TIME, LocalDateTime.now());
         
         // 设置机构ID
@@ -293,7 +293,7 @@ public class SysUserModel {
         }
         
         update.where(SYS_USER.ID.eq(id))
-            .and(SYS_USER.DELETED.eq((byte) 0))
+            .and(SYS_USER.DELETED.eq(0))
             .execute();
     }
     
@@ -302,10 +302,10 @@ public class SysUserModel {
      */
     public void updateStatus(Long id, Integer status) {
         dsl.update(SYS_USER)
-            .set(SYS_USER.STATUS, status.byteValue())
+            .set(SYS_USER.STATUS, status)
             .set(SYS_USER.UPDATE_TIME, LocalDateTime.now())
             .where(SYS_USER.ID.eq(id))
-            .and(SYS_USER.DELETED.eq((byte) 0))
+            .and(SYS_USER.DELETED.eq(0))
             .execute();
     }
     
@@ -314,10 +314,10 @@ public class SysUserModel {
      */
     public void deleteUser(Long id) {
         dsl.update(SYS_USER)
-            .set(SYS_USER.DELETED, (byte) 1)
+            .set(SYS_USER.DELETED, 1)
             .set(SYS_USER.UPDATE_TIME, LocalDateTime.now())
             .where(SYS_USER.ID.eq(id))
-            .and(SYS_USER.DELETED.eq((byte) 0))
+            .and(SYS_USER.DELETED.eq(0))
             .execute();
     }
     
@@ -329,7 +329,7 @@ public class SysUserModel {
             .set(SYS_USER.PASSWORD, passwordEncoder.encode(password))
             .set(SYS_USER.UPDATE_TIME, LocalDateTime.now())
             .where(SYS_USER.ID.eq(id))
-            .and(SYS_USER.DELETED.eq((byte) 0))
+            .and(SYS_USER.DELETED.eq(0))
             .execute();
     }
 
@@ -357,8 +357,8 @@ public class SysUserModel {
         // 获取用户信息
         SysUserRecord user = dsl.selectFrom(SYS_USER)
                 .where(SYS_USER.ID.eq(userId))
-                .and(SYS_USER.DELETED.eq((byte) 0))
-                .and(SYS_USER.STATUS.eq((byte) 1))
+                .and(SYS_USER.DELETED.eq(0))
+                .and(SYS_USER.STATUS.eq(1))
                 .fetchOne();
 
         if (user == null) {
@@ -387,8 +387,8 @@ public class SysUserModel {
     public List<SysUserRecord> findActiveByCampusIds(List<Long> campusIds) {
         return dsl.selectFrom(SYS_USER)
                 .where(SYS_USER.CAMPUS_ID.in(campusIds))
-                .and(SYS_USER.DELETED.eq((byte) 0))
-                .and(SYS_USER.STATUS.eq((byte) 1))
+                .and(SYS_USER.DELETED.eq(0))
+                .and(SYS_USER.STATUS.eq(1))
                 .fetch();
     }
 } 

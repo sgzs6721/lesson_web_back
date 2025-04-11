@@ -90,7 +90,7 @@ public class SysCoachModel {
                     .set(SYS_COACH.GENDER, gender.getCode())
                     .set(SYS_COACH.CAMPUS_ID, campusId)
                     .set(SYS_COACH.INSTITUTION_ID, institutionId)
-                    .set(SYS_COACH.DELETED, (byte) 0)
+                    .set(SYS_COACH.DELETED,  0)
                     .returning(SYS_COACH.ID)
                     .fetchOne()
                     .get(SYS_COACH.ID);
@@ -114,7 +114,7 @@ public class SysCoachModel {
         Record oldRecord = dsl.select(SYS_COACH.CAMPUS_ID, SYS_COACH.INSTITUTION_ID)
                             .from(SYS_COACH)
                             .where(SYS_COACH.ID.eq(id))
-                            .and(SYS_COACH.DELETED.eq((byte) 0))
+                            .and(SYS_COACH.DELETED.eq( 0))
                             .fetchOne();
 
         if (oldRecord != null) {
@@ -143,7 +143,7 @@ public class SysCoachModel {
                 .set(SYS_COACH.CAMPUS_ID, campusId)
                 .set(SYS_COACH.INSTITUTION_ID, institutionId)
                 .where(SYS_COACH.ID.eq(id))
-                .and(SYS_COACH.DELETED.eq((byte) 0))
+                .and(SYS_COACH.DELETED.eq( 0))
                 .execute();
     }
 
@@ -155,7 +155,7 @@ public class SysCoachModel {
         Record record = dsl.select(SYS_COACH.CAMPUS_ID, SYS_COACH.INSTITUTION_ID)
                         .from(SYS_COACH)
                         .where(SYS_COACH.ID.eq(id))
-                        .and(SYS_COACH.DELETED.eq((byte) 0))
+                        .and(SYS_COACH.DELETED.eq( 0))
                         .fetchOne();
 
         if (record != null) {
@@ -167,9 +167,9 @@ public class SysCoachModel {
         }
 
         dsl.update(SYS_COACH)
-                .set(SYS_COACH.DELETED, (byte) 1)
+                .set(SYS_COACH.DELETED,  1)
                 .where(SYS_COACH.ID.eq(id))
-                .and(SYS_COACH.DELETED.eq((byte) 0))
+                .and(SYS_COACH.DELETED.eq( 0))
                 .execute();
     }
 
@@ -180,7 +180,7 @@ public class SysCoachModel {
         dsl.update(SYS_COACH)
                 .set(SYS_COACH.STATUS, status.getCode())
                 .where(SYS_COACH.ID.eq(id))
-                .and(SYS_COACH.DELETED.eq((byte) 0))
+                .and(SYS_COACH.DELETED.eq( 0))
                 .execute();
     }
 
@@ -196,7 +196,7 @@ public class SysCoachModel {
                       .leftJoin(SYS_CAMPUS).on(SYS_COACH.CAMPUS_ID.eq(SYS_CAMPUS.ID))
                       .leftJoin(SYS_INSTITUTION).on(SYS_COACH.INSTITUTION_ID.eq(SYS_INSTITUTION.ID))
                       .where(SYS_COACH.ID.eq(id))
-                      .and(SYS_COACH.DELETED.eq((byte) 0))
+                      .and(SYS_COACH.DELETED.eq( 0))
                       .fetchOne();
 
         if (record == null) {
@@ -206,20 +206,20 @@ public class SysCoachModel {
         // 查询教练证书
         List<SysCoachCertificationRecord> certifications = dsl.selectFrom(SYS_COACH_CERTIFICATION)
                 .where(SYS_COACH_CERTIFICATION.COACH_ID.eq(id))
-                .and(SYS_COACH_CERTIFICATION.DELETED.eq((byte) 0))
+                .and(SYS_COACH_CERTIFICATION.DELETED.eq( 0))
                 .fetch();
 
         // 查询教练薪资
         List<SysCoachSalaryRecord> salaries = dsl.selectFrom(SYS_COACH_SALARY)
                 .where(SYS_COACH_SALARY.COACH_ID.eq(id))
-                .and(SYS_COACH_SALARY.DELETED.eq((byte) 0))
+                .and(SYS_COACH_SALARY.DELETED.eq( 0))
                 .fetch();
 
         // 查询教练课程
         List<String> courses = dsl.select(SYS_COACH_COURSE.COURSE_ID)
                 .from(SYS_COACH_COURSE)
                 .where(SYS_COACH_COURSE.COACH_ID.eq(id))
-                .and(SYS_COACH_COURSE.DELETED.eq((byte) 0))
+                .and(SYS_COACH_COURSE.DELETED.eq( 0))
                 .fetch(SYS_COACH_COURSE.COURSE_ID);
 
         CoachDetailRecord detailRecord = new CoachDetailRecord();
@@ -262,7 +262,7 @@ public class SysCoachModel {
     public List<SysCoachCertificationRecord> getCertifications(Long coachId) {
         return dsl.selectFrom(SYS_COACH_CERTIFICATION)
                 .where(SYS_COACH_CERTIFICATION.COACH_ID.eq(coachId))
-                .and(SYS_COACH_CERTIFICATION.DELETED.eq((byte) 0))
+                .and(SYS_COACH_CERTIFICATION.DELETED.eq( 0))
                 .fetchInto(SysCoachCertificationRecord.class);
     }
 
@@ -272,7 +272,7 @@ public class SysCoachModel {
     public SysCoachSalaryRecord getLatestSalary(Long coachId) {
         return dsl.selectFrom(SYS_COACH_SALARY)
                 .where(SYS_COACH_SALARY.COACH_ID.eq(coachId))
-                .and(SYS_COACH_SALARY.DELETED.eq((byte) 0))
+                .and(SYS_COACH_SALARY.DELETED.eq( 0))
                 .orderBy(SYS_COACH_SALARY.EFFECTIVE_DATE.desc())
                 .limit(1)
                 .fetchOne();
@@ -284,9 +284,9 @@ public class SysCoachModel {
     public void addCertifications(Long coachId, List<String> certifications) {
         // 先删除已有证书
         dsl.update(SYS_COACH_CERTIFICATION)
-           .set(SYS_COACH_CERTIFICATION.DELETED, (byte) 1)
+           .set(SYS_COACH_CERTIFICATION.DELETED,  1)
            .where(SYS_COACH_CERTIFICATION.COACH_ID.eq(coachId))
-           .and(SYS_COACH_CERTIFICATION.DELETED.eq((byte) 0))
+           .and(SYS_COACH_CERTIFICATION.DELETED.eq( 0))
            .execute();
 
         // 添加新证书
@@ -295,7 +295,7 @@ public class SysCoachModel {
                 dsl.insertInto(SYS_COACH_CERTIFICATION)
                    .set(SYS_COACH_CERTIFICATION.COACH_ID, coachId)
                    .set(SYS_COACH_CERTIFICATION.CERTIFICATION_NAME, certificationName)
-                   .set(SYS_COACH_CERTIFICATION.DELETED, (byte) 0)
+                   .set(SYS_COACH_CERTIFICATION.DELETED,  0)
                    .execute();
             }
         }
@@ -316,7 +316,7 @@ public class SysCoachModel {
            .set(SYS_COACH_SALARY.COMMISSION, commission)
            .set(SYS_COACH_SALARY.DIVIDEND, dividend)
            .set(SYS_COACH_SALARY.EFFECTIVE_DATE, effectiveDate)
-           .set(SYS_COACH_SALARY.DELETED, (byte) 0)
+           .set(SYS_COACH_SALARY.DELETED,  0)
            .execute();
     }
 
@@ -327,9 +327,9 @@ public class SysCoachModel {
     public void updateCoachCourses(Long coachId, List<String> courseIds) {
         // 先删除已有关联
         dsl.update(SYS_COACH_COURSE)
-           .set(SYS_COACH_COURSE.DELETED, (byte) 1)
+           .set(SYS_COACH_COURSE.DELETED,  1)
            .where(SYS_COACH_COURSE.COACH_ID.eq(coachId))
-           .and(SYS_COACH_COURSE.DELETED.eq((byte) 0))
+           .and(SYS_COACH_COURSE.DELETED.eq( 0))
            .execute();
 
         // 添加新关联
@@ -338,7 +338,7 @@ public class SysCoachModel {
                 dsl.insertInto(SYS_COACH_COURSE)
                    .set(SYS_COACH_COURSE.COACH_ID, coachId)
                    .set(SYS_COACH_COURSE.COURSE_ID, courseId)
-                   .set(SYS_COACH_COURSE.DELETED, (byte) 0)
+                   .set(SYS_COACH_COURSE.DELETED,  0)
                    .execute();
             }
         }
@@ -352,7 +352,7 @@ public class SysCoachModel {
         return dsl.select(SYS_COACH_COURSE.COURSE_ID)
                 .from(SYS_COACH_COURSE)
                 .where(SYS_COACH_COURSE.COACH_ID.eq(coachId))
-                .and(SYS_COACH_COURSE.DELETED.eq((byte) 0))
+                .and(SYS_COACH_COURSE.DELETED.eq( 0))
                 .fetchInto(String.class);
     }
 
@@ -421,7 +421,7 @@ public class SysCoachModel {
                                      .from(SYS_COACH)
                                      .leftJoin(SYS_CAMPUS).on(SYS_COACH.CAMPUS_ID.eq(SYS_CAMPUS.ID))
                                      .leftJoin(SYS_INSTITUTION).on(SYS_COACH.INSTITUTION_ID.eq(SYS_INSTITUTION.ID))
-                                     .where(SYS_COACH.DELETED.eq((byte) 0));
+                                     .where(SYS_COACH.DELETED.eq( 0));
 
         // 关键词过滤
         if (keyword != null && !keyword.isEmpty()) {
@@ -461,14 +461,14 @@ public class SysCoachModel {
             dsl.selectOne()
                .from(SYS_COACH)
                .where(SYS_COACH.ID.eq(id))
-               .and(SYS_COACH.DELETED.eq((byte) 0))
+               .and(SYS_COACH.DELETED.eq( 0))
         );
     }
 
     public List<CoachDetailRecord> listAllCoaches() {
         Result<Record> records = dsl.select()
                 .from(SYS_COACH)
-                .where(SYS_COACH.DELETED.eq((byte) 0))
+                .where(SYS_COACH.DELETED.eq( 0))
                 .fetch();
 
         return records.map(record -> {

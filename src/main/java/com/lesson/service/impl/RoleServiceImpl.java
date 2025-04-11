@@ -42,8 +42,8 @@ public class RoleServiceImpl implements RoleService {
         
         // 构建查询条件
         SelectConditionStep<SysRoleRecord> baseQuery = dsl.selectFrom(SYS_ROLE)
-            .where(SYS_ROLE.DELETED.eq((byte) 0))
-            .and(SYS_ROLE.STATUS.eq((byte) 1));
+            .where(SYS_ROLE.DELETED.eq(0))
+            .and(SYS_ROLE.STATUS.eq(1));
             
         // 如果不是超级管理员，只能看到协同管理员和校区管理员角色
         if (!isSuperAdmin) {
@@ -89,7 +89,7 @@ public class RoleServiceImpl implements RoleService {
             boolean exists = dsl.fetchExists(
                 dsl.selectFrom(SYS_ROLE)
                     .where(SYS_ROLE.ROLE_NAME.eq(roleName))
-                    .and(SYS_ROLE.DELETED.eq((byte) 0))
+                    .and(SYS_ROLE.DELETED.eq( 0))
             );
             
             if (exists) {
@@ -99,10 +99,10 @@ public class RoleServiceImpl implements RoleService {
             SysRoleRecord role = dsl.newRecord(SYS_ROLE);
             role.setRoleName(roleName);
             role.setDescription(description);
-            role.setStatus((byte) 1);
+            role.setStatus( 1);
             role.setCreatedTime(LocalDateTime.now());
             role.setUpdateTime(LocalDateTime.now());
-            role.setDeleted((byte) 0);
+            role.setDeleted( 0);
             role.store();
             
             log.info("创建角色成功: id={}, name={}", role.getId(), roleName);
@@ -119,7 +119,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public List<RoleVO> getAllRoles() {
         return dsl.selectFrom(SYS_ROLE)
-            .where(SYS_ROLE.DELETED.eq((byte) 0))
+            .where(SYS_ROLE.DELETED.eq( 0))
             .orderBy(SYS_ROLE.CREATED_TIME.desc())
             .fetch()
             .map(record -> {

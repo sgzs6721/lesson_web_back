@@ -35,7 +35,7 @@ public class EduStudentModel {
         record.setId(DSL.using(dsl.configuration()).nextval("student_id_seq").toString());
         record.setCreatedTime(LocalDateTime.now());
         record.setUpdateTime(LocalDateTime.now());
-        record.setDeleted((byte) 0);
+        record.setDeleted( 0);
         dsl.attach(record);
         record.store();
         return record.getId();
@@ -59,7 +59,7 @@ public class EduStudentModel {
      */
     public void deleteStudent(String id) {
         dsl.update(Tables.EDU_STUDENT)
-                .set(Tables.EDU_STUDENT.DELETED, (byte) 1)
+                .set(Tables.EDU_STUDENT.DELETED,  1)
                 .set(Tables.EDU_STUDENT.UPDATE_TIME, LocalDateTime.now())
                 .where(Tables.EDU_STUDENT.ID.eq(id))
                 .execute();
@@ -71,7 +71,7 @@ public class EduStudentModel {
     public void updateStatus(String id, StudentStatus status) {
         EduStudentRecord record = dsl.selectFrom(Tables.EDU_STUDENT)
                 .where(Tables.EDU_STUDENT.ID.eq(id))
-                .and(Tables.EDU_STUDENT.DELETED.eq((byte) 0))
+                .and(Tables.EDU_STUDENT.DELETED.eq( 0))
                 .fetchOne();
         
         if (record != null) {
@@ -103,7 +103,7 @@ public class EduStudentModel {
 //        record.setInstitutionName(institutionName);
 //        record.setStatus(StudentStatus.ACTIVE.name());
 //        record.setCreatedTime(LocalDateTime.now());
-//        record.setDeleted((byte) 0);
+//        record.setDeleted( 0);
 //        record.store();
 //
 //        return id;
@@ -116,7 +116,7 @@ public class EduStudentModel {
         Record record = dsl.select()
                 .from(Tables.EDU_STUDENT)
                 .where(Tables.EDU_STUDENT.ID.eq(id))
-                .and(Tables.EDU_STUDENT.DELETED.eq((byte) 0))
+                .and(Tables.EDU_STUDENT.DELETED.eq( 0))
                 .fetchOne();
         
         return convertToDetailRecord(record);
@@ -132,7 +132,7 @@ public class EduStudentModel {
         return dsl.select()
                 .from(Tables.EDU_STUDENT)
                 .where(Tables.EDU_STUDENT.ID.eq(id))
-                .and(Tables.EDU_STUDENT.DELETED.eq((byte) 0))
+                .and(Tables.EDU_STUDENT.DELETED.eq( 0))
                 .fetchOptional()
                 .map(this::convertToDetailRecord);
     }
@@ -186,14 +186,14 @@ public class EduStudentModel {
         return dsl.fetchExists(
                 dsl.selectFrom(Tables.EDU_STUDENT)
                         .where(Tables.EDU_STUDENT.ID.eq(id))
-                        .and(Tables.EDU_STUDENT.DELETED.eq((byte) 0))
+                        .and(Tables.EDU_STUDENT.DELETED.eq( 0))
         );
     }
 
     private org.jooq.Condition createBaseConditions(String keyword, StudentStatus status,
                                                   Long campusId, Long institutionId) {
         List<org.jooq.Condition> conditions = new ArrayList<>();
-        conditions.add(Tables.EDU_STUDENT.DELETED.eq((byte) 0));
+        conditions.add(Tables.EDU_STUDENT.DELETED.eq( 0));
 
         if (keyword != null && !keyword.isEmpty()) {
             conditions.add(

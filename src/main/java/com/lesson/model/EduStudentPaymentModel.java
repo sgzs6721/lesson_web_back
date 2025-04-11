@@ -33,7 +33,7 @@ public class EduStudentPaymentModel {
     public Long createPayment(EduStudentPaymentRecord record) {
         record.setCreatedTime(LocalDateTime.now());
         record.setUpdateTime(LocalDateTime.now());
-        record.setDeleted((byte) 0);
+        record.setDeleted(0);
         dsl.attach(record);
         record.store();
         return record.getId();
@@ -57,7 +57,7 @@ public class EduStudentPaymentModel {
      */
     public void deletePayment(Long id) {
         dsl.update(Tables.EDU_STUDENT_PAYMENT)
-                .set(Tables.EDU_STUDENT_PAYMENT.DELETED, (byte) 1)
+                .set(Tables.EDU_STUDENT_PAYMENT.DELETED, 1)
                 .set(Tables.EDU_STUDENT_PAYMENT.UPDATE_TIME, LocalDateTime.now())
                 .where(Tables.EDU_STUDENT_PAYMENT.ID.eq(id))
                 .execute();
@@ -73,7 +73,7 @@ public class EduStudentPaymentModel {
         return dsl.select()
                 .from(Tables.EDU_STUDENT_PAYMENT)
                 .where(Tables.EDU_STUDENT_PAYMENT.ID.eq(id))
-                .and(Tables.EDU_STUDENT_PAYMENT.DELETED.eq((byte) 0))
+                .and(Tables.EDU_STUDENT_PAYMENT.DELETED.eq( 0))
                 .fetchOptional()
                 .map(this::convertToDetailRecord);
     }
@@ -116,7 +116,7 @@ public class EduStudentPaymentModel {
     private SelectConditionStep<Record> createBaseQuery(String studentId, String courseId,
                                                       Long campusId, Long institutionId) {
         org.jooq.Condition conditions = DSL.noCondition();
-        conditions = conditions.and(Tables.EDU_STUDENT_PAYMENT.DELETED.eq((byte) 0));
+        conditions = conditions.and(Tables.EDU_STUDENT_PAYMENT.DELETED.eq(0));
 
         if (studentId != null && !studentId.isEmpty()) {
             conditions = conditions.and(Tables.EDU_STUDENT_PAYMENT.STUDENT_ID.eq(studentId));
