@@ -22,7 +22,7 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
       - name: Build application lesson_web_back
-        run: mvn flyway:clean -Dflyway.url=jdbc:mysql://121.36.91.199:3306/lesson?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai -Dflyway.user=root -Dflyway.password= && mvn flyway:repair && mvn flyway:migrate && mvn jooq-codegen:generate && mvn clean compile && mvn install -Dmaven.test.skip=true
+        run: mvn flyway:clean -Dflyway.url="jdbc:mysql://121.36.91.199:3306/lesson?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai" -Dflyway.user="root" -Dflyway.password="" && mvn flyway:repair && mvn flyway:migrate && mvn jooq-codegen:generate && mvn clean compile && mvn install -Dmaven.test.skip=true
       - name: Scp jar To HW Server
         uses: appleboy/scp-action@master
         with:
