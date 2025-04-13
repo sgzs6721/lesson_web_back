@@ -1,4 +1,4 @@
-name: deploy_dev_admin
+name: deploy_test_web_back
 on:
   push:
     branches:
@@ -22,7 +22,7 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
       - name: Build application lesson_web_back
-        run: mvn clean compile && mvn install -Dmaven.test.skip=true
+        run: mvn flyway:clean && mvn flyway:repair && mvn flyway:migrate && mvn jooq-codegen:generate && mvn clean compile && mvn install -Dmaven.test.skip=true
       - name: Scp jar To HW Server
         uses: appleboy/scp-action@master
         with:
