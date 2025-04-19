@@ -21,8 +21,11 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
+      - name: Flyway Clean
+        if: ${{ vars.FLYWAY_CLEAN == '1' }}
+        run: mvn flyway:clean -P test
       - name: Build application lesson_web_back
-        run: mvn flyway:migrate -P test && mvn jooq-codegen:generate -P test && mvn clean compile -P test && mvn install -P test -Dmaven.test.skip=true
+        run: mvn flyway:repair -P test && mvn flyway:migrate -P test && mvn jooq-codegen:generate -P test && mvn clean compile -P test && mvn install -P test -Dmaven.test.skip=true
       - name: Scp jar To HW Server
         uses: appleboy/scp-action@master
         with:
