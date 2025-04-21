@@ -156,7 +156,50 @@ public class CourseServiceImpl implements CourseService {
         if (record == null) {
             return null;
         }
-        return convertToVO(record);
+
+        // 获取课程类型常量
+        List<SysConstantRecord> courseTypes = constantModel.listByType("COURSE_TYPE");
+        Map<Long, String> courseTypeMap = courseTypes.stream()
+            .collect(Collectors.toMap(
+                SysConstantRecord::getId,
+                SysConstantRecord::getConstantValue
+            ));
+
+        // 获取课程的教练信息
+        List<CoachDetailRecord> coaches = sysCoachModel.getCoachesByCourseId(id);
+
+        // 转换为VO
+        CourseVO vo = new CourseVO();
+        // 复制基本信息
+        BeanUtils.copyProperties(record, vo);
+        
+        // 设置课程ID
+        vo.setId(String.valueOf(record.getId()));
+        
+        // 设置课程类型
+        if (record.getTypeId() != null) {
+            String typeValue = courseTypeMap.get(record.getTypeId());
+            if (typeValue != null) {
+                vo.setType(typeValue);
+            }
+        }
+        
+        // 设置教练信息
+        if (coaches != null && !coaches.isEmpty()) {
+            List<CourseVO.CoachInfo> coachInfos = coaches.stream()
+                .map(coach -> {
+                    CourseVO.CoachInfo coachInfo = new CourseVO.CoachInfo();
+                    coachInfo.setId(coach.getId());
+                    coachInfo.setName(coach.getName());
+                    return coachInfo;
+                })
+                .collect(Collectors.toList());
+            vo.setCoaches(coachInfos);
+        } else {
+            vo.setCoaches(new ArrayList<>());
+        }
+        
+        return vo;
     }
 
     @Override
