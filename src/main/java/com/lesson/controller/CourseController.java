@@ -20,7 +20,7 @@ import java.util.List;
 
 @Tag(name = "课程管理")
 @RestController
-@RequestMapping("/api/v1/courses")
+@RequestMapping("/api/courses")
 @RequiredArgsConstructor
 public class CourseController {
     private final CourseService courseService;
