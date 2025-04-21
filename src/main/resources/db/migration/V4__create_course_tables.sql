@@ -8,8 +8,6 @@ CREATE TABLE `edu_course` (
     `total_hours` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '总课时数',
     `consumed_hours` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '已消耗课时数',
     `price` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '课程单价(元)',
-    `coach_id` bigint(20) NOT NULL COMMENT '上课教练ID',
-    `coach_name` varchar(50) NOT NULL COMMENT '教练姓名',
     `description` text COMMENT '课程描述',
     `campus_id` bigint(20) NOT NULL COMMENT '校区ID',
     `institution_id` bigint(20) NOT NULL COMMENT '机构ID',
@@ -20,7 +18,6 @@ CREATE TABLE `edu_course` (
     KEY `idx_name` (`name`),
     KEY `idx_type_id` (`type_id`),
     KEY `idx_status` (`status`),
-    KEY `idx_coach_id` (`coach_id`),
     KEY `idx_campus_id` (`campus_id`),
     KEY `idx_institution_id` (`institution_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='课程表';

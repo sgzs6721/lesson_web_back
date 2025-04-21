@@ -4,7 +4,6 @@ import lombok.Getter;
 
 @Getter
 public enum CourseStatus {
-    DRAFT("草稿"),
     PUBLISHED("已发布"),
     SUSPENDED("已暂停"),
     TERMINATED("已终止");

@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 public class CourseDetailRecord {
     private Long id;
     private String name;
+    private Long typeId;
     private CourseType type;
     private CourseStatus status;
     private BigDecimal unitHours;

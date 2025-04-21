@@ -535,4 +535,31 @@ public class SysCoachModel {
             throw new BusinessException("教练不属于所选校区: " + coachId);
         }
     }
+
+    /**
+     * 根据课程ID获取教练列表
+     */
+    public List<CoachDetailRecord> getCoachesByCourseId(Long courseId) {
+        return dsl.select(
+                SYS_COACH.ID,
+                SYS_COACH.NAME,
+                SYS_COACH.STATUS,
+                SYS_COACH.AGE,
+                SYS_COACH.PHONE,
+                SYS_COACH.AVATAR,
+                SYS_COACH.JOB_TITLE,
+                SYS_COACH.HIRE_DATE,
+                SYS_COACH.EXPERIENCE,
+                SYS_COACH.GENDER,
+                SYS_COACH.CAMPUS_ID,
+                SYS_COACH.INSTITUTION_ID
+            )
+            .from(SYS_COACH)
+            .innerJoin(SYS_COACH_COURSE)
+            .on(SYS_COACH.ID.eq(SYS_COACH_COURSE.COACH_ID))
+            .where(SYS_COACH_COURSE.COURSE_ID.eq(courseId))
+            .and(SYS_COACH_COURSE.DELETED.eq(0))
+            .and(SYS_COACH.DELETED.eq(0))
+            .fetchInto(CoachDetailRecord.class);
+    }
 }

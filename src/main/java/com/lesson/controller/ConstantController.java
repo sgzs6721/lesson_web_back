@@ -22,7 +22,7 @@ import java.util.List;
 public class ConstantController {
     private final ConstantService constantService;
 
-    @GetMapping
+    @GetMapping("/list")
     @Operation(summary = "查询系统常量", description = "根据常量类型查询系统常量列表")
     public Result<List<ConstantVO>> listConstants(
             @Parameter(description = "常量类型") @RequestParam ConstantType type) {

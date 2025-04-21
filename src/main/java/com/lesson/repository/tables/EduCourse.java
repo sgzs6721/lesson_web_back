@@ -20,7 +20,7 @@ import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row16;
+import org.jooq.Row14;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -93,16 +93,6 @@ public class EduCourse extends TableImpl<EduCourseRecord> {
     public final TableField<EduCourseRecord, BigDecimal> PRICE = createField(DSL.name("price"), SQLDataType.DECIMAL(10, 2).nullable(false).defaultValue(DSL.inline("0.00", SQLDataType.DECIMAL)), this, "课程单价(元)");
 
     /**
-     * The column <code>lesson.edu_course.coach_id</code>. 上课教练ID
-     */
-    public final TableField<EduCourseRecord, Long> COACH_ID = createField(DSL.name("coach_id"), SQLDataType.BIGINT.nullable(false), this, "上课教练ID");
-
-    /**
-     * The column <code>lesson.edu_course.coach_name</code>. 教练姓名
-     */
-    public final TableField<EduCourseRecord, String> COACH_NAME = createField(DSL.name("coach_name"), SQLDataType.VARCHAR(50).nullable(false), this, "教练姓名");
-
-    /**
      * The column <code>lesson.edu_course.description</code>. 课程描述
      */
     public final TableField<EduCourseRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB, this, "课程描述");
@@ -172,7 +162,7 @@ public class EduCourse extends TableImpl<EduCourseRecord> {
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.EDU_COURSE_IDX_CAMPUS_ID, Indexes.EDU_COURSE_IDX_COACH_ID, Indexes.EDU_COURSE_IDX_INSTITUTION_ID, Indexes.EDU_COURSE_IDX_NAME, Indexes.EDU_COURSE_IDX_STATUS, Indexes.EDU_COURSE_IDX_TYPE_ID);
+        return Arrays.<Index>asList(Indexes.EDU_COURSE_IDX_CAMPUS_ID, Indexes.EDU_COURSE_IDX_INSTITUTION_ID, Indexes.EDU_COURSE_IDX_NAME, Indexes.EDU_COURSE_IDX_STATUS, Indexes.EDU_COURSE_IDX_TYPE_ID);
     }
 
     @Override
@@ -187,7 +177,7 @@ public class EduCourse extends TableImpl<EduCourseRecord> {
 
     @Override
     public List<UniqueKey<EduCourseRecord>> getKeys() {
-        return Arrays.<UniqueKey<EduCourseRecord>>asList(Keys.KEY_EDU_COURSE_PRIMARY);
+        return Arrays.<UniqueKey<EduCourseRecord>>asList(Keys.KEY_EDU_COURSE_PRIMARY, Keys.KEY_EDU_COURSE_IDX_UNIQUE_NAME_CAMPUS_INSTITUTION);
     }
 
     @Override
@@ -217,11 +207,11 @@ public class EduCourse extends TableImpl<EduCourseRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row16 type methods
+    // Row14 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row16<Long, String, Long, String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, Long, String, String, Long, Long, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
-        return (Row16) super.fieldsRow();
+    public Row14<Long, String, Long, String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, String, Long, Long, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
+        return (Row14) super.fieldsRow();
     }
 }

@@ -351,10 +351,21 @@ public class CoachServiceImpl implements CoachService {
 
 
     @Override
-    public List<CoachSimpleVO> listSimpleCoaches() {
+    public List<CoachSimpleVO> listSimpleCoaches(Long campusId) {
         try {
-            // 查询所有教练的简单信息
-            List<CoachDetailRecord> records = coachModel.listAllCoaches();
+            // 查询指定校区的教练简单信息
+            List<CoachDetailRecord> records = coachModel.listCoaches(
+                null,  // keyword
+                null,  // status
+                null,  // jobTitle
+                campusId,
+                null,  // institutionId
+                null,  // sortField
+                null,  // sortOrder
+                1,     // page
+                Integer.MAX_VALUE  // size
+            );
+            
             return records.stream()
                     .map(record -> {
                         CoachSimpleVO vo = new CoachSimpleVO();

@@ -2,9 +2,13 @@ package com.lesson.service.impl;
 
 import com.lesson.common.exception.BusinessException;
 import com.lesson.enums.CourseStatus;
+import com.lesson.enums.CourseType;
 import com.lesson.model.EduCourseModel;
 import com.lesson.model.SysCoachModel;
+import com.lesson.model.SysConstantModel;
+import com.lesson.model.record.CoachDetailRecord;
 import com.lesson.model.record.CourseDetailRecord;
+import com.lesson.repository.tables.records.SysConstantRecord;
 import com.lesson.service.CourseService;
 import com.lesson.service.CoachService;
 import com.lesson.vo.CourseVO;
@@ -20,18 +24,17 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class CourseServiceImpl implements CourseService {
+    private HttpServletRequest httpServletRequest;
     private final EduCourseModel courseModel;
-    private final HttpServletRequest httpServletRequest;
-    private final CoachService coachService;
-    @Autowired
-    private final SysCoachModel coachModel;  // 添加依赖注入
+    private final SysConstantModel constantModel;
+    private final SysCoachModel sysCoachModel;
 
     @Override
     @Transactional
@@ -50,14 +53,14 @@ public class CourseServiceImpl implements CourseService {
 
             // 验证教练是否存在且属于当前机构
             for (Long coachId : request.getCoachIds()) {
-                coachModel.validateCoach(coachId, request.getCampusId(), institutionId);
+                sysCoachModel.validateCoach(coachId, request.getCampusId(), institutionId);
             }
 
             // 创建课程基本信息
             Long courseId = courseModel.createCourse(
                 request.getName(),
                 request.getTypeId(),
-                CourseStatus.DRAFT,
+                CourseStatus.PUBLISHED,
                 request.getUnitHours(),
                 request.getTotalHours(),
                 request.getPrice(),
@@ -102,7 +105,7 @@ public class CourseServiceImpl implements CourseService {
             // 验证教练是否存在且属于当前机构
             Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
             for (Long coachId : request.getCoachIds()) {
-                coachModel.validateCoach(coachId, request.getCampusId(), institutionId);
+                sysCoachModel.validateCoach(coachId, request.getCampusId(), institutionId);
             }
 
             // 更新课程基本信息
@@ -159,6 +162,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public List<CourseVO> listCourses(CourseQueryRequest request) {
+        // 获取课程基本信息列表
         List<CourseDetailRecord> records = courseModel.listCourses(
             request.getKeyword(),
             request.getTypeId(),
@@ -171,9 +175,64 @@ public class CourseServiceImpl implements CourseService {
             request.getPageNum(),
             request.getPageSize()
         );
+
+        // 获取所有课程类型常量
+        List<SysConstantRecord> courseTypes = constantModel.listByType("COURSE_TYPE");
+        Map<Long, String> courseTypeMap = courseTypes.stream()
+            .collect(Collectors.toMap(
+                SysConstantRecord::getId,
+                SysConstantRecord::getConstantValue
+            ));
+
+        // 批量获取课程教练信息
+        Map<Long, List<CoachDetailRecord>> courseCoachMap = new HashMap<>();
+        List<Long> courseIds = records.stream()
+            .map(CourseDetailRecord::getId)
+            .collect(Collectors.toList());
+        if (!courseIds.isEmpty()) {
+            courseIds.forEach(courseId -> {
+                List<CoachDetailRecord> coaches = sysCoachModel.getCoachesByCourseId(courseId);
+                courseCoachMap.put(courseId, coaches);
+            });
+        }
+
+        // 转换为VO
         return records.stream()
-                     .map(this::convertToVO)
-                     .collect(Collectors.toList());
+            .map(record -> {
+                CourseVO vo = new CourseVO();
+                // 复制基本信息
+                BeanUtils.copyProperties(record, vo);
+                
+                // 设置课程ID
+                vo.setId(String.valueOf(record.getId()));
+                
+                // 设置课程类型
+                if (record.getTypeId() != null) {
+                    String typeValue = courseTypeMap.get(record.getTypeId());
+                    if (typeValue != null) {
+                        vo.setType(CourseType.valueOf(typeValue));
+                    }
+                }
+                
+                // 设置教练信息
+                List<CoachDetailRecord> coaches = courseCoachMap.get(record.getId());
+                if (coaches != null && !coaches.isEmpty()) {
+                    List<CourseVO.CoachInfo> coachInfos = coaches.stream()
+                        .map(coach -> {
+                            CourseVO.CoachInfo coachInfo = new CourseVO.CoachInfo();
+                            coachInfo.setId(coach.getId());
+                            coachInfo.setName(coach.getName());
+                            return coachInfo;
+                        })
+                        .collect(Collectors.toList());
+                    vo.setCoaches(coachInfos);
+                } else {
+                    vo.setCoaches(new ArrayList<>());
+                }
+                
+                return vo;
+            })
+            .collect(Collectors.toList());
     }
 
     @Override

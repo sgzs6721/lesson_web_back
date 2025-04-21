@@ -61,6 +61,7 @@ public class Keys {
     // UNIQUE and PRIMARY KEY definitions
     // -------------------------------------------------------------------------
 
+    public static final UniqueKey<EduCourseRecord> KEY_EDU_COURSE_IDX_UNIQUE_NAME_CAMPUS_INSTITUTION = Internal.createUniqueKey(EduCourse.EDU_COURSE, DSL.name("KEY_edu_course_idx_unique_name_campus_institution"), new TableField[] { EduCourse.EDU_COURSE.NAME, EduCourse.EDU_COURSE.CAMPUS_ID, EduCourse.EDU_COURSE.INSTITUTION_ID, EduCourse.EDU_COURSE.DELETED }, true);
     public static final UniqueKey<EduCourseRecord> KEY_EDU_COURSE_PRIMARY = Internal.createUniqueKey(EduCourse.EDU_COURSE, DSL.name("KEY_edu_course_PRIMARY"), new TableField[] { EduCourse.EDU_COURSE.ID }, true);
     public static final UniqueKey<EduCourseRecordRecord> KEY_EDU_COURSE_RECORD_PRIMARY = Internal.createUniqueKey(com.lesson.repository.tables.EduCourseRecord.EDU_COURSE_RECORD, DSL.name("KEY_edu_course_record_PRIMARY"), new TableField[] { com.lesson.repository.tables.EduCourseRecord.EDU_COURSE_RECORD.ID }, true);
     public static final UniqueKey<EduStudentRecord> KEY_EDU_STUDENT_PRIMARY = Internal.createUniqueKey(EduStudent.EDU_STUDENT, DSL.name("KEY_edu_student_PRIMARY"), new TableField[] { EduStudent.EDU_STUDENT.ID }, true);

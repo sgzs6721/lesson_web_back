@@ -138,17 +138,19 @@ public class CoachController {
     /**
      * 获取教练简单列表
      *
+     * @param campusId 校区ID
      * @return 教练简单信息列表
      */
     @GetMapping("/simple/list")
     @Operation(summary = "获取教练简单列表",
-               description = "获取所有教练的ID和名称列表",
+               description = "获取指定校区下所有教练的ID和名称列表",
                responses = {
                    @ApiResponse(responseCode = "200", description = "获取成功",
                                content = @Content(schema = @Schema(implementation = CoachSimpleVO.class)))
                })
-    public Result<List<CoachSimpleVO>> listSimple() {
-        return Result.success(coachService.listSimpleCoaches());
+    public Result<List<CoachSimpleVO>> listSimple(
+            @Parameter(description = "校区ID", required = true) @RequestParam Long campusId) {
+        return Result.success(coachService.listSimpleCoaches(campusId));
     }
 
     /**

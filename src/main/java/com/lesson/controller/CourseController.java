@@ -2,13 +2,12 @@ package com.lesson.controller;
 
 import com.lesson.common.PageResult;
 import com.lesson.common.Result;
-import com.lesson.enums.CourseStatus;
 import com.lesson.service.CourseService;
 import com.lesson.vo.CourseVO;
 import com.lesson.vo.request.CourseCreateRequest;
 import com.lesson.vo.request.CourseQueryRequest;
-import com.lesson.vo.request.CourseUpdateRequest;
 import com.lesson.vo.request.CourseStatusRequest;
+import com.lesson.vo.request.CourseUpdateRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

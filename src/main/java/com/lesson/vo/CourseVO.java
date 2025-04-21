@@ -2,10 +2,12 @@ package com.lesson.vo;
 
 import com.lesson.enums.CourseStatus;
 import com.lesson.enums.CourseType;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class CourseVO {
@@ -50,34 +52,16 @@ public class CourseVO {
     private BigDecimal price;
 
     /**
-     * 教练ID
-     */
-    private String coachId;
-
-    /**
-     * 教练姓名
-     */
-    private String coachName;
-
-    /**
      * 校区ID
      */
     private Long campusId;
 
-    /**
-     * 校区名称
-     */
-    private String campusName;
 
     /**
      * 机构ID
      */
     private Long institutionId;
 
-    /**
-     * 机构名称
-     */
-    private String institutionName;
 
     /**
      * 课程描述
@@ -93,4 +77,20 @@ public class CourseVO {
      * 更新时间
      */
     private LocalDateTime updateTime;
-} 
+
+    /**
+     * 教练信息
+     */
+    @Schema(description = "教练信息")
+    private List<CoachInfo> coaches;
+
+    @Data
+    @Schema(description = "教练简单信息")
+    public static class CoachInfo {
+        @Schema(description = "教练ID")
+        private Long id;
+        
+        @Schema(description = "教练姓名")
+        private String name;
+    }
+}

@@ -65,11 +65,12 @@ public interface CoachService {
     void updateStatus(Long id, CoachStatus status);
 
     /**
-     * 获取教练简单信息列表
+     * 获取教练简单列表
      *
+     * @param campusId 校区ID
      * @return 教练简单信息列表
      */
-    List<CoachSimpleVO> listSimpleCoaches();
+    List<CoachSimpleVO> listSimpleCoaches(Long campusId);
     
     /**
      * 获取教练关联的课程
