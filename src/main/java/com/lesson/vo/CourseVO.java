@@ -24,7 +24,7 @@ public class CourseVO {
     /**
      * 课程类型
      */
-    private CourseType type;
+    private String type;
 
     /**
      * 课程状态

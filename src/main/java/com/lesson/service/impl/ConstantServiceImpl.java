@@ -1,6 +1,6 @@
 package com.lesson.service.impl;
 
-import com.lesson.enums.ConstantType;
+import com.lesson.common.enums.ConstantType;
 import com.lesson.model.SysConstantModel;
 import com.lesson.service.ConstantService;
 import com.lesson.vo.constant.ConstantVO;

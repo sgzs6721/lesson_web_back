@@ -1,6 +1,6 @@
 package com.lesson.service;
 
-import com.lesson.enums.ConstantType;
+import com.lesson.common.enums.ConstantType;
 import com.lesson.vo.constant.ConstantVO;
 
 import java.util.List;

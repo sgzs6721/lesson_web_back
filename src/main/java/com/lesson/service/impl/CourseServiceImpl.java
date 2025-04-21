@@ -1,6 +1,7 @@
 package com.lesson.service.impl;
 
 import com.lesson.common.exception.BusinessException;
+import com.lesson.common.enums.ConstantType;
 import com.lesson.enums.CourseStatus;
 import com.lesson.enums.CourseType;
 import com.lesson.model.EduCourseModel;
@@ -10,7 +11,6 @@ import com.lesson.model.record.CoachDetailRecord;
 import com.lesson.model.record.CourseDetailRecord;
 import com.lesson.repository.tables.records.SysConstantRecord;
 import com.lesson.service.CourseService;
-import com.lesson.service.CoachService;
 import com.lesson.vo.CourseVO;
 import com.lesson.vo.request.CourseCreateRequest;
 import com.lesson.vo.request.CourseQueryRequest;
@@ -18,7 +18,6 @@ import com.lesson.vo.request.CourseUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -31,7 +30,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class CourseServiceImpl implements CourseService {
-    private HttpServletRequest httpServletRequest;
+    private final HttpServletRequest httpServletRequest; // 注入HttpServletRequest
     private final EduCourseModel courseModel;
     private final SysConstantModel constantModel;
     private final SysCoachModel sysCoachModel;
@@ -177,7 +176,7 @@ public class CourseServiceImpl implements CourseService {
         );
 
         // 获取所有课程类型常量
-        List<SysConstantRecord> courseTypes = constantModel.listByType("COURSE_TYPE");
+        List<SysConstantRecord> courseTypes = constantModel.listByType(ConstantType.COURSE_TYPE.getName());
         Map<Long, String> courseTypeMap = courseTypes.stream()
             .collect(Collectors.toMap(
                 SysConstantRecord::getId,
@@ -210,7 +209,7 @@ public class CourseServiceImpl implements CourseService {
                 if (record.getTypeId() != null) {
                     String typeValue = courseTypeMap.get(record.getTypeId());
                     if (typeValue != null) {
-                        vo.setType(CourseType.valueOf(typeValue));
+                        vo.setType(typeValue);
                     }
                 }
                 

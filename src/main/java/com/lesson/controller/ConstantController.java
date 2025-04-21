@@ -1,7 +1,7 @@
 package com.lesson.controller;
 
 import com.lesson.common.Result;
-import com.lesson.enums.ConstantType;
+import com.lesson.common.enums.ConstantType;
 import com.lesson.service.ConstantService;
 import com.lesson.vo.constant.ConstantVO;
 import io.swagger.v3.oas.annotations.Operation;
