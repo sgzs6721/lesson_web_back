@@ -209,7 +209,6 @@ public class CourseServiceImpl implements CourseService {
             request.getKeyword(),
             request.getTypeId(),
             request.getStatus(),
-            request.getCoachId(),
             request.getCampusId(),
             request.getInstitutionId(),
             request.getSortField(),

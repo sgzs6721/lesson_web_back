@@ -96,7 +96,7 @@ public class EduCourseModel {
   }
 
   public List<CourseDetailRecord> listCourses(String keyword, Long typeId, CourseStatus status,
-                                              Long coachId, Long campusId, Long institutionId,
+                                              Long campusId, Long institutionId,
                                               String sortField, String sortOrder,
                                               int pageNum, int pageSize) {
     SelectConditionStep<Record> query = dsl.select()
