@@ -15,10 +15,11 @@ import java.util.List;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row13;
+import org.jooq.Row11;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -51,9 +52,9 @@ public class EduStudent extends TableImpl<EduStudentRecord> {
     }
 
     /**
-     * The column <code>lesson.edu_student.id</code>. 学员ID
+     * The column <code>lesson.edu_student.id</code>. 记录ID
      */
-    public final TableField<EduStudentRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false), this, "学员ID");
+    public final TableField<EduStudentRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "记录ID");
 
     /**
      * The column <code>lesson.edu_student.name</code>. 学员姓名
@@ -81,19 +82,9 @@ public class EduStudent extends TableImpl<EduStudentRecord> {
     public final TableField<EduStudentRecord, Long> CAMPUS_ID = createField(DSL.name("campus_id"), SQLDataType.BIGINT.nullable(false), this, "校区ID");
 
     /**
-     * The column <code>lesson.edu_student.campus_name</code>. 校区名称
-     */
-    public final TableField<EduStudentRecord, String> CAMPUS_NAME = createField(DSL.name("campus_name"), SQLDataType.VARCHAR(100).nullable(false), this, "校区名称");
-
-    /**
      * The column <code>lesson.edu_student.institution_id</code>. 机构ID
      */
     public final TableField<EduStudentRecord, Long> INSTITUTION_ID = createField(DSL.name("institution_id"), SQLDataType.BIGINT.nullable(false), this, "机构ID");
-
-    /**
-     * The column <code>lesson.edu_student.institution_name</code>. 机构名称
-     */
-    public final TableField<EduStudentRecord, String> INSTITUTION_NAME = createField(DSL.name("institution_name"), SQLDataType.VARCHAR(100).nullable(false), this, "机构名称");
 
     /**
      * The column <code>lesson.edu_student.status</code>. 状态：STUDYING-在学，SUSPENDED-停课，GRADUATED-结业
@@ -159,6 +150,11 @@ public class EduStudent extends TableImpl<EduStudentRecord> {
     }
 
     @Override
+    public Identity<EduStudentRecord, Long> getIdentity() {
+        return (Identity<EduStudentRecord, Long>) super.getIdentity();
+    }
+
+    @Override
     public UniqueKey<EduStudentRecord> getPrimaryKey() {
         return Keys.KEY_EDU_STUDENT_PRIMARY;
     }
@@ -195,11 +191,11 @@ public class EduStudent extends TableImpl<EduStudentRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row13 type methods
+    // Row11 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row13<Long, String, String, Integer, String, Long, String, Long, String, String, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
-        return (Row13) super.fieldsRow();
+    public Row11<Long, String, String, Integer, String, Long, Long, String, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
+        return (Row11) super.fieldsRow();
     }
 }

@@ -21,7 +21,7 @@ import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row17;
+import org.jooq.Row13;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -69,19 +69,9 @@ public class EduStudentCourseTransfer extends TableImpl<EduStudentCourseTransfer
     public final TableField<EduStudentCourseTransferRecord, Long> ORIGINAL_COURSE_ID = createField(DSL.name("original_course_id"), SQLDataType.BIGINT.nullable(false), this, "原课程ID");
 
     /**
-     * The column <code>lesson.edu_student_course_transfer.original_course_name</code>. 原课程名称
-     */
-    public final TableField<EduStudentCourseTransferRecord, String> ORIGINAL_COURSE_NAME = createField(DSL.name("original_course_name"), SQLDataType.VARCHAR(100).nullable(false), this, "原课程名称");
-
-    /**
      * The column <code>lesson.edu_student_course_transfer.target_course_id</code>. 目标课程ID
      */
     public final TableField<EduStudentCourseTransferRecord, Long> TARGET_COURSE_ID = createField(DSL.name("target_course_id"), SQLDataType.BIGINT.nullable(false), this, "目标课程ID");
-
-    /**
-     * The column <code>lesson.edu_student_course_transfer.target_course_name</code>. 目标课程名称
-     */
-    public final TableField<EduStudentCourseTransferRecord, String> TARGET_COURSE_NAME = createField(DSL.name("target_course_name"), SQLDataType.VARCHAR(100).nullable(false), this, "目标课程名称");
 
     /**
      * The column <code>lesson.edu_student_course_transfer.transfer_hours</code>. 转课课时
@@ -109,19 +99,9 @@ public class EduStudentCourseTransfer extends TableImpl<EduStudentCourseTransfer
     public final TableField<EduStudentCourseTransferRecord, Long> CAMPUS_ID = createField(DSL.name("campus_id"), SQLDataType.BIGINT.nullable(false), this, "校区ID");
 
     /**
-     * The column <code>lesson.edu_student_course_transfer.campus_name</code>. 校区名称
-     */
-    public final TableField<EduStudentCourseTransferRecord, String> CAMPUS_NAME = createField(DSL.name("campus_name"), SQLDataType.VARCHAR(100).nullable(false), this, "校区名称");
-
-    /**
      * The column <code>lesson.edu_student_course_transfer.institution_id</code>. 机构ID
      */
     public final TableField<EduStudentCourseTransferRecord, Long> INSTITUTION_ID = createField(DSL.name("institution_id"), SQLDataType.BIGINT.nullable(false), this, "机构ID");
-
-    /**
-     * The column <code>lesson.edu_student_course_transfer.institution_name</code>. 机构名称
-     */
-    public final TableField<EduStudentCourseTransferRecord, String> INSTITUTION_NAME = createField(DSL.name("institution_name"), SQLDataType.VARCHAR(100).nullable(false), this, "机构名称");
 
     /**
      * The column <code>lesson.edu_student_course_transfer.created_time</code>. 创建时间
@@ -223,11 +203,11 @@ public class EduStudentCourseTransfer extends TableImpl<EduStudentCourseTransfer
     }
 
     // -------------------------------------------------------------------------
-    // Row17 type methods
+    // Row13 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row17<Long, String, Long, String, Long, String, BigDecimal, BigDecimal, LocalDate, String, Long, String, Long, String, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
-        return (Row17) super.fieldsRow();
+    public Row13<Long, String, Long, Long, BigDecimal, BigDecimal, LocalDate, String, Long, Long, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
+        return (Row13) super.fieldsRow();
     }
 }

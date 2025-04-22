@@ -10,7 +10,6 @@ import com.lesson.repository.tables.EduStudent;
 import com.lesson.repository.tables.EduStudentClassTransfer;
 import com.lesson.repository.tables.EduStudentCourse;
 import com.lesson.repository.tables.EduStudentCourseOperation;
-import com.lesson.repository.tables.EduStudentCourseOperationRecord;
 import com.lesson.repository.tables.EduStudentCourseRecord;
 import com.lesson.repository.tables.EduStudentCourseTransfer;
 import com.lesson.repository.tables.EduStudentPayment;
@@ -62,11 +61,6 @@ public class Tables {
      * 学员课程操作记录表
      */
     public static final EduStudentCourseOperation EDU_STUDENT_COURSE_OPERATION = EduStudentCourseOperation.EDU_STUDENT_COURSE_OPERATION;
-
-    /**
-     * 学生课程操作记录表
-     */
-    public static final EduStudentCourseOperationRecord EDU_STUDENT_COURSE_OPERATION_RECORD = EduStudentCourseOperationRecord.EDU_STUDENT_COURSE_OPERATION_RECORD;
 
     /**
      * 学员课程记录表

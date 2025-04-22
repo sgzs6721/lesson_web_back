@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 
 import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record17;
-import org.jooq.Row17;
+import org.jooq.Record14;
+import org.jooq.Row14;
 import org.jooq.impl.UpdatableRecordImpl;
 
 
@@ -20,7 +20,7 @@ import org.jooq.impl.UpdatableRecordImpl;
  * 学员退费记录表
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class EduStudentRefundRecord extends UpdatableRecordImpl<EduStudentRefundRecord> implements Record17<Long, String, String, String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, String, Long, String, Long, String, LocalDateTime, LocalDateTime, Integer> {
+public class EduStudentRefundRecord extends UpdatableRecordImpl<EduStudentRefundRecord> implements Record14<Long, String, String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, String, Long, Long, LocalDateTime, LocalDateTime, Integer> {
 
     private static final long serialVersionUID = 1L;
 
@@ -67,199 +67,157 @@ public class EduStudentRefundRecord extends UpdatableRecordImpl<EduStudentRefund
     }
 
     /**
-     * Setter for <code>lesson.edu_student_refund.course_name</code>. 课程名称
-     */
-    public void setCourseName(String value) {
-        set(3, value);
-    }
-
-    /**
-     * Getter for <code>lesson.edu_student_refund.course_name</code>. 课程名称
-     */
-    public String getCourseName() {
-        return (String) get(3);
-    }
-
-    /**
      * Setter for <code>lesson.edu_student_refund.refund_hours</code>. 退课课时
      */
     public void setRefundHours(BigDecimal value) {
-        set(4, value);
+        set(3, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_refund.refund_hours</code>. 退课课时
      */
     public BigDecimal getRefundHours() {
-        return (BigDecimal) get(4);
+        return (BigDecimal) get(3);
     }
 
     /**
      * Setter for <code>lesson.edu_student_refund.refund_amount</code>. 退款金额
      */
     public void setRefundAmount(BigDecimal value) {
-        set(5, value);
+        set(4, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_refund.refund_amount</code>. 退款金额
      */
     public BigDecimal getRefundAmount() {
-        return (BigDecimal) get(5);
+        return (BigDecimal) get(4);
     }
 
     /**
      * Setter for <code>lesson.edu_student_refund.handling_fee</code>. 手续费
      */
     public void setHandlingFee(BigDecimal value) {
-        set(6, value);
+        set(5, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_refund.handling_fee</code>. 手续费
      */
     public BigDecimal getHandlingFee() {
-        return (BigDecimal) get(6);
+        return (BigDecimal) get(5);
     }
 
     /**
      * Setter for <code>lesson.edu_student_refund.deduction_amount</code>. 其他费用扣除
      */
     public void setDeductionAmount(BigDecimal value) {
-        set(7, value);
+        set(6, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_refund.deduction_amount</code>. 其他费用扣除
      */
     public BigDecimal getDeductionAmount() {
-        return (BigDecimal) get(7);
+        return (BigDecimal) get(6);
     }
 
     /**
      * Setter for <code>lesson.edu_student_refund.actual_refund</code>. 实际退款金额
      */
     public void setActualRefund(BigDecimal value) {
-        set(8, value);
+        set(7, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_refund.actual_refund</code>. 实际退款金额
      */
     public BigDecimal getActualRefund() {
-        return (BigDecimal) get(8);
+        return (BigDecimal) get(7);
     }
 
     /**
      * Setter for <code>lesson.edu_student_refund.reason</code>. 退费原因
      */
     public void setReason(String value) {
-        set(9, value);
+        set(8, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_refund.reason</code>. 退费原因
      */
     public String getReason() {
-        return (String) get(9);
+        return (String) get(8);
     }
 
     /**
      * Setter for <code>lesson.edu_student_refund.campus_id</code>. 校区ID
      */
     public void setCampusId(Long value) {
-        set(10, value);
+        set(9, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_refund.campus_id</code>. 校区ID
      */
     public Long getCampusId() {
-        return (Long) get(10);
-    }
-
-    /**
-     * Setter for <code>lesson.edu_student_refund.campus_name</code>. 校区名称
-     */
-    public void setCampusName(String value) {
-        set(11, value);
-    }
-
-    /**
-     * Getter for <code>lesson.edu_student_refund.campus_name</code>. 校区名称
-     */
-    public String getCampusName() {
-        return (String) get(11);
+        return (Long) get(9);
     }
 
     /**
      * Setter for <code>lesson.edu_student_refund.institution_id</code>. 机构ID
      */
     public void setInstitutionId(Long value) {
-        set(12, value);
+        set(10, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_refund.institution_id</code>. 机构ID
      */
     public Long getInstitutionId() {
-        return (Long) get(12);
-    }
-
-    /**
-     * Setter for <code>lesson.edu_student_refund.institution_name</code>. 机构名称
-     */
-    public void setInstitutionName(String value) {
-        set(13, value);
-    }
-
-    /**
-     * Getter for <code>lesson.edu_student_refund.institution_name</code>. 机构名称
-     */
-    public String getInstitutionName() {
-        return (String) get(13);
+        return (Long) get(10);
     }
 
     /**
      * Setter for <code>lesson.edu_student_refund.created_time</code>. 创建时间
      */
     public void setCreatedTime(LocalDateTime value) {
-        set(14, value);
+        set(11, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_refund.created_time</code>. 创建时间
      */
     public LocalDateTime getCreatedTime() {
-        return (LocalDateTime) get(14);
+        return (LocalDateTime) get(11);
     }
 
     /**
      * Setter for <code>lesson.edu_student_refund.update_time</code>. 更新时间
      */
     public void setUpdateTime(LocalDateTime value) {
-        set(15, value);
+        set(12, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_refund.update_time</code>. 更新时间
      */
     public LocalDateTime getUpdateTime() {
-        return (LocalDateTime) get(15);
+        return (LocalDateTime) get(12);
     }
 
     /**
      * Setter for <code>lesson.edu_student_refund.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public void setDeleted(Integer value) {
-        set(16, value);
+        set(13, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_refund.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public Integer getDeleted() {
-        return (Integer) get(16);
+        return (Integer) get(13);
     }
 
     // -------------------------------------------------------------------------
@@ -272,17 +230,17 @@ public class EduStudentRefundRecord extends UpdatableRecordImpl<EduStudentRefund
     }
 
     // -------------------------------------------------------------------------
-    // Record17 type implementation
+    // Record14 type implementation
     // -------------------------------------------------------------------------
 
     @Override
-    public Row17<Long, String, String, String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, String, Long, String, Long, String, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
-        return (Row17) super.fieldsRow();
+    public Row14<Long, String, String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, String, Long, Long, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
+        return (Row14) super.fieldsRow();
     }
 
     @Override
-    public Row17<Long, String, String, String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, String, Long, String, Long, String, LocalDateTime, LocalDateTime, Integer> valuesRow() {
-        return (Row17) super.valuesRow();
+    public Row14<Long, String, String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, String, Long, Long, LocalDateTime, LocalDateTime, Integer> valuesRow() {
+        return (Row14) super.valuesRow();
     }
 
     @Override
@@ -301,72 +259,57 @@ public class EduStudentRefundRecord extends UpdatableRecordImpl<EduStudentRefund
     }
 
     @Override
-    public Field<String> field4() {
-        return EduStudentRefund.EDU_STUDENT_REFUND.COURSE_NAME;
-    }
-
-    @Override
-    public Field<BigDecimal> field5() {
+    public Field<BigDecimal> field4() {
         return EduStudentRefund.EDU_STUDENT_REFUND.REFUND_HOURS;
     }
 
     @Override
-    public Field<BigDecimal> field6() {
+    public Field<BigDecimal> field5() {
         return EduStudentRefund.EDU_STUDENT_REFUND.REFUND_AMOUNT;
     }
 
     @Override
-    public Field<BigDecimal> field7() {
+    public Field<BigDecimal> field6() {
         return EduStudentRefund.EDU_STUDENT_REFUND.HANDLING_FEE;
     }
 
     @Override
-    public Field<BigDecimal> field8() {
+    public Field<BigDecimal> field7() {
         return EduStudentRefund.EDU_STUDENT_REFUND.DEDUCTION_AMOUNT;
     }
 
     @Override
-    public Field<BigDecimal> field9() {
+    public Field<BigDecimal> field8() {
         return EduStudentRefund.EDU_STUDENT_REFUND.ACTUAL_REFUND;
     }
 
     @Override
-    public Field<String> field10() {
+    public Field<String> field9() {
         return EduStudentRefund.EDU_STUDENT_REFUND.REASON;
     }
 
     @Override
-    public Field<Long> field11() {
+    public Field<Long> field10() {
         return EduStudentRefund.EDU_STUDENT_REFUND.CAMPUS_ID;
     }
 
     @Override
-    public Field<String> field12() {
-        return EduStudentRefund.EDU_STUDENT_REFUND.CAMPUS_NAME;
-    }
-
-    @Override
-    public Field<Long> field13() {
+    public Field<Long> field11() {
         return EduStudentRefund.EDU_STUDENT_REFUND.INSTITUTION_ID;
     }
 
     @Override
-    public Field<String> field14() {
-        return EduStudentRefund.EDU_STUDENT_REFUND.INSTITUTION_NAME;
-    }
-
-    @Override
-    public Field<LocalDateTime> field15() {
+    public Field<LocalDateTime> field12() {
         return EduStudentRefund.EDU_STUDENT_REFUND.CREATED_TIME;
     }
 
     @Override
-    public Field<LocalDateTime> field16() {
+    public Field<LocalDateTime> field13() {
         return EduStudentRefund.EDU_STUDENT_REFUND.UPDATE_TIME;
     }
 
     @Override
-    public Field<Integer> field17() {
+    public Field<Integer> field14() {
         return EduStudentRefund.EDU_STUDENT_REFUND.DELETED;
     }
 
@@ -386,72 +329,57 @@ public class EduStudentRefundRecord extends UpdatableRecordImpl<EduStudentRefund
     }
 
     @Override
-    public String component4() {
-        return getCourseName();
-    }
-
-    @Override
-    public BigDecimal component5() {
+    public BigDecimal component4() {
         return getRefundHours();
     }
 
     @Override
-    public BigDecimal component6() {
+    public BigDecimal component5() {
         return getRefundAmount();
     }
 
     @Override
-    public BigDecimal component7() {
+    public BigDecimal component6() {
         return getHandlingFee();
     }
 
     @Override
-    public BigDecimal component8() {
+    public BigDecimal component7() {
         return getDeductionAmount();
     }
 
     @Override
-    public BigDecimal component9() {
+    public BigDecimal component8() {
         return getActualRefund();
     }
 
     @Override
-    public String component10() {
+    public String component9() {
         return getReason();
     }
 
     @Override
-    public Long component11() {
+    public Long component10() {
         return getCampusId();
     }
 
     @Override
-    public String component12() {
-        return getCampusName();
-    }
-
-    @Override
-    public Long component13() {
+    public Long component11() {
         return getInstitutionId();
     }
 
     @Override
-    public String component14() {
-        return getInstitutionName();
-    }
-
-    @Override
-    public LocalDateTime component15() {
+    public LocalDateTime component12() {
         return getCreatedTime();
     }
 
     @Override
-    public LocalDateTime component16() {
+    public LocalDateTime component13() {
         return getUpdateTime();
     }
 
     @Override
-    public Integer component17() {
+    public Integer component14() {
         return getDeleted();
     }
 
@@ -471,72 +399,57 @@ public class EduStudentRefundRecord extends UpdatableRecordImpl<EduStudentRefund
     }
 
     @Override
-    public String value4() {
-        return getCourseName();
-    }
-
-    @Override
-    public BigDecimal value5() {
+    public BigDecimal value4() {
         return getRefundHours();
     }
 
     @Override
-    public BigDecimal value6() {
+    public BigDecimal value5() {
         return getRefundAmount();
     }
 
     @Override
-    public BigDecimal value7() {
+    public BigDecimal value6() {
         return getHandlingFee();
     }
 
     @Override
-    public BigDecimal value8() {
+    public BigDecimal value7() {
         return getDeductionAmount();
     }
 
     @Override
-    public BigDecimal value9() {
+    public BigDecimal value8() {
         return getActualRefund();
     }
 
     @Override
-    public String value10() {
+    public String value9() {
         return getReason();
     }
 
     @Override
-    public Long value11() {
+    public Long value10() {
         return getCampusId();
     }
 
     @Override
-    public String value12() {
-        return getCampusName();
-    }
-
-    @Override
-    public Long value13() {
+    public Long value11() {
         return getInstitutionId();
     }
 
     @Override
-    public String value14() {
-        return getInstitutionName();
-    }
-
-    @Override
-    public LocalDateTime value15() {
+    public LocalDateTime value12() {
         return getCreatedTime();
     }
 
     @Override
-    public LocalDateTime value16() {
+    public LocalDateTime value13() {
         return getUpdateTime();
     }
 
     @Override
-    public Integer value17() {
+    public Integer value14() {
         return getDeleted();
     }
 
@@ -559,91 +472,73 @@ public class EduStudentRefundRecord extends UpdatableRecordImpl<EduStudentRefund
     }
 
     @Override
-    public EduStudentRefundRecord value4(String value) {
-        setCourseName(value);
-        return this;
-    }
-
-    @Override
-    public EduStudentRefundRecord value5(BigDecimal value) {
+    public EduStudentRefundRecord value4(BigDecimal value) {
         setRefundHours(value);
         return this;
     }
 
     @Override
-    public EduStudentRefundRecord value6(BigDecimal value) {
+    public EduStudentRefundRecord value5(BigDecimal value) {
         setRefundAmount(value);
         return this;
     }
 
     @Override
-    public EduStudentRefundRecord value7(BigDecimal value) {
+    public EduStudentRefundRecord value6(BigDecimal value) {
         setHandlingFee(value);
         return this;
     }
 
     @Override
-    public EduStudentRefundRecord value8(BigDecimal value) {
+    public EduStudentRefundRecord value7(BigDecimal value) {
         setDeductionAmount(value);
         return this;
     }
 
     @Override
-    public EduStudentRefundRecord value9(BigDecimal value) {
+    public EduStudentRefundRecord value8(BigDecimal value) {
         setActualRefund(value);
         return this;
     }
 
     @Override
-    public EduStudentRefundRecord value10(String value) {
+    public EduStudentRefundRecord value9(String value) {
         setReason(value);
         return this;
     }
 
     @Override
-    public EduStudentRefundRecord value11(Long value) {
+    public EduStudentRefundRecord value10(Long value) {
         setCampusId(value);
         return this;
     }
 
     @Override
-    public EduStudentRefundRecord value12(String value) {
-        setCampusName(value);
-        return this;
-    }
-
-    @Override
-    public EduStudentRefundRecord value13(Long value) {
+    public EduStudentRefundRecord value11(Long value) {
         setInstitutionId(value);
         return this;
     }
 
     @Override
-    public EduStudentRefundRecord value14(String value) {
-        setInstitutionName(value);
-        return this;
-    }
-
-    @Override
-    public EduStudentRefundRecord value15(LocalDateTime value) {
+    public EduStudentRefundRecord value12(LocalDateTime value) {
         setCreatedTime(value);
         return this;
     }
 
     @Override
-    public EduStudentRefundRecord value16(LocalDateTime value) {
+    public EduStudentRefundRecord value13(LocalDateTime value) {
         setUpdateTime(value);
         return this;
     }
 
     @Override
-    public EduStudentRefundRecord value17(Integer value) {
+    public EduStudentRefundRecord value14(Integer value) {
         setDeleted(value);
         return this;
     }
 
     @Override
-    public EduStudentRefundRecord values(Long value1, String value2, String value3, String value4, BigDecimal value5, BigDecimal value6, BigDecimal value7, BigDecimal value8, BigDecimal value9, String value10, Long value11, String value12, Long value13, String value14, LocalDateTime value15, LocalDateTime value16, Integer value17) {
+    public EduStudentRefundRecord values(Long value1, String value2, String value3, BigDecimal value4, BigDecimal value5, BigDecimal value6, BigDecimal value7, BigDecimal value8, String value9, Long value10, Long value11, LocalDateTime value12, LocalDateTime value13, Integer value14) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -658,9 +553,6 @@ public class EduStudentRefundRecord extends UpdatableRecordImpl<EduStudentRefund
         value12(value12);
         value13(value13);
         value14(value14);
-        value15(value15);
-        value16(value16);
-        value17(value17);
         return this;
     }
 
@@ -678,13 +570,12 @@ public class EduStudentRefundRecord extends UpdatableRecordImpl<EduStudentRefund
     /**
      * Create a detached, initialised EduStudentRefundRecord
      */
-    public EduStudentRefundRecord(Long id, String studentId, String courseId, String courseName, BigDecimal refundHours, BigDecimal refundAmount, BigDecimal handlingFee, BigDecimal deductionAmount, BigDecimal actualRefund, String reason, Long campusId, String campusName, Long institutionId, String institutionName, LocalDateTime createdTime, LocalDateTime updateTime, Integer deleted) {
+    public EduStudentRefundRecord(Long id, String studentId, String courseId, BigDecimal refundHours, BigDecimal refundAmount, BigDecimal handlingFee, BigDecimal deductionAmount, BigDecimal actualRefund, String reason, Long campusId, Long institutionId, LocalDateTime createdTime, LocalDateTime updateTime, Integer deleted) {
         super(EduStudentRefund.EDU_STUDENT_REFUND);
 
         setId(id);
         setStudentId(studentId);
         setCourseId(courseId);
-        setCourseName(courseName);
         setRefundHours(refundHours);
         setRefundAmount(refundAmount);
         setHandlingFee(handlingFee);
@@ -692,9 +583,7 @@ public class EduStudentRefundRecord extends UpdatableRecordImpl<EduStudentRefund
         setActualRefund(actualRefund);
         setReason(reason);
         setCampusId(campusId);
-        setCampusName(campusName);
         setInstitutionId(institutionId);
-        setInstitutionName(institutionName);
         setCreatedTime(createdTime);
         setUpdateTime(updateTime);
         setDeleted(deleted);

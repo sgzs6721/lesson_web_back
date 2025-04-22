@@ -232,10 +232,8 @@ public class EduStudentModel {
         detailRecord.setPhone(record.get(Tables.EDU_STUDENT.PHONE));
         detailRecord.setGender(record.get(Tables.EDU_STUDENT.GENDER));
         detailRecord.setCampusId(record.get(Tables.EDU_STUDENT.CAMPUS_ID));
-        detailRecord.setCampusName(record.get(Tables.EDU_STUDENT.CAMPUS_NAME));
         detailRecord.setInstitutionId(record.get(Tables.EDU_STUDENT.INSTITUTION_ID));
-        detailRecord.setInstitutionName(record.get(Tables.EDU_STUDENT.INSTITUTION_NAME));
-        
+
         return detailRecord;
     }
 } 

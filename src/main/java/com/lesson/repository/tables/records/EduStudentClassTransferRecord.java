@@ -10,8 +10,8 @@ import java.time.LocalDateTime;
 
 import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record14;
-import org.jooq.Row14;
+import org.jooq.Record11;
+import org.jooq.Row11;
 import org.jooq.impl.UpdatableRecordImpl;
 
 
@@ -19,7 +19,7 @@ import org.jooq.impl.UpdatableRecordImpl;
  * 学员转班记录表
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class EduStudentClassTransferRecord extends UpdatableRecordImpl<EduStudentClassTransferRecord> implements Record14<Long, String, String, String, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime, Integer> {
+public class EduStudentClassTransferRecord extends UpdatableRecordImpl<EduStudentClassTransferRecord> implements Record11<Long, String, String, String, String, String, Long, Long, LocalDateTime, LocalDateTime, Integer> {
 
     private static final long serialVersionUID = 1L;
 
@@ -66,157 +66,115 @@ public class EduStudentClassTransferRecord extends UpdatableRecordImpl<EduStuden
     }
 
     /**
-     * Setter for <code>lesson.edu_student_class_transfer.course_name</code>. 课程名称
-     */
-    public void setCourseName(String value) {
-        set(3, value);
-    }
-
-    /**
-     * Getter for <code>lesson.edu_student_class_transfer.course_name</code>. 课程名称
-     */
-    public String getCourseName() {
-        return (String) get(3);
-    }
-
-    /**
      * Setter for <code>lesson.edu_student_class_transfer.original_schedule</code>. 原上课时间
      */
     public void setOriginalSchedule(String value) {
-        set(4, value);
+        set(3, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_class_transfer.original_schedule</code>. 原上课时间
      */
     public String getOriginalSchedule() {
-        return (String) get(4);
+        return (String) get(3);
     }
 
     /**
      * Setter for <code>lesson.edu_student_class_transfer.new_schedule</code>. 新上课时间
      */
     public void setNewSchedule(String value) {
-        set(5, value);
+        set(4, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_class_transfer.new_schedule</code>. 新上课时间
      */
     public String getNewSchedule() {
-        return (String) get(5);
+        return (String) get(4);
     }
 
     /**
      * Setter for <code>lesson.edu_student_class_transfer.reason</code>. 转班原因
      */
     public void setReason(String value) {
-        set(6, value);
+        set(5, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_class_transfer.reason</code>. 转班原因
      */
     public String getReason() {
-        return (String) get(6);
+        return (String) get(5);
     }
 
     /**
      * Setter for <code>lesson.edu_student_class_transfer.campus_id</code>. 校区ID
      */
     public void setCampusId(Long value) {
-        set(7, value);
+        set(6, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_class_transfer.campus_id</code>. 校区ID
      */
     public Long getCampusId() {
-        return (Long) get(7);
-    }
-
-    /**
-     * Setter for <code>lesson.edu_student_class_transfer.campus_name</code>. 校区名称
-     */
-    public void setCampusName(String value) {
-        set(8, value);
-    }
-
-    /**
-     * Getter for <code>lesson.edu_student_class_transfer.campus_name</code>. 校区名称
-     */
-    public String getCampusName() {
-        return (String) get(8);
+        return (Long) get(6);
     }
 
     /**
      * Setter for <code>lesson.edu_student_class_transfer.institution_id</code>. 机构ID
      */
     public void setInstitutionId(Long value) {
-        set(9, value);
+        set(7, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_class_transfer.institution_id</code>. 机构ID
      */
     public Long getInstitutionId() {
-        return (Long) get(9);
-    }
-
-    /**
-     * Setter for <code>lesson.edu_student_class_transfer.institution_name</code>. 机构名称
-     */
-    public void setInstitutionName(String value) {
-        set(10, value);
-    }
-
-    /**
-     * Getter for <code>lesson.edu_student_class_transfer.institution_name</code>. 机构名称
-     */
-    public String getInstitutionName() {
-        return (String) get(10);
+        return (Long) get(7);
     }
 
     /**
      * Setter for <code>lesson.edu_student_class_transfer.created_time</code>. 创建时间
      */
     public void setCreatedTime(LocalDateTime value) {
-        set(11, value);
+        set(8, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_class_transfer.created_time</code>. 创建时间
      */
     public LocalDateTime getCreatedTime() {
-        return (LocalDateTime) get(11);
+        return (LocalDateTime) get(8);
     }
 
     /**
      * Setter for <code>lesson.edu_student_class_transfer.update_time</code>. 更新时间
      */
     public void setUpdateTime(LocalDateTime value) {
-        set(12, value);
+        set(9, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_class_transfer.update_time</code>. 更新时间
      */
     public LocalDateTime getUpdateTime() {
-        return (LocalDateTime) get(12);
+        return (LocalDateTime) get(9);
     }
 
     /**
      * Setter for <code>lesson.edu_student_class_transfer.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public void setDeleted(Integer value) {
-        set(13, value);
+        set(10, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_class_transfer.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public Integer getDeleted() {
-        return (Integer) get(13);
+        return (Integer) get(10);
     }
 
     // -------------------------------------------------------------------------
@@ -229,17 +187,17 @@ public class EduStudentClassTransferRecord extends UpdatableRecordImpl<EduStuden
     }
 
     // -------------------------------------------------------------------------
-    // Record14 type implementation
+    // Record11 type implementation
     // -------------------------------------------------------------------------
 
     @Override
-    public Row14<Long, String, String, String, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
-        return (Row14) super.fieldsRow();
+    public Row11<Long, String, String, String, String, String, Long, Long, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
+        return (Row11) super.fieldsRow();
     }
 
     @Override
-    public Row14<Long, String, String, String, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime, Integer> valuesRow() {
-        return (Row14) super.valuesRow();
+    public Row11<Long, String, String, String, String, String, Long, Long, LocalDateTime, LocalDateTime, Integer> valuesRow() {
+        return (Row11) super.valuesRow();
     }
 
     @Override
@@ -259,56 +217,41 @@ public class EduStudentClassTransferRecord extends UpdatableRecordImpl<EduStuden
 
     @Override
     public Field<String> field4() {
-        return EduStudentClassTransfer.EDU_STUDENT_CLASS_TRANSFER.COURSE_NAME;
-    }
-
-    @Override
-    public Field<String> field5() {
         return EduStudentClassTransfer.EDU_STUDENT_CLASS_TRANSFER.ORIGINAL_SCHEDULE;
     }
 
     @Override
-    public Field<String> field6() {
+    public Field<String> field5() {
         return EduStudentClassTransfer.EDU_STUDENT_CLASS_TRANSFER.NEW_SCHEDULE;
     }
 
     @Override
-    public Field<String> field7() {
+    public Field<String> field6() {
         return EduStudentClassTransfer.EDU_STUDENT_CLASS_TRANSFER.REASON;
     }
 
     @Override
-    public Field<Long> field8() {
+    public Field<Long> field7() {
         return EduStudentClassTransfer.EDU_STUDENT_CLASS_TRANSFER.CAMPUS_ID;
     }
 
     @Override
-    public Field<String> field9() {
-        return EduStudentClassTransfer.EDU_STUDENT_CLASS_TRANSFER.CAMPUS_NAME;
-    }
-
-    @Override
-    public Field<Long> field10() {
+    public Field<Long> field8() {
         return EduStudentClassTransfer.EDU_STUDENT_CLASS_TRANSFER.INSTITUTION_ID;
     }
 
     @Override
-    public Field<String> field11() {
-        return EduStudentClassTransfer.EDU_STUDENT_CLASS_TRANSFER.INSTITUTION_NAME;
-    }
-
-    @Override
-    public Field<LocalDateTime> field12() {
+    public Field<LocalDateTime> field9() {
         return EduStudentClassTransfer.EDU_STUDENT_CLASS_TRANSFER.CREATED_TIME;
     }
 
     @Override
-    public Field<LocalDateTime> field13() {
+    public Field<LocalDateTime> field10() {
         return EduStudentClassTransfer.EDU_STUDENT_CLASS_TRANSFER.UPDATE_TIME;
     }
 
     @Override
-    public Field<Integer> field14() {
+    public Field<Integer> field11() {
         return EduStudentClassTransfer.EDU_STUDENT_CLASS_TRANSFER.DELETED;
     }
 
@@ -329,56 +272,41 @@ public class EduStudentClassTransferRecord extends UpdatableRecordImpl<EduStuden
 
     @Override
     public String component4() {
-        return getCourseName();
-    }
-
-    @Override
-    public String component5() {
         return getOriginalSchedule();
     }
 
     @Override
-    public String component6() {
+    public String component5() {
         return getNewSchedule();
     }
 
     @Override
-    public String component7() {
+    public String component6() {
         return getReason();
     }
 
     @Override
-    public Long component8() {
+    public Long component7() {
         return getCampusId();
     }
 
     @Override
-    public String component9() {
-        return getCampusName();
-    }
-
-    @Override
-    public Long component10() {
+    public Long component8() {
         return getInstitutionId();
     }
 
     @Override
-    public String component11() {
-        return getInstitutionName();
-    }
-
-    @Override
-    public LocalDateTime component12() {
+    public LocalDateTime component9() {
         return getCreatedTime();
     }
 
     @Override
-    public LocalDateTime component13() {
+    public LocalDateTime component10() {
         return getUpdateTime();
     }
 
     @Override
-    public Integer component14() {
+    public Integer component11() {
         return getDeleted();
     }
 
@@ -399,56 +327,41 @@ public class EduStudentClassTransferRecord extends UpdatableRecordImpl<EduStuden
 
     @Override
     public String value4() {
-        return getCourseName();
-    }
-
-    @Override
-    public String value5() {
         return getOriginalSchedule();
     }
 
     @Override
-    public String value6() {
+    public String value5() {
         return getNewSchedule();
     }
 
     @Override
-    public String value7() {
+    public String value6() {
         return getReason();
     }
 
     @Override
-    public Long value8() {
+    public Long value7() {
         return getCampusId();
     }
 
     @Override
-    public String value9() {
-        return getCampusName();
-    }
-
-    @Override
-    public Long value10() {
+    public Long value8() {
         return getInstitutionId();
     }
 
     @Override
-    public String value11() {
-        return getInstitutionName();
-    }
-
-    @Override
-    public LocalDateTime value12() {
+    public LocalDateTime value9() {
         return getCreatedTime();
     }
 
     @Override
-    public LocalDateTime value13() {
+    public LocalDateTime value10() {
         return getUpdateTime();
     }
 
     @Override
-    public Integer value14() {
+    public Integer value11() {
         return getDeleted();
     }
 
@@ -472,72 +385,54 @@ public class EduStudentClassTransferRecord extends UpdatableRecordImpl<EduStuden
 
     @Override
     public EduStudentClassTransferRecord value4(String value) {
-        setCourseName(value);
-        return this;
-    }
-
-    @Override
-    public EduStudentClassTransferRecord value5(String value) {
         setOriginalSchedule(value);
         return this;
     }
 
     @Override
-    public EduStudentClassTransferRecord value6(String value) {
+    public EduStudentClassTransferRecord value5(String value) {
         setNewSchedule(value);
         return this;
     }
 
     @Override
-    public EduStudentClassTransferRecord value7(String value) {
+    public EduStudentClassTransferRecord value6(String value) {
         setReason(value);
         return this;
     }
 
     @Override
-    public EduStudentClassTransferRecord value8(Long value) {
+    public EduStudentClassTransferRecord value7(Long value) {
         setCampusId(value);
         return this;
     }
 
     @Override
-    public EduStudentClassTransferRecord value9(String value) {
-        setCampusName(value);
-        return this;
-    }
-
-    @Override
-    public EduStudentClassTransferRecord value10(Long value) {
+    public EduStudentClassTransferRecord value8(Long value) {
         setInstitutionId(value);
         return this;
     }
 
     @Override
-    public EduStudentClassTransferRecord value11(String value) {
-        setInstitutionName(value);
-        return this;
-    }
-
-    @Override
-    public EduStudentClassTransferRecord value12(LocalDateTime value) {
+    public EduStudentClassTransferRecord value9(LocalDateTime value) {
         setCreatedTime(value);
         return this;
     }
 
     @Override
-    public EduStudentClassTransferRecord value13(LocalDateTime value) {
+    public EduStudentClassTransferRecord value10(LocalDateTime value) {
         setUpdateTime(value);
         return this;
     }
 
     @Override
-    public EduStudentClassTransferRecord value14(Integer value) {
+    public EduStudentClassTransferRecord value11(Integer value) {
         setDeleted(value);
         return this;
     }
 
     @Override
-    public EduStudentClassTransferRecord values(Long value1, String value2, String value3, String value4, String value5, String value6, String value7, Long value8, String value9, Long value10, String value11, LocalDateTime value12, LocalDateTime value13, Integer value14) {
+    public EduStudentClassTransferRecord values(Long value1, String value2, String value3, String value4, String value5, String value6, Long value7, Long value8, LocalDateTime value9, LocalDateTime value10, Integer value11) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -549,9 +444,6 @@ public class EduStudentClassTransferRecord extends UpdatableRecordImpl<EduStuden
         value9(value9);
         value10(value10);
         value11(value11);
-        value12(value12);
-        value13(value13);
-        value14(value14);
         return this;
     }
 
@@ -569,20 +461,17 @@ public class EduStudentClassTransferRecord extends UpdatableRecordImpl<EduStuden
     /**
      * Create a detached, initialised EduStudentClassTransferRecord
      */
-    public EduStudentClassTransferRecord(Long id, String studentId, String courseId, String courseName, String originalSchedule, String newSchedule, String reason, Long campusId, String campusName, Long institutionId, String institutionName, LocalDateTime createdTime, LocalDateTime updateTime, Integer deleted) {
+    public EduStudentClassTransferRecord(Long id, String studentId, String courseId, String originalSchedule, String newSchedule, String reason, Long campusId, Long institutionId, LocalDateTime createdTime, LocalDateTime updateTime, Integer deleted) {
         super(EduStudentClassTransfer.EDU_STUDENT_CLASS_TRANSFER);
 
         setId(id);
         setStudentId(studentId);
         setCourseId(courseId);
-        setCourseName(courseName);
         setOriginalSchedule(originalSchedule);
         setNewSchedule(newSchedule);
         setReason(reason);
         setCampusId(campusId);
-        setCampusName(campusName);
         setInstitutionId(institutionId);
-        setInstitutionName(institutionName);
         setCreatedTime(createdTime);
         setUpdateTime(updateTime);
         setDeleted(deleted);

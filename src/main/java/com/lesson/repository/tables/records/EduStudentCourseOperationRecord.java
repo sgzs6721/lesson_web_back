@@ -9,7 +9,10 @@ import com.lesson.repository.tables.EduStudentCourseOperation;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import org.jooq.Field;
 import org.jooq.Record1;
+import org.jooq.Record22;
+import org.jooq.Row22;
 import org.jooq.impl.UpdatableRecordImpl;
 
 
@@ -17,7 +20,7 @@ import org.jooq.impl.UpdatableRecordImpl;
  * 学员课程操作记录表
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class EduStudentCourseOperationRecord extends UpdatableRecordImpl<EduStudentCourseOperationRecord> {
+public class EduStudentCourseOperationRecord extends UpdatableRecordImpl<EduStudentCourseOperationRecord> implements Record22<Long, Long, String, Long, String, String, String, Long, Long, Long, String, Long, String, BigDecimal, String, String, Long, String, LocalDateTime, LocalDateTime, LocalDateTime, Integer> {
 
     private static final long serialVersionUID = 1L;
 
@@ -78,297 +81,255 @@ public class EduStudentCourseOperationRecord extends UpdatableRecordImpl<EduStud
     }
 
     /**
-     * Setter for <code>lesson.edu_student_course_operation.course_name</code>. 课程名称
-     */
-    public void setCourseName(String value) {
-        set(4, value);
-    }
-
-    /**
-     * Getter for <code>lesson.edu_student_course_operation.course_name</code>. 课程名称
-     */
-    public String getCourseName() {
-        return (String) get(4);
-    }
-
-    /**
      * Setter for <code>lesson.edu_student_course_operation.operation_type</code>. 操作类型：TRANSFER_COURSE-转课，TRANSFER_CLASS-转班，REFUND-退费
      */
     public void setOperationType(String value) {
-        set(5, value);
+        set(4, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_course_operation.operation_type</code>. 操作类型：TRANSFER_COURSE-转课，TRANSFER_CLASS-转班，REFUND-退费
      */
     public String getOperationType() {
-        return (String) get(5);
+        return (String) get(4);
     }
 
     /**
      * Setter for <code>lesson.edu_student_course_operation.before_status</code>. 操作前状态
      */
     public void setBeforeStatus(String value) {
-        set(6, value);
+        set(5, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_course_operation.before_status</code>. 操作前状态
      */
     public String getBeforeStatus() {
-        return (String) get(6);
+        return (String) get(5);
     }
 
     /**
      * Setter for <code>lesson.edu_student_course_operation.after_status</code>. 操作后状态
      */
     public void setAfterStatus(String value) {
-        set(7, value);
+        set(6, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_course_operation.after_status</code>. 操作后状态
      */
     public String getAfterStatus() {
-        return (String) get(7);
+        return (String) get(6);
     }
 
     /**
      * Setter for <code>lesson.edu_student_course_operation.source_course_id</code>. 原课程ID
      */
     public void setSourceCourseId(Long value) {
-        set(8, value);
+        set(7, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_course_operation.source_course_id</code>. 原课程ID
      */
     public Long getSourceCourseId() {
-        return (Long) get(8);
-    }
-
-    /**
-     * Setter for <code>lesson.edu_student_course_operation.source_course_name</code>. 原课程名称
-     */
-    public void setSourceCourseName(String value) {
-        set(9, value);
-    }
-
-    /**
-     * Getter for <code>lesson.edu_student_course_operation.source_course_name</code>. 原课程名称
-     */
-    public String getSourceCourseName() {
-        return (String) get(9);
+        return (Long) get(7);
     }
 
     /**
      * Setter for <code>lesson.edu_student_course_operation.target_course_id</code>. 目标课程ID
      */
     public void setTargetCourseId(Long value) {
-        set(10, value);
+        set(8, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_course_operation.target_course_id</code>. 目标课程ID
      */
     public Long getTargetCourseId() {
-        return (Long) get(10);
-    }
-
-    /**
-     * Setter for <code>lesson.edu_student_course_operation.target_course_name</code>. 目标课程名称
-     */
-    public void setTargetCourseName(String value) {
-        set(11, value);
-    }
-
-    /**
-     * Getter for <code>lesson.edu_student_course_operation.target_course_name</code>. 目标课程名称
-     */
-    public String getTargetCourseName() {
-        return (String) get(11);
+        return (Long) get(8);
     }
 
     /**
      * Setter for <code>lesson.edu_student_course_operation.source_class_id</code>. 原班级ID
      */
     public void setSourceClassId(Long value) {
-        set(12, value);
+        set(9, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_course_operation.source_class_id</code>. 原班级ID
      */
     public Long getSourceClassId() {
-        return (Long) get(12);
+        return (Long) get(9);
     }
 
     /**
      * Setter for <code>lesson.edu_student_course_operation.source_class_name</code>. 原班级名称
      */
     public void setSourceClassName(String value) {
-        set(13, value);
+        set(10, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_course_operation.source_class_name</code>. 原班级名称
      */
     public String getSourceClassName() {
-        return (String) get(13);
+        return (String) get(10);
     }
 
     /**
      * Setter for <code>lesson.edu_student_course_operation.target_class_id</code>. 目标班级ID
      */
     public void setTargetClassId(Long value) {
-        set(14, value);
+        set(11, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_course_operation.target_class_id</code>. 目标班级ID
      */
     public Long getTargetClassId() {
-        return (Long) get(14);
+        return (Long) get(11);
     }
 
     /**
      * Setter for <code>lesson.edu_student_course_operation.target_class_name</code>. 目标班级名称
      */
     public void setTargetClassName(String value) {
-        set(15, value);
+        set(12, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_course_operation.target_class_name</code>. 目标班级名称
      */
     public String getTargetClassName() {
-        return (String) get(15);
+        return (String) get(12);
     }
 
     /**
      * Setter for <code>lesson.edu_student_course_operation.refund_amount</code>. 退费金额
      */
     public void setRefundAmount(BigDecimal value) {
-        set(16, value);
+        set(13, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_course_operation.refund_amount</code>. 退费金额
      */
     public BigDecimal getRefundAmount() {
-        return (BigDecimal) get(16);
+        return (BigDecimal) get(13);
     }
 
     /**
      * Setter for <code>lesson.edu_student_course_operation.refund_method</code>. 退费方式：CASH-现金，BANK_TRANSFER-银行转账，WECHAT-微信，ALIPAY-支付宝
      */
     public void setRefundMethod(String value) {
-        set(17, value);
+        set(14, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_course_operation.refund_method</code>. 退费方式：CASH-现金，BANK_TRANSFER-银行转账，WECHAT-微信，ALIPAY-支付宝
      */
     public String getRefundMethod() {
-        return (String) get(17);
+        return (String) get(14);
     }
 
     /**
      * Setter for <code>lesson.edu_student_course_operation.operation_reason</code>. 操作原因
      */
     public void setOperationReason(String value) {
-        set(18, value);
+        set(15, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_course_operation.operation_reason</code>. 操作原因
      */
     public String getOperationReason() {
-        return (String) get(18);
+        return (String) get(15);
     }
 
     /**
      * Setter for <code>lesson.edu_student_course_operation.operator_id</code>. 操作人ID
      */
     public void setOperatorId(Long value) {
-        set(19, value);
+        set(16, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_course_operation.operator_id</code>. 操作人ID
      */
     public Long getOperatorId() {
-        return (Long) get(19);
+        return (Long) get(16);
     }
 
     /**
      * Setter for <code>lesson.edu_student_course_operation.operator_name</code>. 操作人姓名
      */
     public void setOperatorName(String value) {
-        set(20, value);
+        set(17, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_course_operation.operator_name</code>. 操作人姓名
      */
     public String getOperatorName() {
-        return (String) get(20);
+        return (String) get(17);
     }
 
     /**
      * Setter for <code>lesson.edu_student_course_operation.operation_time</code>. 操作时间
      */
     public void setOperationTime(LocalDateTime value) {
-        set(21, value);
+        set(18, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_course_operation.operation_time</code>. 操作时间
      */
     public LocalDateTime getOperationTime() {
-        return (LocalDateTime) get(21);
+        return (LocalDateTime) get(18);
     }
 
     /**
      * Setter for <code>lesson.edu_student_course_operation.created_time</code>. 创建时间
      */
     public void setCreatedTime(LocalDateTime value) {
-        set(22, value);
+        set(19, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_course_operation.created_time</code>. 创建时间
      */
     public LocalDateTime getCreatedTime() {
-        return (LocalDateTime) get(22);
+        return (LocalDateTime) get(19);
     }
 
     /**
      * Setter for <code>lesson.edu_student_course_operation.update_time</code>. 更新时间
      */
     public void setUpdateTime(LocalDateTime value) {
-        set(23, value);
+        set(20, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_course_operation.update_time</code>. 更新时间
      */
     public LocalDateTime getUpdateTime() {
-        return (LocalDateTime) get(23);
+        return (LocalDateTime) get(20);
     }
 
     /**
      * Setter for <code>lesson.edu_student_course_operation.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public void setDeleted(Integer value) {
-        set(24, value);
+        set(21, value);
     }
 
     /**
      * Getter for <code>lesson.edu_student_course_operation.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public Integer getDeleted() {
-        return (Integer) get(24);
+        return (Integer) get(21);
     }
 
     // -------------------------------------------------------------------------
@@ -378,6 +339,509 @@ public class EduStudentCourseOperationRecord extends UpdatableRecordImpl<EduStud
     @Override
     public Record1<Long> key() {
         return (Record1) super.key();
+    }
+
+    // -------------------------------------------------------------------------
+    // Record22 type implementation
+    // -------------------------------------------------------------------------
+
+    @Override
+    public Row22<Long, Long, String, Long, String, String, String, Long, Long, Long, String, Long, String, BigDecimal, String, String, Long, String, LocalDateTime, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
+        return (Row22) super.fieldsRow();
+    }
+
+    @Override
+    public Row22<Long, Long, String, Long, String, String, String, Long, Long, Long, String, Long, String, BigDecimal, String, String, Long, String, LocalDateTime, LocalDateTime, LocalDateTime, Integer> valuesRow() {
+        return (Row22) super.valuesRow();
+    }
+
+    @Override
+    public Field<Long> field1() {
+        return EduStudentCourseOperation.EDU_STUDENT_COURSE_OPERATION.ID;
+    }
+
+    @Override
+    public Field<Long> field2() {
+        return EduStudentCourseOperation.EDU_STUDENT_COURSE_OPERATION.STUDENT_ID;
+    }
+
+    @Override
+    public Field<String> field3() {
+        return EduStudentCourseOperation.EDU_STUDENT_COURSE_OPERATION.STUDENT_NAME;
+    }
+
+    @Override
+    public Field<Long> field4() {
+        return EduStudentCourseOperation.EDU_STUDENT_COURSE_OPERATION.COURSE_ID;
+    }
+
+    @Override
+    public Field<String> field5() {
+        return EduStudentCourseOperation.EDU_STUDENT_COURSE_OPERATION.OPERATION_TYPE;
+    }
+
+    @Override
+    public Field<String> field6() {
+        return EduStudentCourseOperation.EDU_STUDENT_COURSE_OPERATION.BEFORE_STATUS;
+    }
+
+    @Override
+    public Field<String> field7() {
+        return EduStudentCourseOperation.EDU_STUDENT_COURSE_OPERATION.AFTER_STATUS;
+    }
+
+    @Override
+    public Field<Long> field8() {
+        return EduStudentCourseOperation.EDU_STUDENT_COURSE_OPERATION.SOURCE_COURSE_ID;
+    }
+
+    @Override
+    public Field<Long> field9() {
+        return EduStudentCourseOperation.EDU_STUDENT_COURSE_OPERATION.TARGET_COURSE_ID;
+    }
+
+    @Override
+    public Field<Long> field10() {
+        return EduStudentCourseOperation.EDU_STUDENT_COURSE_OPERATION.SOURCE_CLASS_ID;
+    }
+
+    @Override
+    public Field<String> field11() {
+        return EduStudentCourseOperation.EDU_STUDENT_COURSE_OPERATION.SOURCE_CLASS_NAME;
+    }
+
+    @Override
+    public Field<Long> field12() {
+        return EduStudentCourseOperation.EDU_STUDENT_COURSE_OPERATION.TARGET_CLASS_ID;
+    }
+
+    @Override
+    public Field<String> field13() {
+        return EduStudentCourseOperation.EDU_STUDENT_COURSE_OPERATION.TARGET_CLASS_NAME;
+    }
+
+    @Override
+    public Field<BigDecimal> field14() {
+        return EduStudentCourseOperation.EDU_STUDENT_COURSE_OPERATION.REFUND_AMOUNT;
+    }
+
+    @Override
+    public Field<String> field15() {
+        return EduStudentCourseOperation.EDU_STUDENT_COURSE_OPERATION.REFUND_METHOD;
+    }
+
+    @Override
+    public Field<String> field16() {
+        return EduStudentCourseOperation.EDU_STUDENT_COURSE_OPERATION.OPERATION_REASON;
+    }
+
+    @Override
+    public Field<Long> field17() {
+        return EduStudentCourseOperation.EDU_STUDENT_COURSE_OPERATION.OPERATOR_ID;
+    }
+
+    @Override
+    public Field<String> field18() {
+        return EduStudentCourseOperation.EDU_STUDENT_COURSE_OPERATION.OPERATOR_NAME;
+    }
+
+    @Override
+    public Field<LocalDateTime> field19() {
+        return EduStudentCourseOperation.EDU_STUDENT_COURSE_OPERATION.OPERATION_TIME;
+    }
+
+    @Override
+    public Field<LocalDateTime> field20() {
+        return EduStudentCourseOperation.EDU_STUDENT_COURSE_OPERATION.CREATED_TIME;
+    }
+
+    @Override
+    public Field<LocalDateTime> field21() {
+        return EduStudentCourseOperation.EDU_STUDENT_COURSE_OPERATION.UPDATE_TIME;
+    }
+
+    @Override
+    public Field<Integer> field22() {
+        return EduStudentCourseOperation.EDU_STUDENT_COURSE_OPERATION.DELETED;
+    }
+
+    @Override
+    public Long component1() {
+        return getId();
+    }
+
+    @Override
+    public Long component2() {
+        return getStudentId();
+    }
+
+    @Override
+    public String component3() {
+        return getStudentName();
+    }
+
+    @Override
+    public Long component4() {
+        return getCourseId();
+    }
+
+    @Override
+    public String component5() {
+        return getOperationType();
+    }
+
+    @Override
+    public String component6() {
+        return getBeforeStatus();
+    }
+
+    @Override
+    public String component7() {
+        return getAfterStatus();
+    }
+
+    @Override
+    public Long component8() {
+        return getSourceCourseId();
+    }
+
+    @Override
+    public Long component9() {
+        return getTargetCourseId();
+    }
+
+    @Override
+    public Long component10() {
+        return getSourceClassId();
+    }
+
+    @Override
+    public String component11() {
+        return getSourceClassName();
+    }
+
+    @Override
+    public Long component12() {
+        return getTargetClassId();
+    }
+
+    @Override
+    public String component13() {
+        return getTargetClassName();
+    }
+
+    @Override
+    public BigDecimal component14() {
+        return getRefundAmount();
+    }
+
+    @Override
+    public String component15() {
+        return getRefundMethod();
+    }
+
+    @Override
+    public String component16() {
+        return getOperationReason();
+    }
+
+    @Override
+    public Long component17() {
+        return getOperatorId();
+    }
+
+    @Override
+    public String component18() {
+        return getOperatorName();
+    }
+
+    @Override
+    public LocalDateTime component19() {
+        return getOperationTime();
+    }
+
+    @Override
+    public LocalDateTime component20() {
+        return getCreatedTime();
+    }
+
+    @Override
+    public LocalDateTime component21() {
+        return getUpdateTime();
+    }
+
+    @Override
+    public Integer component22() {
+        return getDeleted();
+    }
+
+    @Override
+    public Long value1() {
+        return getId();
+    }
+
+    @Override
+    public Long value2() {
+        return getStudentId();
+    }
+
+    @Override
+    public String value3() {
+        return getStudentName();
+    }
+
+    @Override
+    public Long value4() {
+        return getCourseId();
+    }
+
+    @Override
+    public String value5() {
+        return getOperationType();
+    }
+
+    @Override
+    public String value6() {
+        return getBeforeStatus();
+    }
+
+    @Override
+    public String value7() {
+        return getAfterStatus();
+    }
+
+    @Override
+    public Long value8() {
+        return getSourceCourseId();
+    }
+
+    @Override
+    public Long value9() {
+        return getTargetCourseId();
+    }
+
+    @Override
+    public Long value10() {
+        return getSourceClassId();
+    }
+
+    @Override
+    public String value11() {
+        return getSourceClassName();
+    }
+
+    @Override
+    public Long value12() {
+        return getTargetClassId();
+    }
+
+    @Override
+    public String value13() {
+        return getTargetClassName();
+    }
+
+    @Override
+    public BigDecimal value14() {
+        return getRefundAmount();
+    }
+
+    @Override
+    public String value15() {
+        return getRefundMethod();
+    }
+
+    @Override
+    public String value16() {
+        return getOperationReason();
+    }
+
+    @Override
+    public Long value17() {
+        return getOperatorId();
+    }
+
+    @Override
+    public String value18() {
+        return getOperatorName();
+    }
+
+    @Override
+    public LocalDateTime value19() {
+        return getOperationTime();
+    }
+
+    @Override
+    public LocalDateTime value20() {
+        return getCreatedTime();
+    }
+
+    @Override
+    public LocalDateTime value21() {
+        return getUpdateTime();
+    }
+
+    @Override
+    public Integer value22() {
+        return getDeleted();
+    }
+
+    @Override
+    public EduStudentCourseOperationRecord value1(Long value) {
+        setId(value);
+        return this;
+    }
+
+    @Override
+    public EduStudentCourseOperationRecord value2(Long value) {
+        setStudentId(value);
+        return this;
+    }
+
+    @Override
+    public EduStudentCourseOperationRecord value3(String value) {
+        setStudentName(value);
+        return this;
+    }
+
+    @Override
+    public EduStudentCourseOperationRecord value4(Long value) {
+        setCourseId(value);
+        return this;
+    }
+
+    @Override
+    public EduStudentCourseOperationRecord value5(String value) {
+        setOperationType(value);
+        return this;
+    }
+
+    @Override
+    public EduStudentCourseOperationRecord value6(String value) {
+        setBeforeStatus(value);
+        return this;
+    }
+
+    @Override
+    public EduStudentCourseOperationRecord value7(String value) {
+        setAfterStatus(value);
+        return this;
+    }
+
+    @Override
+    public EduStudentCourseOperationRecord value8(Long value) {
+        setSourceCourseId(value);
+        return this;
+    }
+
+    @Override
+    public EduStudentCourseOperationRecord value9(Long value) {
+        setTargetCourseId(value);
+        return this;
+    }
+
+    @Override
+    public EduStudentCourseOperationRecord value10(Long value) {
+        setSourceClassId(value);
+        return this;
+    }
+
+    @Override
+    public EduStudentCourseOperationRecord value11(String value) {
+        setSourceClassName(value);
+        return this;
+    }
+
+    @Override
+    public EduStudentCourseOperationRecord value12(Long value) {
+        setTargetClassId(value);
+        return this;
+    }
+
+    @Override
+    public EduStudentCourseOperationRecord value13(String value) {
+        setTargetClassName(value);
+        return this;
+    }
+
+    @Override
+    public EduStudentCourseOperationRecord value14(BigDecimal value) {
+        setRefundAmount(value);
+        return this;
+    }
+
+    @Override
+    public EduStudentCourseOperationRecord value15(String value) {
+        setRefundMethod(value);
+        return this;
+    }
+
+    @Override
+    public EduStudentCourseOperationRecord value16(String value) {
+        setOperationReason(value);
+        return this;
+    }
+
+    @Override
+    public EduStudentCourseOperationRecord value17(Long value) {
+        setOperatorId(value);
+        return this;
+    }
+
+    @Override
+    public EduStudentCourseOperationRecord value18(String value) {
+        setOperatorName(value);
+        return this;
+    }
+
+    @Override
+    public EduStudentCourseOperationRecord value19(LocalDateTime value) {
+        setOperationTime(value);
+        return this;
+    }
+
+    @Override
+    public EduStudentCourseOperationRecord value20(LocalDateTime value) {
+        setCreatedTime(value);
+        return this;
+    }
+
+    @Override
+    public EduStudentCourseOperationRecord value21(LocalDateTime value) {
+        setUpdateTime(value);
+        return this;
+    }
+
+    @Override
+    public EduStudentCourseOperationRecord value22(Integer value) {
+        setDeleted(value);
+        return this;
+    }
+
+    @Override
+    public EduStudentCourseOperationRecord values(Long value1, Long value2, String value3, Long value4, String value5, String value6, String value7, Long value8, Long value9, Long value10, String value11, Long value12, String value13, BigDecimal value14, String value15, String value16, Long value17, String value18, LocalDateTime value19, LocalDateTime value20, LocalDateTime value21, Integer value22) {
+        value1(value1);
+        value2(value2);
+        value3(value3);
+        value4(value4);
+        value5(value5);
+        value6(value6);
+        value7(value7);
+        value8(value8);
+        value9(value9);
+        value10(value10);
+        value11(value11);
+        value12(value12);
+        value13(value13);
+        value14(value14);
+        value15(value15);
+        value16(value16);
+        value17(value17);
+        value18(value18);
+        value19(value19);
+        value20(value20);
+        value21(value21);
+        value22(value22);
+        return this;
     }
 
     // -------------------------------------------------------------------------
@@ -394,21 +858,18 @@ public class EduStudentCourseOperationRecord extends UpdatableRecordImpl<EduStud
     /**
      * Create a detached, initialised EduStudentCourseOperationRecord
      */
-    public EduStudentCourseOperationRecord(Long id, Long studentId, String studentName, Long courseId, String courseName, String operationType, String beforeStatus, String afterStatus, Long sourceCourseId, String sourceCourseName, Long targetCourseId, String targetCourseName, Long sourceClassId, String sourceClassName, Long targetClassId, String targetClassName, BigDecimal refundAmount, String refundMethod, String operationReason, Long operatorId, String operatorName, LocalDateTime operationTime, LocalDateTime createdTime, LocalDateTime updateTime, Integer deleted) {
+    public EduStudentCourseOperationRecord(Long id, Long studentId, String studentName, Long courseId, String operationType, String beforeStatus, String afterStatus, Long sourceCourseId, Long targetCourseId, Long sourceClassId, String sourceClassName, Long targetClassId, String targetClassName, BigDecimal refundAmount, String refundMethod, String operationReason, Long operatorId, String operatorName, LocalDateTime operationTime, LocalDateTime createdTime, LocalDateTime updateTime, Integer deleted) {
         super(EduStudentCourseOperation.EDU_STUDENT_COURSE_OPERATION);
 
         setId(id);
         setStudentId(studentId);
         setStudentName(studentName);
         setCourseId(courseId);
-        setCourseName(courseName);
         setOperationType(operationType);
         setBeforeStatus(beforeStatus);
         setAfterStatus(afterStatus);
         setSourceCourseId(sourceCourseId);
-        setSourceCourseName(sourceCourseName);
         setTargetCourseId(targetCourseId);
-        setTargetCourseName(targetCourseName);
         setSourceClassId(sourceClassId);
         setSourceClassName(sourceClassName);
         setTargetClassId(targetClassId);

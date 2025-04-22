@@ -145,7 +145,6 @@ public class EduStudentPaymentModel {
         detailRecord.setId(payment.getId());
         detailRecord.setStudentId(payment.getStudentId());
         detailRecord.setCourseId(payment.getCourseId());
-        detailRecord.setCourseName(payment.getCourseName());
         detailRecord.setPaymentType(PaymentType.valueOf(payment.getPaymentType()));
         detailRecord.setAmount(payment.getAmount());
         detailRecord.setPaymentMethod(PaymentMethod.valueOf(payment.getPaymentMethod()));
@@ -155,9 +154,7 @@ public class EduStudentPaymentModel {
         detailRecord.setGiftItems(payment.getGiftItems());
         detailRecord.setNotes(payment.getNotes());
         detailRecord.setCampusId(payment.getCampusId());
-        detailRecord.setCampusName(payment.getCampusName());
         detailRecord.setInstitutionId(payment.getInstitutionId());
-        detailRecord.setInstitutionName(payment.getInstitutionName());
         detailRecord.setCreatedTime(payment.getCreatedTime());
         detailRecord.setUpdateTime(payment.getUpdateTime());
         return detailRecord;

@@ -152,16 +152,13 @@ public class EduStudentCourseAttendanceModel {
         detailRecord.setStudentId(attendance.getStudentId());
         detailRecord.setCourseId(attendance.getCourseId());
         detailRecord.setCoachId(attendance.getCoachId());
-        detailRecord.setCoachName(attendance.getCoachName());
         detailRecord.setCourseDate(attendance.getCourseDate());
         detailRecord.setStartTime(attendance.getStartTime());
         detailRecord.setEndTime(attendance.getEndTime());
         detailRecord.setHours(attendance.getHours());
         detailRecord.setNotes(attendance.getNotes());
         detailRecord.setCampusId(attendance.getCampusId());
-        detailRecord.setCampusName(attendance.getCampusName());
         detailRecord.setInstitutionId(attendance.getInstitutionId());
-        detailRecord.setInstitutionName(attendance.getInstitutionName());
         detailRecord.setCreatedTime(attendance.getCreatedTime());
         detailRecord.setUpdateTime(attendance.getUpdateTime());
         return detailRecord;

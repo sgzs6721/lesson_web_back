@@ -1,0 +1,3 @@
+-- 修改学员表自增ID从1000开始
+ALTER TABLE `edu_student` AUTO_INCREMENT = 1000;
+ALTER TABLE `sys_coach` AUTO_INCREMENT = 1000;

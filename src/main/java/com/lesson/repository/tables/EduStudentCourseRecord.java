@@ -22,7 +22,7 @@ import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row17;
+import org.jooq.Row14;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -75,11 +75,6 @@ public class EduStudentCourseRecord extends TableImpl<EduStudentCourseRecordReco
     public final TableField<EduStudentCourseRecordRecord, Long> COACH_ID = createField(DSL.name("coach_id"), SQLDataType.BIGINT.nullable(false), this, "教练ID");
 
     /**
-     * The column <code>lesson.edu_student_course_record.coach_name</code>. 教练姓名
-     */
-    public final TableField<EduStudentCourseRecordRecord, String> COACH_NAME = createField(DSL.name("coach_name"), SQLDataType.VARCHAR(50).nullable(false), this, "教练姓名");
-
-    /**
      * The column <code>lesson.edu_student_course_record.course_date</code>. 上课日期
      */
     public final TableField<EduStudentCourseRecordRecord, LocalDate> COURSE_DATE = createField(DSL.name("course_date"), SQLDataType.LOCALDATE.nullable(false), this, "上课日期");
@@ -110,19 +105,9 @@ public class EduStudentCourseRecord extends TableImpl<EduStudentCourseRecordReco
     public final TableField<EduStudentCourseRecordRecord, Long> CAMPUS_ID = createField(DSL.name("campus_id"), SQLDataType.BIGINT.nullable(false), this, "校区ID");
 
     /**
-     * The column <code>lesson.edu_student_course_record.campus_name</code>. 校区名称
-     */
-    public final TableField<EduStudentCourseRecordRecord, String> CAMPUS_NAME = createField(DSL.name("campus_name"), SQLDataType.VARCHAR(100).nullable(false), this, "校区名称");
-
-    /**
      * The column <code>lesson.edu_student_course_record.institution_id</code>. 机构ID
      */
     public final TableField<EduStudentCourseRecordRecord, Long> INSTITUTION_ID = createField(DSL.name("institution_id"), SQLDataType.BIGINT.nullable(false), this, "机构ID");
-
-    /**
-     * The column <code>lesson.edu_student_course_record.institution_name</code>. 机构名称
-     */
-    public final TableField<EduStudentCourseRecordRecord, String> INSTITUTION_NAME = createField(DSL.name("institution_name"), SQLDataType.VARCHAR(100).nullable(false), this, "机构名称");
 
     /**
      * The column <code>lesson.edu_student_course_record.created_time</code>. 创建时间
@@ -224,11 +209,11 @@ public class EduStudentCourseRecord extends TableImpl<EduStudentCourseRecordReco
     }
 
     // -------------------------------------------------------------------------
-    // Row17 type methods
+    // Row14 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row17<Long, Long, Long, Long, String, LocalDate, LocalTime, LocalTime, BigDecimal, String, Long, String, Long, String, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
-        return (Row17) super.fieldsRow();
+    public Row14<Long, Long, Long, Long, LocalDate, LocalTime, LocalTime, BigDecimal, String, Long, Long, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
+        return (Row14) super.fieldsRow();
     }
 }

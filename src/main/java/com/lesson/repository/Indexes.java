@@ -10,7 +10,6 @@ import com.lesson.repository.tables.EduStudent;
 import com.lesson.repository.tables.EduStudentClassTransfer;
 import com.lesson.repository.tables.EduStudentCourse;
 import com.lesson.repository.tables.EduStudentCourseOperation;
-import com.lesson.repository.tables.EduStudentCourseOperationRecord;
 import com.lesson.repository.tables.EduStudentCourseRecord;
 import com.lesson.repository.tables.EduStudentCourseTransfer;
 import com.lesson.repository.tables.EduStudentPayment;
@@ -59,7 +58,6 @@ public class Indexes {
     public static final Index EDU_STUDENT_CLASS_TRANSFER_IDX_COURSE_ID = Internal.createIndex(DSL.name("idx_course_id"), EduStudentClassTransfer.EDU_STUDENT_CLASS_TRANSFER, new OrderField[] { EduStudentClassTransfer.EDU_STUDENT_CLASS_TRANSFER.COURSE_ID }, false);
     public static final Index EDU_STUDENT_COURSE_IDX_COURSE_ID = Internal.createIndex(DSL.name("idx_course_id"), EduStudentCourse.EDU_STUDENT_COURSE, new OrderField[] { EduStudentCourse.EDU_STUDENT_COURSE.COURSE_ID }, false);
     public static final Index EDU_STUDENT_COURSE_OPERATION_IDX_COURSE_ID = Internal.createIndex(DSL.name("idx_course_id"), EduStudentCourseOperation.EDU_STUDENT_COURSE_OPERATION, new OrderField[] { EduStudentCourseOperation.EDU_STUDENT_COURSE_OPERATION.COURSE_ID }, false);
-    public static final Index EDU_STUDENT_COURSE_OPERATION_RECORD_IDX_COURSE_ID = Internal.createIndex(DSL.name("idx_course_id"), EduStudentCourseOperationRecord.EDU_STUDENT_COURSE_OPERATION_RECORD, new OrderField[] { EduStudentCourseOperationRecord.EDU_STUDENT_COURSE_OPERATION_RECORD.COURSE_ID }, false);
     public static final Index EDU_STUDENT_COURSE_RECORD_IDX_COURSE_ID = Internal.createIndex(DSL.name("idx_course_id"), EduStudentCourseRecord.EDU_STUDENT_COURSE_RECORD, new OrderField[] { EduStudentCourseRecord.EDU_STUDENT_COURSE_RECORD.COURSE_ID }, false);
     public static final Index EDU_STUDENT_PAYMENT_IDX_COURSE_ID = Internal.createIndex(DSL.name("idx_course_id"), EduStudentPayment.EDU_STUDENT_PAYMENT, new OrderField[] { EduStudentPayment.EDU_STUDENT_PAYMENT.COURSE_ID }, false);
     public static final Index EDU_STUDENT_REFUND_IDX_COURSE_ID = Internal.createIndex(DSL.name("idx_course_id"), EduStudentRefund.EDU_STUDENT_REFUND, new OrderField[] { EduStudentRefund.EDU_STUDENT_REFUND.COURSE_ID }, false);
@@ -87,9 +85,7 @@ public class Indexes {
     public static final Index SYS_COACH_IDX_NAME = Internal.createIndex(DSL.name("idx_name"), SysCoach.SYS_COACH, new OrderField[] { SysCoach.SYS_COACH.NAME }, false);
     public static final Index SYS_INSTITUTION_IDX_NAME = Internal.createIndex(DSL.name("idx_name"), SysInstitution.SYS_INSTITUTION, new OrderField[] { SysInstitution.SYS_INSTITUTION.NAME }, false);
     public static final Index EDU_STUDENT_COURSE_OPERATION_IDX_OPERATION_TIME = Internal.createIndex(DSL.name("idx_operation_time"), EduStudentCourseOperation.EDU_STUDENT_COURSE_OPERATION, new OrderField[] { EduStudentCourseOperation.EDU_STUDENT_COURSE_OPERATION.OPERATION_TIME }, false);
-    public static final Index EDU_STUDENT_COURSE_OPERATION_RECORD_IDX_OPERATION_TIME = Internal.createIndex(DSL.name("idx_operation_time"), EduStudentCourseOperationRecord.EDU_STUDENT_COURSE_OPERATION_RECORD, new OrderField[] { EduStudentCourseOperationRecord.EDU_STUDENT_COURSE_OPERATION_RECORD.OPERATION_TIME }, false);
     public static final Index EDU_STUDENT_COURSE_OPERATION_IDX_OPERATION_TYPE = Internal.createIndex(DSL.name("idx_operation_type"), EduStudentCourseOperation.EDU_STUDENT_COURSE_OPERATION, new OrderField[] { EduStudentCourseOperation.EDU_STUDENT_COURSE_OPERATION.OPERATION_TYPE }, false);
-    public static final Index EDU_STUDENT_COURSE_OPERATION_RECORD_IDX_OPERATION_TYPE = Internal.createIndex(DSL.name("idx_operation_type"), EduStudentCourseOperationRecord.EDU_STUDENT_COURSE_OPERATION_RECORD, new OrderField[] { EduStudentCourseOperationRecord.EDU_STUDENT_COURSE_OPERATION_RECORD.OPERATION_TYPE }, false);
     public static final Index EDU_STUDENT_COURSE_TRANSFER_IDX_ORIGINAL_COURSE_ID = Internal.createIndex(DSL.name("idx_original_course_id"), EduStudentCourseTransfer.EDU_STUDENT_COURSE_TRANSFER, new OrderField[] { EduStudentCourseTransfer.EDU_STUDENT_COURSE_TRANSFER.ORIGINAL_COURSE_ID }, false);
     public static final Index EDU_STUDENT_PAYMENT_IDX_PAYMENT_TYPE = Internal.createIndex(DSL.name("idx_payment_type"), EduStudentPayment.EDU_STUDENT_PAYMENT, new OrderField[] { EduStudentPayment.EDU_STUDENT_PAYMENT.PAYMENT_TYPE }, false);
     public static final Index SYS_ROLE_PERMISSION_IDX_PERMISSION = Internal.createIndex(DSL.name("idx_permission"), SysRolePermission.SYS_ROLE_PERMISSION, new OrderField[] { SysRolePermission.SYS_ROLE_PERMISSION.PERMISSION }, false);
@@ -110,7 +106,6 @@ public class Indexes {
     public static final Index EDU_STUDENT_CLASS_TRANSFER_IDX_STUDENT_ID = Internal.createIndex(DSL.name("idx_student_id"), EduStudentClassTransfer.EDU_STUDENT_CLASS_TRANSFER, new OrderField[] { EduStudentClassTransfer.EDU_STUDENT_CLASS_TRANSFER.STUDENT_ID }, false);
     public static final Index EDU_STUDENT_COURSE_IDX_STUDENT_ID = Internal.createIndex(DSL.name("idx_student_id"), EduStudentCourse.EDU_STUDENT_COURSE, new OrderField[] { EduStudentCourse.EDU_STUDENT_COURSE.STUDENT_ID }, false);
     public static final Index EDU_STUDENT_COURSE_OPERATION_IDX_STUDENT_ID = Internal.createIndex(DSL.name("idx_student_id"), EduStudentCourseOperation.EDU_STUDENT_COURSE_OPERATION, new OrderField[] { EduStudentCourseOperation.EDU_STUDENT_COURSE_OPERATION.STUDENT_ID }, false);
-    public static final Index EDU_STUDENT_COURSE_OPERATION_RECORD_IDX_STUDENT_ID = Internal.createIndex(DSL.name("idx_student_id"), EduStudentCourseOperationRecord.EDU_STUDENT_COURSE_OPERATION_RECORD, new OrderField[] { EduStudentCourseOperationRecord.EDU_STUDENT_COURSE_OPERATION_RECORD.STUDENT_ID }, false);
     public static final Index EDU_STUDENT_COURSE_RECORD_IDX_STUDENT_ID = Internal.createIndex(DSL.name("idx_student_id"), EduStudentCourseRecord.EDU_STUDENT_COURSE_RECORD, new OrderField[] { EduStudentCourseRecord.EDU_STUDENT_COURSE_RECORD.STUDENT_ID }, false);
     public static final Index EDU_STUDENT_COURSE_TRANSFER_IDX_STUDENT_ID = Internal.createIndex(DSL.name("idx_student_id"), EduStudentCourseTransfer.EDU_STUDENT_COURSE_TRANSFER, new OrderField[] { EduStudentCourseTransfer.EDU_STUDENT_COURSE_TRANSFER.STUDENT_ID }, false);
     public static final Index EDU_STUDENT_PAYMENT_IDX_STUDENT_ID = Internal.createIndex(DSL.name("idx_student_id"), EduStudentPayment.EDU_STUDENT_PAYMENT, new OrderField[] { EduStudentPayment.EDU_STUDENT_PAYMENT.STUDENT_ID }, false);

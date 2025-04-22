@@ -20,6 +20,7 @@ import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
+import org.jooq.Row22;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -72,11 +73,6 @@ public class EduStudentCourseOperation extends TableImpl<EduStudentCourseOperati
     public final TableField<EduStudentCourseOperationRecord, Long> COURSE_ID = createField(DSL.name("course_id"), SQLDataType.BIGINT.nullable(false), this, "课程ID");
 
     /**
-     * The column <code>lesson.edu_student_course_operation.course_name</code>. 课程名称
-     */
-    public final TableField<EduStudentCourseOperationRecord, String> COURSE_NAME = createField(DSL.name("course_name"), SQLDataType.VARCHAR(100).nullable(false), this, "课程名称");
-
-    /**
      * The column <code>lesson.edu_student_course_operation.operation_type</code>. 操作类型：TRANSFER_COURSE-转课，TRANSFER_CLASS-转班，REFUND-退费
      */
     public final TableField<EduStudentCourseOperationRecord, String> OPERATION_TYPE = createField(DSL.name("operation_type"), SQLDataType.VARCHAR(20).nullable(false), this, "操作类型：TRANSFER_COURSE-转课，TRANSFER_CLASS-转班，REFUND-退费");
@@ -97,19 +93,9 @@ public class EduStudentCourseOperation extends TableImpl<EduStudentCourseOperati
     public final TableField<EduStudentCourseOperationRecord, Long> SOURCE_COURSE_ID = createField(DSL.name("source_course_id"), SQLDataType.BIGINT, this, "原课程ID");
 
     /**
-     * The column <code>lesson.edu_student_course_operation.source_course_name</code>. 原课程名称
-     */
-    public final TableField<EduStudentCourseOperationRecord, String> SOURCE_COURSE_NAME = createField(DSL.name("source_course_name"), SQLDataType.VARCHAR(100), this, "原课程名称");
-
-    /**
      * The column <code>lesson.edu_student_course_operation.target_course_id</code>. 目标课程ID
      */
     public final TableField<EduStudentCourseOperationRecord, Long> TARGET_COURSE_ID = createField(DSL.name("target_course_id"), SQLDataType.BIGINT, this, "目标课程ID");
-
-    /**
-     * The column <code>lesson.edu_student_course_operation.target_course_name</code>. 目标课程名称
-     */
-    public final TableField<EduStudentCourseOperationRecord, String> TARGET_COURSE_NAME = createField(DSL.name("target_course_name"), SQLDataType.VARCHAR(100), this, "目标课程名称");
 
     /**
      * The column <code>lesson.edu_student_course_operation.source_class_id</code>. 原班级ID
@@ -258,5 +244,14 @@ public class EduStudentCourseOperation extends TableImpl<EduStudentCourseOperati
     @Override
     public EduStudentCourseOperation rename(Name name) {
         return new EduStudentCourseOperation(name, null);
+    }
+
+    // -------------------------------------------------------------------------
+    // Row22 type methods
+    // -------------------------------------------------------------------------
+
+    @Override
+    public Row22<Long, Long, String, Long, String, String, String, Long, Long, Long, String, Long, String, BigDecimal, String, String, Long, String, LocalDateTime, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
+        return (Row22) super.fieldsRow();
     }
 }

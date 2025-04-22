@@ -20,7 +20,7 @@ import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row17;
+import org.jooq.Row14;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -68,11 +68,6 @@ public class EduStudentRefund extends TableImpl<EduStudentRefundRecord> {
     public final TableField<EduStudentRefundRecord, String> COURSE_ID = createField(DSL.name("course_id"), SQLDataType.VARCHAR(32).nullable(false), this, "课程ID");
 
     /**
-     * The column <code>lesson.edu_student_refund.course_name</code>. 课程名称
-     */
-    public final TableField<EduStudentRefundRecord, String> COURSE_NAME = createField(DSL.name("course_name"), SQLDataType.VARCHAR(100).nullable(false), this, "课程名称");
-
-    /**
      * The column <code>lesson.edu_student_refund.refund_hours</code>. 退课课时
      */
     public final TableField<EduStudentRefundRecord, BigDecimal> REFUND_HOURS = createField(DSL.name("refund_hours"), SQLDataType.DECIMAL(10, 2).nullable(false), this, "退课课时");
@@ -108,19 +103,9 @@ public class EduStudentRefund extends TableImpl<EduStudentRefundRecord> {
     public final TableField<EduStudentRefundRecord, Long> CAMPUS_ID = createField(DSL.name("campus_id"), SQLDataType.BIGINT.nullable(false), this, "校区ID");
 
     /**
-     * The column <code>lesson.edu_student_refund.campus_name</code>. 校区名称
-     */
-    public final TableField<EduStudentRefundRecord, String> CAMPUS_NAME = createField(DSL.name("campus_name"), SQLDataType.VARCHAR(100).nullable(false), this, "校区名称");
-
-    /**
      * The column <code>lesson.edu_student_refund.institution_id</code>. 机构ID
      */
     public final TableField<EduStudentRefundRecord, Long> INSTITUTION_ID = createField(DSL.name("institution_id"), SQLDataType.BIGINT.nullable(false), this, "机构ID");
-
-    /**
-     * The column <code>lesson.edu_student_refund.institution_name</code>. 机构名称
-     */
-    public final TableField<EduStudentRefundRecord, String> INSTITUTION_NAME = createField(DSL.name("institution_name"), SQLDataType.VARCHAR(100).nullable(false), this, "机构名称");
 
     /**
      * The column <code>lesson.edu_student_refund.created_time</code>. 创建时间
@@ -222,11 +207,11 @@ public class EduStudentRefund extends TableImpl<EduStudentRefundRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row17 type methods
+    // Row14 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row17<Long, String, String, String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, String, Long, String, Long, String, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
-        return (Row17) super.fieldsRow();
+    public Row14<Long, String, String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, String, Long, Long, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
+        return (Row14) super.fieldsRow();
     }
 }

@@ -10,7 +10,6 @@ import com.lesson.repository.tables.EduStudent;
 import com.lesson.repository.tables.EduStudentClassTransfer;
 import com.lesson.repository.tables.EduStudentCourse;
 import com.lesson.repository.tables.EduStudentCourseOperation;
-import com.lesson.repository.tables.EduStudentCourseOperationRecord;
 import com.lesson.repository.tables.EduStudentCourseRecord;
 import com.lesson.repository.tables.EduStudentCourseTransfer;
 import com.lesson.repository.tables.EduStudentPayment;
@@ -76,11 +75,6 @@ public class Lesson extends SchemaImpl {
      * 学员课程操作记录表
      */
     public final EduStudentCourseOperation EDU_STUDENT_COURSE_OPERATION = EduStudentCourseOperation.EDU_STUDENT_COURSE_OPERATION;
-
-    /**
-     * 学生课程操作记录表
-     */
-    public final EduStudentCourseOperationRecord EDU_STUDENT_COURSE_OPERATION_RECORD = EduStudentCourseOperationRecord.EDU_STUDENT_COURSE_OPERATION_RECORD;
 
     /**
      * 学员课程记录表
@@ -174,7 +168,6 @@ public class Lesson extends SchemaImpl {
             EduStudentClassTransfer.EDU_STUDENT_CLASS_TRANSFER,
             EduStudentCourse.EDU_STUDENT_COURSE,
             EduStudentCourseOperation.EDU_STUDENT_COURSE_OPERATION,
-            EduStudentCourseOperationRecord.EDU_STUDENT_COURSE_OPERATION_RECORD,
             EduStudentCourseRecord.EDU_STUDENT_COURSE_RECORD,
             EduStudentCourseTransfer.EDU_STUDENT_COURSE_TRANSFER,
             EduStudentPayment.EDU_STUDENT_PAYMENT,
