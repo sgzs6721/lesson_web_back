@@ -43,11 +43,48 @@ public class EduCourseModel {
   }
 
   public void createCourseCoachRelation(Long courseId, Long coachId) {
-    dsl.insertInto(SYS_COACH_COURSE)
-        .set(SYS_COACH_COURSE.COACH_ID, coachId)
-        .set(SYS_COACH_COURSE.COURSE_ID, courseId)
-        .set(SYS_COACH_COURSE.DELETED, 0)
-        .execute();
+    try {
+      // 首先检查是否存在已删除的记录
+      int deletedCount = dsl.selectCount()
+          .from(SYS_COACH_COURSE)
+          .where(SYS_COACH_COURSE.COACH_ID.eq(coachId))
+          .and(SYS_COACH_COURSE.COURSE_ID.eq(courseId))
+          .and(SYS_COACH_COURSE.DELETED.eq(1))
+          .fetchOne(0, int.class);
+
+      if (deletedCount > 0) {
+        // 如果存在已删除的记录，则将其标记为未删除
+        dsl.update(SYS_COACH_COURSE)
+            .set(SYS_COACH_COURSE.DELETED, 0)
+            .where(SYS_COACH_COURSE.COACH_ID.eq(coachId))
+            .and(SYS_COACH_COURSE.COURSE_ID.eq(courseId))
+            .and(SYS_COACH_COURSE.DELETED.eq(1))
+            .execute();
+        return;
+      }
+
+      // 检查是否存在未删除的记录
+      int activeCount = dsl.selectCount()
+          .from(SYS_COACH_COURSE)
+          .where(SYS_COACH_COURSE.COACH_ID.eq(coachId))
+          .and(SYS_COACH_COURSE.COURSE_ID.eq(courseId))
+          .and(SYS_COACH_COURSE.DELETED.eq(0))
+          .fetchOne(0, int.class);
+
+      if (activeCount > 0) {
+        // 如果已经存在未删除的记录，则不需要做任何操作
+        return;
+      }
+
+      // 如果不存在任何记录，则插入新记录
+      dsl.insertInto(SYS_COACH_COURSE)
+          .set(SYS_COACH_COURSE.COACH_ID, coachId)
+          .set(SYS_COACH_COURSE.COURSE_ID, courseId)
+          .set(SYS_COACH_COURSE.DELETED, 0)
+          .execute();
+    } catch (Exception e) {
+      throw new RuntimeException("创建课程-教练关联失败: " + e.getMessage(), e);
+    }
   }
 
   public void updateCourse(Long id, String name, Long typeId,
@@ -87,11 +124,45 @@ public class EduCourseModel {
   }
 
   public void deleteCourseCoachRelations(Long courseId) {
-    dsl.update(SYS_COACH_COURSE)
-        .set(SYS_COACH_COURSE.DELETED, 1)
+    // 获取当前课程的所有未删除的教练关联
+    List<Long> coachIds = dsl.select(SYS_COACH_COURSE.COACH_ID)
+        .from(SYS_COACH_COURSE)
         .where(SYS_COACH_COURSE.COURSE_ID.eq(courseId))
         .and(SYS_COACH_COURSE.DELETED.eq(0))
-        .execute();
+        .fetch(SYS_COACH_COURSE.COACH_ID);
+
+    // 如果没有关联，直接返回
+    if (coachIds.isEmpty()) {
+      return;
+    }
+
+    // 逐个删除关联，避免批量更新导致的唯一键冲突
+    for (Long coachId : coachIds) {
+      // 检查是否已经存在已删除的记录
+      int count = dsl.selectCount()
+          .from(SYS_COACH_COURSE)
+          .where(SYS_COACH_COURSE.COACH_ID.eq(coachId))
+          .and(SYS_COACH_COURSE.COURSE_ID.eq(courseId))
+          .and(SYS_COACH_COURSE.DELETED.eq(1))
+          .fetchOne(0, int.class);
+
+      if (count > 0) {
+        // 如果已存在已删除的记录，则直接物理删除未删除的记录
+        dsl.delete(SYS_COACH_COURSE)
+            .where(SYS_COACH_COURSE.COACH_ID.eq(coachId))
+            .and(SYS_COACH_COURSE.COURSE_ID.eq(courseId))
+            .and(SYS_COACH_COURSE.DELETED.eq(0))
+            .execute();
+      } else {
+        // 如果不存在已删除的记录，则正常标记为已删除
+        dsl.update(SYS_COACH_COURSE)
+            .set(SYS_COACH_COURSE.DELETED, 1)
+            .where(SYS_COACH_COURSE.COACH_ID.eq(coachId))
+            .and(SYS_COACH_COURSE.COURSE_ID.eq(courseId))
+            .and(SYS_COACH_COURSE.DELETED.eq(0))
+            .execute();
+      }
+    }
   }
 
   public void deleteCourse(Long id) {

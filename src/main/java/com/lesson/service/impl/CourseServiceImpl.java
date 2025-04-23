@@ -120,11 +120,24 @@ public class CourseServiceImpl implements CourseService {
             );
 
             // 更新课程-教练关联关系
-            courseModel.deleteCourseCoachRelations(request.getId());
+            try {
+                // 先将所有关联标记为已删除
+                courseModel.deleteCourseCoachRelations(request.getId());
 
-            // 添加新的关联关系
-            for (Long coachId : request.getCoachIds()) {
-                courseModel.createCourseCoachRelation(request.getId(), coachId);
+                // 然后添加新的关联关系
+                for (Long coachId : request.getCoachIds()) {
+                    try {
+                        courseModel.createCourseCoachRelation(request.getId(), coachId);
+                    } catch (Exception e) {
+                        log.error("创建课程-教练关联失败: courseId={}, coachId={}, error={}",
+                                 request.getId(), coachId, e.getMessage());
+                        // 继续处理其他教练关联，而不是直接失败
+                    }
+                }
+            } catch (Exception e) {
+                log.error("更新课程-教练关联失败: courseId={}, error={}", request.getId(), e.getMessage(), e);
+                // 即使教练关联更新失败，也不应该影响课程基本信息的更新
+                // 只记录错误，不抛出异常
             }
 
             log.info("课程更新成功: courseId={}, name={}, coachIds={}",
