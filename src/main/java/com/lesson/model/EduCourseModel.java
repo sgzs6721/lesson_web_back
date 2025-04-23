@@ -53,16 +53,37 @@ public class EduCourseModel {
   public void updateCourse(Long id, String name, Long typeId,
                            BigDecimal unitHours, BigDecimal totalHours, BigDecimal price,
                            Long campusId, String description) {
-    dsl.update(EDU_COURSE)
-        .set(EDU_COURSE.NAME, name)
-        .set(EDU_COURSE.TYPE_ID, typeId)
-        .set(EDU_COURSE.UNIT_HOURS, unitHours)
-        .set(EDU_COURSE.TOTAL_HOURS, totalHours)
-        .set(EDU_COURSE.PRICE, price)
-        .set(EDU_COURSE.CAMPUS_ID, campusId)
-        .set(EDU_COURSE.DESCRIPTION, description)
-        .where(EDU_COURSE.ID.eq(id))
-        .execute();
+    // 获取当前课程信息
+    CourseDetailRecord existingCourse = getCourseById(id);
+    if (existingCourse == null) {
+      throw new RuntimeException("课程不存在或已删除");
+    }
+
+    // 如果课程名称没有变化，则不更新名称字段，避免触发唯一索引约束
+    if (name != null && name.equals(existingCourse.getName()) &&
+        campusId != null && campusId.equals(existingCourse.getCampusId())) {
+      // 如果名称和校区ID没有变化，不更新这些字段
+      dsl.update(EDU_COURSE)
+          .set(EDU_COURSE.TYPE_ID, typeId)
+          .set(EDU_COURSE.UNIT_HOURS, unitHours)
+          .set(EDU_COURSE.TOTAL_HOURS, totalHours)
+          .set(EDU_COURSE.PRICE, price)
+          .set(EDU_COURSE.DESCRIPTION, description)
+          .where(EDU_COURSE.ID.eq(id))
+          .execute();
+    } else {
+      // 如果名称或校区ID变化了，更新所有字段
+      dsl.update(EDU_COURSE)
+          .set(EDU_COURSE.NAME, name)
+          .set(EDU_COURSE.TYPE_ID, typeId)
+          .set(EDU_COURSE.UNIT_HOURS, unitHours)
+          .set(EDU_COURSE.TOTAL_HOURS, totalHours)
+          .set(EDU_COURSE.PRICE, price)
+          .set(EDU_COURSE.CAMPUS_ID, campusId)
+          .set(EDU_COURSE.DESCRIPTION, description)
+          .where(EDU_COURSE.ID.eq(id))
+          .execute();
+    }
   }
 
   public void deleteCourseCoachRelations(Long courseId) {

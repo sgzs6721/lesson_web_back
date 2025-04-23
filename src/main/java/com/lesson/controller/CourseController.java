@@ -33,8 +33,20 @@ public class CourseController {
     @PostMapping("/update")
     @Operation(summary = "更新课程")
     public Result<Void> update(@Validated @RequestBody CourseUpdateRequest request) {
-        courseService.updateCourse(request);
-        return Result.success();
+        try {
+            courseService.updateCourse(request);
+            return Result.success();
+        } catch (Exception e) {
+            // 捕获并返回详细的错误信息
+            String errorMessage = e.getMessage();
+
+            // 检查是否是唯一索引约束错误
+            if (e.getMessage().contains("Duplicate entry") && e.getMessage().contains("idx_unique_name_campus_institution")) {
+                errorMessage = "课程名称在当前校区已存在，请使用不同的课程名称。\n错误详情：" + e.getMessage();
+            }
+
+            return Result.failed(errorMessage);
+        }
     }
 
     @PostMapping("/delete")
@@ -64,4 +76,4 @@ public class CourseController {
         courseService.updateCourseStatus(request.getId(), request.getStatus());
         return Result.success();
     }
-} 
+}

@@ -73,7 +73,7 @@ public class CourseServiceImpl implements CourseService {
                 courseModel.createCourseCoachRelation(courseId, coachId);
             }
 
-            log.info("课程创建成功: courseId={}, name={}, coachIds={}", 
+            log.info("课程创建成功: courseId={}, name={}, coachIds={}",
                      courseId, request.getName(), request.getCoachIds());
 
             return courseId;
@@ -121,20 +121,37 @@ public class CourseServiceImpl implements CourseService {
 
             // 更新课程-教练关联关系
             courseModel.deleteCourseCoachRelations(request.getId());
-            
+
             // 添加新的关联关系
             for (Long coachId : request.getCoachIds()) {
                 courseModel.createCourseCoachRelation(request.getId(), coachId);
             }
 
-            log.info("课程更新成功: courseId={}, name={}, coachIds={}", 
+            log.info("课程更新成功: courseId={}, name={}, coachIds={}",
                      request.getId(), request.getName(), request.getCoachIds());
         } catch (BusinessException e) {
             log.warn("更新课程失败: id={}, error={}", request.getId(), e.getMessage());
             throw e;
         } catch (Exception e) {
-            log.error("更新课程异常: id={}", request.getId(), e);
-            throw new BusinessException("更新课程失败，请稍后重试");
+            log.error("更新课程异常: id={}, error={}", request.getId(), e.getMessage(), e);
+
+            // 检查是否是唯一索引约束错误
+            if (e.getMessage() != null && e.getMessage().contains("Duplicate entry") && e.getMessage().contains("idx_unique_name_campus_institution")) {
+                // 获取当前课程信息
+                CourseDetailRecord existingCourse = courseModel.getCourseById(request.getId());
+
+                // 检查是否是名称或校区变更导致的错误
+                if (existingCourse != null &&
+                    (!request.getName().equals(existingCourse.getName()) ||
+                     !request.getCampusId().equals(existingCourse.getCampusId()))) {
+                    throw new BusinessException("该课程名称在所选校区已存在，请使用不同的课程名称。");
+                } else {
+                    throw new BusinessException("更新课程失败，可能是由于唯一索引约束冲突。请联系系统管理员。");
+                }
+            }
+
+            // 其他错误直接抛出，保留原始错误信息
+            throw new BusinessException("更新课程失败: " + e.getMessage());
         }
     }
 
@@ -172,10 +189,10 @@ public class CourseServiceImpl implements CourseService {
         CourseVO vo = new CourseVO();
         // 复制基本信息
         BeanUtils.copyProperties(record, vo);
-        
+
         // 设置课程ID
         vo.setId(String.valueOf(record.getId()));
-        
+
         // 设置课程类型
         if (record.getTypeId() != null) {
             String typeValue = courseTypeMap.get(record.getTypeId());
@@ -183,7 +200,7 @@ public class CourseServiceImpl implements CourseService {
                 vo.setType(typeValue);
             }
         }
-        
+
         // 设置教练信息
         if (coaches != null && !coaches.isEmpty()) {
             List<CourseVO.CoachInfo> coachInfos = coaches.stream()
@@ -198,7 +215,7 @@ public class CourseServiceImpl implements CourseService {
         } else {
             vo.setCoaches(new ArrayList<>());
         }
-        
+
         return vo;
     }
 
@@ -243,10 +260,10 @@ public class CourseServiceImpl implements CourseService {
                 CourseVO vo = new CourseVO();
                 // 复制基本信息
                 BeanUtils.copyProperties(record, vo);
-                
+
                 // 设置课程ID
                 vo.setId(String.valueOf(record.getId()));
-                
+
                 // 设置课程类型
                 if (record.getTypeId() != null) {
                     String typeValue = courseTypeMap.get(record.getTypeId());
@@ -254,7 +271,7 @@ public class CourseServiceImpl implements CourseService {
                         vo.setType(typeValue);
                     }
                 }
-                
+
                 // 设置教练信息
                 List<CoachDetailRecord> coaches = courseCoachMap.get(record.getId());
                 if (coaches != null && !coaches.isEmpty()) {
@@ -270,7 +287,7 @@ public class CourseServiceImpl implements CourseService {
                 } else {
                     vo.setCoaches(new ArrayList<>());
                 }
-                
+
                 return vo;
             })
             .collect(Collectors.toList());
@@ -293,4 +310,4 @@ public class CourseServiceImpl implements CourseService {
         BeanUtils.copyProperties(record, vo);
         return vo;
     }
-} 
+}
