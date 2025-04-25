@@ -81,7 +81,8 @@ public class CourseController {
     @GetMapping("/simple")
     @Operation(summary = "获取课程简要信息列表",
                description = "返回课程的ID、名称、教练名称、课程类型和状态等简要信息")
-    public Result<List<CourseSimpleVO>> simple() {
-        return Result.success(courseService.listCourseSimple());
+    public Result<List<CourseSimpleVO>> simple(
+        @Parameter(description = "校区ID", required = true) @RequestParam Long campusId) {
+        return Result.success(courseService.listCourseSimple(campusId));
     }
 }

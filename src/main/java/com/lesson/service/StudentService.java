@@ -10,8 +10,11 @@ import com.lesson.repository.Tables;
 import com.lesson.repository.tables.records.EduCourseRecord;
 import com.lesson.repository.tables.records.EduStudentCourseRecord;
 import com.lesson.repository.tables.records.EduStudentRecord;
+import com.lesson.vo.PageResult;
+import com.lesson.vo.request.StudentQueryRequest;
 import com.lesson.vo.request.StudentWithCourseCreateRequest;
 import com.lesson.vo.request.StudentWithCourseUpdateRequest;
+import com.lesson.vo.response.StudentCourseListVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
@@ -170,6 +173,8 @@ public class StudentService {
             if (courseInfo.getFixedScheduleTimes() != null && !courseInfo.getFixedScheduleTimes().isEmpty()) {
                 String fixedScheduleJson = objectMapper.writeValueAsString(courseInfo.getFixedScheduleTimes());
                 studentCourseRecord.setFixedSchedule(fixedScheduleJson);
+            } else {
+                 studentCourseRecord.setFixedSchedule(null); // 如果列表为空，则设置null
             }
         } catch (JsonProcessingException e) {
             log.error("序列化固定排课时间失败", e);
@@ -178,5 +183,31 @@ public class StudentService {
         
         // 7. 存储学员课程关系
         studentCourseModel.updateStudentCourse(studentCourseRecord);
+    }
+    
+    /**
+     * 查询学员列表（包含课程信息）
+     *
+     * @param request 查询请求
+     * @return 分页结果
+     */
+    public PageResult<StudentCourseListVO> listStudentsWithCourse(StudentQueryRequest request) {
+         // 从token中获取机构ID
+        Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
+        if (institutionId == null) {
+             // 在开发或测试环境中，如果token中没有机构ID，可以设置一个默认值，或者抛出异常
+             // throw new BusinessException("无法获取机构ID");
+             log.warn("无法从请求中获取机构ID (orgId)，将不按机构筛选");
+        }
+        request.setInstitutionId(institutionId); // 设置机构ID，即使是null，让Model层处理
+        
+        List<StudentCourseListVO> list = studentCourseModel.listStudentCourseDetails(request);
+        long total = studentCourseModel.countStudentCourseDetails(request);
+        
+        // TODO: 获取最近上课时间逻辑 (可能需要额外查询 edu_student_course_record 表)
+        // 可以在这里遍历list，对每个VO查询并设置 lastClassTime
+        
+        // 使用 PageResult.of 静态方法创建实例
+        return PageResult.of(list, total, request.getOffset() / request.getLimit() + 1, request.getLimit());
     }
 } 

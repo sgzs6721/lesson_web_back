@@ -326,10 +326,15 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public List<CourseSimpleVO> listCourseSimple() {
+    public List<CourseSimpleVO> listCourseSimple(Long campusId) {
         try {
+            // 从token中获取机构ID
+            Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
+            if (institutionId == null) {
+                throw new BusinessException("机构ID不能为空");
+            }
             // 获取所有未删除的课程
-            List<CourseDetailRecord> courses = courseModel.listAllCourses();
+            List<CourseDetailRecord> courses = courseModel.listAllCourses(campusId, institutionId);
             if (CollectionUtils.isEmpty(courses)) {
                 return Collections.emptyList();
             }
@@ -353,6 +358,7 @@ public class CourseServiceImpl implements CourseService {
                 CourseSimpleVO vo = new CourseSimpleVO();
                 vo.setId(course.getId());
                 vo.setName(course.getName());
+                vo.setTypeId(course.getTypeId());
                 vo.setTypeName(courseTypeMap.getOrDefault(course.getTypeId(), ""));
                 vo.setStatus(course.getStatus());
 

@@ -69,5 +69,7 @@ public interface CourseService {
      *
      * @return 课程简要信息列表
      */
-    List<CourseSimpleVO> listCourseSimple();
+    List<CourseSimpleVO> listCourseSimple(Long campusId);
+
+
 }

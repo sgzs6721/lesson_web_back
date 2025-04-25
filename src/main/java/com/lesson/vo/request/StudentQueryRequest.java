@@ -4,25 +4,47 @@ import com.lesson.enums.StudentStatus;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.YearMonth;
 
 /**
- * 学员查询请求
+ * 学员查询请求（包含课程信息筛选）
  */
 @Data
 @ApiModel("学员查询请求")
 public class StudentQueryRequest {
 
     /**
-     * 关键字（姓名或手机号）
+     * 关键字（学员姓名/ID/电话）
      */
-    @ApiModelProperty("关键字（姓名或手机号）")
+    @ApiModelProperty(value = "关键字（学员姓名/ID/电话）", example = "张三")
     private String keyword;
 
     /**
      * 学员状态
      */
-    @ApiModelProperty("学员状态")
+    @ApiModelProperty(value = "学员课程状态 (STUDYING, SUSPENDED, GRADUATED)", example = "STUDYING")
     private StudentStatus status;
+
+    /**
+     * 课程ID
+     */
+    @ApiModelProperty(value = "课程ID", example = "1")
+    private Long courseId;
+
+    /**
+     * 报名年月
+     */
+    @ApiModelProperty(value = "报名年月 (格式: yyyy-MM)", example = "2025-04")
+    @DateTimeFormat(pattern = "yyyy-MM")
+    private YearMonth enrollmentYearMonth;
+
+    /**
+     * 排序方式
+     */
+    @ApiModelProperty(value = "排序方式", example = "enrollmentDate_desc")
+    private String sortBy;
 
     /**
      * 校区ID
@@ -39,12 +61,12 @@ public class StudentQueryRequest {
     /**
      * 偏移量
      */
-    @ApiModelProperty("偏移量")
+    @ApiModelProperty(value = "偏移量", example = "0")
     private Integer offset = 0;
 
     /**
      * 限制
      */
-    @ApiModelProperty("限制")
+    @ApiModelProperty(value = "限制", example = "10")
     private Integer limit = 10;
 } 

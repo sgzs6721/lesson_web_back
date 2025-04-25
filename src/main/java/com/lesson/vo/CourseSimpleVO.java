@@ -25,9 +25,15 @@ public class CourseSimpleVO {
     private String name;
 
     /**
-     * 课程类型
+     * 课程类型ID
      */
-    @Schema(description = "课程类型")
+    @Schema(description = "课程类型ID")
+    private Long typeId;
+
+    /**
+     * 课程类型名称
+     */
+    @Schema(description = "课程类型名称")
     private String typeName;
 
     /**

@@ -170,42 +170,42 @@ public class StudentCourseController {
         return Result.success(vo);
     }
 
-    /**
-     * 查询学员课程列表
-     *
-     * @param request 查询参数
-     * @return 学员课程列表分页结果
-     */
-    @GetMapping
-    @Operation(summary = "查询学员课程列表", 
-               description = "根据条件分页查询学员课程列表，支持按学员、课程、状态等条件筛选")
-    public Result<PageResult<StudentCourseListVO>> listStudentCourses(
-            @Parameter(description = "查询参数") @Valid StudentCourseQueryRequest request) {
-        List<StudentCourseRecord> records = studentCourseModel.listStudentCourses(
-                request.getStudentId(),
-                request.getCourseId(),
-                request.getStatus(),
-                request.getCampusId(),
-                request.getInstitutionId(),
-                request.getOffset(),
-                request.getLimit()
-        );
-        long total = studentCourseModel.countStudentCourses(
-                request.getStudentId(),
-                request.getCourseId(),
-                request.getStatus(),
-                request.getCampusId(),
-                request.getInstitutionId()
-        );
-        List<StudentCourseListVO> list = records.stream()
-                .map(record -> {
-                    StudentCourseListVO vo = new StudentCourseListVO();
-                    BeanUtils.copyProperties(record, vo);
-                    return vo;
-                })
-                .collect(Collectors.toList());
-        return Result.success(new PageResult<StudentCourseListVO>(list, total));
-    }
+//    /**
+//     * 查询学员课程列表
+//     *
+//     * @param request 查询参数
+//     * @return 学员课程列表分页结果
+//     */
+//    @GetMapping
+//    @Operation(summary = "查询学员课程列表",
+//               description = "根据条件分页查询学员课程列表，支持按学员、课程、状态等条件筛选")
+//    public Result<PageResult<StudentCourseListVO>> listStudentCourses(
+//            @Parameter(description = "查询参数") @Valid StudentCourseQueryRequest request) {
+//        List<StudentCourseRecord> records = studentCourseModel.listStudentCourses(
+//                request.getStudentId(),
+//                request.getCourseId(),
+//                request.getStatus(),
+//                request.getCampusId(),
+//                request.getInstitutionId(),
+//                request.getOffset(),
+//                request.getLimit()
+//        );
+//        long total = studentCourseModel.countStudentCourses(
+//                request.getStudentId(),
+//                request.getCourseId(),
+//                request.getStatus(),
+//                request.getCampusId(),
+//                request.getInstitutionId()
+//        );
+//        List<StudentCourseListVO> list = records.stream()
+//                .map(record -> {
+//                    StudentCourseListVO vo = new StudentCourseListVO();
+//                    BeanUtils.copyProperties(record, vo);
+//                    return vo;
+//                })
+//                .collect(Collectors.toList());
+//        return Result.success(new PageResult<StudentCourseListVO>(list, total));
+//    }
 
     /**
      * 获取学员课程操作记录

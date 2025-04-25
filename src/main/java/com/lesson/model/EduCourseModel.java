@@ -250,11 +250,37 @@ public class EduCourseModel {
    *
    * @return 课程列表
    */
-  public List<CourseDetailRecord> listAllCourses() {
+  public List<CourseDetailRecord> listAllCourses(Long campusId, Long institutionId) {
     return dsl.select()
         .from(EDU_COURSE)
         .where(EDU_COURSE.DELETED.eq(0))
+        .and(EDU_COURSE.CAMPUS_ID.eq(campusId))
+        .and(EDU_COURSE.INSTITUTION_ID.eq(institutionId))
         .orderBy(EDU_COURSE.ID.desc())
+        .fetchInto(CourseDetailRecord.class);
+  }
+
+  /**
+   * 根据校区ID和机构ID获取课程列表
+   *
+   * @param campusId 校区ID
+   * @param institutionId 机构ID
+   * @return 课程列表
+   */
+  public List<CourseDetailRecord> listCoursesByCampus(Long campusId, Long institutionId) {
+    SelectConditionStep<Record> query = dsl.select()
+        .from(EDU_COURSE)
+        .where(EDU_COURSE.DELETED.eq(0));
+
+    if (institutionId != null) {
+      query.and(EDU_COURSE.INSTITUTION_ID.eq(institutionId));
+    }
+
+    if (campusId != null) {
+      query.and(EDU_COURSE.CAMPUS_ID.eq(campusId));
+    }
+
+    return query.orderBy(EDU_COURSE.ID.desc())
         .fetchInto(CourseDetailRecord.class);
   }
 

@@ -1,17 +1,18 @@
 package com.lesson.controller;
 
-import com.lesson.common.PageResult;
 import com.lesson.common.Result;
 import com.lesson.enums.StudentStatus;
 import com.lesson.model.EduStudentModel;
 import com.lesson.model.record.StudentDetailRecord;
 import com.lesson.repository.tables.records.EduStudentRecord;
 import com.lesson.service.StudentService;
+import com.lesson.vo.PageResult;
 import com.lesson.vo.request.StudentCreateRequest;
 import com.lesson.vo.request.StudentQueryRequest;
 import com.lesson.vo.request.StudentUpdateRequest;
 import com.lesson.vo.request.StudentWithCourseCreateRequest;
 import com.lesson.vo.request.StudentWithCourseUpdateRequest;
+import com.lesson.vo.response.StudentCourseListVO;
 import com.lesson.vo.response.StudentDetailVO;
 import com.lesson.vo.response.StudentListVO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -118,36 +119,16 @@ public class StudentController {
     }
 
     /**
-     * 查询学员列表
+     * 查询学员列表 (包含课程信息)
      *
      * @param request 查询参数
-     * @return 学员列表分页结果
+     * @return 学员课程列表分页结果
      */
     @GetMapping("/list")
-    @Operation(summary = "查询学员列表",
-               description = "根据条件分页查询学员列表，支持按姓名、手机号、状态等条件筛选")
-    public Result<PageResult<StudentListVO>> list(@Validated StudentQueryRequest request) {
-        List<StudentDetailRecord> records = studentModel.listStudents(
-                request.getKeyword(),
-                request.getStatus(),
-                request.getCampusId(),
-                request.getInstitutionId(),
-                request.getOffset(),
-                request.getLimit()
-        );
-        long total = studentModel.countStudents(
-                request.getKeyword(),
-                request.getStatus(),
-                request.getCampusId(),
-                request.getInstitutionId()
-        );
-        List<StudentListVO> list = records.stream()
-                .map(record -> {
-                    StudentListVO vo = new StudentListVO();
-                    BeanUtils.copyProperties(record, vo);
-                    return vo;
-                })
-                .collect(Collectors.toList());
-        return Result.success(new PageResult<StudentListVO>(list, total));
+    @Operation(summary = "查询学员列表 (含课程信息)",
+               description = "根据条件分页查询学员列表，包含关联的课程信息，支持按姓名、手机号、状态、课程、报名年月等条件筛选和排序")
+    public Result<PageResult<StudentCourseListVO>> list(@Validated StudentQueryRequest request) {
+        PageResult<StudentCourseListVO> pageResult = studentService.listStudentsWithCourse(request);
+        return Result.success(pageResult);
     }
 }
