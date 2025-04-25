@@ -3,6 +3,7 @@ package com.lesson.controller;
 import com.lesson.common.PageResult;
 import com.lesson.common.Result;
 import com.lesson.service.CourseService;
+import com.lesson.vo.CourseSimpleVO;
 import com.lesson.vo.CourseVO;
 import com.lesson.vo.request.CourseCreateRequest;
 import com.lesson.vo.request.CourseQueryRequest;
@@ -75,5 +76,12 @@ public class CourseController {
     public Result<Void> updateStatus(@Validated @RequestBody CourseStatusRequest request) {
         courseService.updateCourseStatus(request.getId(), request.getStatus());
         return Result.success();
+    }
+
+    @GetMapping("/simple")
+    @Operation(summary = "获取课程简要信息列表",
+               description = "返回课程的ID、名称、教练名称、课程类型和状态等简要信息")
+    public Result<List<CourseSimpleVO>> simple() {
+        return Result.success(courseService.listCourseSimple());
     }
 }

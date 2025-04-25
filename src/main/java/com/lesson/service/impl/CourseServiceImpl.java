@@ -11,6 +11,7 @@ import com.lesson.model.record.CoachDetailRecord;
 import com.lesson.model.record.CourseDetailRecord;
 import com.lesson.repository.tables.records.SysConstantRecord;
 import com.lesson.service.CourseService;
+import com.lesson.vo.CourseSimpleVO;
 import com.lesson.vo.CourseVO;
 import com.lesson.vo.request.CourseCreateRequest;
 import com.lesson.vo.request.CourseQueryRequest;
@@ -322,5 +323,58 @@ public class CourseServiceImpl implements CourseService {
         CourseVO vo = new CourseVO();
         BeanUtils.copyProperties(record, vo);
         return vo;
+    }
+
+    @Override
+    public List<CourseSimpleVO> listCourseSimple() {
+        try {
+            // 获取所有未删除的课程
+            List<CourseDetailRecord> courses = courseModel.listAllCourses();
+            if (CollectionUtils.isEmpty(courses)) {
+                return Collections.emptyList();
+            }
+
+            // 获取所有课程类型
+            List<SysConstantRecord> courseTypes = constantModel.listByType("COURSE_TYPE");
+            Map<Long, String> courseTypeMap = new HashMap<>();
+            for (SysConstantRecord record : courseTypes) {
+                courseTypeMap.put(record.getId(), record.getConstantValue());
+            }
+
+            // 获取所有教练信息
+            Map<Long, List<CoachDetailRecord>> courseCoachMap = new HashMap<>();
+            for (CourseDetailRecord course : courses) {
+                List<CoachDetailRecord> coaches = sysCoachModel.getCoachesByCourseId(course.getId());
+                courseCoachMap.put(course.getId(), coaches);
+            }
+
+            // 转换为VO
+            return courses.stream().map(course -> {
+                CourseSimpleVO vo = new CourseSimpleVO();
+                vo.setId(course.getId());
+                vo.setName(course.getName());
+                vo.setTypeName(courseTypeMap.getOrDefault(course.getTypeId(), ""));
+                vo.setStatus(course.getStatus());
+
+                // 设置教练信息
+                List<CoachDetailRecord> coaches = courseCoachMap.getOrDefault(course.getId(), Collections.emptyList());
+                if (!CollectionUtils.isEmpty(coaches)) {
+                    List<CourseSimpleVO.CoachInfo> coachInfos = coaches.stream().map(coach -> {
+                        CourseSimpleVO.CoachInfo coachInfo = new CourseSimpleVO.CoachInfo();
+                        coachInfo.setId(coach.getId());
+                        coachInfo.setName(coach.getName());
+                        return coachInfo;
+                    }).collect(Collectors.toList());
+                    vo.setCoaches(coachInfos);
+                } else {
+                    vo.setCoaches(Collections.emptyList());
+                }
+
+                return vo;
+            }).collect(Collectors.toList());
+        } catch (Exception e) {
+            log.error("获取课程简要信息列表异常", e);
+            throw new BusinessException("获取课程简要信息列表失败，请稍后重试");
+        }
     }
 }

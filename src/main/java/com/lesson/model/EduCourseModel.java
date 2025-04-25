@@ -245,6 +245,19 @@ public class EduCourseModel {
     return query.fetchOne(0, Long.class);
   }
 
+  /**
+   * 获取所有未删除的课程
+   *
+   * @return 课程列表
+   */
+  public List<CourseDetailRecord> listAllCourses() {
+    return dsl.select()
+        .from(EDU_COURSE)
+        .where(EDU_COURSE.DELETED.eq(0))
+        .orderBy(EDU_COURSE.ID.desc())
+        .fetchInto(CourseDetailRecord.class);
+  }
+
   private SortField<?> getSortField(String field, String order) {
     Field<?> sortField;
     switch (field) {

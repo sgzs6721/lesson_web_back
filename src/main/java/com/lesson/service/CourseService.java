@@ -1,6 +1,7 @@
 package com.lesson.service;
 
 import com.lesson.enums.CourseStatus;
+import com.lesson.vo.CourseSimpleVO;
 import com.lesson.vo.CourseVO;
 import com.lesson.vo.request.CourseCreateRequest;
 import com.lesson.vo.request.CourseQueryRequest;
@@ -62,4 +63,11 @@ public interface CourseService {
      * @return 课程总数
      */
     long countCourses(CourseQueryRequest request);
-} 
+
+    /**
+     * 获取课程简要信息列表
+     *
+     * @return 课程简要信息列表
+     */
+    List<CourseSimpleVO> listCourseSimple();
+}
