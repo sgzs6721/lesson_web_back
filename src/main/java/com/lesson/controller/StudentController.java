@@ -44,7 +44,7 @@ public class StudentController {
     private final EduStudentModel studentModel;
     private final StudentService studentService;
 
-    
+
     /**
      * 创建学员及课程
      *
@@ -58,7 +58,7 @@ public class StudentController {
         Long studentId = studentService.createStudentWithCourse(request);
         return Result.success(studentId);
     }
-    
+
     /**
      * 更新学员及课程
      *
@@ -113,14 +113,17 @@ public class StudentController {
      */
     @GetMapping("/detail")
     @Operation(summary = "获取学员详情",
-               description = "根据学员ID获取学员详细信息")
-    public Result<StudentDetailVO> detail(
+               description = "根据学员ID获取学员详细信息，包含关联的课程信息")
+    public Result<StudentCourseListVO> detail(
             @Parameter(description = "学员ID", required = true) @RequestParam Long id) {
-        StudentDetailRecord detail = studentModel.getStudentById(id)
-                .orElseThrow(() -> new IllegalArgumentException("学员不存在"));
-        StudentDetailVO vo = new StudentDetailVO();
-        BeanUtils.copyProperties(detail, vo);
-        return Result.success(vo);
+        // 直接根据学员ID获取学员详情
+        StudentCourseListVO studentDetail = studentService.getStudentCourseDetail(id);
+
+        if (studentDetail == null) {
+            throw new IllegalArgumentException("学员不存在或没有关联课程");
+        }
+
+        return Result.success(studentDetail);
     }
 
     /**

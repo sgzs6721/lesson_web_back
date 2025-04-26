@@ -611,11 +611,8 @@ public class EduStudentCourseModel {
         detailRecord.setConsumedHours(studentCourse.getConsumedHours());
         String statusStr = studentCourse.getStatus();
         if (statusStr != null) {
-             try {
-                 detailRecord.setStatus(StudentStatus.valueOf(statusStr));
-             } catch (IllegalArgumentException e) {
-                 detailRecord.setStatus(null);
-             }
+             // 使用 getByName 方法代替 valueOf
+             detailRecord.setStatus(StudentStatus.getByName(statusStr));
         } else {
             detailRecord.setStatus(null);
         }

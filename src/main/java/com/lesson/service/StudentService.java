@@ -4,13 +4,17 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lesson.common.exception.BusinessException;
 import com.lesson.enums.StudentStatus;
+import com.lesson.model.EduCourseModel;
 import com.lesson.model.EduStudentCourseModel;
 import com.lesson.model.EduStudentModel;
+import com.lesson.model.record.CourseDetailRecord;
+import com.lesson.model.record.StudentDetailRecord;
 import com.lesson.repository.Tables;
 import com.lesson.repository.tables.records.EduCourseRecord;
 import com.lesson.repository.tables.records.EduStudentCourseRecord;
 import com.lesson.repository.tables.records.EduStudentRecord;
 import com.lesson.repository.tables.records.EduStudentCourseRecordRecord;
+import com.lesson.repository.tables.records.SysConstantRecord;
 import com.lesson.vo.PageResult;
 import com.lesson.vo.request.StudentQueryRequest;
 import com.lesson.vo.request.StudentWithCourseCreateRequest;
@@ -23,6 +27,10 @@ import com.lesson.vo.request.StudentPaymentRequest;
 import com.lesson.model.EduStudentPaymentModel;
 import com.lesson.repository.tables.records.EduStudentPaymentRecord;
 import com.lesson.repository.tables.records.EduStudentRefundRecord;
+import org.jooq.impl.DSL;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
@@ -53,6 +61,7 @@ public class StudentService {
   private final DSLContext dsl;
   private final ObjectMapper objectMapper;
   private final EduStudentPaymentModel studentPaymentModel;
+  private final EduCourseModel courseModel;
 
   /**
    * 创建学员及课程
@@ -196,6 +205,107 @@ public class StudentService {
 
     // 7. 存储学员课程关系
     studentCourseModel.updateStudentCourse(studentCourseRecord);
+  }
+
+  /**
+   * 获取学员课程详情
+   *
+   * @param studentId 学员ID
+   * @return 学员课程详情
+   */
+  public StudentCourseListVO getStudentCourseDetail(Long studentId) {
+    // 从 token 中获取机构ID
+    Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
+    if (institutionId == null) {
+      log.warn("无法从请求中获取机构ID (orgId)，将不按机构筛选");
+    }
+
+    // 直接查询学员信息
+    StudentDetailRecord studentDetail = studentModel.getStudentById(studentId)
+        .orElse(null);
+
+    if (studentDetail == null) {
+      return null;
+    }
+
+    // 查询学员关联的课程信息
+    EduStudentCourseRecord studentCourse = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
+        .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(studentId))
+        .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
+        .fetchOne();
+
+    if (studentCourse == null) {
+      return null;
+    }
+
+    // 查询课程信息
+    CourseDetailRecord course = courseModel.getCourseById(studentCourse.getCourseId());
+    if (course == null) {
+      return null;
+    }
+
+    // 查询课程类型
+    String courseTypeName = null;
+    if (course.getTypeId() != null) {
+      SysConstantRecord courseType = dsl.selectFrom(Tables.SYS_CONSTANT)
+          .where(Tables.SYS_CONSTANT.ID.eq(course.getTypeId()))
+          .fetchOne();
+      if (courseType != null) {
+        courseTypeName = courseType.getConstantValue();
+      }
+    }
+
+    // 查询教练信息
+    String coachName = null;
+    if (studentCourse.getCourseId() != null) {
+      coachName = dsl.select(Tables.SYS_COACH.NAME)
+          .from(Tables.SYS_COACH_COURSE)
+          .join(Tables.SYS_COACH).on(Tables.SYS_COACH_COURSE.COACH_ID.eq(Tables.SYS_COACH.ID))
+          .where(Tables.SYS_COACH_COURSE.COURSE_ID.eq(studentCourse.getCourseId()))
+          .and(Tables.SYS_COACH_COURSE.DELETED.eq(0))
+          .and(Tables.SYS_COACH.DELETED.eq(0))
+          .fetchOneInto(String.class);
+    }
+
+    // 查询最近上课时间
+    LocalDate lastClassTime = dsl.select(DSL.max(Tables.EDU_STUDENT_COURSE_OPERATION.OPERATION_TIME).cast(LocalDate.class))
+        .from(Tables.EDU_STUDENT_COURSE_OPERATION)
+        .where(Tables.EDU_STUDENT_COURSE_OPERATION.STUDENT_ID.eq(studentId))
+        .and(Tables.EDU_STUDENT_COURSE_OPERATION.COURSE_ID.eq(studentCourse.getCourseId()))
+        .fetchOneInto(LocalDate.class);
+
+    // 构建返回对象
+    StudentCourseListVO vo = new StudentCourseListVO();
+    vo.setId(studentId);
+    vo.setStudentName(studentDetail.getName());
+    vo.setStudentGender(studentDetail.getGender());
+    vo.setStudentAge(studentDetail.getAge());
+    vo.setStudentPhone(studentDetail.getPhone());
+    vo.setStudentCourseId(studentCourse.getId());
+    vo.setCourseId(studentCourse.getCourseId());
+    vo.setCourseName(course.getName());
+    vo.setCourseType(courseTypeName);
+    vo.setCourseTypeName(courseTypeName);
+
+    vo.setCoachName(coachName != null ? coachName : "");
+
+    vo.setTotalHours(studentCourse.getTotalHours());
+    vo.setConsumedHours(studentCourse.getConsumedHours());
+
+    // 计算剩余课时
+    BigDecimal remainingHours = studentCourse.getTotalHours().subtract(studentCourse.getConsumedHours());
+    vo.setRemainingHours(remainingHours);
+
+    vo.setLastClassTime(lastClassTime);
+    vo.setEnrollmentDate(studentCourse.getStartDate());
+    vo.setEndDate(studentCourse.getEndDate());
+    vo.setStatus(studentCourse.getStatus());
+
+    vo.setCampusId(studentCourse.getCampusId());
+    vo.setInstitutionId(studentCourse.getInstitutionId());
+    vo.setFixedSchedule(studentCourse.getFixedSchedule());
+
+    return vo;
   }
 
   /**

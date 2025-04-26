@@ -72,7 +72,7 @@ public class EduStudentModel {
                 .where(Tables.EDU_STUDENT.ID.eq(id))
                 .and(Tables.EDU_STUDENT.DELETED.eq( 0))
                 .fetchOne();
-        
+
         if (record != null) {
             record.setStatus(status.name());
             record.store();
@@ -117,7 +117,7 @@ public class EduStudentModel {
                 .where(Tables.EDU_STUDENT.ID.eq(id))
                 .and(Tables.EDU_STUDENT.DELETED.eq( 0))
                 .fetchOne();
-        
+
         return convertToDetailRecord(record);
     }
 
@@ -222,12 +222,12 @@ public class EduStudentModel {
         if (record == null) {
             return null;
         }
-        
+
         StudentDetailRecord detailRecord = new StudentDetailRecord();
         detailRecord.setId(record.get(Tables.EDU_STUDENT.ID));
         detailRecord.setName(record.get(Tables.EDU_STUDENT.NAME));
         String statusStr = record.get(Tables.EDU_STUDENT.STATUS, String.class);
-        detailRecord.setStatus(statusStr != null ? StudentStatus.valueOf(statusStr) : null);
+        detailRecord.setStatus(statusStr != null ? StudentStatus.getByName(statusStr) : null);
         detailRecord.setAge(record.get(Tables.EDU_STUDENT.AGE));
         detailRecord.setPhone(record.get(Tables.EDU_STUDENT.PHONE));
         detailRecord.setGender(record.get(Tables.EDU_STUDENT.GENDER));
@@ -236,4 +236,4 @@ public class EduStudentModel {
 
         return detailRecord;
     }
-} 
+}
