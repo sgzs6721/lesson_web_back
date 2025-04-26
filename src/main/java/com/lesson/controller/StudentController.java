@@ -13,9 +13,13 @@ import com.lesson.vo.request.StudentUpdateRequest;
 import com.lesson.vo.request.StudentWithCourseCreateRequest;
 import com.lesson.vo.request.StudentWithCourseUpdateRequest;
 import com.lesson.vo.request.StudentCheckInRequest;
+import com.lesson.vo.request.StudentAttendanceQueryRequest;
 import com.lesson.vo.response.StudentCourseListVO;
 import com.lesson.vo.response.StudentDetailVO;
 import com.lesson.vo.response.StudentListVO;
+import com.lesson.vo.response.StudentAttendanceListVO;
+import com.lesson.vo.request.StudentPaymentRequest;
+import com.lesson.vo.request.StudentRefundRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -136,7 +140,6 @@ public class StudentController {
     /**
      * 学员打卡
      *
-     * @param studentId 学员ID (从路径获取)
      * @param request   打卡请求体
      * @return 操作结果
      */
@@ -147,5 +150,47 @@ public class StudentController {
             @RequestBody @Valid StudentCheckInRequest request) {
         studentService.checkIn(request);
         return Result.success();
+    }
+
+    /**
+     * 查询学员上课记录列表
+     *
+     * @param request 查询参数 (包含 studentId, pageNum, pageSize)
+     * @return 上课记录列表分页结果
+     */
+    @PostMapping("/attendance-list")
+    @Operation(summary = "查询学员上课记录列表",
+               description = "根据学员ID分页查询其上课打卡记录")
+    public Result<PageResult<StudentAttendanceListVO>> listAttendances(@RequestBody @Validated StudentAttendanceQueryRequest request) {
+        PageResult<StudentAttendanceListVO> pageResult = studentService.listStudentAttendances(request);
+        return Result.success(pageResult);
+    }
+
+    /**
+     * 学员缴费
+     *
+     * @param request 缴费请求体 (包含 studentId, courseId 等)
+     * @return 缴费记录ID
+     */
+    @PostMapping("/payment")
+    @Operation(summary = "学员缴费",
+               description = "记录学员缴费信息，并更新对应课程的课时和有效期")
+    public Result<Long> payment(@RequestBody @Valid StudentPaymentRequest request) {
+        Long paymentId = studentService.processPayment(request);
+        return Result.success(paymentId);
+    }
+
+    /**
+     * 学员退费
+     *
+     * @param request 退费请求体 (包含 studentId, courseId 等)
+     * @return 退费记录ID
+     */
+    @PostMapping("/refund")
+    @Operation(summary = "学员退费",
+               description = "记录学员退费信息，并更新对应课程的状态")
+    public Result<Long> refund(@RequestBody @Valid StudentRefundRequest request) {
+        Long refundId = studentService.processRefund(request);
+        return Result.success(refundId);
     }
 }

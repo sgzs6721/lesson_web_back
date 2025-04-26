@@ -13,8 +13,10 @@ import com.lesson.vo.request.StudentCourseClassTransferRequest;
 import com.lesson.vo.request.StudentCourseRefundRequest;
 import com.lesson.vo.request.StudentCourseTransferRequest;
 import com.lesson.vo.request.StudentQueryRequest;
+import com.lesson.vo.request.StudentAttendanceQueryRequest;
 import com.lesson.vo.response.StudentCourseListVO;
 import com.lesson.vo.response.StudentCourseOperationRecordVO;
+import com.lesson.vo.response.StudentAttendanceListVO;
 import lombok.RequiredArgsConstructor;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -25,6 +27,8 @@ import org.springframework.util.StringUtils;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -36,6 +40,7 @@ import static com.lesson.repository.tables.EduStudentCourse.EDU_STUDENT_COURSE;
 import static com.lesson.repository.tables.EduCourse.EDU_COURSE;
 import static com.lesson.repository.tables.SysCoach.SYS_COACH;
 import static com.lesson.repository.tables.SysConstant.SYS_CONSTANT;
+import static com.lesson.repository.tables.EduStudentCourseRecord.EDU_STUDENT_COURSE_RECORD;
 
 /**
  * 学员课程模型
@@ -669,5 +674,102 @@ public class EduStudentCourseModel {
                 .where(EduCourse.EDU_COURSE.ID.eq(classId))
                 .and(EduCourse.EDU_COURSE.DELETED.eq(0))
                 .fetchOne(0, String.class);
+    }
+
+    /**
+     * 查询学员上课记录列表
+     */
+    public List<StudentAttendanceListVO> listStudentAttendances(StudentAttendanceQueryRequest request, Long institutionId) {
+        SelectJoinStep<?> select = dsl.select(
+                    EDU_STUDENT_COURSE_RECORD.ID.as("record_id"),
+                    EDU_STUDENT_COURSE_RECORD.COURSE_DATE,
+                    EDU_STUDENT_COURSE_RECORD.START_TIME,
+                    EDU_STUDENT_COURSE_RECORD.END_TIME,
+                    EDU_STUDENT_COURSE_RECORD.NOTES,
+                    EDU_COURSE.NAME.as("course_name"),
+                    SYS_COACH.NAME.as("coach_name")
+                )
+                .from(EDU_STUDENT_COURSE_RECORD)
+                .join(EDU_COURSE).on(EDU_STUDENT_COURSE_RECORD.COURSE_ID.eq(EDU_COURSE.ID))
+                .leftJoin(SYS_COACH).on(EDU_STUDENT_COURSE_RECORD.COACH_ID.eq(SYS_COACH.ID));
+
+        Condition conditions = EDU_STUDENT_COURSE_RECORD.DELETED.eq(0)
+                               .and(EDU_COURSE.DELETED.eq(0)); // 确保关联的课程未删除
+
+        // 如果指定了学员ID，则按学员ID筛选
+        if (request.getStudentId() != null) {
+            conditions = conditions.and(EDU_STUDENT_COURSE_RECORD.STUDENT_ID.eq(request.getStudentId()));
+        }
+
+        // 校区ID筛选
+        if (request.getCampusId() != null) {
+            conditions = conditions.and(EDU_STUDENT_COURSE_RECORD.CAMPUS_ID.eq(request.getCampusId()));
+        }
+
+        // 机构ID筛选
+        if (institutionId != null) {
+            conditions = conditions.and(EDU_STUDENT_COURSE_RECORD.INSTITUTION_ID.eq(institutionId));
+        }
+
+        // 可以添加更多筛选条件，比如日期范围
+
+        Result<?> result = select
+                .where(conditions)
+                .orderBy(EDU_STUDENT_COURSE_RECORD.COURSE_DATE.desc(), EDU_STUDENT_COURSE_RECORD.START_TIME.desc()) // 按日期和时间降序
+                .limit(request.getPageSize())
+                .offset((request.getPageNum() - 1) * request.getPageSize())
+                .fetch();
+
+        return result.map(this::mapToStudentAttendanceListVO);
+    }
+
+    /**
+     * 统计学员上课记录数量
+     */
+    public long countStudentAttendances(StudentAttendanceQueryRequest request, Long institutionId) {
+         SelectJoinStep<?> select = dsl.selectCount()
+                .from(EDU_STUDENT_COURSE_RECORD)
+                .join(EDU_COURSE).on(EDU_STUDENT_COURSE_RECORD.COURSE_ID.eq(EDU_COURSE.ID));
+
+         Condition conditions = EDU_STUDENT_COURSE_RECORD.DELETED.eq(0)
+                               .and(EDU_COURSE.DELETED.eq(0));
+
+         // 如果指定了学员ID，则按学员ID筛选
+         if (request.getStudentId() != null) {
+             conditions = conditions.and(EDU_STUDENT_COURSE_RECORD.STUDENT_ID.eq(request.getStudentId()));
+         }
+
+         // 校区ID筛选
+         if (request.getCampusId() != null) {
+             conditions = conditions.and(EDU_STUDENT_COURSE_RECORD.CAMPUS_ID.eq(request.getCampusId()));
+         }
+
+         // 机构ID筛选
+         if (institutionId != null) {
+             conditions = conditions.and(EDU_STUDENT_COURSE_RECORD.INSTITUTION_ID.eq(institutionId));
+         }
+
+         // 可以添加更多筛选条件
+
+         return select.where(conditions).fetchOne(0, long.class);
+    }
+
+    /**
+     * 将查询结果映射到 StudentAttendanceListVO
+     */
+    private StudentAttendanceListVO mapToStudentAttendanceListVO(Record record) {
+        StudentAttendanceListVO vo = new StudentAttendanceListVO();
+        vo.setRecordId(record.get("record_id", Long.class));
+        vo.setCourseDate(record.get("course_date", LocalDate.class));
+        LocalTime startTime = record.get("start_time", LocalTime.class);
+        LocalTime endTime = record.get("end_time", LocalTime.class);
+        // 格式化时间范围
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+        vo.setTimeRange(startTime.format(timeFormatter) + " - " + endTime.format(timeFormatter));
+
+        vo.setCoachName(record.get("coach_name", String.class));
+        vo.setCourseName(record.get("course_name", String.class));
+        vo.setNotes(record.get("notes", String.class));
+        return vo;
     }
 }

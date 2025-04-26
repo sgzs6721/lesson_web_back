@@ -1,20 +1,12 @@
 package com.lesson.controller;
 
-import com.lesson.common.PageResult;
 import com.lesson.common.Result;
-import com.lesson.enums.OperationType;
 import com.lesson.enums.StudentStatus;
 import com.lesson.model.EduStudentCourseModel;
 import com.lesson.model.record.StudentCourseRecord;
 import com.lesson.repository.tables.records.EduStudentCourseRecord;
-import com.lesson.vo.request.StudentCourseCreateRequest;
-import com.lesson.vo.request.StudentCourseQueryRequest;
-import com.lesson.vo.request.StudentCourseRefundRequest;
-import com.lesson.vo.request.StudentCourseTransferRequest;
-import com.lesson.vo.request.StudentCourseUpdateRequest;
-import com.lesson.vo.request.StudentCourseClassTransferRequest;
+import com.lesson.vo.request.*;
 import com.lesson.vo.response.StudentCourseDetailVO;
-import com.lesson.vo.response.StudentCourseListVO;
 import com.lesson.vo.response.StudentCourseOperationRecordVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -25,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 学员课程管理接口
@@ -45,7 +36,7 @@ public class StudentCourseController {
      * @return 记录ID
      */
     @PostMapping
-    @Operation(summary = "创建学员课程", 
+    @Operation(summary = "创建学员课程",
                description = "为学员创建新的课程记录，需要指定学员ID、课程ID等信息")
     public Result<Long> createStudentCourse(
             @Parameter(description = "创建学员课程请求") @RequestBody @Valid StudentCourseCreateRequest request) {
@@ -63,7 +54,7 @@ public class StudentCourseController {
      * @return 操作结果
      */
     @PutMapping("/{id}")
-    @Operation(summary = "更新学员课程", 
+    @Operation(summary = "更新学员课程",
                description = "更新学员课程信息，包括课时、费用等")
     public Result<Void> updateStudentCourse(
             @Parameter(description = "记录ID", required = true) @PathVariable Long id,
@@ -82,7 +73,7 @@ public class StudentCourseController {
      * @return 操作结果
      */
     @DeleteMapping("/{id}")
-    @Operation(summary = "删除学员课程", 
+    @Operation(summary = "删除学员课程",
                description = "删除学员课程记录（逻辑删除）")
     public Result<Void> deleteStudentCourse(
             @Parameter(description = "记录ID", required = true) @PathVariable Long id) {
@@ -98,7 +89,7 @@ public class StudentCourseController {
      * @return 操作结果
      */
     @PutMapping("/{id}/status")
-    @Operation(summary = "更新学员课程状态", 
+    @Operation(summary = "更新学员课程状态",
                description = "更新学员课程状态，可选值：STUDYING-在读，COMPLETED-已完成，REFUNDED-已退费")
     public Result<Void> updateStudentCourseStatus(
             @Parameter(description = "记录ID", required = true) @PathVariable Long id,
@@ -114,7 +105,7 @@ public class StudentCourseController {
      * @return 操作结果
      */
     @PostMapping("/transfer")
-    @Operation(summary = "学员转课", 
+    @Operation(summary = "学员转课",
                description = "将学员从一个课程转到另一个课程")
     public Result<Void> transferStudentCourse(
             @Parameter(description = "转课请求") @RequestBody @Valid StudentCourseTransferRequest request) {
@@ -129,7 +120,7 @@ public class StudentCourseController {
      * @return 操作结果
      */
     @PostMapping("/class-transfer")
-    @Operation(summary = "学员转班", 
+    @Operation(summary = "学员转班",
                description = "将学员从一个班级转到另一个班级")
     public Result<Void> transferStudentClass(
             @Parameter(description = "转班请求") @RequestBody @Valid StudentCourseClassTransferRequest request) {
@@ -144,7 +135,7 @@ public class StudentCourseController {
      * @return 操作结果
      */
     @PostMapping("/refund")
-    @Operation(summary = "学员退费", 
+    @Operation(summary = "学员退费",
                description = "处理学员的退费申请")
     public Result<Void> refundStudentCourse(
             @Parameter(description = "退费请求") @RequestBody @Valid StudentCourseRefundRequest request) {
@@ -159,7 +150,7 @@ public class StudentCourseController {
      * @return 学员课程详情
      */
     @GetMapping("/{id}")
-    @Operation(summary = "获取学员课程详情", 
+    @Operation(summary = "获取学员课程详情",
                description = "根据记录ID获取学员课程详细信息")
     public Result<StudentCourseDetailVO> getStudentCourseDetail(
             @Parameter(description = "记录ID", required = true) @PathVariable Long id) {
@@ -214,7 +205,7 @@ public class StudentCourseController {
      * @return 操作记录列表
      */
     @GetMapping("/{id}/operations")
-    @Operation(summary = "获取学员课程操作记录", 
+    @Operation(summary = "获取学员课程操作记录",
                description = "获取学员课程的所有操作记录，包括转课、转班、退费等")
     public Result<List<StudentCourseOperationRecordVO>> getStudentCourseOperations(
             @Parameter(description = "记录ID", required = true) @PathVariable Long id) {
@@ -226,4 +217,4 @@ public class StudentCourseController {
                 Integer.MAX_VALUE
         ));
     }
-} 
+}
