@@ -1,11 +1,19 @@
 package com.lesson.controller;
 
 import com.lesson.common.Result;
+import com.lesson.common.exception.BusinessException;
 import com.lesson.enums.StudentStatus;
+import com.lesson.model.EduCourseModel;
 import com.lesson.model.EduStudentCourseModel;
+import com.lesson.model.record.CourseDetailRecord;
 import com.lesson.model.record.StudentCourseRecord;
+import com.lesson.repository.Tables;
+import com.lesson.repository.tables.SysCoach;
 import com.lesson.repository.tables.records.EduStudentCourseRecord;
 import com.lesson.vo.request.*;
+import org.jooq.DSLContext;
+
+import java.math.BigDecimal;
 import com.lesson.vo.response.StudentCourseDetailVO;
 import com.lesson.vo.response.StudentCourseOperationRecordVO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,7 +35,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StudentCourseController {
 
+    private final DSLContext dsl;
     private final EduStudentCourseModel studentCourseModel;
+    private final EduCourseModel courseModel;
+    private final SysCoach SYS_COACH = SysCoach.SYS_COACH;
+
+
 
     /**
      * 创建学员课程
@@ -59,9 +72,29 @@ public class StudentCourseController {
     public Result<Void> updateStudentCourse(
             @Parameter(description = "记录ID", required = true) @PathVariable Long id,
             @Parameter(description = "更新学员课程请求") @RequestBody @Valid StudentCourseUpdateRequest request) {
+        // 获取当前学员课程记录
+        EduStudentCourseRecord existingRecord = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
+                .where(Tables.EDU_STUDENT_COURSE.ID.eq(id))
+                .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
+                .fetchOne();
+
+        if (existingRecord == null) {
+            throw new BusinessException("学员课程记录不存在或已删除");
+        }
+
+        // 保留原有的总课时数和已消耗课时数
+        BigDecimal totalHours = existingRecord.getTotalHours();
+        BigDecimal consumedHours = existingRecord.getConsumedHours();
+
+        // 复制请求中的其他字段
         EduStudentCourseRecord record = new EduStudentCourseRecord();
         BeanUtils.copyProperties(request, record);
         record.setId(id);
+
+        // 设置保留的课时数
+        record.setTotalHours(totalHours);
+        record.setConsumedHours(consumedHours);
+
         studentCourseModel.updateStudentCourse(record);
         return Result.success();
     }
@@ -156,8 +189,56 @@ public class StudentCourseController {
             @Parameter(description = "记录ID", required = true) @PathVariable Long id) {
         StudentCourseRecord detail = studentCourseModel.getStudentCourseById(id)
                 .orElseThrow(() -> new IllegalArgumentException("学员课程不存在"));
+
+        // 获取课程名称
+        String courseName = null;
+        if (detail.getCourseId() != null) {
+            CourseDetailRecord course = courseModel.getCourseById(detail.getCourseId());
+            if (course != null) {
+                courseName = course.getName();
+            }
+        }
+
+        // 获取教练名称
+        String coachName = null;
+        if (detail.getCourseId() != null) {
+            // 通过课程和教练的关联表获取教练信息
+            coachName = dsl.select(SYS_COACH.NAME)
+                .from(Tables.SYS_COACH_COURSE)
+                .join(SYS_COACH).on(Tables.SYS_COACH_COURSE.COACH_ID.eq(SYS_COACH.ID))
+                .where(Tables.SYS_COACH_COURSE.COURSE_ID.eq(detail.getCourseId()))
+                .and(Tables.SYS_COACH_COURSE.DELETED.eq(0))
+                .and(SYS_COACH.DELETED.eq(0))
+                .fetchOneInto(String.class);
+        }
+
+        // 获取校区名称
+        String campusName = null;
+        if (detail.getCampusId() != null) {
+            campusName = dsl.select(Tables.SYS_CAMPUS.NAME)
+                .from(Tables.SYS_CAMPUS)
+                .where(Tables.SYS_CAMPUS.ID.eq(detail.getCampusId()))
+                .fetchOneInto(String.class);
+        }
+
+        // 获取机构名称
+        String institutionName = null;
+        if (detail.getInstitutionId() != null) {
+            institutionName = dsl.select(Tables.SYS_INSTITUTION.NAME)
+                .from(Tables.SYS_INSTITUTION)
+                .where(Tables.SYS_INSTITUTION.ID.eq(detail.getInstitutionId()))
+                .fetchOneInto(String.class);
+        }
+
         StudentCourseDetailVO vo = new StudentCourseDetailVO();
         BeanUtils.copyProperties(detail, vo);
+
+        // 设置额外信息
+        vo.setCourseName(courseName);
+        vo.setCoachName(coachName);
+        vo.setCampusName(campusName);
+        vo.setInstitutionName(institutionName);
+
         return Result.success(vo);
     }
 

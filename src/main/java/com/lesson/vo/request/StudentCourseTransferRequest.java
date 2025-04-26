@@ -46,20 +46,7 @@ public class StudentCourseTransferRequest {
     @Schema(description = "目标课程类型")
     private String targetCourseType;
 
-    /**
-     * 目标教练ID
-     */
-    @NotBlank(message = "目标教练ID不能为空")
-    @Schema(description = "目标教练ID")
-    private Long targetCoachId;
 
-    /**
-     * 目标教练姓名
-     */
-    @NotBlank(message = "目标教练姓名不能为空")
-    @Size(max = 50, message = "目标教练姓名长度不能超过50个字符")
-    @Schema(description = "目标教练姓名")
-    private String targetCoachName;
 
     /**
      * 目标课程总课时数
@@ -108,4 +95,4 @@ public class StudentCourseTransferRequest {
     @NotBlank(message = "操作人姓名不能为空")
     @Schema(description = "操作人姓名")
     private String operatorName;
-} 
+}

@@ -21,7 +21,7 @@ import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row15;
+import org.jooq.Row14;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -67,11 +67,6 @@ public class EduStudentCourse extends TableImpl<EduStudentCourseRecord> {
      * The column <code>lesson.edu_student_course.course_id</code>. 课程ID
      */
     public final TableField<EduStudentCourseRecord, Long> COURSE_ID = createField(DSL.name("course_id"), SQLDataType.BIGINT.nullable(false), this, "课程ID");
-
-    /**
-     * The column <code>lesson.edu_student_course.coach_id</code>. 教练ID
-     */
-    public final TableField<EduStudentCourseRecord, Long> COACH_ID = createField(DSL.name("coach_id"), SQLDataType.BIGINT.nullable(false), this, "教练ID");
 
     /**
      * The column <code>lesson.edu_student_course.total_hours</code>. 总课时数
@@ -168,7 +163,7 @@ public class EduStudentCourse extends TableImpl<EduStudentCourseRecord> {
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.EDU_STUDENT_COURSE_IDX_CAMPUS_ID, Indexes.EDU_STUDENT_COURSE_IDX_COACH_ID, Indexes.EDU_STUDENT_COURSE_IDX_COURSE_ID, Indexes.EDU_STUDENT_COURSE_IDX_INSTITUTION_ID, Indexes.EDU_STUDENT_COURSE_IDX_STATUS, Indexes.EDU_STUDENT_COURSE_IDX_STUDENT_ID);
+        return Arrays.<Index>asList(Indexes.EDU_STUDENT_COURSE_IDX_CAMPUS_ID, Indexes.EDU_STUDENT_COURSE_IDX_COURSE_ID, Indexes.EDU_STUDENT_COURSE_IDX_INSTITUTION_ID, Indexes.EDU_STUDENT_COURSE_IDX_STATUS, Indexes.EDU_STUDENT_COURSE_IDX_STUDENT_ID);
     }
 
     @Override
@@ -213,11 +208,11 @@ public class EduStudentCourse extends TableImpl<EduStudentCourseRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row15 type methods
+    // Row14 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row15<Long, Long, Long, Long, BigDecimal, BigDecimal, String, LocalDate, LocalDate, String, Long, Long, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
-        return (Row15) super.fieldsRow();
+    public Row14<Long, Long, Long, BigDecimal, BigDecimal, String, LocalDate, LocalDate, String, Long, Long, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
+        return (Row14) super.fieldsRow();
     }
 }

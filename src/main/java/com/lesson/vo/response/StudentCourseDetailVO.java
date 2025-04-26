@@ -46,11 +46,6 @@ public class StudentCourseDetailVO {
     @ApiModelProperty("课程类型")
     private String courseType;
 
-    /**
-     * 教练ID
-     */
-    @ApiModelProperty("教练ID")
-    private String coachId;
 
     /**
      * 教练姓名
@@ -129,4 +124,4 @@ public class StudentCourseDetailVO {
      */
     @ApiModelProperty("更新时间")
     private LocalDateTime updateTime;
-} 
+}

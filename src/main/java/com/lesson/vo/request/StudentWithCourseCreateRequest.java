@@ -100,13 +100,6 @@ public class StudentWithCourseCreateRequest {
         @ApiModelProperty("课程ID")
         private Long courseId;
 
-        /**
-         * 教练ID
-         */
-        @NotNull(message = "教练ID不能为空")
-        @ApiModelProperty("教练ID")
-        private Long coachId;
-
 
         /**
          * 报名日期

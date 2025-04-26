@@ -95,7 +95,6 @@ public class StudentService {
     EduStudentCourseRecord studentCourseRecord = new EduStudentCourseRecord();
     studentCourseRecord.setStudentId(studentId);
     studentCourseRecord.setCourseId(courseInfo.getCourseId());
-    studentCourseRecord.setCoachId(courseInfo.getCoachId());
     studentCourseRecord.setConsumedHours(java.math.BigDecimal.ZERO);
     studentCourseRecord.setStatus("STUDYING");
     studentCourseRecord.setStartDate(courseInfo.getStartDate());
@@ -172,7 +171,6 @@ public class StudentService {
 
     // 5. 更新学员课程关系
     StudentWithCourseUpdateRequest.CourseInfo courseInfo = request.getCourseInfo();
-    studentCourseRecord.setCoachId(courseInfo.getCoachId());
     // 不使用前端传入的总课时数和已消耗课时数，保持原有值
     // studentCourseRecord.setTotalHours(courseInfo.getTotalHours());
     // if (courseInfo.getConsumedHours() != null) {
@@ -296,7 +294,13 @@ public class StudentService {
     EduStudentCourseRecordRecord attendanceRecord = dsl.newRecord(Tables.EDU_STUDENT_COURSE_RECORD);
     attendanceRecord.setStudentId(request.getStudentId());
     attendanceRecord.setCourseId(request.getCourseId());
-    attendanceRecord.setCoachId(studentCourse.getCoachId()); // 使用学员课程关联的教练ID
+    // 从课程-教练关联表中获取教练ID
+    Long coachId = dsl.select(Tables.SYS_COACH_COURSE.COACH_ID)
+        .from(Tables.SYS_COACH_COURSE)
+        .where(Tables.SYS_COACH_COURSE.COURSE_ID.eq(request.getCourseId()))
+        .and(Tables.SYS_COACH_COURSE.DELETED.eq(0))
+        .fetchOneInto(Long.class);
+    attendanceRecord.setCoachId(coachId); // 使用课程关联的教练ID
     attendanceRecord.setCourseDate(request.getCourseDate());
     attendanceRecord.setStartTime(request.getStartTime());
     attendanceRecord.setEndTime(request.getEndTime());

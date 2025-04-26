@@ -1,5 +1,6 @@
 package com.lesson.vo.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -15,6 +16,7 @@ import java.time.LocalDate;
  */
 @Data
 @ApiModel("更新学员课程请求")
+@JsonIgnoreProperties(ignoreUnknown = true) // 忽略未知字段，如 totalHours, consumedHours
 public class StudentCourseUpdateRequest {
 
     /**
@@ -47,20 +49,7 @@ public class StudentCourseUpdateRequest {
     @ApiModelProperty("课程类型")
     private String courseType;
 
-    /**
-     * 教练ID
-     */
-    @NotBlank(message = "教练ID不能为空")
-    @ApiModelProperty("教练ID")
-    private String coachId;
 
-    /**
-     * 教练姓名
-     */
-    @NotBlank(message = "教练姓名不能为空")
-    @Size(max = 50, message = "教练姓名长度不能超过50个字符")
-    @ApiModelProperty("教练姓名")
-    private String coachName;
 
     /**
      * 总课时数
@@ -109,4 +98,4 @@ public class StudentCourseUpdateRequest {
     @NotNull(message = "机构ID不能为空")
     @ApiModelProperty("机构ID")
     private Long institutionId;
-} 
+}

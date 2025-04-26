@@ -30,6 +30,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -152,7 +153,9 @@ public class EduStudentCourseModel {
                 .join(EDU_STUDENT).on(EDU_STUDENT_COURSE.STUDENT_ID.eq(EDU_STUDENT.ID))
                 .join(EDU_COURSE).on(EDU_STUDENT_COURSE.COURSE_ID.eq(EDU_COURSE.ID))
                 .leftJoin(SYS_CONSTANT).on(EDU_COURSE.TYPE_ID.eq(SYS_CONSTANT.ID))
-                .leftJoin(SYS_COACH).on(EDU_STUDENT_COURSE.COACH_ID.eq(SYS_COACH.ID));
+                // 通过课程和教练的关联表获取教练信息
+                .leftJoin(Tables.SYS_COACH_COURSE).on(EDU_STUDENT_COURSE.COURSE_ID.eq(Tables.SYS_COACH_COURSE.COURSE_ID).and(Tables.SYS_COACH_COURSE.DELETED.eq(0)))
+                .leftJoin(SYS_COACH).on(Tables.SYS_COACH_COURSE.COACH_ID.eq(SYS_COACH.ID).and(SYS_COACH.DELETED.eq(0)));
 
         Condition conditions = buildConditions(request);
 
@@ -183,7 +186,6 @@ public class EduStudentCourseModel {
                     EDU_STUDENT.PHONE.as("student_phone"),
                     EDU_STUDENT_COURSE.ID.as("student_course_id"),
                     EDU_STUDENT_COURSE.COURSE_ID,
-                    EDU_STUDENT_COURSE.COACH_ID,
                     EDU_STUDENT_COURSE.TOTAL_HOURS,
                     EDU_STUDENT_COURSE.CONSUMED_HOURS,
                     remainingHoursField, // 添加计算后的剩余课时字段
@@ -198,14 +200,16 @@ public class EduStudentCourseModel {
                     SYS_COACH.NAME.as("coach_name"),
                     Tables.SYS_CAMPUS.NAME.as("campus_name"),
                     Tables.SYS_INSTITUTION.NAME.as("institution_name"),
+                    EDU_STUDENT_COURSE.FIXED_SCHEDULE.as("fixed_schedule"), // 添加固定排课时间字段
                     lastClassTimeField // 添加最近上课时间字段
                 )
                 .from(EDU_STUDENT_COURSE)
                 .join(EDU_STUDENT).on(EDU_STUDENT_COURSE.STUDENT_ID.eq(EDU_STUDENT.ID))
                 .join(EDU_COURSE).on(EDU_STUDENT_COURSE.COURSE_ID.eq(EDU_COURSE.ID))
                 .leftJoin(SYS_CONSTANT).on(EDU_COURSE.TYPE_ID.eq(SYS_CONSTANT.ID))
-                // 连接未删除的教练记录
-                .leftJoin(SYS_COACH).on(EDU_STUDENT_COURSE.COACH_ID.eq(SYS_COACH.ID).and(SYS_COACH.DELETED.eq(0)))
+                // 通过课程和教练的关联表获取教练信息
+                .leftJoin(Tables.SYS_COACH_COURSE).on(EDU_STUDENT_COURSE.COURSE_ID.eq(Tables.SYS_COACH_COURSE.COURSE_ID).and(Tables.SYS_COACH_COURSE.DELETED.eq(0)))
+                .leftJoin(SYS_COACH).on(Tables.SYS_COACH_COURSE.COACH_ID.eq(SYS_COACH.ID).and(SYS_COACH.DELETED.eq(0)))
                 .leftJoin(Tables.SYS_CAMPUS).on(EDU_STUDENT_COURSE.CAMPUS_ID.eq(Tables.SYS_CAMPUS.ID))
                 .leftJoin(Tables.SYS_INSTITUTION).on(EDU_STUDENT_COURSE.INSTITUTION_ID.eq(Tables.SYS_INSTITUTION.ID));
     }
@@ -274,8 +278,8 @@ public class EduStudentCourseModel {
      */
     private List<SortField<?>> getOrderByFields(String sortBy) {
         if (!StringUtils.hasText(sortBy)) {
-            // 默认按报名日期降序
-            return Collections.singletonList(EDU_STUDENT_COURSE.START_DATE.desc());
+            // 默认按创建时间降序，然后按报名日期降序
+            return Arrays.asList(EDU_STUDENT_COURSE.CREATED_TIME.desc(), EDU_STUDENT_COURSE.START_DATE.desc());
         }
 
         List<SortField<?>> sortFields = new ArrayList<>();
@@ -306,6 +310,9 @@ public class EduStudentCourseModel {
                 case "status":
                      sortField = EDU_STUDENT_COURSE.STATUS;
                      break;
+                case "createdTime":
+                     sortField = EDU_STUDENT_COURSE.CREATED_TIME;
+                     break;
                 // 可以添加更多排序字段
             }
 
@@ -316,6 +323,7 @@ public class EduStudentCourseModel {
 
         // 如果解析失败或未指定有效字段，则使用默认排序
         if (sortFields.isEmpty()) {
+            sortFields.add(EDU_STUDENT_COURSE.CREATED_TIME.desc());
             sortFields.add(EDU_STUDENT_COURSE.START_DATE.desc());
         }
 
@@ -340,7 +348,8 @@ public class EduStudentCourseModel {
         vo.setCourseType(record.get("course_type_name", String.class)); // 设置课程类型
         vo.setCourseTypeName(record.get("course_type_name", String.class));
 
-        vo.setCoachId(record.get("coach_id", Long.class));
+        // 教练ID已经从表中删除，不再设置
+        // vo.setCoachId(record.get("coach_id", Long.class));
         String coachName = record.get("coach_name", String.class);
         vo.setCoachName(coachName != null ? coachName : ""); // 如果教练名称为null，设置为空字符串
 
@@ -357,6 +366,7 @@ public class EduStudentCourseModel {
 
         vo.setCampusId(record.get("campus_id", Long.class));
         vo.setInstitutionId(record.get("institution_id", Long.class));
+        vo.setFixedSchedule(record.get("fixed_schedule", String.class)); // 设置固定排课时间
 
         return vo;
     }
@@ -385,7 +395,7 @@ public class EduStudentCourseModel {
         targetRecord.setStudentId(sourceRecord.getStudentId());
         targetRecord.setCourseId(request.getTargetCourseId());
         //targetRecord.setCourseType(request.getTargetCourseType());
-        targetRecord.setCoachId(request.getTargetCoachId());
+        //targetRecord.setCoachId(request.getTargetCoachId());
         targetRecord.setTotalHours(request.getTargetTotalHours());
         targetRecord.setConsumedHours(request.getTargetConsumedHours());
         targetRecord.setStatus(StudentStatus.NORMAL.name());
@@ -597,7 +607,6 @@ public class EduStudentCourseModel {
         detailRecord.setId(studentCourse.getId());
         detailRecord.setStudentId(studentCourse.getStudentId());
         detailRecord.setCourseId(studentCourse.getCourseId());
-        detailRecord.setCoachId(studentCourse.getCoachId());
         detailRecord.setTotalHours(studentCourse.getTotalHours());
         detailRecord.setConsumedHours(studentCourse.getConsumedHours());
         String statusStr = studentCourse.getStatus();

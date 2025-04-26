@@ -61,8 +61,6 @@ public class StudentCourseListVO {
     @Schema(description = "课程ID", example = "2")
     private Long courseId;
 
-    @Schema(description = "教练ID", example = "3")
-    private Long coachId;
 
     @Schema(description = "校区ID", example = "1")
     private Long campusId;
@@ -89,4 +87,9 @@ public class StudentCourseListVO {
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private LocalDate endDate;
 
+    /**
+     * 固定排课时间，JSON格式
+     */
+    @Schema(description = "固定排课时间，JSON格式")
+    private String fixedSchedule;
 }

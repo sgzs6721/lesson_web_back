@@ -108,13 +108,6 @@ public class StudentWithCourseUpdateRequest {
     @JsonIgnoreProperties(ignoreUnknown = true) // 忽略未知字段，如 totalHours, consumedHours
     public static class CourseInfo {
         /**
-         * 教练ID
-         */
-        @NotNull(message = "教练ID不能为空")
-        @ApiModelProperty("教练ID")
-        private Long coachId;
-
-        /**
          * 报名日期
          */
         @NotNull(message = "报名日期不能为空")

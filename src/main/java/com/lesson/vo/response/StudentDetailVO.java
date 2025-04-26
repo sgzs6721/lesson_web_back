@@ -57,18 +57,6 @@ public class StudentDetailVO {
     private String campusName;
 
     /**
-     * 机构ID
-     */
-    @ApiModelProperty("机构ID")
-    private Long institutionId;
-
-    /**
-     * 机构名称
-     */
-    @ApiModelProperty("机构名称")
-    private String institutionName;
-
-    /**
      * 状态
      */
     @ApiModelProperty("状态")
