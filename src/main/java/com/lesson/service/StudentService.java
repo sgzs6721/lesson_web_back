@@ -10,10 +10,12 @@ import com.lesson.repository.Tables;
 import com.lesson.repository.tables.records.EduCourseRecord;
 import com.lesson.repository.tables.records.EduStudentCourseRecord;
 import com.lesson.repository.tables.records.EduStudentRecord;
+import com.lesson.repository.tables.records.EduStudentCourseRecordRecord;
 import com.lesson.vo.PageResult;
 import com.lesson.vo.request.StudentQueryRequest;
 import com.lesson.vo.request.StudentWithCourseCreateRequest;
 import com.lesson.vo.request.StudentWithCourseUpdateRequest;
+import com.lesson.vo.request.StudentCheckInRequest;
 import com.lesson.vo.response.StudentCourseListVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +25,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.time.Duration;
+import java.time.LocalTime;
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -82,7 +87,6 @@ public class StudentService {
         studentCourseRecord.setStudentId(studentId);
         studentCourseRecord.setCourseId(courseInfo.getCourseId());
         studentCourseRecord.setCoachId(courseInfo.getCoachId());
-        studentCourseRecord.setTotalHours(courseInfo.getTotalHours());
         studentCourseRecord.setConsumedHours(java.math.BigDecimal.ZERO);
         studentCourseRecord.setStatus("STUDYING");
         studentCourseRecord.setStartDate(courseInfo.getStartDate());
@@ -199,8 +203,7 @@ public class StudentService {
              // throw new BusinessException("无法获取机构ID");
              log.warn("无法从请求中获取机构ID (orgId)，将不按机构筛选");
         }
-        request.setInstitutionId(institutionId); // 设置机构ID，即使是null，让Model层处理
-        
+
         List<StudentCourseListVO> list = studentCourseModel.listStudentCourseDetails(request);
         long total = studentCourseModel.countStudentCourseDetails(request);
         
@@ -209,5 +212,95 @@ public class StudentService {
         
         // 使用 PageResult.of 静态方法创建实例
         return PageResult.of(list, total, request.getOffset() / request.getLimit() + 1, request.getLimit());
+    }
+
+    /**
+     * 学员打卡（创建上课记录并更新课时）
+     *
+     * @param request   打卡请求
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void checkIn(StudentCheckInRequest request) {
+        // 0. 从请求中获取机构和校区ID (假设已存在)
+        Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
+        // 获取校区ID，这里可能需要根据studentId或courseId查询
+        // 简化处理：假设从request或studentInfo获取，或有默认值
+        // 实际中可能需要从 edu_student 或 edu_student_course 表获取
+        Long campusId = null; 
+        EduStudentRecord student = dsl.selectFrom(Tables.EDU_STUDENT)
+                                     .where(Tables.EDU_STUDENT.ID.eq(request.getStudentId())
+                                            .and(Tables.EDU_STUDENT.DELETED.eq(0)))
+                                     .fetchOne();
+        if (student != null) {
+            campusId = student.getCampusId();
+            if (institutionId == null) { // 如果token没有，尝试从学员记录获取
+                 institutionId = student.getInstitutionId();
+            }
+        } 
+        if (campusId == null || institutionId == null) {
+             throw new BusinessException("无法确定学员的校区或机构信息");
+        }
+
+        // 1. 查找学员与课程的关联记录 (edu_student_course)
+        EduStudentCourseRecord studentCourse = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
+                .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(request.getStudentId()))
+                .and(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(request.getCourseId()))
+                .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
+                .fetchOne();
+
+        if (studentCourse == null) {
+            throw new BusinessException("学员未报名该课程或课程关系不存在");
+        }
+
+        // 2. 检查学员课程状态是否允许打卡 (例如：必须是 STUDYING)
+        if (!"STUDYING".equals(studentCourse.getStatus())) {
+            throw new BusinessException("当前课程状态不允许打卡: " + studentCourse.getStatus());
+        }
+        
+        // 3. 计算本次消耗课时数
+        // 优先使用课程定义的单次课时，如果不存在，则根据时间计算
+        BigDecimal hoursConsumed; 
+        EduCourseRecord courseInfo = dsl.selectFrom(Tables.EDU_COURSE)
+                                         .where(Tables.EDU_COURSE.ID.eq(request.getCourseId()))
+                                         .fetchOne();
+                                         
+        if (courseInfo != null && courseInfo.getUnitHours() != null && courseInfo.getUnitHours().compareTo(BigDecimal.ZERO) > 0) {
+            hoursConsumed = courseInfo.getUnitHours();
+        } else {
+            // 根据时间计算课时（简单示例：按小时计算，不足1小时算1小时，需要更精确可调整）
+            long minutes = Duration.between(request.getStartTime(), request.getEndTime()).toMinutes();
+            if (minutes <= 0) {
+                throw new BusinessException("结束时间必须晚于开始时间");
+            }
+            hoursConsumed = BigDecimal.valueOf(Math.ceil((double) minutes / 60)); 
+        }
+        
+        // 4. 检查剩余课时是否足够
+        BigDecimal remainingHours = studentCourse.getTotalHours().subtract(studentCourse.getConsumedHours());
+        if (remainingHours.compareTo(hoursConsumed) < 0) {
+            throw new BusinessException("剩余课时不足，无法完成打卡");
+        }
+
+        // 5. 创建上课记录 (edu_student_course_record)
+        EduStudentCourseRecordRecord attendanceRecord = dsl.newRecord(Tables.EDU_STUDENT_COURSE_RECORD);
+        attendanceRecord.setStudentId(request.getStudentId());
+        attendanceRecord.setCourseId(request.getCourseId());
+        attendanceRecord.setCoachId(studentCourse.getCoachId()); // 使用学员课程关联的教练ID
+        attendanceRecord.setCourseDate(request.getCourseDate());
+        attendanceRecord.setStartTime(request.getStartTime());
+        attendanceRecord.setEndTime(request.getEndTime());
+        attendanceRecord.setHours(hoursConsumed);
+        attendanceRecord.setNotes(request.getNotes());
+        attendanceRecord.setCampusId(campusId);
+        attendanceRecord.setInstitutionId(institutionId);
+        attendanceRecord.setCreatedTime(LocalDateTime.now());
+        attendanceRecord.setUpdateTime(LocalDateTime.now());
+        attendanceRecord.setDeleted(0);
+        attendanceRecord.store();
+
+        // 6. 更新学员课程的已消耗课时 (edu_student_course)
+        studentCourse.setConsumedHours(studentCourse.getConsumedHours().add(hoursConsumed));
+        studentCourse.setUpdateTime(LocalDateTime.now());
+        studentCourseModel.updateStudentCourse(studentCourse); // 使用已有的更新方法
     }
 } 

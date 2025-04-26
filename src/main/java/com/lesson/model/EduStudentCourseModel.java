@@ -199,7 +199,8 @@ public class EduStudentCourseModel {
                 .join(EDU_STUDENT).on(EDU_STUDENT_COURSE.STUDENT_ID.eq(EDU_STUDENT.ID))
                 .join(EDU_COURSE).on(EDU_STUDENT_COURSE.COURSE_ID.eq(EDU_COURSE.ID))
                 .leftJoin(SYS_CONSTANT).on(EDU_COURSE.TYPE_ID.eq(SYS_CONSTANT.ID))
-                .leftJoin(SYS_COACH).on(EDU_STUDENT_COURSE.COACH_ID.eq(SYS_COACH.ID))
+                // 连接未删除的教练记录
+                .leftJoin(SYS_COACH).on(EDU_STUDENT_COURSE.COACH_ID.eq(SYS_COACH.ID).and(SYS_COACH.DELETED.eq(0)))
                 .leftJoin(Tables.SYS_CAMPUS).on(EDU_STUDENT_COURSE.CAMPUS_ID.eq(Tables.SYS_CAMPUS.ID))
                 .leftJoin(Tables.SYS_INSTITUTION).on(EDU_STUDENT_COURSE.INSTITUTION_ID.eq(Tables.SYS_INSTITUTION.ID));
     }
@@ -322,8 +323,7 @@ public class EduStudentCourseModel {
     private StudentCourseListVO mapToStudentCourseListVO(Record record) {
         StudentCourseListVO vo = new StudentCourseListVO();
         Long studentId = record.get("student_id", Long.class);
-        vo.setStudentId(studentId);
-        vo.setStudentDisplayId("ST" + studentId);
+        vo.setId(studentId);
         vo.setStudentName(record.get("student_name", String.class));
         vo.setStudentGender(record.get("student_gender", String.class));
         vo.setStudentAge(record.get("student_age", Integer.class));
@@ -336,13 +336,12 @@ public class EduStudentCourseModel {
         vo.setCourseTypeName(record.get("course_type_name", String.class));
 
         vo.setCoachId(record.get("coach_id", Long.class));
-        vo.setCoachName(record.get("coach_name", String.class));
+        String coachName = record.get("coach_name", String.class);
+        vo.setCoachName(coachName != null ? coachName : ""); // 如果教练名称为null，设置为空字符串
 
-        BigDecimal totalHours = record.get("total_hours", BigDecimal.class);
-        BigDecimal consumedHours = record.get("consumed_hours", BigDecimal.class);
-        vo.setTotalHours(totalHours);
-        vo.setConsumedHours(consumedHours);
-        // 直接从查询结果获取计算好的剩余课时
+        // 设置课时信息
+        vo.setTotalHours(record.get("total_hours", BigDecimal.class));
+        vo.setConsumedHours(record.get("consumed_hours", BigDecimal.class));
         vo.setRemainingHours(record.get("remaining_hours", BigDecimal.class));
 
         // 设置最近上课时间
@@ -353,8 +352,6 @@ public class EduStudentCourseModel {
 
         vo.setCampusId(record.get("campus_id", Long.class));
         vo.setInstitutionId(record.get("institution_id", Long.class));
-        vo.setCampusName(record.get("campus_name", String.class)); // 设置校区名称
-        vo.setInstitutionName(record.get("institution_name", String.class)); // 设置机构名称
 
         return vo;
     }

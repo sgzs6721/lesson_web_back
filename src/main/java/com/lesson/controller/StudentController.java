@@ -12,6 +12,7 @@ import com.lesson.vo.request.StudentQueryRequest;
 import com.lesson.vo.request.StudentUpdateRequest;
 import com.lesson.vo.request.StudentWithCourseCreateRequest;
 import com.lesson.vo.request.StudentWithCourseUpdateRequest;
+import com.lesson.vo.request.StudentCheckInRequest;
 import com.lesson.vo.response.StudentCourseListVO;
 import com.lesson.vo.response.StudentDetailVO;
 import com.lesson.vo.response.StudentListVO;
@@ -130,5 +131,21 @@ public class StudentController {
     public Result<PageResult<StudentCourseListVO>> list(@Validated StudentQueryRequest request) {
         PageResult<StudentCourseListVO> pageResult = studentService.listStudentsWithCourse(request);
         return Result.success(pageResult);
+    }
+
+    /**
+     * 学员打卡
+     *
+     * @param studentId 学员ID (从路径获取)
+     * @param request   打卡请求体
+     * @return 操作结果
+     */
+    @PostMapping("/check-in")
+    @Operation(summary = "学员打卡",
+               description = "记录学员上课信息，自动扣除课时")
+    public Result<Void> checkIn(
+            @RequestBody @Valid StudentCheckInRequest request) {
+        studentService.checkIn(request);
+        return Result.success();
     }
 }

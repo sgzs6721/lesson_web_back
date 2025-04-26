@@ -59,6 +59,18 @@ public class StudentQueryRequest {
     private Long institutionId;
 
     /**
+     * 已消耗课时
+     */
+    @ApiModelProperty(value = "已消耗课时", example = "10.5")
+    private java.math.BigDecimal consumedHours;
+
+    /**
+     * 剩余课时
+     */
+    @ApiModelProperty(value = "剩余课时", example = "20.5")
+    private java.math.BigDecimal remainingHours;
+
+    /**
      * 偏移量
      */
     @ApiModelProperty(value = "偏移量", example = "0")
@@ -69,4 +81,4 @@ public class StudentQueryRequest {
      */
     @ApiModelProperty(value = "限制", example = "10")
     private Integer limit = 10;
-} 
+}

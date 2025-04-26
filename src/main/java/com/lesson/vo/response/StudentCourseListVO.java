@@ -14,8 +14,8 @@ import java.time.LocalDate;
 @Schema(description = "学员课程列表响应VO")
 public class StudentCourseListVO {
 
-    @Schema(description = "学员ID (格式化后，如ST100000)", example = "ST100000")
-    private String studentDisplayId;
+    @Schema(description = "学员ID ", example = "1000")
+    private Long id;
 
     @Schema(description = "学员姓名", example = "学员1")
     private String studentName;
@@ -55,10 +55,6 @@ public class StudentCourseListVO {
     @Schema(description = "学员课程状态 (STUDYING, SUSPENDED, GRADUATED)", example = "STUDYING")
     private String status; // 数据库中的原始状态字符串
 
-    // --- 以下为原始ID，便于前端操作 ---
-    @Schema(description = "学员原始数据库ID", example = "100000")
-    private Long studentId;
-
     @Schema(description = "学员课程关系记录ID", example = "55")
     private Long studentCourseId; // 对应 edu_student_course.id
 
@@ -93,15 +89,4 @@ public class StudentCourseListVO {
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private LocalDate endDate;
 
-    /**
-     * 校区名称
-     */
-    @Schema(description = "校区名称")
-    private String campusName;
-
-    /**
-     * 机构名称
-     */
-    @Schema(description = "机构名称")
-    private String institutionName;
 }

@@ -105,12 +105,6 @@ public class StudentWithCourseCreateRequest {
         @ApiModelProperty("教练ID")
         private Long coachId;
 
-        /**
-         * 总课时数
-         */
-        @NotNull(message = "总课时数不能为空")
-        @ApiModelProperty("总课时数")
-        private BigDecimal totalHours;
 
         /**
          * 报名日期
