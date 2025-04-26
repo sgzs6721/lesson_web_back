@@ -1,5 +1,6 @@
 package com.lesson.vo.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.lesson.enums.StudentStatus;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -90,6 +91,7 @@ public class StudentWithCourseCreateRequest {
      */
     @Data
     @ApiModel("课程信息")
+    @JsonIgnoreProperties(ignoreUnknown = true) // 忽略未知字段，如 totalHours
     public static class CourseInfo {
         /**
          * 课程ID

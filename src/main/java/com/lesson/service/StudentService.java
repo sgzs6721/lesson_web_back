@@ -77,7 +77,6 @@ public class StudentService {
     studentRecord.setCampusId(studentInfo.getCampusId());
     studentRecord.setInstitutionId(institutionId);
     studentRecord.setStatus(studentInfo.getStatus().getName());
-
     // 2. 存储学员信息
     Long studentId = studentModel.createStudent(studentRecord);
 
@@ -103,7 +102,8 @@ public class StudentService {
     studentCourseRecord.setEndDate(courseInfo.getEndDate());
     studentCourseRecord.setCampusId(studentInfo.getCampusId());
     studentCourseRecord.setInstitutionId(institutionId);
-
+    // 使用课程表中的标准课时，而不是前端传入的值
+    studentCourseRecord.setTotalHours(courseRecord.getTotalHours());
     // 5. 处理固定排课时间
     try {
       if (courseInfo.getFixedScheduleTimes() != null && !courseInfo.getFixedScheduleTimes().isEmpty()) {
@@ -173,10 +173,11 @@ public class StudentService {
     // 5. 更新学员课程关系
     StudentWithCourseUpdateRequest.CourseInfo courseInfo = request.getCourseInfo();
     studentCourseRecord.setCoachId(courseInfo.getCoachId());
-    studentCourseRecord.setTotalHours(courseInfo.getTotalHours());
-    if (courseInfo.getConsumedHours() != null) {
-      studentCourseRecord.setConsumedHours(courseInfo.getConsumedHours());
-    }
+    // 不使用前端传入的总课时数和已消耗课时数，保持原有值
+    // studentCourseRecord.setTotalHours(courseInfo.getTotalHours());
+    // if (courseInfo.getConsumedHours() != null) {
+    //   studentCourseRecord.setConsumedHours(courseInfo.getConsumedHours());
+    // }
     studentCourseRecord.setStartDate(courseInfo.getStartDate());
     studentCourseRecord.setEndDate(courseInfo.getEndDate());
     studentCourseRecord.setCampusId(studentInfo.getCampusId());
@@ -383,7 +384,7 @@ public class StudentService {
        // 暂时假设关系必须存在
       throw new BusinessException("学员未报名该课程或课程关系不存在");
     }
-    
+
     // 2. 创建缴费记录 (edu_student_payment)
     EduStudentPaymentRecord paymentRecord = dsl.newRecord(Tables.EDU_STUDENT_PAYMENT);
     paymentRecord.setStudentId(request.getStudentId().toString()); // 注意：表字段是VARCHAR
@@ -399,7 +400,7 @@ public class StudentService {
     paymentRecord.setCampusId(campusId);
     paymentRecord.setInstitutionId(institutionId);
     // paymentRecord.setTransactionDate(request.getTransactionDate()); // 表中没有此字段，如果需要需添加迁移
-    
+
     Long paymentId = studentPaymentModel.createPayment(paymentRecord);
 
     // 3. 更新学员课程信息 (edu_student_course)
@@ -409,20 +410,20 @@ public class StudentService {
     BigDecimal addedTotalHours = request.getCourseHours().add(request.getGiftHours());
     studentCourse.setTotalHours(studentCourse.getTotalHours().add(addedTotalHours));
     studentCourse.setEndDate(request.getValidUntil()); // 直接使用新的有效期覆盖
-    
+
     // 如果是续费，且原状态不是 STUDYING，则更新为 STUDYING
-    if (request.getPaymentType() == PaymentType.RENEWAL && 
+    if (request.getPaymentType() == PaymentType.RENEWAL &&
         !"STUDYING".equals(studentCourse.getStatus())) {
         studentCourse.setStatus("STUDYING");
     }
     // 也可以根据业务添加对 SUSPENDED 状态的处理
-    
+
     studentCourse.setUpdateTime(LocalDateTime.now());
     studentCourseModel.updateStudentCourse(studentCourse);
 
     return paymentId;
   }
-  
+
   // 辅助方法获取原始 EduStudentRecord
   private EduStudentRecord getStudentByIdOriginal(Long studentId) {
       return dsl.selectFrom(Tables.EDU_STUDENT)
@@ -441,7 +442,7 @@ public class StudentService {
   public Long processRefund(StudentRefundRequest request) {
     // 0. 获取机构和校区ID
     Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
-    Long campusId = null; 
+    Long campusId = null;
     EduStudentRecord student = getStudentByIdOriginal(request.getStudentId());
     if (student != null) {
       campusId = student.getCampusId();
@@ -463,12 +464,12 @@ public class StudentService {
     if (studentCourse == null) {
       throw new BusinessException("学员未报名该课程或课程关系不存在");
     }
-    
+
     // 2. 检查是否可以退费 (例如，状态不能是已结业/已退费)
     if (StudentStatus.GRADUATED.name().equals(studentCourse.getStatus())) { // 假设GRADUATED也代表已退费
       throw new BusinessException("该课程已结业或已退费，无法重复退费");
     }
-    
+
     // 3. 计算实际退款金额
     BigDecimal actualRefund = request.getRefundAmount()
                                    .subtract(request.getHandlingFee())
@@ -494,15 +495,15 @@ public class StudentService {
     refundRecord.setDeleted(0);
     refundRecord.store();
     Long refundId = refundRecord.getId();
-    
+
     // 5. 更新学员课程信息 (edu_student_course)
     studentCourse.setStatus(StudentStatus.GRADUATED.name()); // 标记为已结业/退费
     studentCourse.setUpdateTime(LocalDateTime.now());
     studentCourseModel.updateStudentCourse(studentCourse);
-    
-    // 6. (可选) 创建操作记录 
+
+    // 6. (可选) 创建操作记录
     // ...
-    
+
     return refundId;
   }
 }

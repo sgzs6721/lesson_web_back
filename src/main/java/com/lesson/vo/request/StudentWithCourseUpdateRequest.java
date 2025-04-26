@@ -1,5 +1,6 @@
 package com.lesson.vo.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.lesson.enums.StudentStatus;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -104,6 +105,7 @@ public class StudentWithCourseUpdateRequest {
      */
     @Data
     @ApiModel("课程信息")
+    @JsonIgnoreProperties(ignoreUnknown = true) // 忽略未知字段，如 totalHours, consumedHours
     public static class CourseInfo {
         /**
          * 教练ID
@@ -111,19 +113,6 @@ public class StudentWithCourseUpdateRequest {
         @NotNull(message = "教练ID不能为空")
         @ApiModelProperty("教练ID")
         private Long coachId;
-
-        /**
-         * 总课时数
-         */
-        @NotNull(message = "总课时数不能为空")
-        @ApiModelProperty("总课时数")
-        private BigDecimal totalHours;
-
-        /**
-         * 已消耗课时数
-         */
-        @ApiModelProperty("已消耗课时数")
-        private BigDecimal consumedHours;
 
         /**
          * 报名日期
@@ -173,4 +162,4 @@ public class StudentWithCourseUpdateRequest {
         @ApiModelProperty("结束时间，格式：HH:mm，如：16:00")
         private String to;
     }
-} 
+}
