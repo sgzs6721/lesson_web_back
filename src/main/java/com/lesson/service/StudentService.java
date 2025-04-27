@@ -91,7 +91,7 @@ public class StudentService {
     studentRecord.setPhone(studentInfo.getPhone());
     studentRecord.setCampusId(studentInfo.getCampusId());
     studentRecord.setInstitutionId(institutionId);
-    studentRecord.setStatus(studentInfo.getStatus().getName());
+    studentRecord.setStatus("NORMAL"); // 学员状态默认为正常
     // 2. 存储学员信息
     Long studentId = studentModel.createStudent(studentRecord);
 
@@ -112,7 +112,9 @@ public class StudentService {
       studentCourseRecord.setStudentId(studentId);
       studentCourseRecord.setCourseId(courseInfo.getCourseId());
       studentCourseRecord.setConsumedHours(java.math.BigDecimal.ZERO);
-      studentCourseRecord.setStatus(StudentCourseStatus.NORMAL.getName());
+      // 使用课程信息中的状态，如果为空则默认为 NORMAL
+      StudentCourseStatus status = courseInfo.getStatus() != null ? courseInfo.getStatus() : StudentCourseStatus.NORMAL;
+      studentCourseRecord.setStatus(status.getName());
       studentCourseRecord.setStartDate(courseInfo.getStartDate());
       studentCourseRecord.setEndDate(courseInfo.getEndDate());
       studentCourseRecord.setCampusId(studentInfo.getCampusId());
@@ -178,9 +180,7 @@ public class StudentService {
     studentRecord.setAge(studentInfo.getAge());
     studentRecord.setPhone(studentInfo.getPhone());
     studentRecord.setCampusId(studentInfo.getCampusId());
-    if (studentInfo.getStatus() != null) {
-      studentRecord.setStatus(studentInfo.getStatus().getName());
-    }
+    // 学员状态不需要更新
     studentRecord.setUpdateTime(LocalDateTime.now());
 
     // 4. 存储学员信息
@@ -202,6 +202,11 @@ public class StudentService {
         studentCourseRecord.setEndDate(courseInfo.getEndDate());
         studentCourseRecord.setCampusId(studentInfo.getCampusId());
         studentCourseRecord.setUpdateTime(LocalDateTime.now());
+
+        // 使用课程信息中的状态
+        if (courseInfo.getStatus() != null) {
+          studentCourseRecord.setStatus(courseInfo.getStatus().getName());
+        }
 
         // 处理固定排课时间
         try {
@@ -235,7 +240,9 @@ public class StudentService {
         newRecord.setStudentId(request.getStudentId());
         newRecord.setCourseId(courseInfo.getCourseId());
         newRecord.setConsumedHours(java.math.BigDecimal.ZERO);
-        newRecord.setStatus(StudentCourseStatus.NORMAL.getName());
+        // 使用课程信息中的状态，如果为空则默认为 NORMAL
+        StudentCourseStatus status = courseInfo.getStatus() != null ? courseInfo.getStatus() : StudentCourseStatus.NORMAL;
+        newRecord.setStatus(status.getName());
         newRecord.setStartDate(courseInfo.getStartDate());
         newRecord.setEndDate(courseInfo.getEndDate());
         newRecord.setCampusId(studentInfo.getCampusId());

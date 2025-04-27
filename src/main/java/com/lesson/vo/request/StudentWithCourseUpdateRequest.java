@@ -88,11 +88,7 @@ public class StudentWithCourseUpdateRequest {
         @ApiModelProperty("校区ID")
         private Long campusId;
 
-        /**
-         * 学员课程状态
-         */
-        @ApiModelProperty("学员课程状态：NORMAL-正常，EXPIRED-过期，GRADUATED-结业")
-        private StudentCourseStatus status;
+
     }
 
     /**
@@ -127,6 +123,12 @@ public class StudentWithCourseUpdateRequest {
          */
         @ApiModelProperty("固定排课时间列表")
         private List<ScheduleTime> fixedScheduleTimes;
+
+        /**
+         * 课程状态
+         */
+        @ApiModelProperty("课程状态：NORMAL-正常，EXPIRED-过期，GRADUATED-结业")
+        private StudentCourseStatus status;
     }
 
     /**
