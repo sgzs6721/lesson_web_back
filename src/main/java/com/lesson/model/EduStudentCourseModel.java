@@ -2,6 +2,7 @@ package com.lesson.model;
 
 import com.lesson.enums.OperationType;
 import com.lesson.enums.RefundMethod;
+import com.lesson.enums.StudentCourseStatus;
 import com.lesson.enums.StudentStatus;
 import com.lesson.model.record.StudentCourseRecord;
 import com.lesson.repository.Tables;
@@ -612,7 +613,7 @@ public class EduStudentCourseModel {
         String statusStr = studentCourse.getStatus();
         if (statusStr != null) {
              // 使用 getByName 方法代替 valueOf
-             detailRecord.setStatus(StudentStatus.getByName(statusStr));
+             detailRecord.setStatus(StudentCourseStatus.getByName(statusStr));
         } else {
             detailRecord.setStatus(null);
         }

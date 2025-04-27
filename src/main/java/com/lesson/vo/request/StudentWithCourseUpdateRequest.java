@@ -1,7 +1,7 @@
 package com.lesson.vo.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.lesson.enums.StudentStatus;
+import com.lesson.enums.StudentCourseStatus;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -26,12 +26,7 @@ public class StudentWithCourseUpdateRequest {
     @ApiModelProperty("学员ID")
     private Long studentId;
 
-    /**
-     * 课程ID
-     */
-    @NotNull(message = "课程ID不能为空")
-    @ApiModelProperty("课程ID")
-    private Long courseId;
+
 
     /**
      * 学员基本信息
@@ -42,12 +37,12 @@ public class StudentWithCourseUpdateRequest {
     private StudentInfo studentInfo;
 
     /**
-     * 课程信息
+     * 课程信息列表
      */
-    @ApiModelProperty("课程信息")
+    @ApiModelProperty("课程信息列表")
     @Valid
-    @NotNull(message = "课程信息不能为空")
-    private CourseInfo courseInfo;
+    @NotEmpty(message = "课程信息列表不能为空")
+    private List<CourseInfo> courseInfoList;
 
     /**
      * 学员基本信息
@@ -94,10 +89,10 @@ public class StudentWithCourseUpdateRequest {
         private Long campusId;
 
         /**
-         * 学员状态
+         * 学员课程状态
          */
-        @ApiModelProperty("学员状态：NORMAL-正常，EXPIRED-过期，GRADUATED-结业")
-        private StudentStatus status;
+        @ApiModelProperty("学员课程状态：NORMAL-正常，EXPIRED-过期，GRADUATED-结业")
+        private StudentCourseStatus status;
     }
 
     /**
@@ -107,6 +102,12 @@ public class StudentWithCourseUpdateRequest {
     @ApiModel("课程信息")
     @JsonIgnoreProperties(ignoreUnknown = true) // 忽略未知字段，如 totalHours, consumedHours
     public static class CourseInfo {
+        /**
+         * 课程ID
+         */
+        @NotNull(message = "课程ID不能为空")
+        @ApiModelProperty("课程ID")
+        private Long courseId;
         /**
          * 报名日期
          */

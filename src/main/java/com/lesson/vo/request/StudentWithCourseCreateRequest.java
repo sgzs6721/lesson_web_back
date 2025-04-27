@@ -1,13 +1,14 @@
 package com.lesson.vo.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.lesson.enums.StudentStatus;
+import com.lesson.enums.StudentCourseStatus;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.Valid;
 import javax.validation.constraints.*;
+import javax.validation.constraints.NotEmpty;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -28,12 +29,12 @@ public class StudentWithCourseCreateRequest {
     private StudentInfo studentInfo;
 
     /**
-     * 报名课程信息
+     * 报名课程信息列表
      */
-    @ApiModelProperty("报名课程信息")
+    @ApiModelProperty("报名课程信息列表")
     @Valid
-    @NotNull(message = "报名课程信息不能为空")
-    private CourseInfo courseInfo;
+    @NotEmpty(message = "报名课程信息列表不能为空")
+    private List<CourseInfo> courseInfoList;
 
     /**
      * 学员基本信息
@@ -80,10 +81,10 @@ public class StudentWithCourseCreateRequest {
         private Long campusId;
 
         /**
-         * 学员状态
+         * 学员课程状态
          */
-        @ApiModelProperty("学员状态：NORMAL-正常，EXPIRED-过期，GRADUATED-结业")
-        private StudentStatus status = StudentStatus.NORMAL; // 默认为正常状态
+        @ApiModelProperty("学员课程状态：NORMAL-正常，EXPIRED-过期，GRADUATED-结业")
+        private StudentCourseStatus status = StudentCourseStatus.NORMAL; // 默认为正常状态
     }
 
     /**

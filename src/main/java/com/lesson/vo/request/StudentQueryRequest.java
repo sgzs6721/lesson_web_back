@@ -16,6 +16,12 @@ import java.time.YearMonth;
 public class StudentQueryRequest {
 
     /**
+     * 学员ID
+     */
+    @ApiModelProperty(value = "学员ID", example = "1000")
+    private Long studentId;
+
+    /**
      * 关键字（学员姓名/ID/电话）
      */
     @ApiModelProperty(value = "关键字（学员姓名/ID/电话）", example = "张三")

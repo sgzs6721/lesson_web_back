@@ -3,6 +3,7 @@ package com.lesson.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lesson.common.exception.BusinessException;
+import com.lesson.enums.StudentCourseStatus;
 import com.lesson.enums.StudentStatus;
 import com.lesson.model.EduCourseModel;
 import com.lesson.model.EduStudentCourseModel;
@@ -31,6 +32,11 @@ import org.jooq.impl.DSL;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import org.jooq.Record;
+import org.jooq.SelectConditionStep;
+import com.lesson.vo.response.StudentWithCoursesVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
@@ -89,42 +95,45 @@ public class StudentService {
     // 2. 存储学员信息
     Long studentId = studentModel.createStudent(studentRecord);
 
-    // 3. 获取课程信息
-    StudentWithCourseCreateRequest.CourseInfo courseInfo = request.getCourseInfo();
-    EduCourseRecord courseRecord = dsl.selectFrom(Tables.EDU_COURSE)
-        .where(Tables.EDU_COURSE.ID.eq(courseInfo.getCourseId()))
-        .and(Tables.EDU_COURSE.DELETED.eq(0))
-        .fetchOne();
+    // 3. 处理多个课程信息
+    for (StudentWithCourseCreateRequest.CourseInfo courseInfo : request.getCourseInfoList()) {
+      // 获取课程信息
+      EduCourseRecord courseRecord = dsl.selectFrom(Tables.EDU_COURSE)
+          .where(Tables.EDU_COURSE.ID.eq(courseInfo.getCourseId()))
+          .and(Tables.EDU_COURSE.DELETED.eq(0))
+          .fetchOne();
 
-    if (courseRecord == null) {
-      throw new IllegalArgumentException("课程不存在");
-    }
-
-    // 4. 创建学员课程关系
-    EduStudentCourseRecord studentCourseRecord = new EduStudentCourseRecord();
-    studentCourseRecord.setStudentId(studentId);
-    studentCourseRecord.setCourseId(courseInfo.getCourseId());
-    studentCourseRecord.setConsumedHours(java.math.BigDecimal.ZERO);
-    studentCourseRecord.setStatus("STUDYING");
-    studentCourseRecord.setStartDate(courseInfo.getStartDate());
-    studentCourseRecord.setEndDate(courseInfo.getEndDate());
-    studentCourseRecord.setCampusId(studentInfo.getCampusId());
-    studentCourseRecord.setInstitutionId(institutionId);
-    // 使用课程表中的标准课时，而不是前端传入的值
-    studentCourseRecord.setTotalHours(courseRecord.getTotalHours());
-    // 5. 处理固定排课时间
-    try {
-      if (courseInfo.getFixedScheduleTimes() != null && !courseInfo.getFixedScheduleTimes().isEmpty()) {
-        String fixedScheduleJson = objectMapper.writeValueAsString(courseInfo.getFixedScheduleTimes());
-        studentCourseRecord.setFixedSchedule(fixedScheduleJson);
+      if (courseRecord == null) {
+        throw new IllegalArgumentException("课程不存在：" + courseInfo.getCourseId());
       }
-    } catch (JsonProcessingException e) {
-      log.error("序列化固定排课时间失败", e);
-      throw new RuntimeException("序列化固定排课时间失败", e);
-    }
 
-    // 6. 存储学员课程关系
-    studentCourseModel.createStudentCourse(studentCourseRecord);
+      // 4. 创建学员课程关系
+      EduStudentCourseRecord studentCourseRecord = new EduStudentCourseRecord();
+      studentCourseRecord.setStudentId(studentId);
+      studentCourseRecord.setCourseId(courseInfo.getCourseId());
+      studentCourseRecord.setConsumedHours(java.math.BigDecimal.ZERO);
+      studentCourseRecord.setStatus(StudentCourseStatus.NORMAL.getName());
+      studentCourseRecord.setStartDate(courseInfo.getStartDate());
+      studentCourseRecord.setEndDate(courseInfo.getEndDate());
+      studentCourseRecord.setCampusId(studentInfo.getCampusId());
+      studentCourseRecord.setInstitutionId(institutionId);
+      // 使用课程表中的标准课时，而不是前端传入的值
+      studentCourseRecord.setTotalHours(courseRecord.getTotalHours());
+
+      // 5. 处理固定排课时间
+      try {
+        if (courseInfo.getFixedScheduleTimes() != null && !courseInfo.getFixedScheduleTimes().isEmpty()) {
+          String fixedScheduleJson = objectMapper.writeValueAsString(courseInfo.getFixedScheduleTimes());
+          studentCourseRecord.setFixedSchedule(fixedScheduleJson);
+        }
+      } catch (JsonProcessingException e) {
+        log.error("序列化固定排课时间失败", e);
+        throw new RuntimeException("序列化固定排课时间失败", e);
+      }
+
+      // 6. 存储学员课程关系
+      studentCourseModel.createStudentCourse(studentCourseRecord);
+    }
 
     return studentId;
   }
@@ -152,15 +161,14 @@ public class StudentService {
       throw new IllegalArgumentException("学员不存在");
     }
 
-    // 2. 验证学员课程关系是否存在
-    EduStudentCourseRecord studentCourseRecord = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
+    // 2. 验证学员是否存在课程关系
+    List<EduStudentCourseRecord> existingCourses = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
         .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(request.getStudentId()))
-        .and(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(request.getCourseId()))
         .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
-        .fetchOne();
+        .fetch();
 
-    if (studentCourseRecord == null) {
-      throw new IllegalArgumentException("学员课程关系不存在");
+    if (existingCourses.isEmpty()) {
+      throw new IllegalArgumentException("学员没有关联的课程");
     }
 
     // 3. 更新学员基本信息
@@ -178,33 +186,78 @@ public class StudentService {
     // 4. 存储学员信息
     studentModel.updateStudent(studentRecord);
 
-    // 5. 更新学员课程关系
-    StudentWithCourseUpdateRequest.CourseInfo courseInfo = request.getCourseInfo();
-    // 不使用前端传入的总课时数和已消耗课时数，保持原有值
-    // studentCourseRecord.setTotalHours(courseInfo.getTotalHours());
-    // if (courseInfo.getConsumedHours() != null) {
-    //   studentCourseRecord.setConsumedHours(courseInfo.getConsumedHours());
-    // }
-    studentCourseRecord.setStartDate(courseInfo.getStartDate());
-    studentCourseRecord.setEndDate(courseInfo.getEndDate());
-    studentCourseRecord.setCampusId(studentInfo.getCampusId());
-    studentCourseRecord.setUpdateTime(LocalDateTime.now());
+    // 5. 更新学员课程关系（多个课程）
+    for (StudentWithCourseUpdateRequest.CourseInfo courseInfo : request.getCourseInfoList()) {
+      // 查找对应的学员课程关系
+      EduStudentCourseRecord studentCourseRecord = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
+          .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(request.getStudentId()))
+          .and(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(courseInfo.getCourseId()))
+          .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
+          .fetchOne();
 
-    // 6. 处理固定排课时间
-    try {
-      if (courseInfo.getFixedScheduleTimes() != null && !courseInfo.getFixedScheduleTimes().isEmpty()) {
-        String fixedScheduleJson = objectMapper.writeValueAsString(courseInfo.getFixedScheduleTimes());
-        studentCourseRecord.setFixedSchedule(fixedScheduleJson);
+      // 如果学员课程关系存在，则更新
+      if (studentCourseRecord != null) {
+        // 不使用前端传入的总课时数和已消耗课时数，保持原有值
+        studentCourseRecord.setStartDate(courseInfo.getStartDate());
+        studentCourseRecord.setEndDate(courseInfo.getEndDate());
+        studentCourseRecord.setCampusId(studentInfo.getCampusId());
+        studentCourseRecord.setUpdateTime(LocalDateTime.now());
+
+        // 处理固定排课时间
+        try {
+          if (courseInfo.getFixedScheduleTimes() != null && !courseInfo.getFixedScheduleTimes().isEmpty()) {
+            String fixedScheduleJson = objectMapper.writeValueAsString(courseInfo.getFixedScheduleTimes());
+            studentCourseRecord.setFixedSchedule(fixedScheduleJson);
+          } else {
+            studentCourseRecord.setFixedSchedule(null); // 如果列表为空，则设置null
+          }
+        } catch (JsonProcessingException e) {
+          log.error("序列化固定排课时间失败", e);
+          throw new RuntimeException("序列化固定排课时间失败", e);
+        }
+
+        // 存储学员课程关系
+        studentCourseModel.updateStudentCourse(studentCourseRecord);
       } else {
-        studentCourseRecord.setFixedSchedule(null); // 如果列表为空，则设置null
-      }
-    } catch (JsonProcessingException e) {
-      log.error("序列化固定排课时间失败", e);
-      throw new RuntimeException("序列化固定排课时间失败", e);
-    }
+        // 如果学员课程关系不存在，则创建新的关系
+        // 获取课程信息
+        EduCourseRecord courseRecord = dsl.selectFrom(Tables.EDU_COURSE)
+            .where(Tables.EDU_COURSE.ID.eq(courseInfo.getCourseId()))
+            .and(Tables.EDU_COURSE.DELETED.eq(0))
+            .fetchOne();
 
-    // 7. 存储学员课程关系
-    studentCourseModel.updateStudentCourse(studentCourseRecord);
+        if (courseRecord == null) {
+          throw new IllegalArgumentException("课程不存在：" + courseInfo.getCourseId());
+        }
+
+        // 创建新的学员课程关系
+        EduStudentCourseRecord newRecord = new EduStudentCourseRecord();
+        newRecord.setStudentId(request.getStudentId());
+        newRecord.setCourseId(courseInfo.getCourseId());
+        newRecord.setConsumedHours(java.math.BigDecimal.ZERO);
+        newRecord.setStatus(StudentCourseStatus.NORMAL.getName());
+        newRecord.setStartDate(courseInfo.getStartDate());
+        newRecord.setEndDate(courseInfo.getEndDate());
+        newRecord.setCampusId(studentInfo.getCampusId());
+        newRecord.setInstitutionId(studentRecord.getInstitutionId());
+        // 使用课程表中的标准课时，而不是前端传入的值
+        newRecord.setTotalHours(courseRecord.getTotalHours());
+
+        // 处理固定排课时间
+        try {
+          if (courseInfo.getFixedScheduleTimes() != null && !courseInfo.getFixedScheduleTimes().isEmpty()) {
+            String fixedScheduleJson = objectMapper.writeValueAsString(courseInfo.getFixedScheduleTimes());
+            newRecord.setFixedSchedule(fixedScheduleJson);
+          }
+        } catch (JsonProcessingException e) {
+          log.error("序列化固定排课时间失败", e);
+          throw new RuntimeException("序列化固定排课时间失败", e);
+        }
+
+        // 存储学员课程关系
+        studentCourseModel.createStudentCourse(newRecord);
+      }
+    }
   }
 
   /**
@@ -310,6 +363,182 @@ public class StudentService {
 
   /**
    * 查询学员列表（包含课程信息）
+   *
+   * @param request 查询请求
+   * @return 分页结果
+   */
+  public PageResult<StudentWithCoursesVO> listStudentsWithCourses(StudentQueryRequest request) {
+    // 从token中获取机构ID
+    Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
+    if (institutionId == null) {
+      log.warn("无法从请求中获取机构ID (orgId)，将不按机构筛选");
+    }
+
+    // 查询学员列表
+    List<EduStudentRecord> students;
+    long total;
+
+    if (request.getStudentId() != null) {
+      // 如果指定了学员ID，只查询该学员
+      EduStudentRecord student = dsl.selectFrom(Tables.EDU_STUDENT)
+          .where(Tables.EDU_STUDENT.ID.eq(request.getStudentId()))
+          .and(Tables.EDU_STUDENT.DELETED.eq(0))
+          .fetchOne();
+
+      if (student != null) {
+        students = Collections.singletonList(student);
+        total = 1;
+      } else {
+        return PageResult.of(Collections.emptyList(), 0, request.getOffset() / request.getLimit() + 1, request.getLimit());
+      }
+    } else {
+      // 否则查询所有学员
+      SelectConditionStep<Record> query = dsl.select()
+          .from(Tables.EDU_STUDENT)
+          .where(Tables.EDU_STUDENT.DELETED.eq(0));
+
+      // 添加筛选条件
+      if (institutionId != null) {
+        query.and(Tables.EDU_STUDENT.INSTITUTION_ID.eq(institutionId));
+      }
+
+      if (request.getCampusId() != null) {
+        query.and(Tables.EDU_STUDENT.CAMPUS_ID.eq(request.getCampusId()));
+      }
+
+      if (request.getKeyword() != null && !request.getKeyword().isEmpty()) {
+        query.and(Tables.EDU_STUDENT.NAME.like("%" + request.getKeyword() + "%"));
+      }
+
+      // 关键字已经在上面处理过了，这里不需要再处理手机号
+      // if (request.getPhone() != null && !request.getPhone().isEmpty()) {
+      //   query.and(Tables.EDU_STUDENT.PHONE.like("%" + request.getPhone() + "%"));
+      // }
+
+      // 查询总数
+      total = query.stream().count();
+
+      // 分页查询
+      students = query
+          .orderBy(Tables.EDU_STUDENT.CREATED_TIME.desc())
+          .limit(request.getLimit())
+          .offset(request.getOffset())
+          .fetchInto(EduStudentRecord.class);
+    }
+
+    // 构建返回结果
+    List<StudentWithCoursesVO> result = new ArrayList<>();
+
+    for (EduStudentRecord student : students) {
+      // 创建学员VO
+      StudentWithCoursesVO studentVO = new StudentWithCoursesVO();
+      studentVO.setId(student.getId());
+      studentVO.setStudentName(student.getName());
+      studentVO.setStudentGender(student.getGender());
+      studentVO.setStudentAge(student.getAge());
+      studentVO.setStudentPhone(student.getPhone());
+      studentVO.setCampusId(student.getCampusId());
+      studentVO.setInstitutionId(student.getInstitutionId());
+      studentVO.setStatus(student.getStatus());
+
+      // 查询校区名称
+      if (student.getCampusId() != null) {
+        String campusName = dsl.select(Tables.SYS_CAMPUS.NAME)
+            .from(Tables.SYS_CAMPUS)
+            .where(Tables.SYS_CAMPUS.ID.eq(student.getCampusId()))
+            .fetchOneInto(String.class);
+        studentVO.setCampusName(campusName);
+      }
+
+      // 查询机构名称
+      if (student.getInstitutionId() != null) {
+        String institutionName = dsl.select(Tables.SYS_INSTITUTION.NAME)
+            .from(Tables.SYS_INSTITUTION)
+            .where(Tables.SYS_INSTITUTION.ID.eq(student.getInstitutionId()))
+            .fetchOneInto(String.class);
+        studentVO.setInstitutionName(institutionName);
+      }
+
+      // 查询学员的课程列表
+      List<EduStudentCourseRecord> studentCourses = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
+          .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(student.getId()))
+          .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
+          .fetch();
+
+      List<StudentWithCoursesVO.CourseInfo> courseInfos = new ArrayList<>();
+
+      for (EduStudentCourseRecord studentCourse : studentCourses) {
+        // 查询课程信息
+        EduCourseRecord course = dsl.selectFrom(Tables.EDU_COURSE)
+            .where(Tables.EDU_COURSE.ID.eq(studentCourse.getCourseId()))
+            .and(Tables.EDU_COURSE.DELETED.eq(0))
+            .fetchOne();
+
+        if (course == null) {
+          continue; // 课程不存在，跳过
+        }
+
+        // 创建课程信息VO
+        StudentWithCoursesVO.CourseInfo courseInfo = new StudentWithCoursesVO.CourseInfo();
+        courseInfo.setStudentCourseId(studentCourse.getId());
+        courseInfo.setCourseId(studentCourse.getCourseId());
+        courseInfo.setCourseName(course.getName());
+        courseInfo.setCourseTypeId(course.getTypeId());
+
+        // 查询课程类型
+        if (course.getTypeId() != null) {
+          String courseTypeName = dsl.select(Tables.SYS_CONSTANT.CONSTANT_VALUE)
+              .from(Tables.SYS_CONSTANT)
+              .where(Tables.SYS_CONSTANT.ID.eq(course.getTypeId()))
+              .fetchOneInto(String.class);
+          courseInfo.setCourseTypeName(courseTypeName);
+        }
+
+        // 查询教练信息
+        Record coachRecord = dsl.select(Tables.SYS_COACH.ID, Tables.SYS_COACH.NAME)
+            .from(Tables.SYS_COACH_COURSE)
+            .join(Tables.SYS_COACH).on(Tables.SYS_COACH_COURSE.COACH_ID.eq(Tables.SYS_COACH.ID))
+            .where(Tables.SYS_COACH_COURSE.COURSE_ID.eq(studentCourse.getCourseId()))
+            .and(Tables.SYS_COACH_COURSE.DELETED.eq(0))
+            .and(Tables.SYS_COACH.DELETED.eq(0))
+            .fetchOne();
+
+        if (coachRecord != null) {
+          courseInfo.setCoachId(coachRecord.get(Tables.SYS_COACH.ID, Long.class));
+          courseInfo.setCoachName(coachRecord.get(Tables.SYS_COACH.NAME, String.class));
+        }
+
+        // 设置课时信息
+        courseInfo.setTotalHours(studentCourse.getTotalHours());
+        courseInfo.setConsumedHours(studentCourse.getConsumedHours());
+        courseInfo.setRemainingHours(studentCourse.getTotalHours().subtract(studentCourse.getConsumedHours()));
+
+        // 查询最近上课时间
+        LocalDate lastClassTime = dsl.select(DSL.max(Tables.EDU_STUDENT_COURSE_OPERATION.OPERATION_TIME).cast(LocalDate.class))
+            .from(Tables.EDU_STUDENT_COURSE_OPERATION)
+            .where(Tables.EDU_STUDENT_COURSE_OPERATION.STUDENT_ID.eq(student.getId()))
+            .and(Tables.EDU_STUDENT_COURSE_OPERATION.COURSE_ID.eq(studentCourse.getCourseId()))
+            .fetchOneInto(LocalDate.class);
+        courseInfo.setLastClassTime(lastClassTime);
+
+        // 设置其他信息
+        courseInfo.setEnrollmentDate(studentCourse.getStartDate());
+        courseInfo.setEndDate(studentCourse.getEndDate());
+        courseInfo.setStatus(studentCourse.getStatus());
+        courseInfo.setFixedSchedule(studentCourse.getFixedSchedule());
+
+        courseInfos.add(courseInfo);
+      }
+
+      studentVO.setCourses(courseInfos);
+      result.add(studentVO);
+    }
+
+    return PageResult.of(result, total, request.getOffset() / request.getLimit() + 1, request.getLimit());
+  }
+
+  /**
+   * 查询学员列表（包含课程信息） - 兼容旧版接口
    *
    * @param request 查询请求
    * @return 分页结果
