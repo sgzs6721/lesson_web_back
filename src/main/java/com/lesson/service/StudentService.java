@@ -446,7 +446,8 @@ public class StudentService {
       studentVO.setStudentPhone(student.getPhone());
       studentVO.setCampusId(student.getCampusId());
       studentVO.setInstitutionId(student.getInstitutionId());
-      studentVO.setStatus(student.getStatus());
+      // 学员状态移动到课程信息中
+      // studentVO.setStatus(student.getStatus());
 
       // 查询校区名称
       if (student.getCampusId() != null) {

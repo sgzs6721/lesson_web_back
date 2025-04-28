@@ -39,8 +39,7 @@ public class StudentWithCoursesVO {
     @Schema(description = "机构名称", example = "测试机构")
     private String institutionName;
 
-    @Schema(description = "学员状态", example = "NORMAL")
-    private String status;
+    // 学员状态移动到课程信息中
 
     /**
      * 学员的课程列表
