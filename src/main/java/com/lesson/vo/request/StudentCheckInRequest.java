@@ -6,8 +6,10 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.math.BigDecimal;
 
 /**
  * 学员打卡（创建上课记录）请求
@@ -41,10 +43,10 @@ public class StudentCheckInRequest {
 
     @ApiModelProperty(value = "备注信息", example = "学员表现良好")
     private String notes;
-    
-    // 注意：课时数 (hours) 通常根据 start_time 和 end_time 计算，或者从课程信息中获取固定值。
-    // 如果需要前端传入，则取消注释并添加验证。
-    // @NotNull(message = "课时数不能为空")
-    // @ApiModelProperty(value = "消耗课时数", required = true, example = "1.0")
-    // private java.math.BigDecimal hours; 
+
+    @NotNull(message = "消耗课时不能为空")
+    @Positive(message = "消耗课时必须大于0")
+    @ApiModelProperty(value = "本次打卡消耗课时", required = true, example = "1.5")
+    private BigDecimal duration;
+
 } 

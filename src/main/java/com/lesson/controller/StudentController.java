@@ -132,26 +132,6 @@ public class StudentController {
         return Result.success(pageResult.getList().get(0));
     }
 
-    /**
-     * 获取学员详情（兼容旧版）
-     *
-     * @param id 学员ID
-     * @return 学员详情
-     */
-    @GetMapping("/detail-old")
-    @Operation(summary = "获取学员详情（兼容旧版）",
-               description = "根据学员ID获取学员详细信息，包含关联的课程信息（兼容旧版）")
-    public Result<StudentCourseListVO> detailOld(
-            @Parameter(description = "学员ID", required = true) @RequestParam Long id) {
-        // 直接根据学员ID获取学员详情
-        StudentCourseListVO studentDetail = studentService.getStudentCourseDetail(id);
-
-        if (studentDetail == null) {
-            throw new IllegalArgumentException("学员不存在或没有关联课程");
-        }
-
-        return Result.success(studentDetail);
-    }
 
     /**
      * 查询学员列表 (包含课程信息)
@@ -164,20 +144,6 @@ public class StudentController {
                description = "根据条件分页查询学员列表，包含关联的课程信息，支持按姓名、手机号、状态、课程、报名年月等条件筛选和排序")
     public Result<PageResult<StudentWithCoursesVO>> list(@Validated StudentQueryRequest request) {
         PageResult<StudentWithCoursesVO> pageResult = studentService.listStudentsWithCourses(request);
-        return Result.success(pageResult);
-    }
-
-    /**
-     * 查询学员列表 (兼容旧版)
-     *
-     * @param request 查询参数
-     * @return 学员课程列表分页结果
-     */
-    @GetMapping("/list-old")
-    @Operation(summary = "查询学员列表 (兼容旧版)",
-               description = "根据条件分页查询学员列表，包含关联的课程信息（兼容旧版）")
-    public Result<PageResult<StudentCourseListVO>> listOld(@Validated StudentQueryRequest request) {
-        PageResult<StudentCourseListVO> pageResult = studentService.listStudentsWithCourse(request);
         return Result.success(pageResult);
     }
 

@@ -12,6 +12,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * 学员缴费请求
@@ -63,8 +64,8 @@ public class StudentPaymentRequest {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate validUntil;
 
-    @ApiModelProperty(value = "赠品描述", example = "篮球一个")
-    private String giftItems;
+    @ApiModelProperty(value = "赠品常量ID列表", example = "[1, 2, 3]")
+    private List<Long> giftItems;
 
     // 备注信息
     @ApiModelProperty(value = "备注信息", example = "续费活动优惠")

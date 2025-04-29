@@ -28,6 +28,7 @@ import com.lesson.vo.request.StudentPaymentRequest;
 import com.lesson.model.EduStudentPaymentModel;
 import com.lesson.repository.tables.records.EduStudentPaymentRecord;
 import com.lesson.repository.tables.records.EduStudentRefundRecord;
+import com.lesson.model.SysConstantModel;
 import org.jooq.impl.DSL;
 
 import java.math.BigDecimal;
@@ -52,6 +53,9 @@ import java.util.List;
 import com.lesson.enums.PaymentType;
 import com.lesson.vo.request.StudentRefundRequest;
 import com.lesson.enums.RefundMethod;
+import java.util.Set;
+import java.util.stream.Collectors;
+import com.lesson.common.enums.ConstantType;
 
 /**
  * 学员服务
@@ -68,6 +72,7 @@ public class StudentService {
   private final ObjectMapper objectMapper;
   private final EduStudentPaymentModel studentPaymentModel;
   private final EduCourseModel courseModel;
+  private final SysConstantModel constantModel;
 
   /**
    * 创建学员及课程
@@ -614,21 +619,26 @@ public class StudentService {
     }
 
     // 3. 计算本次消耗课时数
-    // 优先使用课程定义的单次课时，如果不存在，则根据时间计算
+    // 优先使用传入的 duration，其次使用课程定义的单次课时，最后根据时间计算
     BigDecimal hoursConsumed;
-    EduCourseRecord courseInfo = dsl.selectFrom(Tables.EDU_COURSE)
-        .where(Tables.EDU_COURSE.ID.eq(request.getCourseId()))
-        .fetchOne();
 
-    if (courseInfo != null && courseInfo.getUnitHours() != null && courseInfo.getUnitHours().compareTo(BigDecimal.ZERO) > 0) {
-      hoursConsumed = courseInfo.getUnitHours();
+    if (request.getDuration() != null && request.getDuration().compareTo(BigDecimal.ZERO) > 0) {
+        hoursConsumed = request.getDuration();
     } else {
-      // 根据时间计算课时（简单示例：按小时计算，不足1小时算1小时，需要更精确可调整）
-      long minutes = Duration.between(request.getStartTime(), request.getEndTime()).toMinutes();
-      if (minutes <= 0) {
-        throw new BusinessException("结束时间必须晚于开始时间");
-      }
-      hoursConsumed = BigDecimal.valueOf(Math.ceil((double) minutes / 60));
+        EduCourseRecord courseInfo = dsl.selectFrom(Tables.EDU_COURSE)
+            .where(Tables.EDU_COURSE.ID.eq(request.getCourseId()))
+            .fetchOne();
+
+        if (courseInfo != null && courseInfo.getUnitHours() != null && courseInfo.getUnitHours().compareTo(BigDecimal.ZERO) > 0) {
+            hoursConsumed = courseInfo.getUnitHours();
+        } else {
+            // 根据时间计算课时（简单示例：按小时计算，不足1小时算1小时，需要更精确可调整）
+            long minutes = Duration.between(request.getStartTime(), request.getEndTime()).toMinutes();
+            if (minutes <= 0) {
+                throw new BusinessException("结束时间必须晚于开始时间");
+            }
+            hoursConsumed = BigDecimal.valueOf(Math.ceil((double) minutes / 60));
+        }
     }
 
     // 4. 检查剩余课时是否足够
@@ -722,7 +732,31 @@ public class StudentService {
       throw new BusinessException("无法确定校区或机构信息");
     }
 
-    // 1. 查找学员课程关系记录 (edu_student_course)
+    // 1. 验证赠品ID (如果提供了 giftItems)
+    String giftItemsDbString = null; // 用于存储到数据库的字符串
+    if (request.getGiftItems() != null && !request.getGiftItems().isEmpty()) {
+        List<Long> giftItemIds = request.getGiftItems();
+
+        // 查询所有类型为 GIFT_ITEM_TYPE 的有效常量 ID
+        List<SysConstantRecord> validGiftConstants = constantModel.listByType(ConstantType.GIFT_ITEM.getName());
+        Set<Long> validGiftIds = validGiftConstants.stream()
+                .filter(c -> c.getStatus() == 1) // 仅考虑启用的常量
+                .map(SysConstantRecord::getId)
+                .collect(Collectors.toSet());
+
+        // 校验每个传入的赠品 ID
+        for (Long itemId : giftItemIds) {
+            if (!validGiftIds.contains(itemId)) {
+                throw new BusinessException("无效的赠品ID: " + itemId);
+            }
+        }
+        // 将 ID 列表转换为逗号分隔的字符串以便存储
+        giftItemsDbString = giftItemIds.stream()
+                                    .map(String::valueOf)
+                                    .collect(Collectors.joining(","));
+    }
+
+    // 2. 查找学员课程关系记录 (edu_student_course)
     EduStudentCourseRecord studentCourse = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
             .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(request.getStudentId()))
             .and(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(request.getCourseId()))
@@ -736,7 +770,7 @@ public class StudentService {
       throw new BusinessException("学员未报名该课程或课程关系不存在");
     }
 
-    // 2. 创建缴费记录 (edu_student_payment)
+    // 3. 创建缴费记录 (edu_student_payment)
     EduStudentPaymentRecord paymentRecord = dsl.newRecord(Tables.EDU_STUDENT_PAYMENT);
     paymentRecord.setStudentId(request.getStudentId().toString()); // 注意：表字段是VARCHAR
     paymentRecord.setCourseId(request.getCourseId().toString());   // 注意：表字段是VARCHAR
@@ -746,7 +780,7 @@ public class StudentService {
     paymentRecord.setCourseHours(request.getCourseHours());
     paymentRecord.setGiftHours(request.getGiftHours());
     paymentRecord.setValidUntil(request.getValidUntil());
-    paymentRecord.setGiftItems(request.getGiftItems());
+    paymentRecord.setGiftItems(giftItemsDbString); // 存储转换后的字符串
     paymentRecord.setNotes(request.getNotes());
     paymentRecord.setCampusId(campusId);
     paymentRecord.setInstitutionId(institutionId);
@@ -754,7 +788,7 @@ public class StudentService {
 
     Long paymentId = studentPaymentModel.createPayment(paymentRecord);
 
-    // 3. 更新学员课程信息 (edu_student_course)
+    // 4. 更新学员课程信息 (edu_student_course)
     // - 增加总课时 (正课 + 赠送)
     // - 更新有效期
     // - 如果是续费且原状态是GRADUATED/EXPIRED等，可能需要重置为STUDYING

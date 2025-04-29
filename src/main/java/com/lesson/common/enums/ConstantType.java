@@ -6,7 +6,8 @@ import lombok.Getter;
 public enum ConstantType {
     SYSTEM("SYSTEM", "系统常量"),
     BUSINESS("BUSINESS", "业务常量"),
-    COURSE_TYPE("COURSE_TYPE","课程类型");
+    COURSE_TYPE("COURSE_TYPE","课程类型"),
+    GIFT_ITEM("GIFT_ITEM", "赠品");
 
     @Getter
     private final String name;
