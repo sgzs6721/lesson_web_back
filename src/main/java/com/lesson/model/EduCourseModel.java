@@ -20,7 +20,7 @@ public class EduCourseModel {
   private final DSLContext dsl;
 
   public Long createCourse(String name, Long typeId, CourseStatus status,
-                           BigDecimal unitHours, BigDecimal totalHours, BigDecimal price,
+                           BigDecimal unitHours, BigDecimal totalHours, BigDecimal price, BigDecimal coachFee,
                            Long campusId, Long institutionId, String description) {
     dsl.insertInto(EDU_COURSE)
         .set(EDU_COURSE.NAME, name)
@@ -29,6 +29,7 @@ public class EduCourseModel {
         .set(EDU_COURSE.UNIT_HOURS, unitHours)
         .set(EDU_COURSE.TOTAL_HOURS, totalHours)
         .set(EDU_COURSE.PRICE, price)
+        .set(EDU_COURSE.COACH_FEE, coachFee)
         .set(EDU_COURSE.CAMPUS_ID, campusId)
         .set(EDU_COURSE.INSTITUTION_ID, institutionId)
         .set(EDU_COURSE.DESCRIPTION, description)
@@ -88,7 +89,7 @@ public class EduCourseModel {
   }
 
   public void updateCourse(Long id, String name, Long typeId,
-                           BigDecimal unitHours, BigDecimal totalHours, BigDecimal price,
+                           BigDecimal unitHours, BigDecimal totalHours, BigDecimal price, BigDecimal coachFee,
                            Long campusId, String description) {
     // 获取当前课程信息
     CourseDetailRecord existingCourse = getCourseById(id);
@@ -105,6 +106,7 @@ public class EduCourseModel {
           .set(EDU_COURSE.UNIT_HOURS, unitHours)
           .set(EDU_COURSE.TOTAL_HOURS, totalHours)
           .set(EDU_COURSE.PRICE, price)
+          .set(EDU_COURSE.COACH_FEE, coachFee)
           .set(EDU_COURSE.DESCRIPTION, description)
           .where(EDU_COURSE.ID.eq(id))
           .execute();
@@ -116,6 +118,7 @@ public class EduCourseModel {
           .set(EDU_COURSE.UNIT_HOURS, unitHours)
           .set(EDU_COURSE.TOTAL_HOURS, totalHours)
           .set(EDU_COURSE.PRICE, price)
+          .set(EDU_COURSE.COACH_FEE, coachFee)
           .set(EDU_COURSE.CAMPUS_ID, campusId)
           .set(EDU_COURSE.DESCRIPTION, description)
           .where(EDU_COURSE.ID.eq(id))

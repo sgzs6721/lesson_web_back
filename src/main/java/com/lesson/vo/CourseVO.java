@@ -52,6 +52,11 @@ public class CourseVO {
     private BigDecimal price;
 
     /**
+     * 教练费用
+     */
+    private BigDecimal coachFee;
+
+    /**
      * 校区ID
      */
     private Long campusId;

@@ -19,7 +19,6 @@ public class CourseCreateRequest {
     private String name;
 
     @NotNull(message = "课程类型不能为空")
-
     @Schema(description = "课程类型ID（系统常量ID）")
     private Long typeId;
 
@@ -41,6 +40,11 @@ public class CourseCreateRequest {
     @Positive(message = "课程单价必须大于0")
     @Schema(description = "课程单价")
     private BigDecimal price;
+
+    @NotNull(message = "教练费用不能为空")
+    @Positive(message = "教练费用必须大于0")
+    @Schema(description = "教练费用")
+    private BigDecimal coachFee;
 
     @NotNull(message = "教练列表不能为空")
     @Schema(description = "教练ID列表")

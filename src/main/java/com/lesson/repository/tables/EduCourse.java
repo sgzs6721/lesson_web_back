@@ -20,7 +20,7 @@ import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row14;
+import org.jooq.Row15;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -91,6 +91,11 @@ public class EduCourse extends TableImpl<EduCourseRecord> {
      * The column <code>lesson.edu_course.price</code>. 课程单价(元)
      */
     public final TableField<EduCourseRecord, BigDecimal> PRICE = createField(DSL.name("price"), SQLDataType.DECIMAL(10, 2).nullable(false).defaultValue(DSL.inline("0.00", SQLDataType.DECIMAL)), this, "课程单价(元)");
+
+    /**
+     * The column <code>lesson.edu_course.coach_fee</code>. 教练费用(元)
+     */
+    public final TableField<EduCourseRecord, BigDecimal> COACH_FEE = createField(DSL.name("coach_fee"), SQLDataType.DECIMAL(10, 2).nullable(false).defaultValue(DSL.inline("0.00", SQLDataType.DECIMAL)), this, "教练费用(元)");
 
     /**
      * The column <code>lesson.edu_course.description</code>. 课程描述
@@ -207,11 +212,11 @@ public class EduCourse extends TableImpl<EduCourseRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row14 type methods
+    // Row15 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row14<Long, String, Long, String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, String, Long, Long, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
-        return (Row14) super.fieldsRow();
+    public Row15<Long, String, Long, String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, String, Long, Long, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
+        return (Row15) super.fieldsRow();
     }
 }

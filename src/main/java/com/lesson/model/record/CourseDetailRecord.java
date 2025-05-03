@@ -18,6 +18,7 @@ public class CourseDetailRecord {
     private BigDecimal totalHours;
     private BigDecimal consumedHours;
     private BigDecimal price;
+    private BigDecimal coachFee;
     private Long campusId;
     private String campusName;
     private Long institutionId;

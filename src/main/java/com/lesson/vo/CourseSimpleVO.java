@@ -4,6 +4,7 @@ import com.lesson.enums.CourseStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -41,6 +42,12 @@ public class CourseSimpleVO {
      */
     @Schema(description = "课程状态")
     private CourseStatus status;
+
+    /**
+     * 教练费用
+     */
+    @Schema(description = "教练费用")
+    private BigDecimal coachFee;
 
     /**
      * 教练列表

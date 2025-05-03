@@ -44,6 +44,11 @@ public class CourseUpdateRequest {
     @Schema(description = "课程单价")
     private BigDecimal price;
 
+    @NotNull(message = "教练费用不能为空")
+    @Positive(message = "教练费用必须大于0")
+    @Schema(description = "教练费用")
+    private BigDecimal coachFee;
+
     @NotNull(message = "教练列表不能为空")
     @Schema(description = "教练ID列表")
     private List<Long> coachIds;
@@ -54,4 +59,6 @@ public class CourseUpdateRequest {
 
     @Schema(description = "课程描述")
     private String description;
+
+
 } 

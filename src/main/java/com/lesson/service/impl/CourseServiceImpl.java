@@ -64,6 +64,7 @@ public class CourseServiceImpl implements CourseService {
                 request.getUnitHours(),
                 request.getTotalHours(),
                 request.getPrice(),
+                request.getCoachFee(),
                 request.getCampusId(),
                 institutionId,
                 request.getDescription()
@@ -116,6 +117,7 @@ public class CourseServiceImpl implements CourseService {
                 request.getUnitHours(),
                 request.getTotalHours(),
                 request.getPrice(),
+                request.getCoachFee(),
                 request.getCampusId(),
                 request.getDescription()
             );
