@@ -96,7 +96,7 @@ public class StudentWithCourseUpdateRequest {
      */
     @Data
     @ApiModel("课程信息")
-    @JsonIgnoreProperties(ignoreUnknown = true) // 忽略未知字段，如 totalHours, consumedHours
+    @JsonIgnoreProperties(ignoreUnknown = true) // 忽略未知字段，如 totalHours
     public static class CourseInfo {
         /**
          * 课程ID
@@ -104,19 +104,13 @@ public class StudentWithCourseUpdateRequest {
         @NotNull(message = "课程ID不能为空")
         @ApiModelProperty("课程ID")
         private Long courseId;
+
         /**
          * 报名日期
          */
         @NotNull(message = "报名日期不能为空")
         @ApiModelProperty("报名日期")
-        private LocalDate startDate;
-
-        /**
-         * 有效期至
-         */
-        @NotNull(message = "有效期至不能为空")
-        @ApiModelProperty("有效期至")
-        private LocalDate endDate;
+        private LocalDate enrollDate;
 
         /**
          * 固定排课时间列表，格式为周几和时间点，如[{"weekday":"周一", "from":"15:00", "to":"16:00"}]
@@ -128,7 +122,7 @@ public class StudentWithCourseUpdateRequest {
          * 课程状态
          */
         @ApiModelProperty("课程状态：NORMAL-正常，EXPIRED-过期，GRADUATED-结业")
-        private StudentCourseStatus status;
+        private StudentCourseStatus status = StudentCourseStatus.NORMAL; // 默认为正常状态
     }
 
     /**

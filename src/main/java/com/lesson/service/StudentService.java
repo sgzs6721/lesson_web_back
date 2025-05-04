@@ -120,8 +120,7 @@ public class StudentService {
       // 使用课程信息中的状态，如果为空则默认为 NORMAL
       StudentCourseStatus status = courseInfo.getStatus() != null ? courseInfo.getStatus() : StudentCourseStatus.NORMAL;
       studentCourseRecord.setStatus(status.getName());
-      studentCourseRecord.setStartDate(courseInfo.getStartDate());
-      studentCourseRecord.setEndDate(courseInfo.getEndDate());
+      studentCourseRecord.setStartDate(courseInfo.getEnrollDate());
       studentCourseRecord.setCampusId(studentInfo.getCampusId());
       studentCourseRecord.setInstitutionId(institutionId);
       // 使用课程表中的标准课时，而不是前端传入的值
@@ -203,8 +202,7 @@ public class StudentService {
       // 如果学员课程关系存在，则更新
       if (studentCourseRecord != null) {
         // 不使用前端传入的总课时数和已消耗课时数，保持原有值
-        studentCourseRecord.setStartDate(courseInfo.getStartDate());
-        studentCourseRecord.setEndDate(courseInfo.getEndDate());
+        studentCourseRecord.setStartDate(courseInfo.getEnrollDate());
         studentCourseRecord.setCampusId(studentInfo.getCampusId());
         studentCourseRecord.setUpdateTime(LocalDateTime.now());
 
@@ -248,8 +246,7 @@ public class StudentService {
         // 使用课程信息中的状态，如果为空则默认为 NORMAL
         StudentCourseStatus status = courseInfo.getStatus() != null ? courseInfo.getStatus() : StudentCourseStatus.NORMAL;
         newRecord.setStatus(status.getName());
-        newRecord.setStartDate(courseInfo.getStartDate());
-        newRecord.setEndDate(courseInfo.getEndDate());
+        newRecord.setStartDate(courseInfo.getEnrollDate());
         newRecord.setCampusId(studentInfo.getCampusId());
         newRecord.setInstitutionId(studentRecord.getInstitutionId());
         // 使用课程表中的标准课时，而不是前端传入的值
@@ -363,7 +360,6 @@ public class StudentService {
 
     vo.setLastClassTime(lastClassTime);
     vo.setEnrollmentDate(studentCourse.getStartDate());
-    vo.setEndDate(studentCourse.getEndDate());
     vo.setStatus(studentCourse.getStatus());
 
     vo.setCampusId(studentCourse.getCampusId());
@@ -536,7 +532,6 @@ public class StudentService {
 
         // 设置其他信息
         courseInfo.setEnrollmentDate(studentCourse.getStartDate());
-        courseInfo.setEndDate(studentCourse.getEndDate());
         courseInfo.setStatus(studentCourse.getStatus());
         courseInfo.setFixedSchedule(studentCourse.getFixedSchedule());
 
