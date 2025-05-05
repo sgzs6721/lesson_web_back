@@ -609,7 +609,7 @@ public class StudentService {
     }
 
     // 2. 检查学员课程状态是否允许打卡 (例如：必须是 STUDYING)
-    if (!"STUDYING".equals(studentCourse.getStatus())) {
+    if (!StudentCourseStatus.NORMAL.getDesc().equals(studentCourse.getStatus())) {
       throw new BusinessException("当前课程状态不允许打卡: " + studentCourse.getStatus());
     }
 
