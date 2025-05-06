@@ -12,6 +12,9 @@ import io.swagger.v3.oas.models.responses.ApiResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Configuration
 public class SwaggerConfig {
     @Bean
@@ -31,38 +34,58 @@ public class SwaggerConfig {
     }
     
     private ApiResponse createSuccessResponse() {
+        Map<String, Object> example = new HashMap<>();
+        example.put("code", 200);
+        example.put("message", "操作成功");
+        example.put("data", null);
+        
         return new ApiResponse()
                 .description("操作成功")
                 .content(new Content()
                         .addMediaType("application/json", new MediaType()
                                 .addExamples("default", new Example()
-                                        .value("{\"code\": 200, \"message\": \"操作成功\", \"data\": null}"))));
+                                        .value(example))));
     }
     
     private ApiResponse createUnauthorizedResponse() {
+        Map<String, Object> example = new HashMap<>();
+        example.put("code", 401);
+        example.put("message", "未登录或token已过期");
+        example.put("data", null);
+        
         return new ApiResponse()
                 .description("未授权")
                 .content(new Content()
                         .addMediaType("application/json", new MediaType()
                                 .addExamples("default", new Example()
-                                        .value("{\"code\": 401, \"message\": \"未登录或token已过期\", \"data\": null}"))));
+                                        .value(example))));
     }
     
     private ApiResponse createForbiddenResponse() {
+        Map<String, Object> example = new HashMap<>();
+        example.put("code", 403);
+        example.put("message", "权限不足");
+        example.put("data", null);
+        
         return new ApiResponse()
                 .description("权限不足")
                 .content(new Content()
                         .addMediaType("application/json", new MediaType()
                                 .addExamples("default", new Example()
-                                        .value("{\"code\": 403, \"message\": \"权限不足\", \"data\": null}"))));
+                                        .value(example))));
     }
     
     private ApiResponse createErrorResponse() {
+        Map<String, Object> example = new HashMap<>();
+        example.put("code", 500);
+        example.put("message", "系统异常");
+        example.put("data", null);
+        
         return new ApiResponse()
                 .description("系统异常")
                 .content(new Content()
                         .addMediaType("application/json", new MediaType()
                                 .addExamples("default", new Example()
-                                        .value("{\"code\": 500, \"message\": \"系统异常\", \"data\": null}"))));
+                                        .value(example))));
     }
 } 
