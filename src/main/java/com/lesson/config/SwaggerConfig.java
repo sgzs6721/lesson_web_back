@@ -27,10 +27,28 @@ public class SwaggerConfig {
                         .contact(new Contact()
                                 .name("开发团队")))
                 .components(new Components()
+                        .addSchemas("ResultSuccess", createResultSuccessSchema())
+                        .addSchemas("ResultError", createResultErrorSchema())
                         .addResponses("200", createSuccessResponse())
                         .addResponses("401", createUnauthorizedResponse())
                         .addResponses("403", createForbiddenResponse())
                         .addResponses("500", createErrorResponse()));
+    }
+    
+    private Schema<?> createResultSuccessSchema() {
+        return new Schema<>()
+                .type("object")
+                .addProperty("code", new Schema<>().type("integer").example(200))
+                .addProperty("message", new Schema<>().type("string").example("操作成功"))
+                .addProperty("data", new Schema<>().type("object"));
+    }
+    
+    private Schema<?> createResultErrorSchema() {
+        return new Schema<>()
+                .type("object")
+                .addProperty("code", new Schema<>().type("integer").example(500))
+                .addProperty("message", new Schema<>().type("string").example("系统异常"))
+                .addProperty("data", new Schema<>().type("null"));
     }
     
     private ApiResponse createSuccessResponse() {
@@ -43,6 +61,7 @@ public class SwaggerConfig {
                 .description("操作成功")
                 .content(new Content()
                         .addMediaType("application/json", new MediaType()
+                                .schema(new Schema<>().$ref("#/components/schemas/ResultSuccess"))
                                 .addExamples("default", new Example()
                                         .value(example))));
     }
@@ -57,6 +76,11 @@ public class SwaggerConfig {
                 .description("未授权")
                 .content(new Content()
                         .addMediaType("application/json", new MediaType()
+                                .schema(new Schema<>()
+                                        .type("object")
+                                        .addProperty("code", new Schema<>().type("integer").example(401))
+                                        .addProperty("message", new Schema<>().type("string").example("未登录或token已过期"))
+                                        .addProperty("data", new Schema<>().type("null")))
                                 .addExamples("default", new Example()
                                         .value(example))));
     }
@@ -71,6 +95,11 @@ public class SwaggerConfig {
                 .description("权限不足")
                 .content(new Content()
                         .addMediaType("application/json", new MediaType()
+                                .schema(new Schema<>()
+                                        .type("object")
+                                        .addProperty("code", new Schema<>().type("integer").example(403))
+                                        .addProperty("message", new Schema<>().type("string").example("权限不足"))
+                                        .addProperty("data", new Schema<>().type("null")))
                                 .addExamples("default", new Example()
                                         .value(example))));
     }
@@ -85,6 +114,7 @@ public class SwaggerConfig {
                 .description("系统异常")
                 .content(new Content()
                         .addMediaType("application/json", new MediaType()
+                                .schema(new Schema<>().$ref("#/components/schemas/ResultError"))
                                 .addExamples("default", new Example()
                                         .value(example))));
     }

@@ -1,25 +1,30 @@
 package com.lesson.common;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
  * 通用返回结果
  */
 @Data
+@Schema(description = "通用返回结果")
 public class Result<T> {
     /**
      * 状态码
      */
+    @Schema(description = "状态码", example = "200")
     private int code;
 
     /**
      * 提示信息
      */
+    @Schema(description = "提示信息", example = "操作成功")
     private String message;
 
     /**
      * 数据
      */
+    @Schema(description = "返回数据")
     private T data;
 
     private Result(int code, String message, T data) {
