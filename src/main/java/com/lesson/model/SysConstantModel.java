@@ -32,6 +32,7 @@ public class SysConstantModel {
      * @return 创建的记录ID
      */
     public Long createConstant(SysConstantRecord record) {
+
         // 检查常量键是否已存在
         boolean exists = dsl.selectCount()
             .from(SYS_CONSTANT)
@@ -46,6 +47,8 @@ public class SysConstantModel {
         record.setCreatedTime(LocalDateTime.now());
         record.setUpdateTime(LocalDateTime.now());
         record.setDeleted(0);
+        // 关键部分，确保record关联到dsl
+        dsl.attach(record);
         record.store();
         return record.getId();
     }
