@@ -113,8 +113,8 @@ public class StudentWithCourseCreateRequest {
         /**
          * 课程状态
          */
-        @ApiModelProperty("课程状态：NORMAL-正常，EXPIRED-过期，GRADUATED-结业")
-        private StudentCourseStatus status = StudentCourseStatus.NORMAL; // 默认为正常状态
+        @ApiModelProperty("课程状态：STUDYING-在学，EXPIRED-过期，GRADUATED-结业")
+        private StudentCourseStatus status = StudentCourseStatus.STUDYING; // 默认为在学状态
     }
 
     /**

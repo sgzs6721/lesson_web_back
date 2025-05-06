@@ -17,17 +17,24 @@ import java.time.LocalDate;
 public class StudentCourseTransferRequest {
 
     /**
-     * 原课程ID
+     * 学员ID
      */
-    @NotBlank(message = "原课程ID不能为空")
-    @Schema(description = "原课程ID")
-    private Long sourceCourseId;
+    @NotNull(message = "学员ID不能为空")
+    @Schema(description = "学员ID", required = true)
+    private Long studentId;
+
+    /**
+     * 课程ID
+     */
+    @NotNull(message = "课程ID不能为空")
+    @Schema(description = "课程ID", required = true)
+    private Long courseId;
 
     /**
      * 目标课程ID
      */
-    @NotBlank(message = "目标课程ID不能为空")
-    @Schema(description = "目标课程ID")
+    @NotNull(message = "目标课程ID不能为空")
+    @Schema(description = "目标课程ID", required = true)
     private Long targetCourseId;
 
     /**
@@ -45,8 +52,6 @@ public class StudentCourseTransferRequest {
     @Size(max = 50, message = "目标课程类型长度不能超过50个字符")
     @Schema(description = "目标课程类型")
     private String targetCourseType;
-
-
 
     /**
      * 目标课程总课时数
@@ -85,7 +90,7 @@ public class StudentCourseTransferRequest {
     /**
      * 操作人ID
      */
-    @NotBlank(message = "操作人ID不能为空")
+    @NotNull(message = "操作人ID不能为空")
     @Schema(description = "操作人ID")
     private Long operatorId;
 
@@ -95,4 +100,10 @@ public class StudentCourseTransferRequest {
     @NotBlank(message = "操作人姓名不能为空")
     @Schema(description = "操作人姓名")
     private String operatorName;
+
+    /**
+     * 校区ID
+     */
+    @Schema(description = "校区ID")
+    private Long campusId;
 }

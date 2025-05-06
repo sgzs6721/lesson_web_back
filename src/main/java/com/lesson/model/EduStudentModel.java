@@ -1,14 +1,12 @@
 package com.lesson.model;
 
-import com.lesson.enums.StudentStatus;
+import com.lesson.enums.StudentCourseStatus;
 import com.lesson.model.record.StudentDetailRecord;
 import com.lesson.repository.Tables;
 import com.lesson.repository.tables.records.EduStudentRecord;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
 import org.jooq.Record;
-import org.jooq.Result;
-import org.jooq.SelectQuery;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Repository;
 
@@ -64,49 +62,6 @@ public class EduStudentModel {
                 .execute();
     }
 
-    /**
-     * 更新学员状态
-     */
-    public void updateStatus(Long id, StudentStatus status) {
-        EduStudentRecord record = dsl.selectFrom(Tables.EDU_STUDENT)
-                .where(Tables.EDU_STUDENT.ID.eq(id))
-                .and(Tables.EDU_STUDENT.DELETED.eq( 0))
-                .fetchOne();
-
-        if (record != null) {
-            record.setStatus(status.name());
-            record.store();
-        }
-    }
-
-    /**
-     * 创建学员
-     */
-//    public String createStudent(String name, String gender, Integer age, String phone, String parentName,
-//                             String parentPhone, String address, String source, Long campusId, String campusName,
-//                             Long institutionId, String institutionName) {
-//        String id = generateId();
-//        EduStudentRecord record = dsl.newRecord(Tables.EDU_STUDENT);
-//        record.setId(id);
-//        record.setName(name);
-//        record.setGender(gender);
-//        record.setAge(age);
-//        record.setPhone(phone);
-//        record.setParentName(parentName);
-//        record.setParentPhone(parentPhone);
-//        record.setAddress(address);
-//        record.setSource(source);
-//        record.setCampusId(campusId);
-//        record.setCampusName(campusName);
-//        record.setInstitutionId(institutionId);
-//        record.setInstitutionName(institutionName);
-//        record.setStatus(StudentStatus.ACTIVE.name());
-//        record.setCreatedTime(LocalDateTime.now());
-//        record.setDeleted( 0);
-//        record.store();
-//
-//        return id;
-//    }
 
     /**
      * 查询学员
@@ -136,87 +91,6 @@ public class EduStudentModel {
                 .map(this::convertToDetailRecord);
     }
 
-    /**
-     * 列出学员
-     *
-     * @param keyword       关键字
-     * @param status       状态
-     * @param campusId     校区ID
-     * @param institutionId 机构ID
-     * @param offset       偏移量
-     * @param limit        限制
-     * @return 学员列表
-     */
-    public List<StudentDetailRecord> listStudents(String keyword, StudentStatus status, Long campusId,
-                                                Long institutionId, int offset, int limit) {
-        return dsl.select()
-                .from(Tables.EDU_STUDENT)
-                .where(createBaseConditions(keyword, status, campusId, institutionId))
-                .orderBy(Tables.EDU_STUDENT.CREATED_TIME.desc())
-                .offset(offset)
-                .limit(limit)
-                .fetch()
-                .map(this::convertToDetailRecord);
-    }
-
-    /**
-     * 统计学员数量
-     *
-     * @param keyword       关键字
-     * @param status       状态
-     * @param campusId     校区ID
-     * @param institutionId 机构ID
-     * @return 学员数量
-     */
-    public long countStudents(String keyword, StudentStatus status, Long campusId, Long institutionId) {
-        return dsl.selectCount()
-                .from(Tables.EDU_STUDENT)
-                .where(createBaseConditions(keyword, status, campusId, institutionId))
-                .fetchOne(0, Long.class);
-    }
-
-    /**
-     * 检查学员是否存在
-     *
-     * @param id 学员ID
-     * @return 是否存在
-     */
-    public boolean existsById(Long id) {
-        return dsl.fetchExists(
-                dsl.selectFrom(Tables.EDU_STUDENT)
-                        .where(Tables.EDU_STUDENT.ID.eq(id))
-                        .and(Tables.EDU_STUDENT.DELETED.eq( 0))
-        );
-    }
-
-    private org.jooq.Condition createBaseConditions(String keyword, StudentStatus status,
-                                                  Long campusId, Long institutionId) {
-        List<org.jooq.Condition> conditions = new ArrayList<>();
-        conditions.add(Tables.EDU_STUDENT.DELETED.eq( 0));
-
-        if (keyword != null && !keyword.isEmpty()) {
-            conditions.add(
-                    DSL.or(
-                            Tables.EDU_STUDENT.NAME.like("%" + keyword + "%"),
-                            Tables.EDU_STUDENT.PHONE.like("%" + keyword + "%")
-                    )
-            );
-        }
-
-        if (status != null) {
-            conditions.add(Tables.EDU_STUDENT.STATUS.eq(status.name()));
-        }
-
-        if (campusId != null) {
-            conditions.add(Tables.EDU_STUDENT.CAMPUS_ID.eq(campusId));
-        }
-
-        if (institutionId != null) {
-            conditions.add(Tables.EDU_STUDENT.INSTITUTION_ID.eq(institutionId));
-        }
-
-        return DSL.and(conditions);
-    }
 
     private StudentDetailRecord convertToDetailRecord(org.jooq.Record record) {
         if (record == null) {
@@ -227,7 +101,7 @@ public class EduStudentModel {
         detailRecord.setId(record.get(Tables.EDU_STUDENT.ID));
         detailRecord.setName(record.get(Tables.EDU_STUDENT.NAME));
         String statusStr = record.get(Tables.EDU_STUDENT.STATUS, String.class);
-        detailRecord.setStatus(statusStr != null ? StudentStatus.getByName(statusStr) : null);
+        detailRecord.setStatus(statusStr != null ? StudentCourseStatus.getByName(statusStr) : null);
         detailRecord.setAge(record.get(Tables.EDU_STUDENT.AGE));
         detailRecord.setPhone(record.get(Tables.EDU_STUDENT.PHONE));
         detailRecord.setGender(record.get(Tables.EDU_STUDENT.GENDER));

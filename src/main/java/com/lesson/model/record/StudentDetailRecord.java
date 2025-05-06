@@ -1,6 +1,6 @@
 package com.lesson.model.record;
 
-import com.lesson.enums.StudentStatus;
+import com.lesson.enums.StudentCourseStatus;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -58,7 +58,7 @@ public class StudentDetailRecord {
     /**
      * 状态
      */
-    private StudentStatus status;
+    private StudentCourseStatus status;
     
     /**
      * 创建时间

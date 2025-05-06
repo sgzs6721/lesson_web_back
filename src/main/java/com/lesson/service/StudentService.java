@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lesson.common.exception.BusinessException;
 import com.lesson.enums.StudentCourseStatus;
-import com.lesson.enums.StudentStatus;
 import com.lesson.model.EduCourseModel;
 import com.lesson.model.EduStudentCourseModel;
 import com.lesson.model.EduStudentModel;
@@ -47,15 +46,17 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.time.Duration;
-import java.time.LocalTime;
-import java.math.BigDecimal;
 import java.util.List;
-import com.lesson.enums.PaymentType;
+
 import com.lesson.vo.request.StudentRefundRequest;
-import com.lesson.enums.RefundMethod;
+
 import java.util.Set;
 import java.util.stream.Collectors;
 import com.lesson.common.enums.ConstantType;
+import com.lesson.vo.response.StudentRefundDetailVO;
+import com.lesson.vo.request.StudentCourseTransferRequest;
+import com.lesson.vo.response.StudentCourseOperationRecordVO;
+import com.lesson.vo.request.StudentCourseClassTransferRequest;
 
 /**
  * 学员服务
@@ -75,6 +76,17 @@ public class StudentService {
   private final SysConstantModel constantModel;
 
   /**
+   * 从请求中获取机构ID
+   */
+  private Long getInstitutionId() {
+    Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
+    if (institutionId == null) {
+      throw new BusinessException("无法从请求中获取机构ID");
+    }
+    return institutionId;
+  }
+
+  /**
    * 创建学员及课程
    *
    * @param request 学员及课程创建请求
@@ -83,12 +95,12 @@ public class StudentService {
   @Transactional(rollbackFor = Exception.class)
   public Long createStudentWithCourse(StudentWithCourseCreateRequest request) {
     // 从token中获取机构ID
-    Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
-    if (institutionId == null) {
-      throw new BusinessException("机构ID不能为空");
-    }
-    // 1. 创建学员基本信息
+    Long institutionId = getInstitutionId();
+
+    // 1. 获取学员基本信息
     StudentWithCourseCreateRequest.StudentInfo studentInfo = request.getStudentInfo();
+
+    // 2. 创建学员记录
     EduStudentRecord studentRecord = new EduStudentRecord();
     studentRecord.setName(studentInfo.getName());
     studentRecord.setGender(studentInfo.getGender());
@@ -96,11 +108,12 @@ public class StudentService {
     studentRecord.setPhone(studentInfo.getPhone());
     studentRecord.setCampusId(studentInfo.getCampusId());
     studentRecord.setInstitutionId(institutionId);
-    studentRecord.setStatus("NORMAL"); // 学员状态默认为正常
-    // 2. 存储学员信息
+    studentRecord.setStatus("STUDYING"); // 学员状态默认为在学
+
+    // 3. 存储学员记录
     Long studentId = studentModel.createStudent(studentRecord);
 
-    // 3. 处理多个课程信息
+    // 4. 处理课程信息
     for (StudentWithCourseCreateRequest.CourseInfo courseInfo : request.getCourseInfoList()) {
       // 获取课程信息
       EduCourseRecord courseRecord = dsl.selectFrom(Tables.EDU_COURSE)
@@ -117,9 +130,8 @@ public class StudentService {
       studentCourseRecord.setStudentId(studentId);
       studentCourseRecord.setCourseId(courseInfo.getCourseId());
       studentCourseRecord.setConsumedHours(java.math.BigDecimal.ZERO);
-      // 使用课程信息中的状态，如果为空则默认为 NORMAL
-      StudentCourseStatus status = courseInfo.getStatus() != null ? courseInfo.getStatus() : StudentCourseStatus.NORMAL;
-      studentCourseRecord.setStatus(status.getName());
+      // 使用课程信息中的状态，如果为空则默认为 STUDYING
+      studentCourseRecord.setStatus(StudentCourseStatus.WAITING_PAYMENT.getName());
       studentCourseRecord.setStartDate(courseInfo.getEnrollDate());
       studentCourseRecord.setCampusId(studentInfo.getCampusId());
       studentCourseRecord.setInstitutionId(institutionId);
@@ -152,119 +164,88 @@ public class StudentService {
   @Transactional(rollbackFor = Exception.class)
   public void updateStudentWithCourse(StudentWithCourseUpdateRequest request) {
     // 从token中获取机构ID
-    Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
-    if (institutionId == null) {
-      throw new BusinessException("机构ID不能为空");
-    }
+    Long institutionId = getInstitutionId();
 
-    // 1. 验证学员是否存在
+    // 1. 获取学员基本信息
+    StudentWithCourseUpdateRequest.StudentInfo studentInfo = request.getStudentInfo();
+
+    // 2. 更新学员记录
     EduStudentRecord studentRecord = dsl.selectFrom(Tables.EDU_STUDENT)
         .where(Tables.EDU_STUDENT.ID.eq(request.getStudentId()))
         .and(Tables.EDU_STUDENT.DELETED.eq(0))
         .fetchOne();
 
     if (studentRecord == null) {
-      throw new IllegalArgumentException("学员不存在");
+      throw new IllegalArgumentException("学员不存在：" + request.getStudentId());
     }
 
-    // 2. 验证学员是否存在课程关系
-    List<EduStudentCourseRecord> existingCourses = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
-        .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(request.getStudentId()))
-        .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
-        .fetch();
-
-    if (existingCourses.isEmpty()) {
-      throw new IllegalArgumentException("学员没有关联的课程");
-    }
-
-    // 3. 更新学员基本信息
-    StudentWithCourseUpdateRequest.StudentInfo studentInfo = request.getStudentInfo();
     studentRecord.setName(studentInfo.getName());
     studentRecord.setGender(studentInfo.getGender());
     studentRecord.setAge(studentInfo.getAge());
     studentRecord.setPhone(studentInfo.getPhone());
     studentRecord.setCampusId(studentInfo.getCampusId());
-    // 学员状态不需要更新
+    studentRecord.setInstitutionId(institutionId);
     studentRecord.setUpdateTime(LocalDateTime.now());
 
-    // 4. 存储学员信息
+    // 3. 存储学员记录
     studentModel.updateStudent(studentRecord);
 
-    // 5. 更新学员课程关系（多个课程）
+    // 4. 处理课程信息
     for (StudentWithCourseUpdateRequest.CourseInfo courseInfo : request.getCourseInfoList()) {
-      // 查找对应的学员课程关系
-      EduStudentCourseRecord studentCourseRecord = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
-          .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(request.getStudentId()))
-          .and(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(courseInfo.getCourseId()))
-          .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
+      // 获取课程信息
+      EduCourseRecord courseRecord = dsl.selectFrom(Tables.EDU_COURSE)
+          .where(Tables.EDU_COURSE.ID.eq(courseInfo.getCourseId()))
+          .and(Tables.EDU_COURSE.DELETED.eq(0))
           .fetchOne();
 
-      // 如果学员课程关系存在，则更新
-      if (studentCourseRecord != null) {
-        // 不使用前端传入的总课时数和已消耗课时数，保持原有值
-        studentCourseRecord.setStartDate(courseInfo.getEnrollDate());
-        studentCourseRecord.setCampusId(studentInfo.getCampusId());
-        studentCourseRecord.setUpdateTime(LocalDateTime.now());
+      if (courseRecord == null) {
+        throw new IllegalArgumentException("课程不存在：" + courseInfo.getCourseId());
+      }
 
-        // 使用课程信息中的状态
-        if (courseInfo.getStatus() != null) {
-          studentCourseRecord.setStatus(courseInfo.getStatus().getName());
-        }
-
-        // 处理固定排课时间
-        try {
-          if (courseInfo.getFixedScheduleTimes() != null && !courseInfo.getFixedScheduleTimes().isEmpty()) {
-            String fixedScheduleJson = objectMapper.writeValueAsString(courseInfo.getFixedScheduleTimes());
-            studentCourseRecord.setFixedSchedule(fixedScheduleJson);
-          } else {
-            studentCourseRecord.setFixedSchedule(null); // 如果列表为空，则设置null
-          }
-        } catch (JsonProcessingException e) {
-          log.error("序列化固定排课时间失败", e);
-          throw new RuntimeException("序列化固定排课时间失败", e);
-        }
-
-        // 存储学员课程关系
-        studentCourseModel.updateStudentCourse(studentCourseRecord);
-      } else {
-        // 如果学员课程关系不存在，则创建新的关系
-        // 获取课程信息
-        EduCourseRecord courseRecord = dsl.selectFrom(Tables.EDU_COURSE)
-            .where(Tables.EDU_COURSE.ID.eq(courseInfo.getCourseId()))
-            .and(Tables.EDU_COURSE.DELETED.eq(0))
+      // 5. 获取或创建学员课程关系
+      EduStudentCourseRecord studentCourseRecord;
+      if (courseInfo.getStudentCourseId() != null) {
+        // 如果有ID，则获取现有记录
+        studentCourseRecord = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
+            .where(Tables.EDU_STUDENT_COURSE.ID.eq(courseInfo.getStudentCourseId()))
+            .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
             .fetchOne();
 
-        if (courseRecord == null) {
-          throw new IllegalArgumentException("课程不存在：" + courseInfo.getCourseId());
+        if (studentCourseRecord == null) {
+          throw new IllegalArgumentException("学员课程关系不存在：" + courseInfo.getStudentCourseId());
         }
-
-        // 创建新的学员课程关系
-        EduStudentCourseRecord newRecord = new EduStudentCourseRecord();
-        newRecord.setStudentId(request.getStudentId());
-        newRecord.setCourseId(courseInfo.getCourseId());
-        newRecord.setConsumedHours(java.math.BigDecimal.ZERO);
-        // 使用课程信息中的状态，如果为空则默认为 NORMAL
-        StudentCourseStatus status = courseInfo.getStatus() != null ? courseInfo.getStatus() : StudentCourseStatus.NORMAL;
-        newRecord.setStatus(status.getName());
-        newRecord.setStartDate(courseInfo.getEnrollDate());
-        newRecord.setCampusId(studentInfo.getCampusId());
-        newRecord.setInstitutionId(studentRecord.getInstitutionId());
+      } else {
+        // 如果没有ID，则创建新记录
+        studentCourseRecord = new EduStudentCourseRecord();
+        studentCourseRecord.setStudentId(request.getStudentId());
+        studentCourseRecord.setCourseId(courseInfo.getCourseId());
+        studentCourseRecord.setConsumedHours(java.math.BigDecimal.ZERO);
+        // 使用课程信息中的状态，如果为空则默认为 STUDYING
+        StudentCourseStatus status = courseInfo.getStatus() != null ? courseInfo.getStatus() : StudentCourseStatus.STUDYING;
+        studentCourseRecord.setStatus(status.getName());
+        studentCourseRecord.setStartDate(courseInfo.getEnrollDate());
+        studentCourseRecord.setCampusId(studentInfo.getCampusId());
+        studentCourseRecord.setInstitutionId(institutionId);
         // 使用课程表中的标准课时，而不是前端传入的值
-        newRecord.setTotalHours(courseRecord.getTotalHours());
+        studentCourseRecord.setTotalHours(courseRecord.getTotalHours());
+      }
 
-        // 处理固定排课时间
-        try {
-          if (courseInfo.getFixedScheduleTimes() != null && !courseInfo.getFixedScheduleTimes().isEmpty()) {
-            String fixedScheduleJson = objectMapper.writeValueAsString(courseInfo.getFixedScheduleTimes());
-            newRecord.setFixedSchedule(fixedScheduleJson);
-          }
-        } catch (JsonProcessingException e) {
-          log.error("序列化固定排课时间失败", e);
-          throw new RuntimeException("序列化固定排课时间失败", e);
+      // 6. 处理固定排课时间
+      try {
+        if (courseInfo.getFixedScheduleTimes() != null && !courseInfo.getFixedScheduleTimes().isEmpty()) {
+          String fixedScheduleJson = objectMapper.writeValueAsString(courseInfo.getFixedScheduleTimes());
+          studentCourseRecord.setFixedSchedule(fixedScheduleJson);
         }
+      } catch (JsonProcessingException e) {
+        log.error("序列化固定排课时间失败", e);
+        throw new RuntimeException("序列化固定排课时间失败", e);
+      }
 
-        // 存储学员课程关系
-        studentCourseModel.createStudentCourse(newRecord);
+      // 7. 存储学员课程关系
+      if (courseInfo.getStudentCourseId() != null) {
+        studentCourseModel.updateStudentCourse(studentCourseRecord);
+      } else {
+        studentCourseModel.createStudentCourse(studentCourseRecord);
       }
     }
   }
@@ -277,7 +258,7 @@ public class StudentService {
    */
   public StudentCourseListVO getStudentCourseDetail(Long studentId) {
     // 从 token 中获取机构ID
-    Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
+    Long institutionId = getInstitutionId();
     if (institutionId == null) {
       log.warn("无法从请求中获取机构ID (orgId)，将不按机构筛选");
     }
@@ -377,7 +358,7 @@ public class StudentService {
    */
   public PageResult<StudentWithCoursesVO> listStudentsWithCourses(StudentQueryRequest request) {
     // 从token中获取机构ID
-    Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
+    Long institutionId = getInstitutionId();
     if (institutionId == null) {
       log.warn("无法从请求中获取机构ID (orgId)，将不按机构筛选");
     }
@@ -418,13 +399,15 @@ public class StudentService {
         query.and(Tables.EDU_STUDENT.NAME.like("%" + request.getKeyword() + "%"));
       }
 
-      // 关键字已经在上面处理过了，这里不需要再处理手机号
-      // if (request.getPhone() != null && !request.getPhone().isEmpty()) {
-      //   query.and(Tables.EDU_STUDENT.PHONE.like("%" + request.getPhone() + "%"));
-      // }
-
-      // 查询总数
-      total = query.stream().count();
+      // 先查询总数
+      total = dsl.selectCount()
+          .from(Tables.EDU_STUDENT)
+          .where(Tables.EDU_STUDENT.DELETED.eq(0))
+          .and(institutionId != null ? Tables.EDU_STUDENT.INSTITUTION_ID.eq(institutionId) : DSL.noCondition())
+          .and(request.getCampusId() != null ? Tables.EDU_STUDENT.CAMPUS_ID.eq(request.getCampusId()) : DSL.noCondition())
+          .and(request.getKeyword() != null && !request.getKeyword().isEmpty() ? 
+               Tables.EDU_STUDENT.NAME.like("%" + request.getKeyword() + "%") : DSL.noCondition())
+          .fetchOne(0, Long.class);
 
       // 分页查询
       students = query
@@ -447,8 +430,6 @@ public class StudentService {
       studentVO.setStudentPhone(student.getPhone());
       studentVO.setCampusId(student.getCampusId());
       studentVO.setInstitutionId(student.getInstitutionId());
-      // 学员状态移动到课程信息中
-      // studentVO.setStatus(student.getStatus());
 
       // 查询校区名称
       if (student.getCampusId() != null) {
@@ -484,40 +465,32 @@ public class StudentService {
             .fetchOne();
 
         if (course == null) {
-          continue; // 课程不存在，跳过
+          continue;
         }
 
-        // 创建课程信息VO
-        StudentWithCoursesVO.CourseInfo courseInfo = new StudentWithCoursesVO.CourseInfo();
-        courseInfo.setStudentCourseId(studentCourse.getId());
-        courseInfo.setCourseId(studentCourse.getCourseId());
-        courseInfo.setCourseName(course.getName());
-        courseInfo.setCourseTypeId(course.getTypeId());
+        // 查询课程类型名称
+        String courseTypeName = dsl.select(Tables.SYS_CONSTANT.CONSTANT_VALUE)
+            .from(Tables.SYS_CONSTANT)
+            .where(Tables.SYS_CONSTANT.ID.eq(course.getTypeId()))
+            .fetchOneInto(String.class);
 
-        // 查询课程类型
-        if (course.getTypeId() != null) {
-          String courseTypeName = dsl.select(Tables.SYS_CONSTANT.CONSTANT_VALUE)
-              .from(Tables.SYS_CONSTANT)
-              .where(Tables.SYS_CONSTANT.ID.eq(course.getTypeId()))
-              .fetchOneInto(String.class);
-          courseInfo.setCourseTypeName(courseTypeName);
-        }
-
-        // 查询教练信息
-        Record coachRecord = dsl.select(Tables.SYS_COACH.ID, Tables.SYS_COACH.NAME)
+        // 查询教练名称
+        String coachName = dsl.select(Tables.SYS_COACH.NAME)
             .from(Tables.SYS_COACH_COURSE)
             .join(Tables.SYS_COACH).on(Tables.SYS_COACH_COURSE.COACH_ID.eq(Tables.SYS_COACH.ID))
-            .where(Tables.SYS_COACH_COURSE.COURSE_ID.eq(studentCourse.getCourseId()))
+            .where(Tables.SYS_COACH_COURSE.COURSE_ID.eq(course.getId()))
             .and(Tables.SYS_COACH_COURSE.DELETED.eq(0))
             .and(Tables.SYS_COACH.DELETED.eq(0))
-            .fetchOne();
+            .fetchOneInto(String.class);
 
-        if (coachRecord != null) {
-          courseInfo.setCoachId(coachRecord.get(Tables.SYS_COACH.ID, Long.class));
-          courseInfo.setCoachName(coachRecord.get(Tables.SYS_COACH.NAME, String.class));
-        }
-
-        // 设置课时信息
+        // 创建课程信息
+        StudentWithCoursesVO.CourseInfo courseInfo = new StudentWithCoursesVO.CourseInfo();
+        courseInfo.setStudentCourseId(studentCourse.getId());
+        courseInfo.setCourseId(course.getId());
+        courseInfo.setCourseName(course.getName());
+        courseInfo.setCourseTypeId(course.getTypeId());
+        courseInfo.setCourseTypeName(courseTypeName);
+        courseInfo.setCoachName(coachName != null ? coachName : "");
         courseInfo.setTotalHours(studentCourse.getTotalHours());
         courseInfo.setConsumedHours(studentCourse.getConsumedHours());
         courseInfo.setRemainingHours(studentCourse.getTotalHours().subtract(studentCourse.getConsumedHours()));
@@ -532,7 +505,7 @@ public class StudentService {
 
         // 设置其他信息
         courseInfo.setEnrollmentDate(studentCourse.getStartDate());
-        courseInfo.setStatus(studentCourse.getStatus());
+        courseInfo.setStatus(studentCourse.getStatus() != null ? studentCourse.getStatus() : StudentCourseStatus.STUDYING.getName());
         courseInfo.setFixedSchedule(studentCourse.getFixedSchedule());
 
         courseInfos.add(courseInfo);
@@ -553,21 +526,150 @@ public class StudentService {
    */
   public PageResult<StudentCourseListVO> listStudentsWithCourse(StudentQueryRequest request) {
     // 从token中获取机构ID
-    Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
+    Long institutionId = getInstitutionId();
     if (institutionId == null) {
       // 在开发或测试环境中，如果token中没有机构ID，可以设置一个默认值，或者抛出异常
       // throw new BusinessException("无法获取机构ID");
       log.warn("无法从请求中获取机构ID (orgId)，将不按机构筛选");
     }
 
-    List<StudentCourseListVO> list = studentCourseModel.listStudentCourseDetails(request);
-    long total = studentCourseModel.countStudentCourseDetails(request);
+    // 查询学员列表
+    List<EduStudentRecord> students;
+    long total;
 
-    // TODO: 获取最近上课时间逻辑 (可能需要额外查询 edu_student_course_record 表)
-    // 可以在这里遍历list，对每个VO查询并设置 lastClassTime
+    if (request.getStudentId() != null) {
+      // 如果指定了学员ID，只查询该学员
+      EduStudentRecord student = dsl.selectFrom(Tables.EDU_STUDENT)
+          .where(Tables.EDU_STUDENT.ID.eq(request.getStudentId()))
+          .and(Tables.EDU_STUDENT.DELETED.eq(0))
+          .fetchOne();
 
-    // 使用 PageResult.of 静态方法创建实例
-    return PageResult.of(list, total, request.getOffset() / request.getLimit() + 1, request.getLimit());
+      if (student != null) {
+        students = Collections.singletonList(student);
+        total = 1;
+      } else {
+        return PageResult.of(Collections.emptyList(), 0, request.getOffset() / request.getLimit() + 1, request.getLimit());
+      }
+    } else {
+      // 否则查询所有学员
+      SelectConditionStep<Record> query = dsl.select()
+          .from(Tables.EDU_STUDENT)
+          .where(Tables.EDU_STUDENT.DELETED.eq(0));
+
+      // 添加筛选条件
+      if (institutionId != null) {
+        query.and(Tables.EDU_STUDENT.INSTITUTION_ID.eq(institutionId));
+      }
+
+      if (request.getCampusId() != null) {
+        query.and(Tables.EDU_STUDENT.CAMPUS_ID.eq(request.getCampusId()));
+      }
+
+      if (request.getKeyword() != null && !request.getKeyword().isEmpty()) {
+        query.and(Tables.EDU_STUDENT.NAME.like("%" + request.getKeyword() + "%"));
+      }
+
+      // 先查询总数
+      total = dsl.selectCount()
+          .from(Tables.EDU_STUDENT)
+          .where(Tables.EDU_STUDENT.DELETED.eq(0))
+          .and(institutionId != null ? Tables.EDU_STUDENT.INSTITUTION_ID.eq(institutionId) : DSL.noCondition())
+          .and(request.getCampusId() != null ? Tables.EDU_STUDENT.CAMPUS_ID.eq(request.getCampusId()) : DSL.noCondition())
+          .and(request.getKeyword() != null && !request.getKeyword().isEmpty() ? 
+               Tables.EDU_STUDENT.NAME.like("%" + request.getKeyword() + "%") : DSL.noCondition())
+          .fetchOne(0, Long.class);
+
+      // 分页查询
+      students = query
+          .orderBy(Tables.EDU_STUDENT.CREATED_TIME.desc())
+          .limit(request.getLimit())
+          .offset(request.getOffset())
+          .fetchInto(EduStudentRecord.class);
+    }
+
+    // 构建返回结果
+    List<StudentCourseListVO> result = new ArrayList<>();
+
+    for (EduStudentRecord student : students) {
+      // 查询学员的课程列表
+      List<EduStudentCourseRecord> studentCourses = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
+          .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(student.getId()))
+          .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
+          .fetch();
+
+      for (EduStudentCourseRecord studentCourse : studentCourses) {
+        // 检查课程状态，如果不是在学状态，则跳过
+        if (!StudentCourseStatus.STUDYING.getName().equals(studentCourse.getStatus())) {
+          continue;
+        }
+
+        // 查询课程信息
+        EduCourseRecord course = dsl.selectFrom(Tables.EDU_COURSE)
+            .where(Tables.EDU_COURSE.ID.eq(studentCourse.getCourseId()))
+            .and(Tables.EDU_COURSE.DELETED.eq(0))
+            .fetchOne();
+
+        if (course == null) {
+          continue;
+        }
+
+        // 查询课程类型名称
+        String courseTypeName = dsl.select(Tables.SYS_CONSTANT.CONSTANT_VALUE)
+            .from(Tables.SYS_CONSTANT)
+            .where(Tables.SYS_CONSTANT.ID.eq(course.getTypeId()))
+            .fetchOneInto(String.class);
+
+        // 查询教练名称
+        String coachName = dsl.select(Tables.SYS_COACH.NAME)
+            .from(Tables.SYS_COACH_COURSE)
+            .join(Tables.SYS_COACH).on(Tables.SYS_COACH_COURSE.COACH_ID.eq(Tables.SYS_COACH.ID))
+            .where(Tables.SYS_COACH_COURSE.COURSE_ID.eq(course.getId()))
+            .and(Tables.SYS_COACH_COURSE.DELETED.eq(0))
+            .and(Tables.SYS_COACH.DELETED.eq(0))
+            .fetchOneInto(String.class);
+
+        // 查询最近上课时间
+        LocalDate lastClassTime = dsl.select(DSL.max(Tables.EDU_STUDENT_COURSE_OPERATION.OPERATION_TIME).cast(LocalDate.class))
+            .from(Tables.EDU_STUDENT_COURSE_OPERATION)
+            .where(Tables.EDU_STUDENT_COURSE_OPERATION.STUDENT_ID.eq(student.getId()))
+            .and(Tables.EDU_STUDENT_COURSE_OPERATION.COURSE_ID.eq(studentCourse.getCourseId()))
+            .fetchOneInto(LocalDate.class);
+
+        // 构建返回对象
+        StudentCourseListVO vo = new StudentCourseListVO();
+        vo.setId(student.getId());
+        vo.setStudentName(student.getName());
+        vo.setStudentGender(student.getGender());
+        vo.setStudentAge(student.getAge());
+        vo.setStudentPhone(student.getPhone());
+        vo.setStudentCourseId(studentCourse.getId());
+        vo.setCourseId(studentCourse.getCourseId());
+        vo.setCourseName(course.getName());
+        vo.setCourseType(courseTypeName);
+        vo.setCourseTypeName(courseTypeName);
+
+        vo.setCoachName(coachName != null ? coachName : "");
+
+        vo.setTotalHours(studentCourse.getTotalHours());
+        vo.setConsumedHours(studentCourse.getConsumedHours());
+
+        // 计算剩余课时
+        BigDecimal remainingHours = studentCourse.getTotalHours().subtract(studentCourse.getConsumedHours());
+        vo.setRemainingHours(remainingHours);
+
+        vo.setLastClassTime(lastClassTime);
+        vo.setEnrollmentDate(studentCourse.getStartDate());
+        vo.setStatus(studentCourse.getStatus());
+
+        vo.setCampusId(studentCourse.getCampusId());
+        vo.setInstitutionId(studentCourse.getInstitutionId());
+        vo.setFixedSchedule(studentCourse.getFixedSchedule());
+
+        result.add(vo);
+      }
+    }
+
+    return PageResult.of(result, total, request.getOffset() / request.getLimit() + 1, request.getLimit());
   }
 
   /**
@@ -577,27 +679,13 @@ public class StudentService {
    */
   @Transactional(rollbackFor = Exception.class)
   public void checkIn(StudentCheckInRequest request) {
-    // 0. 从请求中获取机构和校区ID (假设已存在)
-    Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
-    // 获取校区ID，这里可能需要根据studentId或courseId查询
-    // 简化处理：假设从request或studentInfo获取，或有默认值
-    // 实际中可能需要从 edu_student 或 edu_student_course 表获取
-    Long campusId = null;
-    EduStudentRecord student = dsl.selectFrom(Tables.EDU_STUDENT)
-        .where(Tables.EDU_STUDENT.ID.eq(request.getStudentId())
-            .and(Tables.EDU_STUDENT.DELETED.eq(0)))
-        .fetchOne();
-    if (student != null) {
-      campusId = student.getCampusId();
-      if (institutionId == null) { // 如果token没有，尝试从学员记录获取
-        institutionId = student.getInstitutionId();
-      }
-    }
-    if (campusId == null || institutionId == null) {
-      throw new BusinessException("无法确定学员的校区或机构信息");
+    // 1. 验证学员和课程信息
+    EduStudentRecord student = getStudentByIdOriginal(request.getStudentId());
+    if (student == null) {
+      throw new BusinessException("学员不存在");
     }
 
-    // 1. 查找学员与课程的关联记录 (edu_student_course)
+    // 2. 获取学员课程关系
     EduStudentCourseRecord studentCourse = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
         .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(request.getStudentId()))
         .and(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(request.getCourseId()))
@@ -605,44 +693,42 @@ public class StudentService {
         .fetchOne();
 
     if (studentCourse == null) {
-      throw new BusinessException("学员未报名该课程或课程关系不存在");
+      throw new BusinessException("学员未报名该课程");
     }
 
-    // 2. 检查学员课程状态是否允许打卡 (例如：必须是 STUDYING)
-    if (!StudentCourseStatus.NORMAL.getName().equals(studentCourse.getStatus())) {
-      throw new BusinessException("当前课程状态不允许打卡: " + studentCourse.getStatus());
-    }
+    // 3. 获取校区和机构信息
+    Long campusId = student.getCampusId();
+    Long institutionId = student.getInstitutionId();
 
-    // 3. 计算本次消耗课时数
-    // 优先使用传入的 duration，其次使用课程定义的单次课时，最后根据时间计算
+    // 4. 计算消耗课时
     BigDecimal hoursConsumed;
 
     if (request.getDuration() != null && request.getDuration().compareTo(BigDecimal.ZERO) > 0) {
-        hoursConsumed = request.getDuration();
+      hoursConsumed = request.getDuration();
     } else {
-        EduCourseRecord courseInfo = dsl.selectFrom(Tables.EDU_COURSE)
-            .where(Tables.EDU_COURSE.ID.eq(request.getCourseId()))
-            .fetchOne();
+      EduCourseRecord courseInfo = dsl.selectFrom(Tables.EDU_COURSE)
+          .where(Tables.EDU_COURSE.ID.eq(request.getCourseId()))
+          .fetchOne();
 
-        if (courseInfo != null && courseInfo.getUnitHours() != null && courseInfo.getUnitHours().compareTo(BigDecimal.ZERO) > 0) {
-            hoursConsumed = courseInfo.getUnitHours();
-        } else {
-            // 根据时间计算课时（简单示例：按小时计算，不足1小时算1小时，需要更精确可调整）
-            long minutes = Duration.between(request.getStartTime(), request.getEndTime()).toMinutes();
-            if (minutes <= 0) {
-                throw new BusinessException("结束时间必须晚于开始时间");
-            }
-            hoursConsumed = BigDecimal.valueOf(Math.ceil((double) minutes / 60));
+      if (courseInfo != null && courseInfo.getUnitHours() != null && courseInfo.getUnitHours().compareTo(BigDecimal.ZERO) > 0) {
+        hoursConsumed = courseInfo.getUnitHours();
+      } else {
+        // 根据时间计算课时（简单示例：按小时计算，不足1小时算1小时，需要更精确可调整）
+        long minutes = Duration.between(request.getStartTime(), request.getEndTime()).toMinutes();
+        if (minutes <= 0) {
+          throw new BusinessException("结束时间必须晚于开始时间");
         }
+        hoursConsumed = BigDecimal.valueOf(Math.ceil((double) minutes / 60));
+      }
     }
 
-    // 4. 检查剩余课时是否足够
+    // 5. 检查剩余课时是否足够
     BigDecimal remainingHours = studentCourse.getTotalHours().subtract(studentCourse.getConsumedHours());
     if (remainingHours.compareTo(hoursConsumed) < 0) {
       throw new BusinessException("剩余课时不足，无法完成打卡");
     }
 
-    // 5. 创建上课记录 (edu_student_course_record)
+    // 6. 创建上课记录 (edu_student_course_record)
     EduStudentCourseRecordRecord attendanceRecord = dsl.newRecord(Tables.EDU_STUDENT_COURSE_RECORD);
     attendanceRecord.setStudentId(request.getStudentId());
     attendanceRecord.setCourseId(request.getCourseId());
@@ -665,10 +751,17 @@ public class StudentService {
     attendanceRecord.setDeleted(0);
     attendanceRecord.store();
 
-    // 6. 更新学员课程的已消耗课时 (edu_student_course)
+    // 7. 更新学员课程的已消耗课时 (edu_student_course)
     studentCourse.setConsumedHours(studentCourse.getConsumedHours().add(hoursConsumed));
     studentCourse.setUpdateTime(LocalDateTime.now());
-    studentCourseModel.updateStudentCourse(studentCourse); // 使用已有的更新方法
+    studentCourseModel.updateStudentCourse(studentCourse);
+
+    // 8. 更新课程表的已消耗课时 (edu_course)
+    dsl.update(Tables.EDU_COURSE)
+        .set(Tables.EDU_COURSE.CONSUMED_HOURS, Tables.EDU_COURSE.CONSUMED_HOURS.add(hoursConsumed))
+        .set(Tables.EDU_COURSE.UPDATE_TIME, LocalDateTime.now())
+        .where(Tables.EDU_COURSE.ID.eq(request.getCourseId()))
+        .execute();
   }
 
   /**
@@ -681,7 +774,7 @@ public class StudentService {
     // 这里可以添加权限校验，确保操作者有权限查看该学员的记录
 
     // 从 token 中获取机构ID，如果请求中没有指定
-    Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
+    Long institutionId = getInstitutionId();
     if (institutionId == null) {
 
       log.warn("无法从请求中获取机构ID (orgId)，将不按机构筛选");
@@ -714,7 +807,7 @@ public class StudentService {
   @Transactional(rollbackFor = Exception.class)
   public Long processPayment(StudentPaymentRequest request) {
     // 0. 获取机构和校区ID
-    Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
+    Long institutionId = getInstitutionId();
     Long campusId = null; // 需要确定校区ID来源
     EduStudentRecord student = getStudentByIdOriginal(request.getStudentId()); // 获取原始学员记录
     if (student != null) {
@@ -791,12 +884,8 @@ public class StudentService {
     studentCourse.setTotalHours(studentCourse.getTotalHours().add(addedTotalHours));
     studentCourse.setEndDate(request.getValidUntil()); // 直接使用新的有效期覆盖
 
-    // 如果是续费，且原状态不是 STUDYING，则更新为 STUDYING
-    if (request.getPaymentType() == PaymentType.RENEWAL &&
-        !"STUDYING".equals(studentCourse.getStatus())) {
-        studentCourse.setStatus("STUDYING");
-    }
-    // 也可以根据业务添加对 SUSPENDED 状态的处理
+    // 更新课程状态为已缴费
+    studentCourse.setStatus(StudentCourseStatus.STUDYING.getName());
 
     studentCourse.setUpdateTime(LocalDateTime.now());
     studentCourseModel.updateStudentCourse(studentCourse);
@@ -821,7 +910,7 @@ public class StudentService {
   @Transactional(rollbackFor = Exception.class)
   public Long processRefund(StudentRefundRequest request) {
     // 0. 获取机构和校区ID
-    Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
+    Long institutionId = getInstitutionId();
     Long campusId = null;
     EduStudentRecord student = getStudentByIdOriginal(request.getStudentId());
     if (student != null) {
@@ -846,7 +935,7 @@ public class StudentService {
     }
 
     // 2. 检查是否可以退费 (例如，状态不能是已结业/已退费)
-    if (StudentStatus.GRADUATED.name().equals(studentCourse.getStatus())) { // 假设GRADUATED也代表已退费
+    if (StudentCourseStatus.GRADUATED.name().equals(studentCourse.getStatus())) { // 假设GRADUATED也代表已退费
       throw new BusinessException("该课程已结业或已退费，无法重复退费");
     }
 
@@ -877,7 +966,7 @@ public class StudentService {
     Long refundId = refundRecord.getId();
 
     // 5. 更新学员课程信息 (edu_student_course)
-    studentCourse.setStatus(StudentStatus.GRADUATED.name()); // 标记为已结业/退费
+    studentCourse.setStatus(StudentCourseStatus.GRADUATED.name()); // 标记为已结业/退费
     studentCourse.setUpdateTime(LocalDateTime.now());
     studentCourseModel.updateStudentCourse(studentCourse);
 
@@ -885,5 +974,146 @@ public class StudentService {
     // ...
 
     return refundId;
+  }
+
+  /**
+   * 获取学员退费详情
+   *
+   * @param studentId 学员ID
+   * @param courseId 课程ID
+   * @param campusId 校区ID
+   * @return 退费详情
+   */
+  public StudentRefundDetailVO getRefundDetail(Long studentId, Long courseId, Long campusId) {
+    // 从token中获取机构ID
+    Long institutionId = getInstitutionId();
+    if (institutionId == null) {
+        throw new BusinessException("无法从请求中获取机构ID");
+    }
+
+    // 1. 获取学员课程关系
+    EduStudentCourseRecord studentCourse = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
+        .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(studentId))
+        .and(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(courseId))
+        .and(Tables.EDU_STUDENT_COURSE.CAMPUS_ID.eq(campusId))
+        .and(Tables.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
+        .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
+        .fetchOne();
+
+    if (studentCourse == null) {
+        throw new BusinessException("学员未报名该课程或校区/机构信息不匹配");
+    }
+
+    // 2. 获取课程信息
+    EduCourseRecord course = dsl.selectFrom(Tables.EDU_COURSE)
+        .where(Tables.EDU_COURSE.ID.eq(courseId))
+        .and(Tables.EDU_COURSE.CAMPUS_ID.eq(campusId))
+        .and(Tables.EDU_COURSE.INSTITUTION_ID.eq(institutionId))
+        .and(Tables.EDU_COURSE.DELETED.eq(0))
+        .fetchOne();
+
+    if (course == null) {
+        throw new BusinessException("课程不存在或校区/机构信息不匹配");
+    }
+
+    // 3. 获取最近一次缴费记录
+    EduStudentPaymentRecord lastPayment = dsl.selectFrom(Tables.EDU_STUDENT_PAYMENT)
+        .where(Tables.EDU_STUDENT_PAYMENT.STUDENT_ID.eq(studentId.toString()))
+        .and(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.eq(courseId.toString()))
+        .and(Tables.EDU_STUDENT_PAYMENT.CAMPUS_ID.eq(campusId))
+        .and(Tables.EDU_STUDENT_PAYMENT.INSTITUTION_ID.eq(institutionId))
+        .and(Tables.EDU_STUDENT_PAYMENT.DELETED.eq(0))
+        .orderBy(Tables.EDU_STUDENT_PAYMENT.CREATED_TIME.desc())
+        .limit(1)
+        .fetchOne();
+
+    if (lastPayment == null) {
+        throw new BusinessException("未找到缴费记录");
+    }
+
+    // 4. 检查最近缴费后是否有上课记录
+    boolean hasAttendedAfterLastPayment = dsl.selectCount()
+        .from(Tables.EDU_STUDENT_COURSE_RECORD)
+        .where(Tables.EDU_STUDENT_COURSE_RECORD.STUDENT_ID.eq(studentId))
+        .and(Tables.EDU_STUDENT_COURSE_RECORD.COURSE_ID.eq(courseId))
+        .and(Tables.EDU_STUDENT_COURSE_RECORD.CAMPUS_ID.eq(campusId))
+        .and(Tables.EDU_STUDENT_COURSE_RECORD.INSTITUTION_ID.eq(institutionId))
+        .and(Tables.EDU_STUDENT_COURSE_RECORD.CREATED_TIME.gt(lastPayment.getCreatedTime()))
+        .and(Tables.EDU_STUDENT_COURSE_RECORD.DELETED.eq(0))
+        .fetchOne(0, Integer.class) > 0;
+
+    // 5. 计算总缴费金额
+    BigDecimal totalPayment = dsl.select(DSL.sum(Tables.EDU_STUDENT_PAYMENT.AMOUNT))
+        .from(Tables.EDU_STUDENT_PAYMENT)
+        .where(Tables.EDU_STUDENT_PAYMENT.STUDENT_ID.eq(studentId.toString()))
+        .and(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.eq(courseId.toString()))
+        .and(Tables.EDU_STUDENT_PAYMENT.CAMPUS_ID.eq(campusId))
+        .and(Tables.EDU_STUDENT_PAYMENT.INSTITUTION_ID.eq(institutionId))
+        .and(Tables.EDU_STUDENT_PAYMENT.DELETED.eq(0))
+        .fetchOneInto(BigDecimal.class);
+
+    if (totalPayment == null) {
+        totalPayment = BigDecimal.ZERO;
+    }
+
+    // 6. 计算应退金额
+    BigDecimal refundAmount;
+    if (hasAttendedAfterLastPayment) {
+        // 如果最近缴费后已上课，按剩余课时比例退款
+        BigDecimal remainingHours = studentCourse.getTotalHours().subtract(studentCourse.getConsumedHours());
+        BigDecimal unitPrice = course.getPrice();
+        refundAmount = remainingHours.multiply(unitPrice);
+    } else {
+        // 如果最近缴费后未上课，全额退款
+        refundAmount = lastPayment.getAmount();
+    }
+
+    // 7. 构建返回对象
+    StudentRefundDetailVO vo = new StudentRefundDetailVO();
+    vo.setStudentCourseId(studentCourse.getId());
+    vo.setCourseId(courseId);
+    vo.setCourseName(course.getName());
+    vo.setCoursePrice(course.getPrice());
+    vo.setTotalHours(studentCourse.getTotalHours());
+    vo.setConsumedHours(studentCourse.getConsumedHours());
+    vo.setRemainingHours(studentCourse.getTotalHours().subtract(studentCourse.getConsumedHours()));
+    vo.setTotalPayment(totalPayment);
+    vo.setRefundAmount(refundAmount);
+    vo.setLastPaymentDate(lastPayment.getCreatedTime().toLocalDate());
+    vo.setHasAttendedAfterLastPayment(hasAttendedAfterLastPayment);
+    vo.setCanFullRefund(!hasAttendedAfterLastPayment);
+
+    return vo;
+  }
+
+  /**
+   * 学员转课
+   *
+   * @param request 转课请求
+   * @return 操作记录
+   */
+  public StudentCourseOperationRecordVO transferCourse(StudentCourseTransferRequest request) {
+    // 从token中获取机构ID
+    Long institutionId = getInstitutionId();
+    if (institutionId == null) {
+        throw new BusinessException("无法从请求中获取机构ID");
+    }
+    return studentCourseModel.transferCourse(request.getStudentId(), request.getCourseId(), request, institutionId);
+  }
+
+  /**
+   * 处理学员转班请求
+   *
+   * @param request 转班请求
+   * @return 操作记录
+   */
+  public StudentCourseOperationRecordVO transferClass(StudentCourseClassTransferRequest request) {
+    Long institutionId = getInstitutionId();
+    return studentCourseModel.transferClass(
+        request.getStudentId(),
+        request.getCourseId(),
+        request,
+        institutionId
+    );
   }
 }

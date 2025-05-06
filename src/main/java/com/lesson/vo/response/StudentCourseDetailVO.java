@@ -1,6 +1,6 @@
 package com.lesson.vo.response;
 
-import com.lesson.enums.StudentStatus;
+import com.lesson.enums.StudentCourseStatus;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -69,7 +69,7 @@ public class StudentCourseDetailVO {
      * 状态
      */
     @ApiModelProperty("状态")
-    private StudentStatus status;
+    private StudentCourseStatus status;
 
     /**
      * 报名日期

@@ -1,5 +1,6 @@
 package com.lesson.vo.response;
 
+import com.lesson.common.enums.OperationType;
 import com.lesson.enums.RefundMethod;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -45,9 +46,9 @@ public class StudentCourseOperationRecordVO {
     private String courseName;
 
     /**
-     * 操作类型：TRANSFER_COURSE-转课，TRANSFER_CLASS-转班，REFUND-退费
+     * 操作类型：TRANSFER_COURSE-转课，REFUND-退费，EXTEND-延期，FREEZE-冻结，UNFREEZE-解冻
      */
-    @Schema(description = "操作类型：TRANSFER_COURSE-转课，TRANSFER_CLASS-转班，REFUND-退费")
+    @Schema(description = "操作类型：TRANSFER_COURSE-转课，REFUND-退费，EXTEND-延期，FREEZE-冻结，UNFREEZE-解冻")
     private String operationType;
 
     /**

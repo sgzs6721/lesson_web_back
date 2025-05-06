@@ -1,6 +1,6 @@
 package com.lesson.vo.request;
 
-import com.lesson.enums.StudentStatus;
+import com.lesson.enums.StudentCourseStatus;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -28,7 +28,7 @@ public class StudentCourseQueryRequest {
      * 学员课程状态
      */
     @ApiModelProperty("学员课程状态")
-    private StudentStatus status;
+    private StudentCourseStatus status;
 
     /**
      * 校区ID

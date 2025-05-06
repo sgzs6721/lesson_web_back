@@ -99,6 +99,12 @@ public class StudentWithCourseUpdateRequest {
     @JsonIgnoreProperties(ignoreUnknown = true) // 忽略未知字段，如 totalHours
     public static class CourseInfo {
         /**
+         * 学员课程关系记录ID
+         */
+        @ApiModelProperty("学员课程关系记录ID")
+        private Long studentCourseId;
+
+        /**
          * 课程ID
          */
         @NotNull(message = "课程ID不能为空")
@@ -121,8 +127,8 @@ public class StudentWithCourseUpdateRequest {
         /**
          * 课程状态
          */
-        @ApiModelProperty("课程状态：NORMAL-正常，EXPIRED-过期，GRADUATED-结业")
-        private StudentCourseStatus status = StudentCourseStatus.NORMAL; // 默认为正常状态
+        @ApiModelProperty("课程状态：STUDYING-在学，EXPIRED-过期，GRADUATED-结业")
+        private StudentCourseStatus status = StudentCourseStatus.STUDYING; // 默认为在学状态
     }
 
     /**

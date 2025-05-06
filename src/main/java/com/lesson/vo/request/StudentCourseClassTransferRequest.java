@@ -14,16 +14,30 @@ import javax.validation.constraints.NotNull;
 public class StudentCourseClassTransferRequest {
 
     /**
+     * 学员ID
+     */
+    @NotNull(message = "学员ID不能为空")
+    @Schema(description = "学员ID")
+    private Long studentId;
+
+    /**
+     * 课程ID
+     */
+    @NotNull(message = "课程ID不能为空")
+    @Schema(description = "课程ID")
+    private Long courseId;
+
+    /**
      * 原班级ID
      */
-    @NotBlank(message = "原班级ID不能为空")
+    @NotNull(message = "原班级ID不能为空")
     @Schema(description = "原班级ID")
     private Long sourceClassId;
 
     /**
      * 目标班级ID
      */
-    @NotBlank(message = "目标班级ID不能为空")
+    @NotNull(message = "目标班级ID不能为空")
     @Schema(description = "目标班级ID")
     private Long targetClassId;
 
@@ -43,7 +57,7 @@ public class StudentCourseClassTransferRequest {
     /**
      * 操作人ID
      */
-    @NotBlank(message = "操作人ID不能为空")
+    @NotNull(message = "操作人ID不能为空")
     @Schema(description = "操作人ID")
     private Long operatorId;
 
@@ -53,4 +67,11 @@ public class StudentCourseClassTransferRequest {
     @NotBlank(message = "操作人姓名不能为空")
     @Schema(description = "操作人姓名")
     private String operatorName;
+
+    /**
+     * 校区ID
+     */
+    @NotNull(message = "校区ID不能为空")
+    @Schema(description = "校区ID")
+    private Long campusId;
 } 

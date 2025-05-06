@@ -91,7 +91,7 @@ public class EduStudentCourse extends TableImpl<EduStudentCourseRecord> {
     /**
      * The column <code>lesson.edu_student_course.end_date</code>. 有效期至
      */
-    public final TableField<EduStudentCourseRecord, LocalDate> END_DATE = createField(DSL.name("end_date"), SQLDataType.LOCALDATE.nullable(false), this, "有效期至");
+    public final TableField<EduStudentCourseRecord, LocalDate> END_DATE = createField(DSL.name("end_date"), SQLDataType.LOCALDATE, this, "有效期至");
 
     /**
      * The column <code>lesson.edu_student_course.fixed_schedule</code>. 固定排课时间，JSON格式

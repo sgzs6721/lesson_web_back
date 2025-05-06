@@ -1,37 +1,24 @@
 package com.lesson.controller;
 
 import com.lesson.common.Result;
-import com.lesson.enums.StudentStatus;
 import com.lesson.model.EduStudentModel;
-import com.lesson.model.record.StudentDetailRecord;
-import com.lesson.repository.tables.records.EduStudentRecord;
+import com.lesson.model.EduStudentCourseModel;
 import com.lesson.service.StudentService;
 import com.lesson.vo.PageResult;
-import com.lesson.vo.request.StudentCreateRequest;
-import com.lesson.vo.request.StudentQueryRequest;
-import com.lesson.vo.request.StudentUpdateRequest;
-import com.lesson.vo.request.StudentWithCourseCreateRequest;
-import com.lesson.vo.request.StudentWithCourseUpdateRequest;
-import com.lesson.vo.request.StudentCheckInRequest;
-import com.lesson.vo.request.StudentAttendanceQueryRequest;
-import com.lesson.vo.response.StudentCourseListVO;
-import com.lesson.vo.response.StudentWithCoursesVO;
-import com.lesson.vo.response.StudentDetailVO;
-import com.lesson.vo.response.StudentListVO;
+import com.lesson.vo.request.*;
 import com.lesson.vo.response.StudentAttendanceListVO;
-import com.lesson.vo.request.StudentPaymentRequest;
-import com.lesson.vo.request.StudentRefundRequest;
+import com.lesson.vo.response.StudentCourseOperationRecordVO;
+import com.lesson.vo.response.StudentWithCoursesVO;
+import com.lesson.vo.response.StudentRefundDetailVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.BeanUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 学员管理接口
@@ -44,6 +31,7 @@ public class StudentController {
 
     private final EduStudentModel studentModel;
     private final StudentService studentService;
+    private final EduStudentCourseModel studentCourseModel;
 
 
     /**
@@ -89,22 +77,6 @@ public class StudentController {
         return Result.success();
     }
 
-    /**
-     * 更新学员状态
-     *
-     * @param id 学员ID
-     * @param status 状态
-     * @return 操作结果
-     */
-    @PostMapping("/updateStatus")
-    @Operation(summary = "更新学员状态",
-               description = "更新学员状态，可选值：STUDYING-在读，GRADUATED-已毕业，DROPPED-已退学")
-    public Result<Void> updateStatus(
-            @Parameter(description = "学员ID", required = true) @RequestParam Long id,
-            @Parameter(description = "学员状态", required = true) @RequestParam StudentStatus status) {
-        studentModel.updateStatus(id, status);
-        return Result.success();
-    }
 
     /**
      * 获取学员详情
@@ -202,5 +174,30 @@ public class StudentController {
     public Result<Long> refund(@RequestBody @Valid StudentRefundRequest request) {
         Long refundId = studentService.processRefund(request);
         return Result.success(refundId);
+    }
+
+    @GetMapping("/refund/detail")
+    @Operation(summary = "获取退费详情", description = "获取学员课程退费详情，包括总缴费金额、课程单价、剩余课时等信息")
+    @ApiResponse(responseCode = "200", description = "退费详情")
+    public Result<StudentRefundDetailVO> getRefundDetail(
+            @RequestParam @Parameter(description = "学员ID") Long studentId,
+            @RequestParam @Parameter(description = "课程ID") Long courseId,
+            @RequestParam @Parameter(description = "校区ID") Long campusId) {
+        return Result.success(studentService.getRefundDetail(studentId, courseId, campusId));
+    }
+
+    /**
+     * 学员转课
+     *
+     * @param request 转课请求
+     * @return 操作记录
+     */
+    @PostMapping("/transfer-course")
+    @Operation(summary = "学员转课",
+               description = "将学员从一个课程转到另一个课程")
+    public Result<StudentCourseOperationRecordVO> transferStudentCourse(
+            @Parameter(description = "转课请求") @RequestBody @Valid StudentCourseTransferRequest request) {
+        StudentCourseOperationRecordVO record = studentService.transferCourse(request);
+        return Result.success(record);
     }
 }

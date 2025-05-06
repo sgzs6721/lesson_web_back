@@ -1,6 +1,6 @@
 package com.lesson.vo.request;
 
-import com.lesson.enums.StudentStatus;
+import com.lesson.enums.StudentCourseStatus;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -31,7 +31,7 @@ public class StudentQueryRequest {
      * 学员状态
      */
     @ApiModelProperty(value = "学员课程状态 (STUDYING, SUSPENDED, GRADUATED)", example = "STUDYING")
-    private StudentStatus status;
+    private StudentCourseStatus status;
 
     /**
      * 课程ID
