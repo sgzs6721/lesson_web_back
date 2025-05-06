@@ -1,5 +1,6 @@
 package com.lesson.interceptor;
 
+import com.lesson.common.exception.AuthException;
 import com.lesson.utils.JwtUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,7 @@ public class JwtInterceptor implements HandlerInterceptor {
         // 从请求头中获取token
         String token = request.getHeader("Authorization");
         if (token == null || token.isEmpty()) {
-            throw new RuntimeException("未登录或token已过期");
+            throw new AuthException("未登录或token已过期");
         }
 
         try {
@@ -36,9 +37,9 @@ public class JwtInterceptor implements HandlerInterceptor {
             request.setAttribute("orgId", jwtUtil.getOrgId(token));
             return true;
         } catch (ExpiredJwtException e) {
-            throw new RuntimeException("token已过期");
+            throw new AuthException("token已过期");
         } catch (Exception e) {
-            throw new RuntimeException("token无效");
+            throw new AuthException("token无效");
         }
     }
 } 
