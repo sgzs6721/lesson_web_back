@@ -19,7 +19,7 @@ public class SysConstantModel {
     public List<SysConstantRecord> listByType(String type) {
         return dsl.selectFrom(SYS_CONSTANT)
             .where(SYS_CONSTANT.TYPE.eq(type))
-            .and(SYS_CONSTANT.STATUS.eq(1))
+            //.and(SYS_CONSTANT.STATUS.eq(1))
             .and(SYS_CONSTANT.DELETED.eq(0))
             .orderBy(SYS_CONSTANT.CREATED_TIME)
             .fetch();
