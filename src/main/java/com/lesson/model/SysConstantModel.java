@@ -70,6 +70,8 @@ public class SysConstantModel {
         }
 
         record.setUpdateTime(LocalDateTime.now());
+        // 关键部分，确保record关联到dsl
+        dsl.attach(record);
         record.update();
     }
 
