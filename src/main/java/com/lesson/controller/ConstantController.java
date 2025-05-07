@@ -30,7 +30,7 @@ public class ConstantController {
 
     @PostMapping("/create")
     @Operation(summary = "创建系统常量")
-    public Result<Long> createConstant(@RequestBody ConstantCreateRequest request) {
+    public Result<ConstantVO> createConstant(@RequestBody ConstantCreateRequest request) {
         return Result.success(constantService.createConstant(request));
     }
 

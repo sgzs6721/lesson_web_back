@@ -34,14 +34,24 @@ public class ConstantServiceImpl implements ConstantService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Long createConstant(ConstantCreateRequest request) {
+    public ConstantVO createConstant(ConstantCreateRequest request) {
         SysConstantRecord record = new SysConstantRecord();
         record.setConstantKey(request.getConstantKey());
         record.setConstantValue(request.getConstantValue());
         record.setDescription(request.getDescription());
         record.setType(request.getType().name());
         record.setStatus(request.getStatus());
-        return constantModel.createConstant(record);
+        Long id = constantModel.createConstant(record);
+        
+        // 创建返回VO对象
+        ConstantVO vo = new ConstantVO();
+        vo.setId(id);
+        vo.setConstantKey(request.getConstantKey());
+        vo.setConstantValue(request.getConstantValue());
+        vo.setDescription(request.getDescription());
+        vo.setType(request.getType().name());
+        vo.setStatus(request.getStatus());
+        return vo;
     }
 
     @Override

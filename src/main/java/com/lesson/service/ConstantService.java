@@ -14,9 +14,9 @@ public interface ConstantService {
      * 创建系统常量
      *
      * @param request 创建请求
-     * @return 创建的常量ID
+     * @return 创建的常量详情
      */
-    Long createConstant(ConstantCreateRequest request);
+    ConstantVO createConstant(ConstantCreateRequest request);
     
     /**
      * 更新系统常量
