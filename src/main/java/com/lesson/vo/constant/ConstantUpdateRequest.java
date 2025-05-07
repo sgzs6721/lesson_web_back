@@ -19,6 +19,10 @@ public class ConstantUpdateRequest {
     @Schema(description = "常量值", required = true)
     private String constantValue;
     
+    @NotBlank(message = "常量键不能为空")
+    @Schema(description = "常量键", required = true)
+    private String constantKey;
+    
     @Schema(description = "描述")
     private String description;
     

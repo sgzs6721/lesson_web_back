@@ -49,6 +49,7 @@ public class ConstantServiceImpl implements ConstantService {
     public void updateConstant(ConstantUpdateRequest request) {
         SysConstantRecord record = new SysConstantRecord();
         record.setId(request.getId());
+        record.setConstantKey(request.getConstantKey());
         record.setConstantValue(request.getConstantValue());
         record.setDescription(request.getDescription());
         if (request.getStatus() != null) {

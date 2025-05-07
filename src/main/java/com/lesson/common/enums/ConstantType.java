@@ -7,6 +7,7 @@ public enum ConstantType {
     COURSE_TYPE("COURSE_TYPE","课程类型"),
     GIFT_ITEM("GIFT_ITEM", "赠品"),
     PAYMENT_TYPE("PAYMENT_TYPE", "支付类型"),
+    PAYMENT_METHOD("PAYMENT_METHOD", "支付方式"),
     HANDLING_FEE_TYPE("HANDLING_FEE_TYPE", "手续费类型");
 
     @Getter
