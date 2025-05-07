@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 /**
@@ -28,6 +29,9 @@ public class StudentAttendanceListVO {
 
     @Schema(description = "备注", example = "学生表现优秀，积极参与课堂活动")
     private String notes;
+    
+    @Schema(description = "消耗课时", example = "1.5")
+    private BigDecimal hours;
     
     // 可能需要的原始数据
     @Schema(description = "记录ID")

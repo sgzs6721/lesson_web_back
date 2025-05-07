@@ -378,7 +378,7 @@ public class StudentService {
         students = Collections.singletonList(student);
         total = 1;
       } else {
-        return PageResult.of(Collections.emptyList(), 0, request.getOffset() / request.getLimit() + 1, request.getLimit());
+        return PageResult.of(Collections.emptyList(), 0, request.getPageNum(), request.getPageSize());
       }
     } else {
       // 否则查询所有学员
@@ -412,8 +412,8 @@ public class StudentService {
       // 分页查询
       students = query
           .orderBy(Tables.EDU_STUDENT.CREATED_TIME.desc())
-          .limit(request.getLimit())
-          .offset(request.getOffset())
+          .limit(request.getPageSize())
+          .offset((request.getPageNum() - 1) * request.getPageSize())
           .fetchInto(EduStudentRecord.class);
     }
 
@@ -515,7 +515,7 @@ public class StudentService {
       result.add(studentVO);
     }
 
-    return PageResult.of(result, total, request.getOffset() / request.getLimit() + 1, request.getLimit());
+    return PageResult.of(result, total, request.getPageNum(), request.getPageSize());
   }
 
   /**
@@ -548,7 +548,7 @@ public class StudentService {
         students = Collections.singletonList(student);
         total = 1;
       } else {
-        return PageResult.of(Collections.emptyList(), 0, request.getOffset() / request.getLimit() + 1, request.getLimit());
+        return PageResult.of(Collections.emptyList(), 0, request.getPageNum(), request.getPageSize());
       }
     } else {
       // 否则查询所有学员
@@ -582,8 +582,8 @@ public class StudentService {
       // 分页查询
       students = query
           .orderBy(Tables.EDU_STUDENT.CREATED_TIME.desc())
-          .limit(request.getLimit())
-          .offset(request.getOffset())
+          .limit(request.getPageSize())
+          .offset((request.getPageNum() - 1) * request.getPageSize())
           .fetchInto(EduStudentRecord.class);
     }
 
@@ -669,7 +669,7 @@ public class StudentService {
       }
     }
 
-    return PageResult.of(result, total, request.getOffset() / request.getLimit() + 1, request.getLimit());
+    return PageResult.of(result, total, request.getPageNum(), request.getPageSize());
   }
 
   /**
@@ -754,9 +754,16 @@ public class StudentService {
     // 7. 更新学员课程的已消耗课时 (edu_student_course)
     studentCourse.setConsumedHours(studentCourse.getConsumedHours().add(hoursConsumed));
     studentCourse.setUpdateTime(LocalDateTime.now());
+    
+    // 8. 将学员课程状态更新为"学习中"
+    if (!StudentCourseStatus.STUDYING.getName().equals(studentCourse.getStatus())) {
+      studentCourse.setStatus(StudentCourseStatus.STUDYING.getName());
+      log.info("学员[{}]打卡成功，状态已更新为：学习中", request.getStudentId());
+    }
+    
     studentCourseModel.updateStudentCourse(studentCourse);
 
-    // 8. 更新课程表的已消耗课时 (edu_course)
+    // 9. 更新课程表的已消耗课时 (edu_course)
     dsl.update(Tables.EDU_COURSE)
         .set(Tables.EDU_COURSE.CONSUMED_HOURS, Tables.EDU_COURSE.CONSUMED_HOURS.add(hoursConsumed))
         .set(Tables.EDU_COURSE.UPDATE_TIME, LocalDateTime.now())
@@ -884,8 +891,8 @@ public class StudentService {
     studentCourse.setTotalHours(studentCourse.getTotalHours().add(addedTotalHours));
     studentCourse.setEndDate(request.getValidUntil()); // 直接使用新的有效期覆盖
 
-    // 更新课程状态为已缴费
-    studentCourse.setStatus(StudentCourseStatus.STUDYING.getName());
+    // 更新课程状态为待上课
+    studentCourse.setStatus(StudentCourseStatus.WAITING_CLASS.getName());
 
     studentCourse.setUpdateTime(LocalDateTime.now());
     studentCourseModel.updateStudentCourse(studentCourse);

@@ -788,6 +788,7 @@ public class EduStudentCourseModel {
                     EDU_STUDENT_COURSE_RECORD.START_TIME,
                     EDU_STUDENT_COURSE_RECORD.END_TIME,
                     EDU_STUDENT_COURSE_RECORD.NOTES,
+                    EDU_STUDENT_COURSE_RECORD.HOURS,
                     EDU_COURSE.NAME.as("course_name"),
                     SYS_COACH.NAME.as("coach_name")
                 )
@@ -872,6 +873,7 @@ public class EduStudentCourseModel {
         vo.setCoachName(record.get("coach_name", String.class));
         vo.setCourseName(record.get("course_name", String.class));
         vo.setNotes(record.get("notes", String.class));
+        vo.setHours(record.get("hours", BigDecimal.class));
         return vo;
     }
 }
