@@ -8,6 +8,7 @@ import lombok.Data;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -37,7 +38,7 @@ public class CourseCreateRequest {
     private BigDecimal price;
 
     @NotNull(message = "教练费用不能为空")
-    @Positive(message = "教练费用必须大于0")
+    @PositiveOrZero(message = "教练费用必须大于等于0")
     @Schema(description = "教练费用")
     private BigDecimal coachFee;
 
