@@ -88,7 +88,7 @@ public class EduCourseModel {
     }
   }
 
-  public void updateCourse(Long id, String name, Long typeId,
+  public void updateCourse(Long id, String name, Long typeId, CourseStatus status,
                            BigDecimal unitHours, BigDecimal totalHours, BigDecimal price, BigDecimal coachFee,
                            Long campusId, String description) {
     // 获取当前课程信息
@@ -103,6 +103,7 @@ public class EduCourseModel {
       // 如果名称和校区ID没有变化，不更新这些字段
       dsl.update(EDU_COURSE)
           .set(EDU_COURSE.TYPE_ID, typeId)
+          .set(EDU_COURSE.STATUS, status.name())
           .set(EDU_COURSE.UNIT_HOURS, unitHours)
           .set(EDU_COURSE.TOTAL_HOURS, totalHours)
           .set(EDU_COURSE.PRICE, price)
@@ -115,6 +116,7 @@ public class EduCourseModel {
       dsl.update(EDU_COURSE)
           .set(EDU_COURSE.NAME, name)
           .set(EDU_COURSE.TYPE_ID, typeId)
+          .set(EDU_COURSE.STATUS, status.name())
           .set(EDU_COURSE.UNIT_HOURS, unitHours)
           .set(EDU_COURSE.TOTAL_HOURS, totalHours)
           .set(EDU_COURSE.PRICE, price)

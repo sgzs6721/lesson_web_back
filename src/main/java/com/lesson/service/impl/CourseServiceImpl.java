@@ -115,6 +115,7 @@ public class CourseServiceImpl implements CourseService {
                 request.getId(),
                 request.getName(),
                 request.getTypeId(),
+                request.getStatus(), // 传递状态参数
                 request.getUnitHours(),
                 existingCourse.getTotalHours(), // 保留原有的总课时值
                 request.getPrice(),
