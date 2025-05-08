@@ -34,11 +34,6 @@ public class CourseUpdateRequest {
     @Schema(description = "单次课时")
     private BigDecimal unitHours;
 
-    @NotNull(message = "总课时不能为空")
-    @Positive(message = "总课时必须大于0")
-    @Schema(description = "总课时")
-    private BigDecimal totalHours;
-
     @NotNull(message = "课程单价不能为空")
     @Positive(message = "课程单价必须大于0")
     @Schema(description = "课程单价")
@@ -61,4 +56,4 @@ public class CourseUpdateRequest {
     private String description;
 
 
-} 
+}

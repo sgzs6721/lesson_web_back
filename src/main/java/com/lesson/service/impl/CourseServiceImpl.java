@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -62,7 +63,7 @@ public class CourseServiceImpl implements CourseService {
                 request.getTypeId(),
                 CourseStatus.PUBLISHED,
                 request.getUnitHours(),
-                request.getTotalHours(),
+                BigDecimal.ZERO, // 总课时默认为0
                 request.getPrice(),
                 request.getCoachFee(),
                 request.getCampusId(),
@@ -115,7 +116,7 @@ public class CourseServiceImpl implements CourseService {
                 request.getName(),
                 request.getTypeId(),
                 request.getUnitHours(),
-                request.getTotalHours(),
+                existingCourse.getTotalHours(), // 保留原有的总课时值
                 request.getPrice(),
                 request.getCoachFee(),
                 request.getCampusId(),
