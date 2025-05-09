@@ -2,6 +2,7 @@ package com.lesson.model;
 
 import com.lesson.common.exception.BusinessException;
 import com.lesson.common.enums.OperationType;
+import com.lesson.common.enums.ConstantType;
 import com.lesson.enums.StudentCourseStatus;
 import com.lesson.repository.tables.records.EduStudentCourseRecord;
 import com.lesson.repository.tables.records.EduCourseRecord;
@@ -419,6 +420,11 @@ public class EduStudentCourseModel {
 
         // 3. 计算剩余课时和补差价
         BigDecimal remainingHours = sourceRecord.getTotalHours().subtract(sourceRecord.getConsumedHours());
+        // 如果请求中提供了转课课时，则使用请求中的值
+        if (request.getTransferHours() != null) {
+            remainingHours = request.getTransferHours();
+        }
+        
         BigDecimal sourceUnitPrice = dsl.select(Tables.EDU_COURSE.PRICE)
                 .from(Tables.EDU_COURSE)
                 .where(Tables.EDU_COURSE.ID.eq(sourceRecord.getCourseId()))
@@ -427,24 +433,40 @@ public class EduStudentCourseModel {
         
         // 计算补差价
         BigDecimal compensationFee = BigDecimal.ZERO;
-        if (sourceUnitPrice != null && targetUnitPrice != null) {
-            BigDecimal sourceValue = remainingHours.multiply(sourceUnitPrice);
-            BigDecimal targetValue = remainingHours.multiply(targetUnitPrice);
-            compensationFee = targetValue.subtract(sourceValue);
-            if (compensationFee.compareTo(BigDecimal.ZERO) < 0) {
-                compensationFee = BigDecimal.ZERO;
+        // 如果请求中提供了补差价，则使用请求中的值
+        if (request.getCompensationFee() != null) {
+            compensationFee = request.getCompensationFee();
+        } else {
+            // 否则自动计算补差价
+            if (sourceUnitPrice != null && targetUnitPrice != null) {
+                BigDecimal sourceValue = remainingHours.multiply(sourceUnitPrice);
+                BigDecimal targetValue = remainingHours.multiply(targetUnitPrice);
+                compensationFee = targetValue.subtract(sourceValue);
+                if (compensationFee.compareTo(BigDecimal.ZERO) < 0) {
+                    compensationFee = BigDecimal.ZERO;
+                }
             }
         }
 
         // 4. 创建新课程记录
         EduStudentCourseRecord targetRecord = new EduStudentCourseRecord();
-        targetRecord.setStudentId(sourceRecord.getStudentId());
+        targetRecord.setStudentId(request.getTargetStudentId());
         targetRecord.setCourseId(request.getTargetCourseId());
         targetRecord.setTotalHours(remainingHours); // 使用剩余课时
         targetRecord.setConsumedHours(BigDecimal.ZERO); // 重置已消耗课时
         targetRecord.setStatus(StudentCourseStatus.STUDYING.getName());
-        targetRecord.setStartDate(request.getTargetStartDate());
-        targetRecord.setEndDate(request.getTargetEndDate());
+        
+        // 设置开始日期为当前日期
+        targetRecord.setStartDate(LocalDate.now());
+        
+        // 从有效期类型获取结束日期
+        LocalDate endDate = null;
+        if (request.getValidUntil() != null) {
+            // 根据有效期类型计算结束日期
+            endDate = calculateEndDateFromConstantType(request.getValidUntil());
+        }
+        targetRecord.setEndDate(endDate);
+        
         targetRecord.setCampusId(request.getCampusId());
         targetRecord.setInstitutionId(institutionId);
         targetRecord.setCreatedTime(LocalDateTime.now());
@@ -467,8 +489,15 @@ public class EduStudentCourseModel {
         transferRecord.setTargetCourseId(request.getTargetCourseId());
         transferRecord.setTransferHours(remainingHours);
         transferRecord.setCompensationFee(compensationFee);
-        transferRecord.setValidUntil(request.getTargetEndDate());
-        transferRecord.setReason(request.getTransferReason());
+        
+        // 从有效期类型计算结束日期
+        LocalDate validUntil = null;
+        if (request.getValidUntil() != null) {
+            validUntil = calculateEndDateFromConstantType(request.getValidUntil());
+        }
+        transferRecord.setValidUntil(validUntil);
+        
+        transferRecord.setReason(request.getTransferCause());
         transferRecord.setCampusId(request.getCampusId());
         transferRecord.setInstitutionId(institutionId);
         transferRecord.setCreatedTime(LocalDateTime.now());
@@ -486,9 +515,35 @@ public class EduStudentCourseModel {
         operationRecord.setAfterStatus(StudentCourseStatus.GRADUATED.getName());
         operationRecord.setSourceCourseId(sourceRecord.getCourseId());
         operationRecord.setTargetCourseId(request.getTargetCourseId());
-        operationRecord.setOperationReason(request.getTransferReason());
-        operationRecord.setOperatorId(request.getOperatorId());
-        operationRecord.setOperatorName(request.getOperatorName());
+        
+        // 目标学员信息记录在操作原因中，格式为：转给学员[姓名(ID)]
+        String targetStudentName = getStudentName(request.getTargetStudentId());
+        String transferReason = String.format("转给学员[%s(%d)]，原因：%s", 
+                targetStudentName, 
+                request.getTargetStudentId(), 
+                request.getTransferCause() != null ? request.getTransferCause() : "");
+        
+        operationRecord.setOperationReason(transferReason);
+        
+        // 由于请求中不再包含操作人信息，我们从上下文或系统默认值中获取
+        // 获取当前登录用户作为操作人
+        HttpServletRequest httpRequest = getRequest();
+        String operatorName = "系统";
+        Long operatorId = 0L; // 默认系统用户ID
+        
+        if (httpRequest != null) {
+            // 尝试从请求中获取当前登录的用户
+            String token = httpRequest.getHeader("Authorization");
+            if (token != null && !token.isEmpty()) {
+                // 从token中解析用户信息
+                // 注意：这里需要根据实际的认证机制进行调整
+                // 例如：operatorId = tokenService.getUserId(token);
+                // operatorName = tokenService.getUserName(token);
+            }
+        }
+        
+        operationRecord.setOperatorId(operatorId);
+        operationRecord.setOperatorName(operatorName);
         operationRecord.setOperationTime(LocalDateTime.now());
 
         // 9. 保存操作记录
@@ -497,6 +552,44 @@ public class EduStudentCourseModel {
 
         // 10. 返回操作记录
         return convertToOperationRecordVO(operationRecord);
+    }
+
+    /**
+     * 根据常量类型计算结束日期
+     * 
+     * @param constantType 常量类型
+     * @return 计算后的结束日期
+     */
+    private LocalDate calculateEndDateFromConstantType(ConstantType constantType) {
+        if (constantType == null) {
+            // 默认一年有效期
+            return LocalDate.now().plusYears(1);
+        }
+        
+        // 查询该常量类型下的常量值
+        String constantValue = dsl.select(Tables.SYS_CONSTANT.CONSTANT_VALUE)
+                .from(Tables.SYS_CONSTANT)
+                .where(Tables.SYS_CONSTANT.TYPE.eq(constantType.getName()))
+                .fetchOneInto(String.class);
+        
+        if (constantValue == null) {
+            // 如果没有找到对应的常量值，默认一年有效期
+            return LocalDate.now().plusYears(1);
+        }
+        
+        // 尝试解析常量值为月份数
+        try {
+            int months = Integer.parseInt(constantValue);
+            return LocalDate.now().plusMonths(months);
+        } catch (NumberFormatException e) {
+            // 如果常量值不是数字，可能是特定日期格式
+            try {
+                return LocalDate.parse(constantValue);
+            } catch (Exception ex) {
+                // 解析失败，使用默认值
+                return LocalDate.now().plusYears(1);
+            }
+        }
     }
 
     /**

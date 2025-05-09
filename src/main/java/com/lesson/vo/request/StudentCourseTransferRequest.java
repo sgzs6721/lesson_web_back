@@ -5,9 +5,8 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import com.lesson.common.enums.ConstantType;
 
 /**
  * 学员转课请求
@@ -22,6 +21,13 @@ public class StudentCourseTransferRequest {
     @NotNull(message = "学员ID不能为空")
     @Schema(description = "学员ID", required = true)
     private Long studentId;
+    
+    /**
+     * 目标学员ID
+     */
+    @NotNull(message = "目标学员ID不能为空")
+    @Schema(description = "目标学员ID", required = true)
+    private Long targetStudentId;
 
     /**
      * 课程ID
@@ -38,68 +44,29 @@ public class StudentCourseTransferRequest {
     private Long targetCourseId;
 
     /**
-     * 目标课程名称
+     * 转课课时
      */
-    @NotBlank(message = "目标课程名称不能为空")
-    @Size(max = 100, message = "目标课程名称长度不能超过100个字符")
-    @Schema(description = "目标课程名称")
-    private String targetCourseName;
+    @Schema(description = "转课课时")
+    private BigDecimal transferHours;
 
     /**
-     * 目标课程类型
+     * 有效期类型
      */
-    @NotBlank(message = "目标课程类型不能为空")
-    @Size(max = 50, message = "目标课程类型长度不能超过50个字符")
-    @Schema(description = "目标课程类型")
-    private String targetCourseType;
+    @NotNull(message = "有效期不能为空")
+    @Schema(description = "有效期类型")
+    private ConstantType validUntil;
 
     /**
-     * 目标课程总课时数
+     * 补差价
      */
-    @NotNull(message = "目标课程总课时数不能为空")
-    @Schema(description = "目标课程总课时数")
-    private BigDecimal targetTotalHours;
-
-    /**
-     * 目标课程已消耗课时数
-     */
-    @NotNull(message = "目标课程已消耗课时数不能为空")
-    @Schema(description = "目标课程已消耗课时数")
-    private BigDecimal targetConsumedHours;
-
-    /**
-     * 目标课程报名日期
-     */
-    @NotNull(message = "目标课程报名日期不能为空")
-    @Schema(description = "目标课程报名日期")
-    private LocalDate targetStartDate;
-
-    /**
-     * 目标课程有效期至
-     */
-    @NotNull(message = "目标课程有效期不能为空")
-    @Schema(description = "目标课程有效期至")
-    private LocalDate targetEndDate;
+    @Schema(description = "补差价")
+    private BigDecimal compensationFee;
 
     /**
      * 转课原因
      */
     @Schema(description = "转课原因")
-    private String transferReason;
-
-    /**
-     * 操作人ID
-     */
-    @NotNull(message = "操作人ID不能为空")
-    @Schema(description = "操作人ID")
-    private Long operatorId;
-
-    /**
-     * 操作人姓名
-     */
-    @NotBlank(message = "操作人姓名不能为空")
-    @Schema(description = "操作人姓名")
-    private String operatorName;
+    private String transferCause;
 
     /**
      * 校区ID

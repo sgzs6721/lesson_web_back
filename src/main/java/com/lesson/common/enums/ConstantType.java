@@ -8,7 +8,8 @@ public enum ConstantType {
     GIFT_ITEM("GIFT_ITEM", "赠品"),
     PAYMENT_TYPE("PAYMENT_TYPE", "支付类型"),
     PAYMENT_METHOD("PAYMENT_METHOD", "支付方式"),
-    HANDLING_FEE_TYPE("HANDLING_FEE_TYPE", "手续费类型");
+    HANDLING_FEE_TYPE("HANDLING_FEE_TYPE", "手续费类型"),
+    VALIDITY_PERIOD("VALIDITY_PERIOD", "有效期");
 
     @Getter
     private final String name;
