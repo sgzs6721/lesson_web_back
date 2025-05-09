@@ -200,4 +200,19 @@ public class StudentController {
         StudentCourseOperationRecordVO record = studentService.transferCourse(request);
         return Result.success(record);
     }
+
+    /**
+     * 学员班内转课
+     *
+     * @param request 班内转课请求
+     * @return 操作记录
+     */
+    @PostMapping("/transfer-within-course")
+    @Operation(summary = "学员班内转课",
+               description = "将学员从一个课程班级转到另一个课程班级，但保留在同一教学体系内")
+    public Result<StudentCourseOperationRecordVO> transferWithinCourse(
+            @Parameter(description = "班内转课请求") @RequestBody @Valid StudentWithinCourseTransferRequest request) {
+        StudentCourseOperationRecordVO record = studentService.transferClass(request);
+        return Result.success(record);
+    }
 }

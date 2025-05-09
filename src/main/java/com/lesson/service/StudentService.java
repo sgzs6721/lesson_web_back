@@ -56,7 +56,7 @@ import com.lesson.common.enums.ConstantType;
 import com.lesson.vo.response.StudentRefundDetailVO;
 import com.lesson.vo.request.StudentCourseTransferRequest;
 import com.lesson.vo.response.StudentCourseOperationRecordVO;
-import com.lesson.vo.request.StudentCourseClassTransferRequest;
+import com.lesson.vo.request.StudentWithinCourseTransferRequest;
 
 /**
  * 学员服务
@@ -1109,12 +1109,12 @@ public class StudentService {
   }
 
   /**
-   * 处理学员转班请求
+   * 处理学员班内转课请求
    *
-   * @param request 转班请求
+   * @param request 班内转课请求
    * @return 操作记录
    */
-  public StudentCourseOperationRecordVO transferClass(StudentCourseClassTransferRequest request) {
+  public StudentCourseOperationRecordVO transferClass(StudentWithinCourseTransferRequest request) {
     Long institutionId = getInstitutionId();
     return studentCourseModel.transferClass(
         request.getStudentId(),

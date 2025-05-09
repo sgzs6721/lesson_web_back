@@ -9,6 +9,7 @@ import com.lesson.repository.tables.records.EduCourseRecord;
 import com.lesson.repository.tables.records.EduStudentCourseTransferRecord;
 import com.lesson.repository.tables.records.EduStudentCourseOperationRecord;
 import com.lesson.vo.request.StudentCourseTransferRequest;
+import com.lesson.vo.request.StudentWithinCourseTransferRequest;
 import com.lesson.vo.response.StudentCourseOperationRecordVO;
 import org.jooq.DSLContext;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +24,6 @@ import com.lesson.repository.Tables;
 import com.lesson.model.record.StudentCourseRecord;
 import com.lesson.repository.tables.EduCourse;
 import com.lesson.repository.tables.records.*;
-import com.lesson.vo.request.StudentCourseClassTransferRequest;
 import com.lesson.vo.request.StudentCourseRefundRequest;
 import com.lesson.vo.request.StudentQueryRequest;
 import com.lesson.vo.request.StudentAttendanceQueryRequest;
@@ -593,16 +593,16 @@ public class EduStudentCourseModel {
     }
 
     /**
-     * 学员转班
+     * 学员班内转课
      *
      * @param studentId 学员ID
      * @param courseId 课程ID
-     * @param request 转班请求
+     * @param request 班内转课请求
      * @param institutionId 机构ID
      * @return 操作记录
      */
     @Transactional
-    public StudentCourseOperationRecordVO transferClass(Long studentId, Long courseId, StudentCourseClassTransferRequest request, Long institutionId) {
+    public StudentCourseOperationRecordVO transferClass(Long studentId, Long courseId, StudentWithinCourseTransferRequest request, Long institutionId) {
         // 1. 获取原课程信息
         EduStudentCourseRecord record = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
                 .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(studentId))
@@ -616,21 +616,46 @@ public class EduStudentCourseModel {
             throw new BusinessException("学员课程不存在或校区/机构信息不匹配");
         }
 
-        // 2. 验证目标班级
-        // TODO: 添加目标班级验证逻辑
+        // 2. 验证目标课程
+        // 检查目标课程是否存在
+        EduCourseRecord targetCourse = dsl.selectFrom(Tables.EDU_COURSE)
+                .where(Tables.EDU_COURSE.ID.eq(request.getTargetCourseId()))
+                .and(Tables.EDU_COURSE.CAMPUS_ID.eq(request.getCampusId()))
+                .and(Tables.EDU_COURSE.INSTITUTION_ID.eq(institutionId))
+                .and(Tables.EDU_COURSE.DELETED.eq(0))
+                .fetchOne();
 
-        // 3. 更新班级信息
-        record.setFixedSchedule(request.getTargetClassId().toString());
+        if (targetCourse == null) {
+            throw new BusinessException("目标课程不存在或校区/机构信息不匹配");
+        }
+
+        // 3. 处理转班课时
+        BigDecimal transferHours = request.getTransferHours();
+        if (transferHours == null || transferHours.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BusinessException("转班课时必须大于0");
+        }
+
+        // 确保转班课时不超过学员剩余课时
+        BigDecimal remainingHours = record.getTotalHours().subtract(record.getConsumedHours());
+        if (transferHours.compareTo(remainingHours) > 0) {
+            throw new BusinessException("转班课时不能超过剩余课时");
+        }
+
+        // 4. 处理补差价（如果有）
+        BigDecimal compensationFee = request.getCompensationFee() != null ? request.getCompensationFee() : BigDecimal.ZERO;
+
+        // 5. 更新课程信息
+        record.setCourseId(request.getTargetCourseId());
         record.setUpdateTime(LocalDateTime.now());
         record.update();
 
-        // 4. 创建转班记录
+        // 6. 创建转班记录
         EduStudentClassTransferRecord transferRecord = new EduStudentClassTransferRecord();
         transferRecord.setStudentId(studentId.toString());
         transferRecord.setCourseId(courseId.toString());
-        transferRecord.setOriginalSchedule(record.getFixedSchedule());
-        transferRecord.setNewSchedule(request.getTargetClassId().toString());
-        transferRecord.setReason(request.getTransferReason());
+        transferRecord.setOriginalSchedule(request.getSourceCourseId().toString());
+        transferRecord.setNewSchedule(request.getTargetCourseId().toString());
+        transferRecord.setReason(request.getTransferCause());
         transferRecord.setCampusId(request.getCampusId());
         transferRecord.setInstitutionId(institutionId);
         transferRecord.setCreatedTime(LocalDateTime.now());
@@ -638,7 +663,7 @@ public class EduStudentCourseModel {
         transferRecord.setDeleted(0);
         transferRecord.store();
 
-        // 5. 创建操作记录
+        // 7. 创建操作记录
         EduStudentCourseOperationRecord operationRecord = new EduStudentCourseOperationRecord();
         operationRecord.setStudentId(record.getStudentId());
         operationRecord.setStudentName(getStudentName(record.getStudentId()));
@@ -646,20 +671,63 @@ public class EduStudentCourseModel {
         operationRecord.setOperationType(OperationType.TRANSFER_CLASS.name());
         operationRecord.setBeforeStatus(record.getStatus());
         operationRecord.setAfterStatus(record.getStatus());
-        operationRecord.setSourceClassId(request.getSourceClassId());
-        operationRecord.setTargetClassId(request.getTargetClassId());
-        operationRecord.setTargetClassName(request.getTargetClassName());
-        operationRecord.setOperationReason(request.getTransferReason());
-        operationRecord.setOperatorId(request.getOperatorId());
-        operationRecord.setOperatorName(request.getOperatorName());
+        operationRecord.setSourceCourseId(request.getSourceCourseId());
+        operationRecord.setTargetCourseId(request.getTargetCourseId());
+        
+        // 获取目标课程名称
+        String targetCourseName = getCourseName(request.getTargetCourseId());
+        operationRecord.setTargetClassName(targetCourseName);
+        
+        // 设置转班原因，包含转班课时和补差价信息
+        String operationReason = String.format("转班课时: %s, 补差价: %s, 原因: %s", 
+                transferHours, 
+                compensationFee, 
+                request.getTransferCause() != null ? request.getTransferCause() : "");
+        operationRecord.setOperationReason(operationReason);
+        
+        // 由于请求中不再包含操作人信息，我们从上下文或系统默认值中获取
+        HttpServletRequest httpRequest = getRequest();
+        String operatorName = "系统";
+        Long operatorId = 0L; // 默认系统用户ID
+        
+        if (httpRequest != null) {
+            // 尝试从请求中获取当前登录的用户
+            String token = httpRequest.getHeader("Authorization");
+            if (token != null && !token.isEmpty()) {
+                // 从token中解析用户信息
+                // 注意：这里需要根据实际的认证机制进行调整
+                // 例如：operatorId = tokenService.getUserId(token);
+                // operatorName = tokenService.getUserName(token);
+            }
+        }
+        
+        operationRecord.setOperatorId(operatorId);
+        operationRecord.setOperatorName(operatorName);
         operationRecord.setOperationTime(LocalDateTime.now());
 
-        // 6. 保存操作记录
+        // 8. 保存操作记录
         dsl.attach(operationRecord);
         operationRecord.store();
 
-        // 7. 返回操作记录
+        // 9. 返回操作记录
         return convertToOperationRecordVO(operationRecord);
+    }
+
+    /**
+     * 获取课程名称
+     *
+     * @param courseId 课程ID
+     * @return 课程名称
+     */
+    private String getCourseName(Long courseId) {
+        if (courseId == null) {
+            return null;
+        }
+        return dsl.select(EduCourse.EDU_COURSE.NAME)
+                .from(EduCourse.EDU_COURSE)
+                .where(EduCourse.EDU_COURSE.ID.eq(courseId))
+                .and(EduCourse.EDU_COURSE.DELETED.eq(0))
+                .fetchOne(0, String.class);
     }
 
     /**
@@ -852,23 +920,6 @@ public class EduStudentCourseModel {
                 .from(Tables.EDU_STUDENT)
                 .where(Tables.EDU_STUDENT.ID.eq(studentId))
                 .fetchOneInto(String.class);
-    }
-
-    /**
-     * 获取班级名称
-     *
-     * @param classId 班级ID
-     * @return 班级名称
-     */
-    private String getClassName(Long classId) {
-        if (classId == null) {
-            return null;
-        }
-        return dsl.select(EduCourse.EDU_COURSE.NAME)
-                .from(EduCourse.EDU_COURSE)
-                .where(EduCourse.EDU_COURSE.ID.eq(classId))
-                .and(EduCourse.EDU_COURSE.DELETED.eq(0))
-                .fetchOne(0, String.class);
     }
 
     /**
