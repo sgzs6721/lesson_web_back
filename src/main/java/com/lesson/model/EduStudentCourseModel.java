@@ -617,7 +617,6 @@ public class EduStudentCourseModel {
         }
 
         // 2. 验证目标课程
-        // 检查目标课程是否存在
         EduCourseRecord targetCourse = dsl.selectFrom(Tables.EDU_COURSE)
                 .where(Tables.EDU_COURSE.ID.eq(request.getTargetCourseId()))
                 .and(Tables.EDU_COURSE.CAMPUS_ID.eq(request.getCampusId()))
@@ -644,10 +643,36 @@ public class EduStudentCourseModel {
         // 4. 处理补差价（如果有）
         BigDecimal compensationFee = request.getCompensationFee() != null ? request.getCompensationFee() : BigDecimal.ZERO;
 
-        // 5. 更新课程信息
-        record.setCourseId(request.getTargetCourseId());
-        record.setUpdateTime(LocalDateTime.now());
-        record.update();
+        // 5. 根据转班课时情况处理课程记录
+        if (transferHours.compareTo(remainingHours) == 0) {
+            // 全部课时转班：更新原记录到新班级
+            record.setCourseId(request.getTargetCourseId());
+            record.setUpdateTime(LocalDateTime.now());
+            record.update();
+        } else {
+            // 部分课时转班：保留原记录，创建新记录
+            // 5.1 更新原记录的课时
+            record.setTotalHours(record.getTotalHours().subtract(transferHours));
+            record.setUpdateTime(LocalDateTime.now());
+            record.update();
+
+            // 5.2 创建新记录
+            EduStudentCourseRecord newRecord = new EduStudentCourseRecord();
+            newRecord.setStudentId(studentId);
+            newRecord.setCourseId(request.getTargetCourseId());
+            newRecord.setTotalHours(transferHours);
+            newRecord.setConsumedHours(BigDecimal.ZERO);
+            newRecord.setStatus(record.getStatus());
+            newRecord.setStartDate(LocalDate.now());
+            newRecord.setEndDate(record.getEndDate());
+            newRecord.setCampusId(request.getCampusId());
+            newRecord.setInstitutionId(institutionId);
+            newRecord.setCreatedTime(LocalDateTime.now());
+            newRecord.setUpdateTime(LocalDateTime.now());
+            newRecord.setDeleted(0);
+            dsl.attach(newRecord);
+            newRecord.store();
+        }
 
         // 6. 创建转班记录
         EduStudentClassTransferRecord transferRecord = new EduStudentClassTransferRecord();
@@ -655,6 +680,8 @@ public class EduStudentCourseModel {
         transferRecord.setCourseId(sourceCourseId.toString());
         transferRecord.setOriginalSchedule(request.getSourceCourseId().toString());
         transferRecord.setNewSchedule(request.getTargetCourseId().toString());
+        transferRecord.setTransferHours(transferHours);
+        transferRecord.setCompensationFee(compensationFee);
         transferRecord.setReason(request.getTransferCause());
         transferRecord.setCampusId(request.getCampusId());
         transferRecord.setInstitutionId(institutionId);
@@ -686,19 +713,16 @@ public class EduStudentCourseModel {
                 request.getTransferCause() != null ? request.getTransferCause() : "");
         operationRecord.setOperationReason(operationReason);
         
-        // 由于请求中不再包含操作人信息，我们从上下文或系统默认值中获取
+        // 获取操作人信息
         HttpServletRequest httpRequest = getRequest();
         String operatorName = "系统";
-        Long operatorId = 0L; // 默认系统用户ID
+        Long operatorId = 0L;
         
         if (httpRequest != null) {
-            // 尝试从请求中获取当前登录的用户
             String token = httpRequest.getHeader("Authorization");
             if (token != null && !token.isEmpty()) {
                 // 从token中解析用户信息
                 // 注意：这里需要根据实际的认证机制进行调整
-                // 例如：operatorId = tokenService.getUserId(token);
-                // operatorName = tokenService.getUserName(token);
             }
         }
         
