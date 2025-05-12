@@ -661,6 +661,7 @@ public class EduStudentCourseModel {
         transferRecord.setCreatedTime(LocalDateTime.now());
         transferRecord.setUpdateTime(LocalDateTime.now());
         transferRecord.setDeleted(0);
+        dsl.attach(transferRecord);
         transferRecord.store();
 
         // 7. 创建操作记录
