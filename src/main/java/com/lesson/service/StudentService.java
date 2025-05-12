@@ -1118,7 +1118,7 @@ public class StudentService {
     Long institutionId = getInstitutionId();
     return studentCourseModel.transferClass(
         request.getStudentId(),
-        request.getCourseId(),
+        request.getSourceCourseId(),
         request,
         institutionId
     );

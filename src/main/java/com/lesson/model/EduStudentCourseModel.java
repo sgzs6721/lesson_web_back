@@ -596,17 +596,17 @@ public class EduStudentCourseModel {
      * 学员班内转课
      *
      * @param studentId 学员ID
-     * @param courseId 课程ID
+     * @param sourceCourseId 课程ID
      * @param request 班内转课请求
      * @param institutionId 机构ID
      * @return 操作记录
      */
     @Transactional
-    public StudentCourseOperationRecordVO transferClass(Long studentId, Long courseId, StudentWithinCourseTransferRequest request, Long institutionId) {
+    public StudentCourseOperationRecordVO transferClass(Long studentId, Long sourceCourseId, StudentWithinCourseTransferRequest request, Long institutionId) {
         // 1. 获取原课程信息
         EduStudentCourseRecord record = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
                 .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(studentId))
-                .and(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(courseId))
+                .and(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(sourceCourseId))
                 .and(Tables.EDU_STUDENT_COURSE.CAMPUS_ID.eq(request.getCampusId()))
                 .and(Tables.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
                 .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
@@ -652,7 +652,7 @@ public class EduStudentCourseModel {
         // 6. 创建转班记录
         EduStudentClassTransferRecord transferRecord = new EduStudentClassTransferRecord();
         transferRecord.setStudentId(studentId.toString());
-        transferRecord.setCourseId(courseId.toString());
+        transferRecord.setCourseId(sourceCourseId.toString());
         transferRecord.setOriginalSchedule(request.getSourceCourseId().toString());
         transferRecord.setNewSchedule(request.getTargetCourseId().toString());
         transferRecord.setReason(request.getTransferCause());

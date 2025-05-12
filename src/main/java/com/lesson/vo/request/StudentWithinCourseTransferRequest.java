@@ -21,13 +21,6 @@ public class StudentWithinCourseTransferRequest {
     private Long studentId;
 
     /**
-     * 课程ID
-     */
-    @NotNull(message = "课程ID不能为空")
-    @Schema(description = "课程ID")
-    private Long courseId;
-
-    /**
      * 原课程ID
      */
     @NotNull(message = "原课程ID不能为空")
