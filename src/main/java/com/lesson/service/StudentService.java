@@ -381,7 +381,7 @@ public class StudentService {
         return PageResult.of(Collections.emptyList(), 0, request.getPageNum(), request.getPageSize());
       }
     } else {
-      // 否则查询所有学员
+      // 构建基础查询
       SelectConditionStep<Record> query = dsl.select()
           .from(Tables.EDU_STUDENT)
           .where(Tables.EDU_STUDENT.DELETED.eq(0));
