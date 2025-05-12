@@ -424,13 +424,13 @@ public class EduStudentCourseModel {
         if (request.getTransferHours() != null) {
             remainingHours = request.getTransferHours();
         }
-        
+
         BigDecimal sourceUnitPrice = dsl.select(Tables.EDU_COURSE.PRICE)
                 .from(Tables.EDU_COURSE)
                 .where(Tables.EDU_COURSE.ID.eq(sourceRecord.getCourseId()))
                 .fetchOneInto(BigDecimal.class);
         BigDecimal targetUnitPrice = targetCourse.getPrice();
-        
+
         // 计算补差价
         BigDecimal compensationFee = BigDecimal.ZERO;
         // 如果请求中提供了补差价，则使用请求中的值
@@ -455,18 +455,18 @@ public class EduStudentCourseModel {
         targetRecord.setTotalHours(remainingHours); // 使用剩余课时
         targetRecord.setConsumedHours(BigDecimal.ZERO); // 重置已消耗课时
         targetRecord.setStatus(StudentCourseStatus.STUDYING.getName());
-        
+
         // 设置开始日期为当前日期
         targetRecord.setStartDate(LocalDate.now());
-        
-        // 从有效期类型获取结束日期
+
+        // 从有效期常量ID获取结束日期
         LocalDate endDate = null;
-        if (request.getValidUntil() != null) {
-            // 根据有效期类型计算结束日期
-            endDate = calculateEndDateFromConstantType(request.getValidUntil());
+        if (request.getValidityPeriod() != null) {
+            // 根据有效期常量ID计算结束日期
+            endDate = calculateEndDateFromConstantType(request.getValidityPeriod());
         }
         targetRecord.setEndDate(endDate);
-        
+
         targetRecord.setCampusId(request.getCampusId());
         targetRecord.setInstitutionId(institutionId);
         targetRecord.setCreatedTime(LocalDateTime.now());
@@ -489,14 +489,14 @@ public class EduStudentCourseModel {
         transferRecord.setTargetCourseId(request.getTargetCourseId());
         transferRecord.setTransferHours(remainingHours);
         transferRecord.setCompensationFee(compensationFee);
-        
-        // 从有效期类型计算结束日期
+
+        // 从有效期常量ID计算结束日期
         LocalDate validUntil = null;
-        if (request.getValidUntil() != null) {
-            validUntil = calculateEndDateFromConstantType(request.getValidUntil());
+        if (request.getValidityPeriod() != null) {
+            validUntil = calculateEndDateFromConstantType(request.getValidityPeriod());
         }
         transferRecord.setValidUntil(validUntil);
-        
+
         transferRecord.setReason(request.getTransferCause());
         transferRecord.setCampusId(request.getCampusId());
         transferRecord.setInstitutionId(institutionId);
@@ -515,22 +515,22 @@ public class EduStudentCourseModel {
         operationRecord.setAfterStatus(StudentCourseStatus.GRADUATED.getName());
         operationRecord.setSourceCourseId(sourceRecord.getCourseId());
         operationRecord.setTargetCourseId(request.getTargetCourseId());
-        
+
         // 目标学员信息记录在操作原因中，格式为：转给学员[姓名(ID)]
         String targetStudentName = getStudentName(request.getTargetStudentId());
-        String transferReason = String.format("转给学员[%s(%d)]，原因：%s", 
-                targetStudentName, 
-                request.getTargetStudentId(), 
+        String transferReason = String.format("转给学员[%s(%d)]，原因：%s",
+                targetStudentName,
+                request.getTargetStudentId(),
                 request.getTransferCause() != null ? request.getTransferCause() : "");
-        
+
         operationRecord.setOperationReason(transferReason);
-        
+
         // 由于请求中不再包含操作人信息，我们从上下文或系统默认值中获取
         // 获取当前登录用户作为操作人
         HttpServletRequest httpRequest = getRequest();
         String operatorName = "系统";
         Long operatorId = 0L; // 默认系统用户ID
-        
+
         if (httpRequest != null) {
             // 尝试从请求中获取当前登录的用户
             String token = httpRequest.getHeader("Authorization");
@@ -541,7 +541,7 @@ public class EduStudentCourseModel {
                 // operatorName = tokenService.getUserName(token);
             }
         }
-        
+
         operationRecord.setOperatorId(operatorId);
         operationRecord.setOperatorName(operatorName);
         operationRecord.setOperationTime(LocalDateTime.now());
@@ -555,40 +555,48 @@ public class EduStudentCourseModel {
     }
 
     /**
-     * 根据常量类型计算结束日期
-     * 
-     * @param constantType 常量类型
+     * 根据有效期常量ID计算结束日期
+     *
+     * @param validityPeriodId 有效期常量ID
      * @return 计算后的结束日期
      */
-    private LocalDate calculateEndDateFromConstantType(ConstantType constantType) {
-        if (constantType == null) {
+    private LocalDate calculateEndDateFromConstantType(Long validityPeriodId) {
+        if (validityPeriodId == null) {
             // 默认一年有效期
             return LocalDate.now().plusYears(1);
         }
-        
-        // 查询该常量类型下的常量值
+
+        // 查询该常量ID对应的常量值
         String constantValue = dsl.select(Tables.SYS_CONSTANT.CONSTANT_VALUE)
                 .from(Tables.SYS_CONSTANT)
-                .where(Tables.SYS_CONSTANT.TYPE.eq(constantType.getName()))
+                .where(Tables.SYS_CONSTANT.ID.eq(validityPeriodId))
+                .and(Tables.SYS_CONSTANT.TYPE.eq(ConstantType.VALIDITY_PERIOD.getName()))
                 .fetchOneInto(String.class);
-        
+
         if (constantValue == null) {
             // 如果没有找到对应的常量值，默认一年有效期
             return LocalDate.now().plusYears(1);
         }
-        
-        // 尝试解析常量值为月份数
-        try {
-            int months = Integer.parseInt(constantValue);
-            return LocalDate.now().plusMonths(months);
-        } catch (NumberFormatException e) {
-            // 如果常量值不是数字，可能是特定日期格式
-            try {
-                return LocalDate.parse(constantValue);
-            } catch (Exception ex) {
-                // 解析失败，使用默认值
-                return LocalDate.now().plusYears(1);
-            }
+
+        // 根据常量值确定有效期
+        if (constantValue.contains("1个月")) {
+            return LocalDate.now().plusMonths(1);
+        } else if (constantValue.contains("3个月")) {
+            return LocalDate.now().plusMonths(3);
+        } else if (constantValue.contains("6个月")) {
+            return LocalDate.now().plusMonths(6);
+        } else if (constantValue.contains("1年")) {
+            return LocalDate.now().plusYears(1);
+        } else if (constantValue.contains("2年")) {
+            return LocalDate.now().plusYears(2);
+        } else if (constantValue.contains("3年")) {
+            return LocalDate.now().plusYears(3);
+        } else if (constantValue.contains("永久")) {
+            // 永久有效期设置为100年
+            return LocalDate.now().plusYears(100);
+        } else {
+            // 默认一年有效期
+            return LocalDate.now().plusYears(1);
         }
     }
 
@@ -680,8 +688,6 @@ public class EduStudentCourseModel {
         transferRecord.setCourseId(sourceCourseId.toString());
         transferRecord.setOriginalSchedule(request.getSourceCourseId().toString());
         transferRecord.setNewSchedule(request.getTargetCourseId().toString());
-        transferRecord.setTransferHours(transferHours);
-        transferRecord.setCompensationFee(compensationFee);
         transferRecord.setReason(request.getTransferCause());
         transferRecord.setCampusId(request.getCampusId());
         transferRecord.setInstitutionId(institutionId);
@@ -701,23 +707,23 @@ public class EduStudentCourseModel {
         operationRecord.setAfterStatus(record.getStatus());
         operationRecord.setSourceCourseId(request.getSourceCourseId());
         operationRecord.setTargetCourseId(request.getTargetCourseId());
-        
+
         // 获取目标课程名称
         String targetCourseName = getCourseName(request.getTargetCourseId());
         operationRecord.setTargetClassName(targetCourseName);
-        
+
         // 设置转班原因，包含转班课时和补差价信息
-        String operationReason = String.format("转班课时: %s, 补差价: %s, 原因: %s", 
-                transferHours, 
-                compensationFee, 
+        String operationReason = String.format("转班课时: %s, 补差价: %s, 原因: %s",
+                transferHours,
+                compensationFee,
                 request.getTransferCause() != null ? request.getTransferCause() : "");
         operationRecord.setOperationReason(operationReason);
-        
+
         // 获取操作人信息
         HttpServletRequest httpRequest = getRequest();
         String operatorName = "系统";
         Long operatorId = 0L;
-        
+
         if (httpRequest != null) {
             String token = httpRequest.getHeader("Authorization");
             if (token != null && !token.isEmpty()) {
@@ -725,7 +731,7 @@ public class EduStudentCourseModel {
                 // 注意：这里需要根据实际的认证机制进行调整
             }
         }
-        
+
         operationRecord.setOperatorId(operatorId);
         operationRecord.setOperatorName(operatorName);
         operationRecord.setOperationTime(LocalDateTime.now());

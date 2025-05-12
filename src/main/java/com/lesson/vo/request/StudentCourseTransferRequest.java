@@ -21,7 +21,7 @@ public class StudentCourseTransferRequest {
     @NotNull(message = "学员ID不能为空")
     @Schema(description = "学员ID", required = true)
     private Long studentId;
-    
+
     /**
      * 目标学员ID
      */
@@ -50,11 +50,11 @@ public class StudentCourseTransferRequest {
     private BigDecimal transferHours;
 
     /**
-     * 有效期类型
+     * 有效期
      */
     @NotNull(message = "有效期不能为空")
-    @Schema(description = "有效期类型")
-    private ConstantType validUntil;
+    @Schema(description = "有效期")
+    private Long validityPeriod;
 
     /**
      * 补差价
