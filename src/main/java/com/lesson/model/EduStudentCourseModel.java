@@ -621,14 +621,17 @@ public class EduStudentCourseModel {
     @Transactional
     public StudentCourseOperationRecordVO transferClass(Long studentId, Long sourceCourseId, StudentWithinCourseTransferRequest request, Long institutionId) {
         // 1. 获取原课程信息
-        EduStudentCourseRecord record = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
+        List<EduStudentCourseRecord> records = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
                 .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(studentId))
                 .and(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(sourceCourseId))
                 .and(Tables.EDU_STUDENT_COURSE.CAMPUS_ID.eq(request.getCampusId()))
                 .and(Tables.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
                 .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
-                .fetchOne();
-
+                .fetch();
+        if (records.size() > 1) {
+            throw new BusinessException("数据异常：存在多条学员课程记录，请联系管理员处理！");
+        }
+        EduStudentCourseRecord record = records.isEmpty() ? null : records.get(0);
         if (record == null) {
             throw new BusinessException("学员课程不存在或校区/机构信息不匹配");
         }
@@ -661,13 +664,17 @@ public class EduStudentCourseModel {
         BigDecimal compensationFee = request.getCompensationFee() != null ? request.getCompensationFee() : BigDecimal.ZERO;
 
         // 5. 检查目标班级是否已存在该学员的记录
-        EduStudentCourseRecord existingTargetRecord = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
+        List<EduStudentCourseRecord> targetRecords = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
                 .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(studentId))
                 .and(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(request.getTargetCourseId()))
                 .and(Tables.EDU_STUDENT_COURSE.CAMPUS_ID.eq(request.getCampusId()))
                 .and(Tables.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
                 .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
-                .fetchOne();
+                .fetch();
+        if (targetRecords.size() > 1) {
+            throw new BusinessException("数据异常：目标班级存在多条学员课程记录，请联系管理员处理！");
+        }
+        EduStudentCourseRecord existingTargetRecord = targetRecords.isEmpty() ? null : targetRecords.get(0);
 
         // 6. 根据转班课时情况处理课程记录
         if (existingTargetRecord != null) {
