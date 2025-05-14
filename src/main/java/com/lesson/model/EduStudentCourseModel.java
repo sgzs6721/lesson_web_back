@@ -1,17 +1,27 @@
 package com.lesson.model;
 
-import com.lesson.common.exception.BusinessException;
-import com.lesson.common.enums.OperationType;
 import com.lesson.common.enums.ConstantType;
-import com.lesson.enums.StudentCourseStatus;
-import com.lesson.repository.tables.records.EduStudentCourseRecord;
+import com.lesson.common.enums.OperationType;
+import com.lesson.common.enums.StudentCourseStatus;
+import com.lesson.common.exception.BusinessException;
+import com.lesson.common.util.JwtUtil;
+import com.lesson.repository.tables.EduCourse;
+import com.lesson.repository.tables.EduStudentClassTransfer;
+import com.lesson.repository.tables.EduStudentCourse;
+import com.lesson.repository.tables.EduStudentCourseOperation;
 import com.lesson.repository.tables.records.EduCourseRecord;
-import com.lesson.repository.tables.records.EduStudentCourseTransferRecord;
+import com.lesson.repository.tables.records.EduStudentClassTransferRecord;
 import com.lesson.repository.tables.records.EduStudentCourseOperationRecord;
+import com.lesson.repository.tables.records.EduStudentCourseRecord;
 import com.lesson.vo.request.StudentCourseTransferRequest;
 import com.lesson.vo.request.StudentWithinCourseTransferRequest;
 import com.lesson.vo.response.StudentCourseOperationRecordVO;
+import io.jsonwebtoken.Claims;
+import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -53,7 +63,8 @@ import static com.lesson.repository.tables.EduCourse.EDU_COURSE;
  * 学员课程模型
  */
 
-@Repository
+@Slf4j
+@Component
 @RequiredArgsConstructor
 public class EduStudentCourseModel {
     private final DSLContext dsl;
@@ -652,38 +663,68 @@ public class EduStudentCourseModel {
         // 4. 处理补差价（如果有）
         BigDecimal compensationFee = request.getCompensationFee() != null ? request.getCompensationFee() : BigDecimal.ZERO;
 
-        // 5. 根据转班课时情况处理课程记录
+        // 5. 检查目标班级是否已存在该学员的记录
+        EduStudentCourseRecord existingTargetRecord = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
+                .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(studentId))
+                .and(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(request.getTargetCourseId()))
+                .and(Tables.EDU_STUDENT_COURSE.CAMPUS_ID.eq(request.getCampusId()))
+                .and(Tables.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
+                .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
+                .fetchOne();
+
+        // 6. 根据转班课时情况处理课程记录
         if (transferHours.compareTo(remainingHours) == 0) {
-            // 全部课时转班：更新原记录到新班级
-            record.setCourseId(request.getTargetCourseId());
-            record.setUpdateTime(LocalDateTime.now());
-            record.update();
+            // 全部课时转班
+            if (existingTargetRecord != null) {
+                // 如果目标班级已存在记录，更新课时
+                existingTargetRecord.setTotalHours(existingTargetRecord.getTotalHours().add(transferHours));
+                existingTargetRecord.setUpdateTime(LocalDateTime.now());
+                existingTargetRecord.update();
+                
+                // 删除原记录
+                record.setDeleted(1);
+                record.setUpdateTime(LocalDateTime.now());
+                record.update();
+            } else {
+                // 如果目标班级不存在记录，更新原记录到新班级
+                record.setCourseId(request.getTargetCourseId());
+                record.setUpdateTime(LocalDateTime.now());
+                record.update();
+            }
         } else {
-            // 部分课时转班：保留原记录，创建新记录
-            // 5.1 更新原记录的课时
+            // 部分课时转班
+            // 6.1 更新原记录的课时
             record.setTotalHours(record.getTotalHours().subtract(transferHours));
             record.setUpdateTime(LocalDateTime.now());
             record.update();
 
-            // 5.2 创建新记录
-            EduStudentCourseRecord newRecord = new EduStudentCourseRecord();
-            newRecord.setStudentId(studentId);
-            newRecord.setCourseId(request.getTargetCourseId());
-            newRecord.setTotalHours(transferHours);
-            newRecord.setConsumedHours(BigDecimal.ZERO);
-            newRecord.setStatus(record.getStatus());
-            newRecord.setStartDate(LocalDate.now());
-            newRecord.setEndDate(record.getEndDate());
-            newRecord.setCampusId(request.getCampusId());
-            newRecord.setInstitutionId(institutionId);
-            newRecord.setCreatedTime(LocalDateTime.now());
-            newRecord.setUpdateTime(LocalDateTime.now());
-            newRecord.setDeleted(0);
-            dsl.attach(newRecord);
-            newRecord.store();
+            // 6.2 处理目标班级记录
+            if (existingTargetRecord != null) {
+                // 如果目标班级已存在记录，累加课时
+                existingTargetRecord.setTotalHours(existingTargetRecord.getTotalHours().add(transferHours));
+                existingTargetRecord.setUpdateTime(LocalDateTime.now());
+                existingTargetRecord.update();
+            } else {
+                // 如果目标班级不存在记录，创建新记录
+                EduStudentCourseRecord newRecord = new EduStudentCourseRecord();
+                newRecord.setStudentId(studentId);
+                newRecord.setCourseId(request.getTargetCourseId());
+                newRecord.setTotalHours(transferHours);
+                newRecord.setConsumedHours(BigDecimal.ZERO);
+                newRecord.setStatus(record.getStatus());
+                newRecord.setStartDate(LocalDate.now());
+                newRecord.setEndDate(record.getEndDate());
+                newRecord.setCampusId(request.getCampusId());
+                newRecord.setInstitutionId(institutionId);
+                newRecord.setCreatedTime(LocalDateTime.now());
+                newRecord.setUpdateTime(LocalDateTime.now());
+                newRecord.setDeleted(0);
+                dsl.attach(newRecord);
+                newRecord.store();
+            }
         }
 
-        // 6. 创建转班记录
+        // 7. 创建转班记录
         EduStudentClassTransferRecord transferRecord = new EduStudentClassTransferRecord();
         transferRecord.setStudentId(studentId.toString());
         transferRecord.setCourseId(sourceCourseId.toString());
@@ -698,7 +739,7 @@ public class EduStudentCourseModel {
         dsl.attach(transferRecord);
         transferRecord.store();
 
-        // 7. 创建操作记录
+        // 8. 创建操作记录
         EduStudentCourseOperationRecord operationRecord = new EduStudentCourseOperationRecord();
         operationRecord.setStudentId(record.getStudentId());
         operationRecord.setStudentName(getStudentName(record.getStudentId()));
@@ -724,24 +765,28 @@ public class EduStudentCourseModel {
         HttpServletRequest httpRequest = getRequest();
         String operatorName = "系统";
         Long operatorId = 0L;
-
         if (httpRequest != null) {
             String token = httpRequest.getHeader("Authorization");
-            if (token != null && !token.isEmpty()) {
-                // 从token中解析用户信息
-                // 注意：这里需要根据实际的认证机制进行调整
+            if (token != null && token.startsWith("Bearer ")) {
+                token = token.substring(7);
+                try {
+                    Claims claims = JwtUtil.parseToken(token);
+                    operatorId = Long.parseLong(claims.getSubject());
+                    operatorName = claims.get("name", String.class);
+                } catch (Exception e) {
+                    log.error("解析token失败", e);
+                }
             }
         }
-
         operationRecord.setOperatorId(operatorId);
         operationRecord.setOperatorName(operatorName);
         operationRecord.setOperationTime(LocalDateTime.now());
-
-        // 8. 保存操作记录
+        operationRecord.setCreatedTime(LocalDateTime.now());
+        operationRecord.setUpdateTime(LocalDateTime.now());
+        operationRecord.setDeleted(0);
         dsl.attach(operationRecord);
         operationRecord.store();
 
-        // 9. 返回操作记录
         return convertToOperationRecordVO(operationRecord);
     }
 
