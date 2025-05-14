@@ -675,59 +675,46 @@ public class EduStudentCourseModel {
         log.info("[转班] 剩余课时={}, 转班课时={}, 目标课程已存在记录课时={}", remainingHours, transferHours, existingTargetRecord != null ? existingTargetRecord.getTotalHours() : null);
 
         // 6. 根据转班课时情况处理课程记录
-        if (transferHours.compareTo(remainingHours) == 0) {
-            // 全部课时转班
-            if (existingTargetRecord != null) {
-                log.info("[转班] 全部课时转班，目标课程已存在，累加课时并删除原记录");
-                // 如果目标班级已存在记录，更新课时
-                existingTargetRecord.setTotalHours(existingTargetRecord.getTotalHours().add(transferHours));
-                existingTargetRecord.setUpdateTime(LocalDateTime.now());
-                existingTargetRecord.update();
-                
-                // 删除原记录
+        if (existingTargetRecord != null) {
+            // 目标课程已存在，累加课时
+            log.info("[转班] 目标课程已存在，累加课时 {} 到目标记录，并删除原记录", transferHours);
+            existingTargetRecord.setTotalHours(existingTargetRecord.getTotalHours().add(transferHours));
+            existingTargetRecord.setUpdateTime(LocalDateTime.now());
+            existingTargetRecord.update();
+            // 删除原记录
+            record.setDeleted(1);
+            record.setUpdateTime(LocalDateTime.now());
+            record.update();
+        } else {
+            // 目标课程不存在，创建新记录
+            log.info("[转班] 目标课程不存在，创建新记录，课时 {}", transferHours);
+            EduStudentCourseRecord newRecord = new EduStudentCourseRecord();
+            newRecord.setStudentId(studentId);
+            newRecord.setCourseId(request.getTargetCourseId());
+            newRecord.setTotalHours(transferHours);
+            newRecord.setConsumedHours(BigDecimal.ZERO);
+            newRecord.setStatus(record.getStatus());
+            newRecord.setStartDate(LocalDate.now());
+            newRecord.setEndDate(record.getEndDate());
+            newRecord.setCampusId(request.getCampusId());
+            newRecord.setInstitutionId(institutionId);
+            newRecord.setCreatedTime(LocalDateTime.now());
+            newRecord.setUpdateTime(LocalDateTime.now());
+            newRecord.setDeleted(0);
+            dsl.attach(newRecord);
+            newRecord.store();
+            // 部分课时转班时，原记录要扣减课时
+            if (transferHours.compareTo(record.getTotalHours().subtract(record.getConsumedHours())) < 0) {
+                log.info("[转班] 部分课时转班，原记录扣减课时 {}", transferHours);
+                record.setTotalHours(record.getTotalHours().subtract(transferHours));
+                record.setUpdateTime(LocalDateTime.now());
+                record.update();
+            } else {
+                // 全部课时转班，原记录删除
+                log.info("[转班] 全部课时转班，原记录删除");
                 record.setDeleted(1);
                 record.setUpdateTime(LocalDateTime.now());
                 record.update();
-            } else {
-                log.info("[转班] 全部课时转班，目标课程不存在，直接更新原记录到新班级");
-                // 如果目标班级不存在记录，更新原记录到新班级
-                record.setCourseId(request.getTargetCourseId());
-                record.setUpdateTime(LocalDateTime.now());
-                record.update();
-            }
-        } else {
-            // 部分课时转班
-            log.info("[转班] 部分课时转班，先扣减原记录课时，再处理目标课程记录");
-            // 6.1 更新原记录的课时
-            record.setTotalHours(record.getTotalHours().subtract(transferHours));
-            record.setUpdateTime(LocalDateTime.now());
-            record.update();
-
-            // 6.2 处理目标班级记录
-            if (existingTargetRecord != null) {
-                log.info("[转班] 目标课程已存在，累加课时");
-                // 如果目标班级已存在记录，累加课时
-                existingTargetRecord.setTotalHours(existingTargetRecord.getTotalHours().add(transferHours));
-                existingTargetRecord.setUpdateTime(LocalDateTime.now());
-                existingTargetRecord.update();
-            } else {
-                log.info("[转班] 目标课程不存在，创建新记录");
-                // 如果目标班级不存在记录，创建新记录
-                EduStudentCourseRecord newRecord = new EduStudentCourseRecord();
-                newRecord.setStudentId(studentId);
-                newRecord.setCourseId(request.getTargetCourseId());
-                newRecord.setTotalHours(transferHours);
-                newRecord.setConsumedHours(BigDecimal.ZERO);
-                newRecord.setStatus(record.getStatus());
-                newRecord.setStartDate(LocalDate.now());
-                newRecord.setEndDate(record.getEndDate());
-                newRecord.setCampusId(request.getCampusId());
-                newRecord.setInstitutionId(institutionId);
-                newRecord.setCreatedTime(LocalDateTime.now());
-                newRecord.setUpdateTime(LocalDateTime.now());
-                newRecord.setDeleted(0);
-                dsl.attach(newRecord);
-                newRecord.store();
             }
         }
 
