@@ -2,50 +2,38 @@ package com.lesson.model;
 
 import com.lesson.common.enums.ConstantType;
 import com.lesson.common.enums.OperationType;
-import com.lesson.common.enums.StudentCourseStatus;
+import com.lesson.enums.StudentCourseStatus;
 import com.lesson.common.exception.BusinessException;
-import com.lesson.common.util.JwtUtil;
-import com.lesson.repository.tables.EduCourse;
-import com.lesson.repository.tables.EduStudentClassTransfer;
-import com.lesson.repository.tables.EduStudentCourse;
-import com.lesson.repository.tables.EduStudentCourseOperation;
+import com.lesson.model.record.StudentCourseRecord;
+import com.lesson.repository.Tables;
+import com.lesson.repository.tables.*;
+import com.lesson.repository.tables.records.*;
 import com.lesson.repository.tables.records.EduCourseRecord;
-import com.lesson.repository.tables.records.EduStudentClassTransferRecord;
-import com.lesson.repository.tables.records.EduStudentCourseOperationRecord;
 import com.lesson.repository.tables.records.EduStudentCourseRecord;
-import com.lesson.vo.request.StudentCourseTransferRequest;
-import com.lesson.vo.request.StudentWithinCourseTransferRequest;
+import com.lesson.utils.JwtUtil;
+import com.lesson.vo.request.*;
 import com.lesson.vo.response.StudentCourseOperationRecordVO;
+import com.lesson.vo.response.StudentCourseListVO;
+import com.lesson.vo.response.StudentAttendanceListVO;
 import io.jsonwebtoken.Claims;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
 import org.jooq.Record;
+import org.jooq.Result;
+import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-
-import com.lesson.repository.Tables;
-import com.lesson.model.record.StudentCourseRecord;
-import com.lesson.repository.tables.EduCourse;
-import com.lesson.repository.tables.records.*;
-import com.lesson.vo.request.StudentCourseRefundRequest;
-import com.lesson.vo.request.StudentQueryRequest;
-import com.lesson.vo.request.StudentAttendanceQueryRequest;
-import com.lesson.vo.response.StudentCourseListVO;
-import com.lesson.vo.response.StudentAttendanceListVO;
-import lombok.RequiredArgsConstructor;
-import org.jooq.*;
-import org.jooq.impl.DSL;
-import org.springframework.stereotype.Repository;
-import org.springframework.util.StringUtils;
-
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -58,6 +46,11 @@ import static com.lesson.repository.tables.SysCoach.SYS_COACH;
 import static com.lesson.repository.tables.SysConstant.SYS_CONSTANT;
 import static com.lesson.repository.tables.EduStudentCourseRecord.EDU_STUDENT_COURSE_RECORD;
 import static com.lesson.repository.tables.EduCourse.EDU_COURSE;
+import static com.lesson.repository.tables.EduStudentCourse.EDU_STUDENT_COURSE;
+import static com.lesson.repository.tables.EduStudentCourseOperation.EDU_STUDENT_COURSE_OPERATION;
+import static com.lesson.repository.tables.SysCampus.SYS_CAMPUS;
+import static com.lesson.repository.tables.SysInstitution.SYS_INSTITUTION;
+import static com.lesson.repository.tables.SysCoachCourse.SYS_COACH_COURSE;
 
 /**
  * 学员课程模型
@@ -67,7 +60,11 @@ import static com.lesson.repository.tables.EduCourse.EDU_COURSE;
 @Component
 @RequiredArgsConstructor
 public class EduStudentCourseModel {
-    private final DSLContext dsl;
+    @Autowired
+    private DSLContext dsl;
+
+    @Autowired
+    private JwtUtil jwtUtil;
 
     private HttpServletRequest getRequest() {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
@@ -80,7 +77,7 @@ public class EduStudentCourseModel {
      * @param record 学员课程记录
      * @return 记录ID
      */
-    public Long createStudentCourse(EduStudentCourseRecord record) {
+    public Long createStudentCourse(com.lesson.repository.tables.records.EduStudentCourseRecord record) {
         record.setCreatedTime(LocalDateTime.now());
         record.setUpdateTime(LocalDateTime.now());
         record.setDeleted(0);
@@ -94,7 +91,7 @@ public class EduStudentCourseModel {
      *
      * @param record 学员课程记录
      */
-    public void updateStudentCourse(EduStudentCourseRecord record) {
+    public void updateStudentCourse(com.lesson.repository.tables.records.EduStudentCourseRecord record) {
         record.setUpdateTime(LocalDateTime.now());
         dsl.attach(record);
         record.update();
@@ -106,25 +103,25 @@ public class EduStudentCourseModel {
      * @param id 记录ID
      */
     public void deleteStudentCourse(Long id) {
-        dsl.update(Tables.EDU_STUDENT_COURSE)
-                .set(Tables.EDU_STUDENT_COURSE.DELETED, 1)
-                .set(Tables.EDU_STUDENT_COURSE.UPDATE_TIME, LocalDateTime.now())
-                .where(Tables.EDU_STUDENT_COURSE.ID.eq(id))
+        dsl.update(EDU_STUDENT_COURSE)
+                .set(EDU_STUDENT_COURSE.DELETED, 1)
+                .set(EDU_STUDENT_COURSE.UPDATE_TIME, LocalDateTime.now())
+                .where(EDU_STUDENT_COURSE.ID.eq(id))
                 .execute();
     }
 
     /**
      * 更新学员课程状态
      *
-     * @param id     记录ID
+     * @param id 记录ID
      * @param status 状态
      */
     public void updateStudentCourseStatus(Long id, StudentCourseStatus status) {
-        dsl.update(Tables.EDU_STUDENT_COURSE)
-                .set(Tables.EDU_STUDENT_COURSE.STATUS, status.getName())
-                .set(Tables.EDU_STUDENT_COURSE.UPDATE_TIME, LocalDateTime.now())
-                .where(Tables.EDU_STUDENT_COURSE.ID.eq(id))
-                .execute();
+        dsl.update(EDU_STUDENT_COURSE)
+           .set(EDU_STUDENT_COURSE.STATUS, status.getName())
+           .set(EDU_STUDENT_COURSE.UPDATE_TIME, LocalDateTime.now())
+           .where(EDU_STUDENT_COURSE.ID.eq(id))
+           .execute();
     }
 
     /**
@@ -135,9 +132,9 @@ public class EduStudentCourseModel {
      */
     public Optional<StudentCourseRecord> getStudentCourseById(Long id) {
         return dsl.select()
-                .from(Tables.EDU_STUDENT_COURSE)
-                .where(Tables.EDU_STUDENT_COURSE.ID.eq(id))
-                .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
+                .from(EDU_STUDENT_COURSE)
+                .where(EDU_STUDENT_COURSE.ID.eq(id))
+                .and(EDU_STUDENT_COURSE.DELETED.eq(0))
                 .fetchOptional()
                 .map(this::convertToDetailRecord);
     }
@@ -171,13 +168,13 @@ public class EduStudentCourseModel {
      * @return 记录总数
      */
     public long countStudentCourseDetails(StudentQueryRequest request) {
-        SelectJoinStep<?> select = dsl.selectCount().from(Tables.EDU_STUDENT_COURSE)
-                .join(EDU_STUDENT).on(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(EDU_STUDENT.ID))
-                .join(EDU_COURSE).on(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(EDU_COURSE.ID))
+        SelectJoinStep<?> select = dsl.selectCount().from(EDU_STUDENT_COURSE)
+                .join(EDU_STUDENT).on(EDU_STUDENT_COURSE.STUDENT_ID.eq(EDU_STUDENT.ID))
+                .join(EDU_COURSE).on(EDU_STUDENT_COURSE.COURSE_ID.eq(EDU_COURSE.ID))
                 .leftJoin(SYS_CONSTANT).on(EDU_COURSE.TYPE_ID.eq(SYS_CONSTANT.ID))
                 // 通过课程和教练的关联表获取教练信息
-                .leftJoin(Tables.SYS_COACH_COURSE).on(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(Tables.SYS_COACH_COURSE.COURSE_ID).and(Tables.SYS_COACH_COURSE.DELETED.eq(0)))
-                .leftJoin(SYS_COACH).on(Tables.SYS_COACH_COURSE.COACH_ID.eq(SYS_COACH.ID).and(SYS_COACH.DELETED.eq(0)));
+                .leftJoin(SYS_COACH_COURSE).on(EDU_STUDENT_COURSE.COURSE_ID.eq(SYS_COACH_COURSE.COURSE_ID).and(SYS_COACH_COURSE.DELETED.eq(0)))
+                .leftJoin(SYS_COACH).on(SYS_COACH_COURSE.COACH_ID.eq(SYS_COACH.ID).and(SYS_COACH.DELETED.eq(0)));
 
         Condition conditions = buildConditions(request);
 
@@ -189,15 +186,15 @@ public class EduStudentCourseModel {
      */
     private SelectJoinStep<?> createStudentCourseDetailQuery() {
         // 计算剩余课时 (total_hours - consumed_hours)
-        Field<BigDecimal> remainingHoursField = Tables.EDU_STUDENT_COURSE.TOTAL_HOURS.minus(Tables.EDU_STUDENT_COURSE.CONSUMED_HOURS).as("remaining_hours");
+        Field<BigDecimal> remainingHoursField = EDU_STUDENT_COURSE.TOTAL_HOURS.minus(EDU_STUDENT_COURSE.CONSUMED_HOURS).as("remaining_hours");
 
         // 定义最近上课时间的子查询
         // 由于没有 CLASS_ATTENDANCE 操作类型，我们使用最近的操作时间作为替代
         Field<LocalDate> lastClassTimeField = DSL.field(
-            DSL.select(DSL.max(Tables.EDU_STUDENT_COURSE_OPERATION.OPERATION_TIME).cast(LocalDate.class))
-               .from(Tables.EDU_STUDENT_COURSE_OPERATION)
-               .where(Tables.EDU_STUDENT_COURSE_OPERATION.STUDENT_ID.eq(EDU_STUDENT.ID))
-               .and(Tables.EDU_STUDENT_COURSE_OPERATION.COURSE_ID.eq(Tables.EDU_STUDENT_COURSE.COURSE_ID))
+            DSL.select(DSL.max(EDU_STUDENT_COURSE_OPERATION.OPERATION_TIME).cast(LocalDate.class))
+               .from(EDU_STUDENT_COURSE_OPERATION)
+               .where(EDU_STUDENT_COURSE_OPERATION.STUDENT_ID.eq(EDU_STUDENT.ID))
+               .and(EDU_STUDENT_COURSE_OPERATION.COURSE_ID.eq(EDU_STUDENT_COURSE.COURSE_ID))
         ).as("last_class_time");
 
         return dsl.select(
@@ -206,52 +203,52 @@ public class EduStudentCourseModel {
                     EDU_STUDENT.GENDER.as("student_gender"),
                     EDU_STUDENT.AGE.as("student_age"),
                     EDU_STUDENT.PHONE.as("student_phone"),
-                    Tables.EDU_STUDENT_COURSE.ID.as("student_course_id"),
-                    Tables.EDU_STUDENT_COURSE.COURSE_ID,
-                    Tables.EDU_STUDENT_COURSE.TOTAL_HOURS,
-                    Tables.EDU_STUDENT_COURSE.CONSUMED_HOURS,
+                    EDU_STUDENT_COURSE.ID.as("student_course_id"),
+                    EDU_STUDENT_COURSE.COURSE_ID,
+                    EDU_STUDENT_COURSE.TOTAL_HOURS,
+                    EDU_STUDENT_COURSE.CONSUMED_HOURS,
                     remainingHoursField, // 添加计算后的剩余课时字段
-                    Tables.EDU_STUDENT_COURSE.START_DATE.as("enrollment_date"),
-                    Tables.EDU_STUDENT_COURSE.END_DATE.as("end_date"),
-                    Tables.EDU_STUDENT_COURSE.STATUS,
-                    Tables.EDU_STUDENT_COURSE.CAMPUS_ID,
-                    Tables.EDU_STUDENT_COURSE.INSTITUTION_ID,
+                    EDU_STUDENT_COURSE.START_DATE.as("enrollment_date"),
+                    EDU_STUDENT_COURSE.END_DATE.as("end_date"),
+                    EDU_STUDENT_COURSE.STATUS,
+                    EDU_STUDENT_COURSE.CAMPUS_ID,
+                    EDU_STUDENT_COURSE.INSTITUTION_ID,
                     EDU_COURSE.NAME.as("course_name"),
                     EDU_COURSE.TYPE_ID.as("course_type_id"),
                     SYS_CONSTANT.CONSTANT_VALUE.as("course_type_name"),
                     SYS_COACH.NAME.as("coach_name"),
-                    Tables.SYS_CAMPUS.NAME.as("campus_name"),
-                    Tables.SYS_INSTITUTION.NAME.as("institution_name"),
-                    Tables.EDU_STUDENT_COURSE.FIXED_SCHEDULE.as("fixed_schedule"), // 添加固定排课时间字段
+                    SYS_CAMPUS.NAME.as("campus_name"),
+                    SYS_INSTITUTION.NAME.as("institution_name"),
+                    EDU_STUDENT_COURSE.FIXED_SCHEDULE.as("fixed_schedule"), // 添加固定排课时间字段
                     lastClassTimeField // 添加最近上课时间字段
                 )
-                .from(Tables.EDU_STUDENT_COURSE)
-                .join(EDU_STUDENT).on(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(EDU_STUDENT.ID))
-                .join(EDU_COURSE).on(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(EDU_COURSE.ID))
+                .from(EDU_STUDENT_COURSE)
+                .join(EDU_STUDENT).on(EDU_STUDENT_COURSE.STUDENT_ID.eq(EDU_STUDENT.ID))
+                .join(EDU_COURSE).on(EDU_STUDENT_COURSE.COURSE_ID.eq(EDU_COURSE.ID))
                 .leftJoin(SYS_CONSTANT).on(EDU_COURSE.TYPE_ID.eq(SYS_CONSTANT.ID))
                 // 通过课程和教练的关联表获取教练信息
-                .leftJoin(Tables.SYS_COACH_COURSE).on(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(Tables.SYS_COACH_COURSE.COURSE_ID).and(Tables.SYS_COACH_COURSE.DELETED.eq(0)))
-                .leftJoin(SYS_COACH).on(Tables.SYS_COACH_COURSE.COACH_ID.eq(SYS_COACH.ID).and(SYS_COACH.DELETED.eq(0)))
-                .leftJoin(Tables.SYS_CAMPUS).on(Tables.EDU_STUDENT_COURSE.CAMPUS_ID.eq(Tables.SYS_CAMPUS.ID))
-                .leftJoin(Tables.SYS_INSTITUTION).on(Tables.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(Tables.SYS_INSTITUTION.ID));
+                .leftJoin(SYS_COACH_COURSE).on(EDU_STUDENT_COURSE.COURSE_ID.eq(SYS_COACH_COURSE.COURSE_ID).and(SYS_COACH_COURSE.DELETED.eq(0)))
+                .leftJoin(SYS_COACH).on(SYS_COACH_COURSE.COACH_ID.eq(SYS_COACH.ID).and(SYS_COACH.DELETED.eq(0)))
+                .leftJoin(SYS_CAMPUS).on(EDU_STUDENT_COURSE.CAMPUS_ID.eq(SYS_CAMPUS.ID))
+                .leftJoin(SYS_INSTITUTION).on(EDU_STUDENT_COURSE.INSTITUTION_ID.eq(SYS_INSTITUTION.ID));
     }
 
     /**
      * 根据请求构建查询条件
      */
     private Condition buildConditions(StudentQueryRequest request) {
-        Condition conditions = Tables.EDU_STUDENT_COURSE.DELETED.eq(0)
+        Condition conditions = EDU_STUDENT_COURSE.DELETED.eq(0)
                 .and(EDU_STUDENT.DELETED.eq(0))
                 .and(EDU_COURSE.DELETED.eq(0));
 
         // 机构ID筛选
         if (request.getInstitutionId() != null) {
-             conditions = conditions.and(Tables.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(request.getInstitutionId()));
+             conditions = conditions.and(EDU_STUDENT_COURSE.INSTITUTION_ID.eq(request.getInstitutionId()));
         }
 
         // 校区ID筛选
         if (request.getCampusId() != null) {
-            conditions = conditions.and(Tables.EDU_STUDENT_COURSE.CAMPUS_ID.eq(request.getCampusId()));
+            conditions = conditions.and(EDU_STUDENT_COURSE.CAMPUS_ID.eq(request.getCampusId()));
         }
 
         // 关键字筛选 (学员姓名/ID/电话)
@@ -277,19 +274,19 @@ public class EduStudentCourseModel {
 
         // 状态筛选
         if (request.getStatus() != null) {
-            conditions = conditions.and(Tables.EDU_STUDENT_COURSE.STATUS.eq(request.getStatus().name()));
+            conditions = conditions.and(EDU_STUDENT_COURSE.STATUS.eq(request.getStatus().name()));
         }
 
         // 课程ID筛选
         if (request.getCourseId() != null) {
-            conditions = conditions.and(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(request.getCourseId()));
+            conditions = conditions.and(EDU_STUDENT_COURSE.COURSE_ID.eq(request.getCourseId()));
         }
 
         // 报名年月筛选
         if (request.getEnrollmentYearMonth() != null) {
             LocalDate startOfMonth = request.getEnrollmentYearMonth().atDay(1);
             LocalDate endOfMonth = request.getEnrollmentYearMonth().atEndOfMonth();
-            conditions = conditions.and(Tables.EDU_STUDENT_COURSE.START_DATE.between(startOfMonth, endOfMonth));
+            conditions = conditions.and(EDU_STUDENT_COURSE.START_DATE.between(startOfMonth, endOfMonth));
         }
 
         return conditions;
@@ -301,7 +298,7 @@ public class EduStudentCourseModel {
     private List<SortField<?>> getOrderByFields(String sortBy) {
         if (!StringUtils.hasText(sortBy)) {
             // 默认按创建时间降序，然后按报名日期降序
-            return Arrays.asList(Tables.EDU_STUDENT_COURSE.CREATED_TIME.desc(), Tables.EDU_STUDENT_COURSE.START_DATE.desc());
+            return Arrays.asList(EDU_STUDENT_COURSE.CREATED_TIME.desc(), EDU_STUDENT_COURSE.START_DATE.desc());
         }
 
         List<SortField<?>> sortFields = new ArrayList<>();
@@ -321,19 +318,19 @@ public class EduStudentCourseModel {
                     break;
                 case "remainingHours":
                     // 按计算出的剩余课时排序
-                    sortField = Tables.EDU_STUDENT_COURSE.TOTAL_HOURS.minus(Tables.EDU_STUDENT_COURSE.CONSUMED_HOURS);
+                    sortField = EDU_STUDENT_COURSE.TOTAL_HOURS.minus(EDU_STUDENT_COURSE.CONSUMED_HOURS);
                     break;
                 case "lastClassTime":
                     // sortField = LAST_CLASS_TIME_FIELD; // 需要定义最近上课时间字段
                     break;
                 case "enrollmentDate":
-                    sortField = Tables.EDU_STUDENT_COURSE.START_DATE;
+                    sortField = EDU_STUDENT_COURSE.START_DATE;
                     break;
                 case "status":
-                     sortField = Tables.EDU_STUDENT_COURSE.STATUS;
+                     sortField = EDU_STUDENT_COURSE.STATUS;
                      break;
                 case "createdTime":
-                     sortField = Tables.EDU_STUDENT_COURSE.CREATED_TIME;
+                     sortField = EDU_STUDENT_COURSE.CREATED_TIME;
                      break;
                 // 可以添加更多排序字段
             }
@@ -345,8 +342,8 @@ public class EduStudentCourseModel {
 
         // 如果解析失败或未指定有效字段，则使用默认排序
         if (sortFields.isEmpty()) {
-            sortFields.add(Tables.EDU_STUDENT_COURSE.CREATED_TIME.desc());
-            sortFields.add(Tables.EDU_STUDENT_COURSE.START_DATE.desc());
+            sortFields.add(EDU_STUDENT_COURSE.CREATED_TIME.desc());
+            sortFields.add(EDU_STUDENT_COURSE.START_DATE.desc());
         }
 
         return sortFields;
@@ -671,23 +668,15 @@ public class EduStudentCourseModel {
                 .and(Tables.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
                 .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
                 .fetchOne();
-        log.info("[转班] 查找目标课程记录: 学员ID={}, 课程ID={}, 校区ID={}, 机构ID={}, 查到={}", studentId, request.getTargetCourseId(), request.getCampusId(), institutionId, existingTargetRecord != null);
-        log.info("[转班] 剩余课时={}, 转班课时={}, 目标课程已存在记录课时={}", remainingHours, transferHours, existingTargetRecord != null ? existingTargetRecord.getTotalHours() : null);
 
         // 6. 根据转班课时情况处理课程记录
         if (existingTargetRecord != null) {
             // 目标课程已存在，累加课时
-            log.info("[转班] 目标课程已存在，累加课时 {} 到目标记录，并删除原记录", transferHours);
             existingTargetRecord.setTotalHours(existingTargetRecord.getTotalHours().add(transferHours));
             existingTargetRecord.setUpdateTime(LocalDateTime.now());
             existingTargetRecord.update();
-            // 删除原记录
-            record.setDeleted(1);
-            record.setUpdateTime(LocalDateTime.now());
-            record.update();
         } else {
             // 目标课程不存在，创建新记录
-            log.info("[转班] 目标课程不存在，创建新记录，课时 {}", transferHours);
             EduStudentCourseRecord newRecord = new EduStudentCourseRecord();
             newRecord.setStudentId(studentId);
             newRecord.setCourseId(request.getTargetCourseId());
@@ -703,22 +692,14 @@ public class EduStudentCourseModel {
             newRecord.setDeleted(0);
             dsl.attach(newRecord);
             newRecord.store();
-            // 部分课时转班时，原记录要扣减课时
-            if (transferHours.compareTo(record.getTotalHours().subtract(record.getConsumedHours())) < 0) {
-                log.info("[转班] 部分课时转班，原记录扣减课时 {}", transferHours);
-                record.setTotalHours(record.getTotalHours().subtract(transferHours));
-                record.setUpdateTime(LocalDateTime.now());
-                record.update();
-            } else {
-                // 全部课时转班，原记录删除
-                log.info("[转班] 全部课时转班，原记录删除");
-                record.setDeleted(1);
-                record.setUpdateTime(LocalDateTime.now());
-                record.update();
-            }
         }
 
-        // 7. 创建转班记录
+        // 7. 更新原记录课时
+        record.setTotalHours(record.getTotalHours().subtract(transferHours));
+        record.setUpdateTime(LocalDateTime.now());
+        record.update();
+
+        // 8. 创建转班记录
         EduStudentClassTransferRecord transferRecord = new EduStudentClassTransferRecord();
         transferRecord.setStudentId(studentId.toString());
         transferRecord.setCourseId(sourceCourseId.toString());
@@ -733,7 +714,7 @@ public class EduStudentCourseModel {
         dsl.attach(transferRecord);
         transferRecord.store();
 
-        // 8. 创建操作记录
+        // 9. 创建操作记录
         EduStudentCourseOperationRecord operationRecord = new EduStudentCourseOperationRecord();
         operationRecord.setStudentId(record.getStudentId());
         operationRecord.setStudentName(getStudentName(record.getStudentId()));
@@ -764,7 +745,7 @@ public class EduStudentCourseModel {
             if (token != null && token.startsWith("Bearer ")) {
                 token = token.substring(7);
                 try {
-                    Claims claims = JwtUtil.parseToken(token);
+                    Claims claims = getClaimsFromToken(token);
                     operatorId = Long.parseLong(claims.getSubject());
                     operatorName = claims.get("name", String.class);
                 } catch (Exception e) {
@@ -1090,5 +1071,9 @@ public class EduStudentCourseModel {
         vo.setNotes(record.get("notes", String.class));
         vo.setHours(record.get("hours", BigDecimal.class));
         return vo;
+    }
+
+    private Claims getClaimsFromToken(String token) {
+        return jwtUtil.parseToken(token);
     }
 }
