@@ -671,11 +671,14 @@ public class EduStudentCourseModel {
                 .and(Tables.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
                 .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
                 .fetchOne();
+        log.info("[转班] 查找目标课程记录: 学员ID={}, 课程ID={}, 校区ID={}, 机构ID={}, 查到={}", studentId, request.getTargetCourseId(), request.getCampusId(), institutionId, existingTargetRecord != null);
+        log.info("[转班] 剩余课时={}, 转班课时={}, 目标课程已存在记录课时={}", remainingHours, transferHours, existingTargetRecord != null ? existingTargetRecord.getTotalHours() : null);
 
         // 6. 根据转班课时情况处理课程记录
         if (transferHours.compareTo(remainingHours) == 0) {
             // 全部课时转班
             if (existingTargetRecord != null) {
+                log.info("[转班] 全部课时转班，目标课程已存在，累加课时并删除原记录");
                 // 如果目标班级已存在记录，更新课时
                 existingTargetRecord.setTotalHours(existingTargetRecord.getTotalHours().add(transferHours));
                 existingTargetRecord.setUpdateTime(LocalDateTime.now());
@@ -686,6 +689,7 @@ public class EduStudentCourseModel {
                 record.setUpdateTime(LocalDateTime.now());
                 record.update();
             } else {
+                log.info("[转班] 全部课时转班，目标课程不存在，直接更新原记录到新班级");
                 // 如果目标班级不存在记录，更新原记录到新班级
                 record.setCourseId(request.getTargetCourseId());
                 record.setUpdateTime(LocalDateTime.now());
@@ -693,6 +697,7 @@ public class EduStudentCourseModel {
             }
         } else {
             // 部分课时转班
+            log.info("[转班] 部分课时转班，先扣减原记录课时，再处理目标课程记录");
             // 6.1 更新原记录的课时
             record.setTotalHours(record.getTotalHours().subtract(transferHours));
             record.setUpdateTime(LocalDateTime.now());
@@ -700,11 +705,13 @@ public class EduStudentCourseModel {
 
             // 6.2 处理目标班级记录
             if (existingTargetRecord != null) {
+                log.info("[转班] 目标课程已存在，累加课时");
                 // 如果目标班级已存在记录，累加课时
                 existingTargetRecord.setTotalHours(existingTargetRecord.getTotalHours().add(transferHours));
                 existingTargetRecord.setUpdateTime(LocalDateTime.now());
                 existingTargetRecord.update();
             } else {
+                log.info("[转班] 目标课程不存在，创建新记录");
                 // 如果目标班级不存在记录，创建新记录
                 EduStudentCourseRecord newRecord = new EduStudentCourseRecord();
                 newRecord.setStudentId(studentId);
