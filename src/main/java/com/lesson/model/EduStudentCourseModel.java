@@ -616,10 +616,9 @@ public class EduStudentCourseModel {
      * @param sourceCourseId 课程ID
      * @param request 班内转课请求
      * @param institutionId 机构ID
-     * @return 操作记录
      */
     @Transactional
-    public StudentCourseOperationRecordVO transferClass(Long studentId, Long sourceCourseId, StudentWithinCourseTransferRequest request, Long institutionId) {
+    public void transferClass(Long studentId, Long sourceCourseId, StudentWithinCourseTransferRequest request, Long institutionId) {
         // 1. 获取原课程信息
         List<EduStudentCourseRecord> records = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
                 .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(studentId))
@@ -643,7 +642,6 @@ public class EduStudentCourseModel {
                 .and(Tables.EDU_COURSE.INSTITUTION_ID.eq(institutionId))
                 .and(Tables.EDU_COURSE.DELETED.eq(0))
                 .fetchOne();
-
         if (targetCourse == null) {
             throw new BusinessException("目标课程不存在或校区/机构信息不匹配");
         }
@@ -653,17 +651,13 @@ public class EduStudentCourseModel {
         if (transferHours == null || transferHours.compareTo(BigDecimal.ZERO) <= 0) {
             throw new BusinessException("转班课时必须大于0");
         }
-
         // 确保转班课时不超过学员剩余课时
         BigDecimal remainingHours = record.getTotalHours().subtract(record.getConsumedHours());
         if (transferHours.compareTo(remainingHours) > 0) {
             throw new BusinessException("转班课时不能超过剩余课时");
         }
 
-        // 4. 处理补差价（如果有）
-        BigDecimal compensationFee = request.getCompensationFee() != null ? request.getCompensationFee() : BigDecimal.ZERO;
-
-        // 5. 检查目标班级是否已存在该学员的记录
+        // 4. 检查目标班级是否已存在该学员的记录
         List<EduStudentCourseRecord> targetRecords = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
                 .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(studentId))
                 .and(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(request.getTargetCourseId()))
@@ -676,13 +670,15 @@ public class EduStudentCourseModel {
         }
         EduStudentCourseRecord existingTargetRecord = targetRecords.isEmpty() ? null : targetRecords.get(0);
 
-        // 6. 根据转班课时情况处理课程记录
+        // 5. 根据转班课时情况处理课程记录
         if (existingTargetRecord != null) {
+            log.info("目标课程已存在，累加课时处理...");
             // 目标课程已存在，累加课时
             existingTargetRecord.setTotalHours(existingTargetRecord.getTotalHours().add(transferHours));
             existingTargetRecord.setUpdateTime(LocalDateTime.now());
             existingTargetRecord.update();
         } else {
+            log.info("目标课程已存在，累加课时处理...");
             // 目标课程不存在，创建新记录
             EduStudentCourseRecord newRecord = new EduStudentCourseRecord();
             newRecord.setStudentId(studentId);
@@ -701,92 +697,10 @@ public class EduStudentCourseModel {
             newRecord.store();
         }
 
-        // 7. 更新原记录课时
+        // 6. 更新原记录课时
         record.setTotalHours(record.getTotalHours().subtract(transferHours));
         record.setUpdateTime(LocalDateTime.now());
         record.update();
-
-        // 8. 创建转班记录
-        EduStudentClassTransferRecord transferRecord = new EduStudentClassTransferRecord();
-        transferRecord.setStudentId(studentId.toString());
-        transferRecord.setCourseId(sourceCourseId.toString());
-        transferRecord.setOriginalSchedule(request.getSourceCourseId().toString());
-        transferRecord.setNewSchedule(request.getTargetCourseId().toString());
-        transferRecord.setReason(request.getTransferCause());
-        transferRecord.setCampusId(request.getCampusId());
-        transferRecord.setInstitutionId(institutionId);
-        transferRecord.setCreatedTime(LocalDateTime.now());
-        transferRecord.setUpdateTime(LocalDateTime.now());
-        transferRecord.setDeleted(0);
-        dsl.attach(transferRecord);
-        transferRecord.store();
-
-        // 9. 创建操作记录
-        EduStudentCourseOperationRecord operationRecord = new EduStudentCourseOperationRecord();
-        operationRecord.setStudentId(record.getStudentId());
-        operationRecord.setStudentName(getStudentName(record.getStudentId()));
-        operationRecord.setCourseId(record.getCourseId());
-        operationRecord.setOperationType(OperationType.TRANSFER_CLASS.name());
-        operationRecord.setBeforeStatus(record.getStatus());
-        operationRecord.setAfterStatus(record.getStatus());
-        operationRecord.setSourceCourseId(request.getSourceCourseId());
-        operationRecord.setTargetCourseId(request.getTargetCourseId());
-
-        // 获取目标课程名称
-        String targetCourseName = getCourseName(request.getTargetCourseId());
-        operationRecord.setTargetClassName(targetCourseName);
-
-        // 设置转班原因，包含转班课时和补差价信息
-        String operationReason = String.format("转班课时: %s, 补差价: %s, 原因: %s",
-                transferHours,
-                compensationFee,
-                request.getTransferCause() != null ? request.getTransferCause() : "");
-        operationRecord.setOperationReason(operationReason);
-
-        // 获取操作人信息
-        HttpServletRequest httpRequest = getRequest();
-        String operatorName = "系统";
-        Long operatorId = 0L;
-        if (httpRequest != null) {
-            String token = httpRequest.getHeader("Authorization");
-            if (token != null && token.startsWith("Bearer ")) {
-                token = token.substring(7);
-                try {
-                    Claims claims = getClaimsFromToken(token);
-                    operatorId = Long.parseLong(claims.getSubject());
-                    operatorName = claims.get("name", String.class);
-                } catch (Exception e) {
-                    log.error("解析token失败", e);
-                }
-            }
-        }
-        operationRecord.setOperatorId(operatorId);
-        operationRecord.setOperatorName(operatorName);
-        operationRecord.setOperationTime(LocalDateTime.now());
-        operationRecord.setCreatedTime(LocalDateTime.now());
-        operationRecord.setUpdateTime(LocalDateTime.now());
-        operationRecord.setDeleted(0);
-        dsl.attach(operationRecord);
-        operationRecord.store();
-
-        return convertToOperationRecordVO(operationRecord);
-    }
-
-    /**
-     * 获取课程名称
-     *
-     * @param courseId 课程ID
-     * @return 课程名称
-     */
-    private String getCourseName(Long courseId) {
-        if (courseId == null) {
-            return null;
-        }
-        return dsl.select(EduCourse.EDU_COURSE.NAME)
-                .from(EduCourse.EDU_COURSE)
-                .where(EduCourse.EDU_COURSE.ID.eq(courseId))
-                .and(EduCourse.EDU_COURSE.DELETED.eq(0))
-                .fetchOne(0, String.class);
     }
 
     /**
