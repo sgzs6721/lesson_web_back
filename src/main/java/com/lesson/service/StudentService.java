@@ -405,7 +405,7 @@ public class StudentService {
           .where(Tables.EDU_STUDENT.DELETED.eq(0))
           .and(institutionId != null ? Tables.EDU_STUDENT.INSTITUTION_ID.eq(institutionId) : DSL.noCondition())
           .and(request.getCampusId() != null ? Tables.EDU_STUDENT.CAMPUS_ID.eq(request.getCampusId()) : DSL.noCondition())
-          .and(request.getKeyword() != null && !request.getKeyword().isEmpty() ? 
+          .and(request.getKeyword() != null && !request.getKeyword().isEmpty() ?
                Tables.EDU_STUDENT.NAME.like("%" + request.getKeyword() + "%") : DSL.noCondition())
           .fetchOne(0, Long.class);
 
@@ -575,7 +575,7 @@ public class StudentService {
           .where(Tables.EDU_STUDENT.DELETED.eq(0))
           .and(institutionId != null ? Tables.EDU_STUDENT.INSTITUTION_ID.eq(institutionId) : DSL.noCondition())
           .and(request.getCampusId() != null ? Tables.EDU_STUDENT.CAMPUS_ID.eq(request.getCampusId()) : DSL.noCondition())
-          .and(request.getKeyword() != null && !request.getKeyword().isEmpty() ? 
+          .and(request.getKeyword() != null && !request.getKeyword().isEmpty() ?
                Tables.EDU_STUDENT.NAME.like("%" + request.getKeyword() + "%") : DSL.noCondition())
           .fetchOne(0, Long.class);
 
@@ -754,13 +754,13 @@ public class StudentService {
     // 7. 更新学员课程的已消耗课时 (edu_student_course)
     studentCourse.setConsumedHours(studentCourse.getConsumedHours().add(hoursConsumed));
     studentCourse.setUpdateTime(LocalDateTime.now());
-    
+
     // 8. 将学员课程状态更新为"学习中"
     if (!StudentCourseStatus.STUDYING.getName().equals(studentCourse.getStatus())) {
       studentCourse.setStatus(StudentCourseStatus.STUDYING.getName());
       log.info("学员[{}]打卡成功，状态已更新为：学习中", request.getStudentId());
     }
-    
+
     studentCourseModel.updateStudentCourse(studentCourse);
 
     // 9. 更新课程表的已消耗课时 (edu_course)
@@ -1116,11 +1116,23 @@ public class StudentService {
    */
   public StudentCourseOperationRecordVO transferClass(StudentWithinCourseTransferRequest request) {
     Long institutionId = getInstitutionId();
-    return studentCourseModel.transferClass(
+    studentCourseModel.transferClass(
         request.getStudentId(),
         request.getSourceCourseId(),
         request,
         institutionId
     );
+    // 手动组装VO返回
+    StudentCourseOperationRecordVO vo = new StudentCourseOperationRecordVO();
+    vo.setStudentId(request.getStudentId());
+    vo.setCourseId(request.getSourceCourseId());
+    vo.setOperationType("TRANSFER_CLASS");
+    vo.setSourceCourseId(request.getSourceCourseId());
+    vo.setTargetCourseId(request.getTargetCourseId());
+    vo.setOperationReason(request.getTransferCause());
+    vo.setOperationTime(java.time.LocalDateTime.now());
+    // 你可以根据需要补充更多字段，比如操作人、学员姓名、课程名称等
+
+    return vo;
   }
 }
