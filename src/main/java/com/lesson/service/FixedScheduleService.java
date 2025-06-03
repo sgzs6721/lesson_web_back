@@ -79,7 +79,14 @@ public class FixedScheduleService {
         }
 
         // 6. 处理每条课程记录
-        for (Record record : records) {
+        for (Record6<String, String, Long, String, BigDecimal, BigDecimal> record : records) {
+            // 打印日志，排查过滤问题
+            log.info("课程ID: {}, total_hours: {}, deleted: {}, status: {}, fixed_schedule: {}",
+                record.get(EDU_STUDENT_COURSE.COURSE_ID),
+                record.get(EDU_STUDENT_COURSE.TOTAL_HOURS),
+                0, // 查询出来的都是deleted=0
+                "studying", // 查询出来的都是status!=WAITING_PAYMENT
+                record.get(EDU_STUDENT_COURSE.FIXED_SCHEDULE));
             String fixedScheduleJson = record.get(EDU_STUDENT_COURSE.FIXED_SCHEDULE);
             if (fixedScheduleJson != null) {
                 try {
