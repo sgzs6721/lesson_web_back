@@ -90,6 +90,7 @@ public class FixedScheduleService {
 
                     for (Map<String, String> scheduleTime : scheduleTimes) {
                         String weekday = scheduleTime.get("weekday");
+                        weekday = convertNumberToChineseWeekday(weekday);
                         String from = scheduleTime.get("from");
                         String to = scheduleTime.get("to");
                         String timeSlot = from + "-" + to;
@@ -151,5 +152,18 @@ public class FixedScheduleService {
         weekdayMap.put("周六", "SATURDAY");
         weekdayMap.put("周日", "SUNDAY");
         return weekdayMap.getOrDefault(weekday, weekday);
+    }
+
+    private String convertNumberToChineseWeekday(String weekday) {
+        switch (weekday) {
+            case "1": return "周一";
+            case "2": return "周二";
+            case "3": return "周三";
+            case "4": return "周四";
+            case "5": return "周五";
+            case "6": return "周六";
+            case "7": return "周日";
+            default: return weekday;
+        }
     }
 } 
