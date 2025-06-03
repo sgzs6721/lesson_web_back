@@ -4,6 +4,7 @@ import com.lesson.vo.response.FixedScheduleVO;
 import org.jooq.DSLContext;
 import org.jooq.Condition;
 import org.jooq.Record;
+import org.jooq.Record7;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,7 @@ import static com.lesson.repository.tables.SysConstant.SYS_CONSTANT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.math.BigDecimal;
+import static com.lesson.repository.tables.SysCoachCourse.SYS_COACH_COURSE;
 
 @Service
 @RequiredArgsConstructor
@@ -44,15 +46,12 @@ public class FixedScheduleService {
         Condition conditions = EDU_STUDENT_COURSE.DELETED.eq(0)
             .and(EDU_STUDENT_COURSE.STATUS.eq("STUDYING"));
 
-        if (coachId != null) {
-            conditions = conditions.and(EDU_STUDENT_COURSE.COACH_ID.eq(coachId));
-        }
         if (courseId != null) {
             conditions = conditions.and(EDU_STUDENT_COURSE.COURSE_ID.eq(courseId));
         }
 
         // 4. 从数据库查询课程数据
-        List<Record> records = dsl.select(
+        org.jooq.Result<Record7<String, String, Long, String, String, BigDecimal, BigDecimal>> records = dsl.select(
                 EDU_STUDENT_COURSE.FIXED_SCHEDULE,
                 EDU_COURSE.NAME.as("courseName"),
                 EDU_COURSE.TYPE_ID,
@@ -64,7 +63,6 @@ public class FixedScheduleService {
             .from(EDU_STUDENT_COURSE)
             .join(EDU_COURSE).on(EDU_STUDENT_COURSE.COURSE_ID.eq(EDU_COURSE.ID))
             .leftJoin(SYS_CONSTANT).on(EDU_COURSE.TYPE_ID.eq(SYS_CONSTANT.ID))
-            .leftJoin(SYS_COACH).on(EDU_STUDENT_COURSE.COACH_ID.eq(SYS_COACH.ID))
             .where(conditions)
             .fetch();
 
@@ -112,6 +110,16 @@ public class FixedScheduleService {
                         
                         vo.setTotalHours(totalHours.toString());
                         vo.setRemainHours(remainingHours.toString());
+                        
+                        // 查询教练名称（通过课程ID查）
+                        String coachName = dsl.select(SYS_COACH.NAME)
+                            .from(SYS_COACH_COURSE)
+                            .join(SYS_COACH).on(SYS_COACH_COURSE.COACH_ID.eq(SYS_COACH.ID))
+                            .where(SYS_COACH_COURSE.COURSE_ID.eq(record.get(EDU_STUDENT_COURSE.COURSE_ID)))
+                            .and(SYS_COACH_COURSE.DELETED.eq(0))
+                            .and(SYS_COACH.DELETED.eq(0))
+                            .fetchOneInto(String.class);
+                        vo.setCoachName(coachName);
                         
                         // 添加到对应时间段
                         schedule.get(timeSlot).get(day).add(vo);
