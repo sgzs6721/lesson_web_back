@@ -57,7 +57,7 @@ public class FixedScheduleService {
         }
 
         // 4. 从数据库查询课程数据
-        org.jooq.Result<org.jooq.Record8<String, String, Long, String, BigDecimal, BigDecimal, Long, String>> records = dsl.select(
+        org.jooq.Result<org.jooq.Record9<String, String, Long, String, BigDecimal, BigDecimal, Long, String, Long>> records = dsl.select(
                 EDU_STUDENT_COURSE.FIXED_SCHEDULE,
                 EDU_COURSE.NAME.as("courseName"),
                 EDU_COURSE.TYPE_ID,
@@ -65,12 +65,14 @@ public class FixedScheduleService {
                 EDU_STUDENT_COURSE.TOTAL_HOURS,
                 EDU_STUDENT_COURSE.CONSUMED_HOURS,
                 EDU_STUDENT_COURSE.COURSE_ID,
-                EDU_STUDENT.NAME.as("studentName")
+                EDU_STUDENT.NAME.as("studentName"),
+                SYS_COACH_COURSE.COACH_ID
             )
             .from(EDU_STUDENT_COURSE)
             .join(EDU_COURSE).on(EDU_STUDENT_COURSE.COURSE_ID.eq(EDU_COURSE.ID))
             .join(EDU_STUDENT).on(EDU_STUDENT_COURSE.STUDENT_ID.eq(EDU_STUDENT.ID))
             .leftJoin(SYS_CONSTANT).on(EDU_COURSE.TYPE_ID.eq(SYS_CONSTANT.ID))
+            .leftJoin(SYS_COACH_COURSE).on(EDU_STUDENT_COURSE.COURSE_ID.eq(SYS_COACH_COURSE.COURSE_ID).and(SYS_COACH_COURSE.DELETED.eq(0)))
             .where(conditions)
             .fetch();
 
@@ -87,7 +89,7 @@ public class FixedScheduleService {
         }
 
         // 6. 处理每条课程记录
-        for (org.jooq.Record8<String, String, Long, String, BigDecimal, BigDecimal, Long, String> record : records) {
+        for (org.jooq.Record9<String, String, Long, String, BigDecimal, BigDecimal, Long, String, Long> record : records) {
             // 打印日志，排查过滤问题
             log.info("课程ID: {}, total_hours: {}, deleted: {}, status: {}, fixed_schedule: {}",
                 record.get(EDU_STUDENT_COURSE.COURSE_ID),
@@ -126,6 +128,7 @@ public class FixedScheduleService {
                         
                         vo.setTotalHours(totalHours.toString());
                         vo.setRemainHours(remainingHours.toString());
+                        vo.setCoachId(record.get(SYS_COACH_COURSE.COACH_ID));
                         
                         // 添加到对应时间段
                         schedule.get(timeSlot).get(day).add(vo);

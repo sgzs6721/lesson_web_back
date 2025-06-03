@@ -30,5 +30,7 @@ public class FixedScheduleVO {
         private String totalHours;
         @Schema(description = "剩余课时")
         private String remainHours;
+        @Schema(description = "教练ID")
+        private Long coachId;
     }
 } 
