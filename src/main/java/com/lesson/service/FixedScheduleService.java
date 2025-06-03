@@ -4,7 +4,7 @@ import com.lesson.vo.response.FixedScheduleVO;
 import org.jooq.DSLContext;
 import org.jooq.Condition;
 import org.jooq.Record;
-import org.jooq.Record7;
+import org.jooq.Record6;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,12 +51,11 @@ public class FixedScheduleService {
         }
 
         // 4. 从数据库查询课程数据
-        org.jooq.Result<Record7<String, String, Long, String, String, BigDecimal, BigDecimal>> records = dsl.select(
+        org.jooq.Result<Record6<String, String, Long, String, BigDecimal, BigDecimal>> records = dsl.select(
                 EDU_STUDENT_COURSE.FIXED_SCHEDULE,
                 EDU_COURSE.NAME.as("courseName"),
                 EDU_COURSE.TYPE_ID,
                 SYS_CONSTANT.CONSTANT_VALUE.as("courseType"),
-                SYS_COACH.NAME.as("coachName"),
                 EDU_STUDENT_COURSE.TOTAL_HOURS,
                 EDU_STUDENT_COURSE.CONSUMED_HOURS
             )
@@ -99,7 +98,6 @@ public class FixedScheduleService {
                         
                         // 创建课程VO
                         FixedScheduleVO.FixedScheduleCourseVO vo = new FixedScheduleVO.FixedScheduleCourseVO();
-                        vo.setCoachName(record.get("coachName", String.class));
                         vo.setCourseName(record.get("courseName", String.class));
                         vo.setCourseType(record.get("courseType", String.class));
                         
