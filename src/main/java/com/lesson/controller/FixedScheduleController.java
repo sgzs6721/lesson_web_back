@@ -21,9 +21,12 @@ public class FixedScheduleController {
     public Result<FixedScheduleVO> getFixedSchedule(
             @RequestParam(required = false) Long coachId,
             @RequestParam(required = false) Long courseId,
-            @RequestParam(required = false) String type
+            @RequestParam(required = false) String type,
+            @RequestParam Long campusId,
+            javax.servlet.http.HttpServletRequest request
     ) {
-        FixedScheduleVO vo = fixedScheduleService.getFixedSchedule(coachId, courseId, type);
+        Long institutionId = (Long) request.getAttribute("orgId");
+        FixedScheduleVO vo = fixedScheduleService.getFixedSchedule(coachId, courseId, type, campusId, institutionId);
         return Result.success(vo);
     }
 } 

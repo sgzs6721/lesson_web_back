@@ -201,6 +201,37 @@ Content-Type: application/json
 }
 
 ### ================================
+### 9. 缴费记录接口测试
+### ================================
+
+### 查询缴费记录列表
+POST {{baseUrl}}/api/payment/record/list
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+    "keyword": "",
+    "courseId": null,
+    "lessonType": "",
+    "paymentType": "",
+    "payType": "",
+    "startDate": null,
+    "endDate": null,
+    "pageNum": 1,
+    "pageSize": 20
+}
+
+### 查询缴费统计
+POST {{baseUrl}}/api/payment/record/stat
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+    "startDate": "2023-06-01",
+    "endDate": "2023-06-30"
+}
+
+### ================================
 ### 使用说明
 ### ================================
 # 1. 首先调用登录接口获取token
