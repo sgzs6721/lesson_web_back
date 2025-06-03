@@ -274,11 +274,12 @@ public class StudentService {
     }
 
     // 查询学员关联的课程信息
-    EduStudentCourseRecord studentCourse = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
+    List<EduStudentCourseRecord> studentCourses = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
         .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(studentId))
         .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
-        .fetchOne();
+        .fetch();
 
+    EduStudentCourseRecord studentCourse = studentCourses.isEmpty() ? null : studentCourses.get(0);
     if (studentCourse == null) {
       return null;
     }
@@ -682,18 +683,22 @@ public class StudentService {
   @Transactional(rollbackFor = Exception.class)
   public void checkIn(StudentCheckInRequest request) {
     // 1. 验证学员和课程信息
-    EduStudentRecord student = getStudentByIdOriginal(request.getStudentId());
+    EduStudentRecord student = dsl.selectFrom(Tables.EDU_STUDENT)
+        .where(Tables.EDU_STUDENT.ID.eq(request.getStudentId()))
+        .and(Tables.EDU_STUDENT.DELETED.eq(0))
+        .fetchAny();
     if (student == null) {
       throw new BusinessException("学员不存在");
     }
 
     // 2. 获取学员课程关系
-    EduStudentCourseRecord studentCourse = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
+    List<EduStudentCourseRecord> studentCourses = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
         .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(request.getStudentId()))
         .and(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(request.getCourseId()))
         .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
-        .fetchOne();
+        .fetch();
 
+    EduStudentCourseRecord studentCourse = studentCourses.isEmpty() ? null : studentCourses.get(0);
     if (studentCourse == null) {
       throw new BusinessException("学员未报名该课程");
     }
@@ -818,7 +823,10 @@ public class StudentService {
     // 0. 获取机构和校区ID
     Long institutionId = getInstitutionId();
     Long campusId = null; // 需要确定校区ID来源
-    EduStudentRecord student = getStudentByIdOriginal(request.getStudentId()); // 获取原始学员记录
+    EduStudentRecord student = dsl.selectFrom(Tables.EDU_STUDENT)
+        .where(Tables.EDU_STUDENT.ID.eq(request.getStudentId()))
+        .and(Tables.EDU_STUDENT.DELETED.eq(0))
+        .fetchAny();
     if (student != null) {
       campusId = student.getCampusId();
       if (institutionId == null) institutionId = student.getInstitutionId();
@@ -958,7 +966,10 @@ public class StudentService {
     // 0. 获取机构和校区ID
     Long institutionId = getInstitutionId();
     Long campusId = null;
-    EduStudentRecord student = getStudentByIdOriginal(request.getStudentId());
+    EduStudentRecord student = dsl.selectFrom(Tables.EDU_STUDENT)
+        .where(Tables.EDU_STUDENT.ID.eq(request.getStudentId()))
+        .and(Tables.EDU_STUDENT.DELETED.eq(0))
+        .fetchAny();
     if (student != null) {
       campusId = student.getCampusId();
       if (institutionId == null) institutionId = student.getInstitutionId();

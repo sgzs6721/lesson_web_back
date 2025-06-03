@@ -1,0 +1,117 @@
+{
+	"client": "Thunder Client",
+	"collectionName": "Lesson API Collection",
+	"dateExported": "2024-03-21T10:00:00.000Z",
+	"version": "1.1",
+	"folders": [
+		{
+			"name": "认证",
+			"description": "用户认证相关接口"
+		},
+		{
+			"name": "课程管理",
+			"description": "课程相关接口"
+		}
+	],
+	"requests": [
+		{
+			"id": "1",
+			"name": "用户登录",
+			"url": "{{baseUrl}}/api/auth/login",
+			"method": "POST",
+			"folder": "认证",
+			"headers": [
+				{
+					"name": "Content-Type",
+					"value": "application/json"
+				}
+			],
+			"body": {
+				"type": "json",
+				"raw": "{\n    \"phone\": \"13800138000\",\n    \"password\": \"123456\"\n}"
+			}
+		},
+		{
+			"id": "2",
+			"name": "获取学员课程列表",
+			"url": "{{baseUrl}}/api/student/courses",
+			"method": "GET",
+			"folder": "课程管理",
+			"headers": [
+				{
+					"name": "Authorization",
+					"value": "{{token}}"
+				}
+			]
+		},
+		{
+			"id": "3",
+			"name": "获取课程详情",
+			"url": "{{baseUrl}}/api/student/courses/1",
+			"method": "GET",
+			"folder": "课程管理",
+			"headers": [
+				{
+					"name": "Authorization",
+					"value": "{{token}}"
+				}
+			]
+		},
+		{
+			"id": "4",
+			"name": "获取课程总课时",
+			"url": "{{baseUrl}}/api/student/courses/1/total-hours",
+			"method": "GET",
+			"folder": "课程管理",
+			"headers": [
+				{
+					"name": "Authorization",
+					"value": "{{token}}"
+				}
+			]
+		},
+		{
+			"id": "5",
+			"name": "获取课程剩余课时",
+			"url": "{{baseUrl}}/api/student/courses/1/remaining-hours",
+			"method": "GET",
+			"folder": "课程管理",
+			"headers": [
+				{
+					"name": "Authorization",
+					"value": "{{token}}"
+				}
+			]
+		}
+	],
+	"environments": [
+		{
+			"id": "1",
+			"name": "开发环境",
+			"variables": [
+				{
+					"name": "baseUrl",
+					"value": "http://localhost:8080/lesson"
+				},
+				{
+					"name": "token",
+					"value": "Bearer YOUR_JWT_TOKEN"
+				}
+			]
+		},
+		{
+			"id": "2",
+			"name": "测试环境",
+			"variables": [
+				{
+					"name": "baseUrl",
+					"value": "http://121.36.91.199:8080/lesson"
+				},
+				{
+					"name": "token",
+					"value": "Bearer YOUR_JWT_TOKEN"
+				}
+			]
+		}
+	]
+} 

@@ -1,0 +1,255 @@
+### 固定课表管理系统 API 测试
+### 基础配置
+@baseUrl = http://lesson.devtesting.top/lesson
+@token = eyJhbGciOiJIUzM4NCJ9.eyJ1c2VySWQiOjYsIm9yZ0lkIjoyLCJpYXQiOjE3NDg5MjMwNTUsImV4cCI6MTc0OTUyNzg1NX0.4pFmtvZmHJHSqkXyfuqKlNdvZKnoVdsdUnGIlFhEpWeS5juZJ7nawEpTc57bGgBp
+
+### ================================
+### 1. 用户认证
+### ================================
+
+### 用户登录
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+    "phone": "15811384776",
+    "password": "12345678"
+}
+
+### ================================
+### 2. 固定课表接口
+### ================================
+
+### 获取固定课表（无参数）
+GET {{baseUrl}}/api/fixed-schedule/list
+Authorization: {{token}}
+
+### 按教练ID查询固定课表
+GET {{baseUrl}}/api/fixed-schedule/list?coachId=1
+Authorization: {{token}}
+
+### 按课程ID查询固定课表
+GET {{baseUrl}}/api/fixed-schedule/list?courseId=2
+Authorization: {{token}}
+
+### 按课程类型查询固定课表
+GET {{baseUrl}}/api/fixed-schedule/list?type=舞蹈
+Authorization: {{token}}
+
+### 组合条件查询
+GET {{baseUrl}}/api/fixed-schedule/list?coachId=1&courseId=2&type=舞蹈
+Authorization: {{token}}
+
+### ================================
+### 3. 学员管理接口
+### ================================
+
+### 创建学员及课程（包含固定课表）
+POST {{baseUrl}}/api/student/create
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+    "studentInfo": {
+        "name": "张小明",
+        "gender": "男",
+        "age": 8,
+        "phone": "13800138001",
+        "campusId": 1
+    },
+    "courseInfoList": [
+        {
+            "courseId": 1,
+            "enrollDate": "2024-01-15",
+            "status": "STUDYING",
+            "fixedScheduleTimes": [
+                {
+                    "weekday": "周一",
+                    "from": "15:00",
+                    "to": "16:00"
+                },
+                {
+                    "weekday": "周三",
+                    "from": "16:00",
+                    "to": "17:00"
+                }
+            ]
+        }
+    ]
+}
+
+### 查询学员列表
+POST {{baseUrl}}/api/student/list
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+    "pageNum": 1,
+    "pageSize": 10,
+    "courseId": 1,
+    "campusId": 1
+}
+
+### 获取学员缴费课时缓存信息
+GET {{baseUrl}}/api/student/payment-hours?studentId=1&courseId=1
+Authorization: {{token}}
+
+### ================================
+### 4. 课程管理接口
+### ================================
+
+### 创建课程
+POST {{baseUrl}}/api/courses/create
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+    "name": "少儿舞蹈课",
+    "typeId": 1,
+    "unitHours": 1.0,
+    "price": 200.00,
+    "coachFee": 100.00,
+    "campusId": 1,
+    "coachIds": [1],
+    "description": "适合4-12岁儿童的舞蹈课程"
+}
+
+### 查询课程列表
+POST {{baseUrl}}/api/courses/list
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+    "pageNum": 1,
+    "pageSize": 10,
+    "campusId": 1
+}
+
+### ================================
+### 5. 缴费接口测试
+### ================================
+
+### 学员缴费
+POST {{baseUrl}}/api/student/payment
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+    "studentId": 1,
+    "courseId": 1,
+    "paymentAmount": 2000.00,
+    "regularHours": 20.0,
+    "giftHours": 5.0,
+    "paymentMethod": "微信支付",
+    "notes": "新学员缴费"
+}
+
+### ================================
+### 6. 系统管理接口
+### ================================
+
+### 获取课程类型常量
+GET {{baseUrl}}/api/constants/list?type=COURSE_TYPE
+Authorization: {{token}}
+
+### 获取可分配角色列表
+GET {{baseUrl}}/api/roles/assignable
+Authorization: {{token}}
+
+### ================================
+### 7. 财务管理接口
+### ================================
+
+### 添加财务记录
+POST {{baseUrl}}/api/finance/record
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+    "type": "INCOME",
+    "amount": 2000.00,
+    "description": "学员缴费",
+    "categoryId": 1,
+    "campusId": 1
+}
+
+### 查询财务记录
+POST {{baseUrl}}/api/finance/list
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+    "pageNum": 1,
+    "pageSize": 10,
+    "type": "INCOME",
+    "startDate": "2024-01-01",
+    "endDate": "2024-12-31"
+}
+
+### ================================
+### 8. 打卡消课记录
+### ================================
+
+### 打卡消课记录列表
+POST {{baseUrl}}/api/attendance/record/list
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+    "pageNum": 1,
+    "pageSize": 10,
+    "studentId": 1,
+    "courseId": 1,
+    "startDate": "2024-01-01",
+    "endDate": "2024-12-31"
+}
+
+### ================================
+### 使用说明
+### ================================
+# 1. 首先调用登录接口获取token
+# 2. 将获取到的token替换上面的 YOUR_JWT_TOKEN
+# 3. 根据需要调用相应的接口进行测试
+# 4. 注意修改请求参数中的ID值为实际存在的数据 
+
+### 获取学员课程列表
+GET {{baseUrl}}/api/student/courses
+Authorization: {{token}}
+
+### 获取课程详情
+GET {{baseUrl}}/api/student/courses/1
+Authorization: {{token}}
+
+### 获取课程总课时
+GET {{baseUrl}}/api/student/courses/1/total-hours
+Authorization: {{token}}
+
+### 获取课程剩余课时
+GET {{baseUrl}}/api/student/courses/1/remaining-hours
+Authorization: {{token}}
+
+### 获取课程消费记录
+GET {{baseUrl}}/api/student/courses/1/consumption-records
+Authorization: {{token}}
+
+### 获取课程考勤记录
+GET {{baseUrl}}/api/student/courses/1/attendance-records
+Authorization: {{token}}
+
+### 获取课程评价
+GET {{baseUrl}}/api/student/courses/1/evaluation
+Authorization: {{token}}
+
+### 提交课程评价
+POST {{baseUrl}}/api/student/courses/1/evaluation
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+    "rating": 5,
+    "comment": "课程非常好，老师讲解很清晰"
+}
+
+### 获取课程进度
+GET {{baseUrl}}/api/student/courses/1/progress
+Authorization: {{token}} 
