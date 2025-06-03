@@ -44,7 +44,8 @@ public class FixedScheduleService {
 
         // 3. 构建查询条件
         Condition conditions = EDU_STUDENT_COURSE.DELETED.eq(0)
-            .and(EDU_STUDENT_COURSE.STATUS.eq("STUDYING"));
+            .and(EDU_STUDENT_COURSE.STATUS.ne("WAITING_PAYMENT"))
+            .and(EDU_STUDENT_COURSE.TOTAL_HOURS.gt(BigDecimal.ZERO));
 
         if (courseId != null) {
             conditions = conditions.and(EDU_STUDENT_COURSE.COURSE_ID.eq(courseId));

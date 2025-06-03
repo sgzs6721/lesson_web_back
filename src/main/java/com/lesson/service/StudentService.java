@@ -192,7 +192,13 @@ public class StudentService {
     // 3. 存储学员记录
     studentModel.updateStudent(studentRecord);
 
-    // 4. 处理课程信息
+    // 4. 先将该学员所有课程逻辑删除
+    dsl.update(Tables.EDU_STUDENT_COURSE)
+        .set(Tables.EDU_STUDENT_COURSE.DELETED, 1)
+        .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(request.getStudentId()))
+        .execute();
+
+    // 5. 处理课程信息
     for (StudentWithCourseUpdateRequest.CourseInfo courseInfo : request.getCourseInfoList()) {
       // 获取课程信息
       EduCourseRecord courseRecord = dsl.selectFrom(Tables.EDU_COURSE)
@@ -204,13 +210,12 @@ public class StudentService {
         throw new IllegalArgumentException("课程不存在：" + courseInfo.getCourseId());
       }
 
-      // 5. 获取或创建学员课程关系
+      // 6. 获取或创建学员课程关系
       EduStudentCourseRecord studentCourseRecord;
       if (courseInfo.getStudentCourseId() != null) {
         // 如果有ID，则获取现有记录
         studentCourseRecord = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
             .where(Tables.EDU_STUDENT_COURSE.ID.eq(courseInfo.getStudentCourseId()))
-            .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
             .fetchOne();
 
         if (studentCourseRecord == null) {
@@ -232,7 +237,7 @@ public class StudentService {
         studentCourseRecord.setTotalHours(courseRecord.getTotalHours());
       }
 
-      // 6. 处理固定排课时间
+      // 7. 处理固定排课时间
       try {
         if (courseInfo.getFixedScheduleTimes() != null && !courseInfo.getFixedScheduleTimes().isEmpty()) {
           String fixedScheduleJson = objectMapper.writeValueAsString(courseInfo.getFixedScheduleTimes());
@@ -243,7 +248,10 @@ public class StudentService {
         throw new RuntimeException("序列化固定排课时间失败", e);
       }
 
-      // 7. 存储学员课程关系
+      // 8. 恢复课程为未删除
+      studentCourseRecord.setDeleted(0);
+
+      // 9. 存储学员课程关系
       if (courseInfo.getStudentCourseId() != null) {
         studentCourseModel.updateStudentCourse(studentCourseRecord);
       } else {
