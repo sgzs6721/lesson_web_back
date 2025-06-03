@@ -22,6 +22,9 @@ public class PaymentRecordQueryRequest {
     @Schema(description = "支付类型", example = "微信支付")
     private String payType;
 
+    @Schema(description = "校区ID", example = "1")
+    private Long campusId;
+
     @Schema(description = "开始日期", example = "2023-06-01")
     private LocalDate startDate;
 

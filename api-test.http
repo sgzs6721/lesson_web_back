@@ -20,8 +20,8 @@ Content-Type: application/json
 ### 2. 固定课表接口
 ### ================================
 
-### 获取固定课表（无参数）
-GET {{baseUrl}}/api/fixed-schedule/list
+### 获取固定课表（必须传校区ID）
+GET {{baseUrl}}/api/fixed-schedule/list?campusId=3
 Authorization: {{token}}
 
 ### 按教练ID查询固定课表
@@ -217,6 +217,7 @@ Content-Type: application/json
     "payType": "",
     "startDate": null,
     "endDate": null,
+    "campusId": 1,
     "pageNum": 1,
     "pageSize": 20
 }

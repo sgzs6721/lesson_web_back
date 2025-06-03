@@ -44,16 +44,19 @@ public class PaymentRecordService {
         if (request.getPayType() != null && !request.getPayType().isEmpty()) {
             query.and("pay_type = ?", request.getPayType());
         }
+        if (request.getCampusId() != null) {
+            query.and("campus_id = ?", request.getCampusId());
+        }
         if (request.getStartDate() != null) {
-            query.and("payment_date >= ?", request.getStartDate());
+            query.and("created_time >= ?", request.getStartDate());
         }
         if (request.getEndDate() != null) {
-            query.and("payment_date <= ?", request.getEndDate());
+            query.and("created_time <= ?", request.getEndDate());
         }
 
         long total = query.fetchCount();
         List<Record> records = query
-                .orderBy(field("payment_date", Date.class).desc())
+                .orderBy(field("created_time", java.sql.Timestamp.class).desc())
                 .limit(request.getPageSize())
                 .offset((request.getPageNum() - 1) * request.getPageSize())
                 .fetch();
@@ -62,7 +65,7 @@ public class PaymentRecordService {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         for (Record r : records) {
             PaymentRecordListVO.Item item = new PaymentRecordListVO.Item();
-            item.setDate(r.get("payment_date", Date.class).toLocalDate().format(dateFormatter));
+            item.setDate(r.get("created_time", java.sql.Timestamp.class).toLocalDateTime().format(dateFormatter));
             item.setStudent(r.get("student_name", String.class) + " (" + r.get("student_id", String.class) + ")");
             item.setCourse(r.get("course_name", String.class));
             item.setAmount(r.get("amount", String.class));
@@ -82,43 +85,50 @@ public class PaymentRecordService {
         SelectConditionStep<Record> query = dsl.select()
                 .from("edu_student_payment")
                 .where("deleted = 0");
+        if (request.getCampusId() != null) {
+            query.and("campus_id = ?", request.getCampusId());
+        }
         if (request.getStartDate() != null) {
-            query.and("payment_date >= ?", request.getStartDate());
+            query.and("created_time >= ?", request.getStartDate());
         }
         if (request.getEndDate() != null) {
-            query.and("payment_date <= ?", request.getEndDate());
+            query.and("created_time <= ?", request.getEndDate());
         }
         // 缴费次数
         long paymentCount = dsl.selectCount()
                 .from("edu_student_payment")
                 .where("deleted = 0")
                 .and("payment_type in ('新增','续费')")
-                .and(request.getStartDate() != null ? "payment_date >= '" + request.getStartDate() + "'" : "1=1")
-                .and(request.getEndDate() != null ? "payment_date <= '" + request.getEndDate() + "'" : "1=1")
+                .and(request.getCampusId() != null ? "campus_id = '" + request.getCampusId() + "'" : "1=1")
+                .and(request.getStartDate() != null ? "created_time >= '" + request.getStartDate() + "'" : "1=1")
+                .and(request.getEndDate() != null ? "created_time <= '" + request.getEndDate() + "'" : "1=1")
                 .fetchOne(0, Long.class);
         // 缴费总额
         double paymentTotal = dsl.select(field("sum(amount)", Double.class))
                 .from("edu_student_payment")
                 .where("deleted = 0")
                 .and("payment_type in ('新增','续费')")
-                .and(request.getStartDate() != null ? "payment_date >= '" + request.getStartDate() + "'" : "1=1")
-                .and(request.getEndDate() != null ? "payment_date <= '" + request.getEndDate() + "'" : "1=1")
+                .and(request.getCampusId() != null ? "campus_id = '" + request.getCampusId() + "'" : "1=1")
+                .and(request.getStartDate() != null ? "created_time >= '" + request.getStartDate() + "'" : "1=1")
+                .and(request.getEndDate() != null ? "created_time <= '" + request.getEndDate() + "'" : "1=1")
                 .fetchOne(0, Double.class);
         // 退费次数
         long refundCount = dsl.selectCount()
                 .from("edu_student_payment")
                 .where("deleted = 0")
                 .and("payment_type = '退费'")
-                .and(request.getStartDate() != null ? "payment_date >= '" + request.getStartDate() + "'" : "1=1")
-                .and(request.getEndDate() != null ? "payment_date <= '" + request.getEndDate() + "'" : "1=1")
+                .and(request.getCampusId() != null ? "campus_id = '" + request.getCampusId() + "'" : "1=1")
+                .and(request.getStartDate() != null ? "created_time >= '" + request.getStartDate() + "'" : "1=1")
+                .and(request.getEndDate() != null ? "created_time <= '" + request.getEndDate() + "'" : "1=1")
                 .fetchOne(0, Long.class);
         // 退费总额
         double refundTotal = dsl.select(field("sum(amount)", Double.class))
                 .from("edu_student_payment")
                 .where("deleted = 0")
                 .and("payment_type = '退费'")
-                .and(request.getStartDate() != null ? "payment_date >= '" + request.getStartDate() + "'" : "1=1")
-                .and(request.getEndDate() != null ? "payment_date <= '" + request.getEndDate() + "'" : "1=1")
+                .and(request.getCampusId() != null ? "campus_id = '" + request.getCampusId() + "'" : "1=1")
+                .and(request.getStartDate() != null ? "created_time >= '" + request.getStartDate() + "'" : "1=1")
+                .and(request.getEndDate() != null ? "created_time <= '" + request.getEndDate() + "'" : "1=1")
                 .fetchOne(0, Double.class);
 
         PaymentRecordStatVO vo = new PaymentRecordStatVO();
