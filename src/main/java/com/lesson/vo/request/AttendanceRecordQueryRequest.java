@@ -7,6 +7,9 @@ import java.time.LocalDate;
 @Data
 @Schema(description = "打卡消课记录查询参数")
 public class AttendanceRecordQueryRequest {
+    @Schema(description = "学员ID", example = "1001")
+    private Long studentId;
+
     @Schema(description = "学员名/ID/课程，支持模糊搜索", example = "张三")
     private String keyword;
 

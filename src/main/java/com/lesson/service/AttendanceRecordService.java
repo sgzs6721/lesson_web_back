@@ -33,6 +33,9 @@ public class AttendanceRecordService {
           "%" + request.getKeyword() + "%"
       );
     }
+    if (request.getStudentId() != null) {
+      query.and("student_id = ?", request.getStudentId());
+    }
     if (request.getCourseId() != null) {
       query.and("course_id = ?", request.getCourseId());
     }
