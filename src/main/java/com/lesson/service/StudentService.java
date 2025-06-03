@@ -304,13 +304,14 @@ public class StudentService {
     // 查询教练信息
     String coachName = null;
     if (studentCourse.getCourseId() != null) {
-      coachName = dsl.select(Tables.SYS_COACH.NAME)
+      List<String> coachNames = dsl.select(Tables.SYS_COACH.NAME)
           .from(Tables.SYS_COACH_COURSE)
           .join(Tables.SYS_COACH).on(Tables.SYS_COACH_COURSE.COACH_ID.eq(Tables.SYS_COACH.ID))
           .where(Tables.SYS_COACH_COURSE.COURSE_ID.eq(studentCourse.getCourseId()))
           .and(Tables.SYS_COACH_COURSE.DELETED.eq(0))
           .and(Tables.SYS_COACH.DELETED.eq(0))
-          .fetchOneInto(String.class);
+          .fetchInto(String.class);
+      coachName = String.join("，", coachNames);
     }
 
     // 查询最近上课时间
@@ -478,13 +479,14 @@ public class StudentService {
             .fetchOneInto(String.class);
 
         // 查询教练名称
-        String coachName = dsl.select(Tables.SYS_COACH.NAME)
+        List<String> coachNames = dsl.select(Tables.SYS_COACH.NAME)
             .from(Tables.SYS_COACH_COURSE)
             .join(Tables.SYS_COACH).on(Tables.SYS_COACH_COURSE.COACH_ID.eq(Tables.SYS_COACH.ID))
             .where(Tables.SYS_COACH_COURSE.COURSE_ID.eq(course.getId()))
             .and(Tables.SYS_COACH_COURSE.DELETED.eq(0))
             .and(Tables.SYS_COACH.DELETED.eq(0))
-            .fetchOneInto(String.class);
+            .fetchInto(String.class);
+        String coachName = String.join("，", coachNames);
 
         // 创建课程信息
         StudentWithCoursesVO.CourseInfo courseInfo = new StudentWithCoursesVO.CourseInfo();
@@ -623,13 +625,14 @@ public class StudentService {
             .fetchOneInto(String.class);
 
         // 查询教练名称
-        String coachName = dsl.select(Tables.SYS_COACH.NAME)
+        List<String> coachNames = dsl.select(Tables.SYS_COACH.NAME)
             .from(Tables.SYS_COACH_COURSE)
             .join(Tables.SYS_COACH).on(Tables.SYS_COACH_COURSE.COACH_ID.eq(Tables.SYS_COACH.ID))
             .where(Tables.SYS_COACH_COURSE.COURSE_ID.eq(course.getId()))
             .and(Tables.SYS_COACH_COURSE.DELETED.eq(0))
             .and(Tables.SYS_COACH.DELETED.eq(0))
-            .fetchOneInto(String.class);
+            .fetchInto(String.class);
+        String coachName = String.join("，", coachNames);
 
         // 查询最近上课时间
         LocalDate lastClassTime = dsl.select(DSL.max(Tables.EDU_STUDENT_COURSE_OPERATION.OPERATION_TIME).cast(LocalDate.class))
