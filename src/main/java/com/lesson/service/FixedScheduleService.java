@@ -4,7 +4,7 @@ import com.lesson.vo.response.FixedScheduleVO;
 import org.jooq.DSLContext;
 import org.jooq.Condition;
 import org.jooq.Record;
-import org.jooq.Record6;
+import org.jooq.Record7;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,13 +52,14 @@ public class FixedScheduleService {
         }
 
         // 4. 从数据库查询课程数据
-        org.jooq.Result<Record6<String, String, Long, String, BigDecimal, BigDecimal>> records = dsl.select(
+        org.jooq.Result<Record7<String, String, Long, String, BigDecimal, BigDecimal, Long>> records = dsl.select(
                 EDU_STUDENT_COURSE.FIXED_SCHEDULE,
                 EDU_COURSE.NAME.as("courseName"),
                 EDU_COURSE.TYPE_ID,
                 SYS_CONSTANT.CONSTANT_VALUE.as("courseType"),
                 EDU_STUDENT_COURSE.TOTAL_HOURS,
-                EDU_STUDENT_COURSE.CONSUMED_HOURS
+                EDU_STUDENT_COURSE.CONSUMED_HOURS,
+                EDU_STUDENT_COURSE.COURSE_ID
             )
             .from(EDU_STUDENT_COURSE)
             .join(EDU_COURSE).on(EDU_STUDENT_COURSE.COURSE_ID.eq(EDU_COURSE.ID))
@@ -79,7 +80,7 @@ public class FixedScheduleService {
         }
 
         // 6. 处理每条课程记录
-        for (Record6<String, String, Long, String, BigDecimal, BigDecimal> record : records) {
+        for (Record7<String, String, Long, String, BigDecimal, BigDecimal, Long> record : records) {
             // 打印日志，排查过滤问题
             log.info("课程ID: {}, total_hours: {}, deleted: {}, status: {}, fixed_schedule: {}",
                 record.get(EDU_STUDENT_COURSE.COURSE_ID),
