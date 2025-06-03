@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.SelectConditionStep;
+import org.jooq.SelectJoinStep;
+import org.jooq.SelectOnConditionStep;
 import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
@@ -14,6 +16,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.sql.Date;
 import static org.jooq.impl.DSL.field;
+import static com.lesson.repository.tables.EduStudentCourseRecord.EDU_STUDENT_COURSE_RECORD;
+import static com.lesson.repository.tables.EduStudent.EDU_STUDENT;
+import static com.lesson.repository.tables.EduCourse.EDU_COURSE;
+import static com.lesson.repository.tables.SysCoach.SYS_COACH;
+import java.time.LocalTime;
+import java.time.LocalDate;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -21,52 +31,79 @@ public class AttendanceRecordService {
   private final DSLContext dsl;
 
   public AttendanceRecordListVO listAttendanceRecords(AttendanceRecordQueryRequest request) {
-    // 假设表名为 edu_student_course_record
-    SelectConditionStep<Record> query = dsl.select()
-        .from("edu_student_course_record")
-        .where("deleted = 0");
+    // 使用jOOQ代码生成器对象进行多表关联查询
+    SelectOnConditionStep<org.jooq.Record15<Long, Long, String, String, String, LocalDate, LocalTime, LocalTime, BigDecimal, String, Long, Long, LocalDateTime, LocalDateTime, Integer>> select = dsl.select(
+        EDU_STUDENT_COURSE_RECORD.ID,
+        EDU_STUDENT_COURSE_RECORD.STUDENT_ID,
+        EDU_STUDENT.NAME.as("student_name"),
+        EDU_COURSE.NAME.as("course_name"),
+        SYS_COACH.NAME.as("coach_name"),
+        EDU_STUDENT_COURSE_RECORD.COURSE_DATE,
+        EDU_STUDENT_COURSE_RECORD.START_TIME,
+        EDU_STUDENT_COURSE_RECORD.END_TIME,
+        EDU_STUDENT_COURSE_RECORD.HOURS,
+        EDU_STUDENT_COURSE_RECORD.NOTES,
+        EDU_STUDENT_COURSE_RECORD.CAMPUS_ID,
+        EDU_STUDENT_COURSE_RECORD.INSTITUTION_ID,
+        EDU_STUDENT_COURSE_RECORD.CREATED_TIME,
+        EDU_STUDENT_COURSE_RECORD.UPDATE_TIME,
+        EDU_STUDENT_COURSE_RECORD.DELETED
+    )
+    .from(EDU_STUDENT_COURSE_RECORD)
+    .leftJoin(EDU_STUDENT).on(EDU_STUDENT_COURSE_RECORD.STUDENT_ID.eq(EDU_STUDENT.ID))
+    .leftJoin(EDU_COURSE).on(EDU_STUDENT_COURSE_RECORD.COURSE_ID.eq(EDU_COURSE.ID))
+    .leftJoin(SYS_COACH).on(EDU_STUDENT_COURSE_RECORD.COACH_ID.eq(SYS_COACH.ID));
 
+    org.jooq.Condition condition = EDU_STUDENT_COURSE_RECORD.DELETED.eq(0);
     if (request.getKeyword() != null && !request.getKeyword().isEmpty()) {
-      query.and("(student_name like ? or course_name like ? or student_id like ?)",
-          "%" + request.getKeyword() + "%",
-          "%" + request.getKeyword() + "%",
-          "%" + request.getKeyword() + "%"
+      String keyword = "%" + request.getKeyword() + "%";
+      condition = condition.and(
+        EDU_STUDENT.NAME.like(keyword)
+        .or(EDU_COURSE.NAME.like(keyword))
+        .or(EDU_STUDENT_COURSE_RECORD.STUDENT_ID.cast(String.class).like(keyword))
       );
     }
     if (request.getStudentId() != null) {
-      query.and("student_id = ?", request.getStudentId());
+      condition = condition.and(EDU_STUDENT_COURSE_RECORD.STUDENT_ID.eq(request.getStudentId()));
     }
     if (request.getCourseId() != null) {
-      query.and("course_id = ?", request.getCourseId());
-    }
-    if (request.getStatus() != null && !request.getStatus().isEmpty()) {
-      query.and("status = ?", request.getStatus());
+      condition = condition.and(EDU_STUDENT_COURSE_RECORD.COURSE_ID.eq(request.getCourseId()));
     }
     if (request.getStartDate() != null) {
-      query.and("course_date >= ?", request.getStartDate());
+      condition = condition.and(EDU_STUDENT_COURSE_RECORD.COURSE_DATE.ge(request.getStartDate()));
     }
     if (request.getEndDate() != null) {
-      query.and("course_date <= ?", request.getEndDate());
+      condition = condition.and(EDU_STUDENT_COURSE_RECORD.COURSE_DATE.le(request.getEndDate()));
     }
 
-    long total = query.fetchCount();
-    List<Record> records = query
-        .orderBy(field("course_date", Date.class).desc())
+    long total = dsl.selectCount()
+        .from(EDU_STUDENT_COURSE_RECORD)
+        .leftJoin(EDU_STUDENT).on(EDU_STUDENT_COURSE_RECORD.STUDENT_ID.eq(EDU_STUDENT.ID))
+        .leftJoin(EDU_COURSE).on(EDU_STUDENT_COURSE_RECORD.COURSE_ID.eq(EDU_COURSE.ID))
+        .leftJoin(SYS_COACH).on(EDU_STUDENT_COURSE_RECORD.COACH_ID.eq(SYS_COACH.ID))
+        .where(condition)
+        .fetchOne(0, long.class);
+
+    org.jooq.Result<org.jooq.Record15<Long, Long, String, String, String, LocalDate, LocalTime, LocalTime, BigDecimal, String, Long, Long, LocalDateTime, LocalDateTime, Integer>> records = select.where(condition)
+        .orderBy(EDU_STUDENT_COURSE_RECORD.COURSE_DATE.desc())
         .limit(request.getPageSize())
         .offset((request.getPageNum() - 1) * request.getPageSize())
         .fetch();
 
     List<AttendanceRecordListVO.Item> list = new ArrayList<>();
     DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    for (Record r : records) {
+    for (org.jooq.Record15<Long, Long, String, String, String, LocalDate, LocalTime, LocalTime, BigDecimal, String, Long, Long, LocalDateTime, LocalDateTime, Integer> r : records) {
       AttendanceRecordListVO.Item item = new AttendanceRecordListVO.Item();
-      item.setDate(r.get("course_date", java.sql.Date.class).toLocalDate().format(dateFormatter));
+      item.setDate(r.get(EDU_STUDENT_COURSE_RECORD.COURSE_DATE, java.sql.Date.class).toLocalDate().format(dateFormatter));
       item.setStudentName(r.get("student_name", String.class));
       item.setCourseName(r.get("course_name", String.class));
       item.setCoachName(r.get("coach_name", String.class));
-      item.setClassTime(r.get("start_time", String.class) + "-" + r.get("end_time", String.class));
-      item.setCheckTime(r.get("check_in_time", String.class));
-      item.setStatus(r.get("status", String.class));
+      // 时间段格式化
+      LocalTime start = r.get(EDU_STUDENT_COURSE_RECORD.START_TIME, LocalTime.class);
+      LocalTime end = r.get(EDU_STUDENT_COURSE_RECORD.END_TIME, LocalTime.class);
+      item.setClassTime((start != null && end != null) ? (start + "-" + end) : "");
+      item.setCheckTime(""); // 无打卡时间字段
+      item.setStatus("");    // 无状态字段
       list.add(item);
     }
     AttendanceRecordListVO vo = new AttendanceRecordListVO();

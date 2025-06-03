@@ -197,11 +197,7 @@ Content-Type: application/json
 
 {
     "pageNum": 1,
-    "pageSize": 10,
-    "studentId": 1,
-    "courseId": 1,
-    "startDate": "2024-01-01",
-    "endDate": "2024-12-31"
+    "pageSize": 10
 }
 
 ### ================================
