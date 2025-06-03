@@ -11,6 +11,7 @@ import com.lesson.model.record.CoachDetailRecord;
 import com.lesson.model.record.CourseDetailRecord;
 import com.lesson.repository.tables.records.SysConstantRecord;
 import com.lesson.service.CourseService;
+import com.lesson.service.CourseHoursRedisService;
 import com.lesson.vo.CourseSimpleVO;
 import com.lesson.vo.CourseVO;
 import com.lesson.vo.request.CourseCreateRequest;
@@ -36,6 +37,7 @@ public class CourseServiceImpl implements CourseService {
     private final EduCourseModel courseModel;
     private final SysConstantModel constantModel;
     private final SysCoachModel sysCoachModel;
+    private final CourseHoursRedisService courseHoursRedisService;
 
     @Override
     @Transactional
@@ -187,39 +189,45 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public CourseVO getCourseById(Long id) {
+        // 获取课程详情
         CourseDetailRecord record = courseModel.getCourseById(id);
         if (record == null) {
-            return null;
+            throw new BusinessException("课程不存在或已删除");
         }
 
-        // 获取课程类型常量
-        List<SysConstantRecord> courseTypes = constantModel.listByType("COURSE_TYPE");
-        Map<Long, String> courseTypeMap = courseTypes.stream()
-            .collect(Collectors.toMap(
-                SysConstantRecord::getId,
-                SysConstantRecord::getConstantValue
-            ));
-
-        // 获取课程的教练信息
-        List<CoachDetailRecord> coaches = sysCoachModel.getCoachesByCourseId(id);
+        // 从token中获取机构ID和校区ID
+        Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
+        Long campusId = record.getCampusId();
 
         // 转换为VO
         CourseVO vo = new CourseVO();
-        // 复制基本信息
         BeanUtils.copyProperties(record, vo);
-
-        // 设置课程ID
         vo.setId(String.valueOf(record.getId()));
 
-        // 设置课程类型
+        // 从Redis获取课程总课时，如果Redis中没有，则使用数据库中的值
+        BigDecimal totalHoursFromRedis = courseHoursRedisService.getCourseTotalHours(institutionId, campusId, id);
+        if (totalHoursFromRedis != null) {
+            vo.setTotalHours(totalHoursFromRedis);
+            log.info("从Redis获取课程总课时: courseId={}, totalHours={}", id, totalHoursFromRedis);
+        } else {
+            vo.setTotalHours(record.getTotalHours());
+        }
+
+        // 获取课程类型
         if (record.getTypeId() != null) {
-            String typeValue = courseTypeMap.get(record.getTypeId());
-            if (typeValue != null) {
-                vo.setType(typeValue);
+            // 获取所有课程类型常量
+            List<SysConstantRecord> courseTypes = constantModel.listByType(ConstantType.COURSE_TYPE.getName());
+            SysConstantRecord typeRecord = courseTypes.stream()
+                .filter(type -> type.getId().equals(record.getTypeId()))
+                .findFirst()
+                .orElse(null);
+            if (typeRecord != null) {
+                vo.setType(typeRecord.getConstantValue());
             }
         }
 
-        // 设置教练信息
+        // 获取教练信息
+        List<CoachDetailRecord> coaches = sysCoachModel.getCoachesByCourseId(id);
         if (coaches != null && !coaches.isEmpty()) {
             List<CourseVO.CoachInfo> coachInfos = coaches.stream()
                 .map(coach -> {

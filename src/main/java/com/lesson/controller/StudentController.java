@@ -4,12 +4,14 @@ import com.lesson.common.Result;
 import com.lesson.model.EduStudentModel;
 import com.lesson.model.EduStudentCourseModel;
 import com.lesson.service.StudentService;
+import com.lesson.service.CourseHoursRedisService;
 import com.lesson.vo.PageResult;
 import com.lesson.vo.request.*;
 import com.lesson.vo.response.StudentAttendanceListVO;
 import com.lesson.vo.response.StudentCourseOperationRecordVO;
 import com.lesson.vo.response.StudentWithCoursesVO;
 import com.lesson.vo.response.StudentRefundDetailVO;
+import com.lesson.vo.response.PaymentHoursInfoVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -18,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 /**
@@ -32,6 +35,8 @@ public class StudentController {
     private final EduStudentModel studentModel;
     private final StudentService studentService;
     private final EduStudentCourseModel studentCourseModel;
+    private final CourseHoursRedisService courseHoursRedisService;
+    private final HttpServletRequest httpServletRequest;
 
 
     /**
@@ -214,5 +219,63 @@ public class StudentController {
             @Parameter(description = "班内转课请求") @RequestBody @Valid StudentWithinCourseTransferRequest request) {
         StudentCourseOperationRecordVO record = studentService.transferClass(request);
         return Result.success(record);
+    }
+
+    /**
+     * 获取学员缴费课时缓存信息
+     *
+     * @param studentId 学员ID
+     * @param courseId 课程ID
+     * @return 缓存的课时信息
+     */
+    @GetMapping("/payment-hours")
+    @Operation(summary = "获取学员缴费课时缓存信息",
+               description = "从Redis缓存中获取学员最近一次缴费的课时信息")
+    public Result<PaymentHoursInfoVO> getPaymentHours(
+            @Parameter(description = "学员ID", required = true) @RequestParam Long studentId,
+            @Parameter(description = "课程ID", required = true) @RequestParam Long courseId) {
+        
+        // 获取机构ID和校区ID
+        Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
+        Long campusId = studentService.getStudentCampusId(studentId);
+        
+        CourseHoursRedisService.PaymentHoursInfo hoursInfo = 
+            courseHoursRedisService.getPaymentHours(institutionId, campusId, courseId, studentId);
+        
+        if (hoursInfo == null) {
+            return Result.success(null);
+        }
+        
+        PaymentHoursInfoVO vo = new PaymentHoursInfoVO();
+        vo.setRegularHours(hoursInfo.getRegularHours());
+        vo.setGiftHours(hoursInfo.getGiftHours());
+        vo.setTotalHours(hoursInfo.getTotalHours());
+        vo.setPaymentId(hoursInfo.getPaymentId());
+        vo.setTimestamp(hoursInfo.getTimestamp());
+        
+        return Result.success(vo);
+    }
+
+    /**
+     * 清除学员缴费课时缓存
+     *
+     * @param studentId 学员ID
+     * @param courseId 课程ID
+     * @return 操作结果
+     */
+    @PostMapping("/clear-payment-hours")
+    @Operation(summary = "清除学员缴费课时缓存",
+               description = "从Redis缓存中清除学员的缴费课时信息")
+    public Result<Void> clearPaymentHours(
+            @Parameter(description = "学员ID", required = true) @RequestParam Long studentId,
+            @Parameter(description = "课程ID", required = true) @RequestParam Long courseId) {
+        
+        // 获取机构ID和校区ID
+        Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
+        Long campusId = studentService.getStudentCampusId(studentId);
+        
+        courseHoursRedisService.deletePaymentHours(institutionId, campusId, courseId, studentId);
+        
+        return Result.success();
     }
 }

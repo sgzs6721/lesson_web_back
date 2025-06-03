@@ -42,21 +42,22 @@ import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.time.Duration;
 import java.util.List;
-
-import com.lesson.vo.request.StudentRefundRequest;
-
-import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.Set;
+
 import com.lesson.common.enums.ConstantType;
-import com.lesson.vo.response.StudentRefundDetailVO;
 import com.lesson.vo.request.StudentCourseTransferRequest;
+import com.lesson.vo.request.StudentRefundRequest;
+import com.lesson.vo.response.StudentRefundDetailVO;
 import com.lesson.vo.response.StudentCourseOperationRecordVO;
 import com.lesson.vo.request.StudentWithinCourseTransferRequest;
+import com.lesson.service.CourseHoursRedisService;
 
 /**
  * 学员服务
@@ -74,6 +75,7 @@ public class StudentService {
   private final EduStudentPaymentModel studentPaymentModel;
   private final EduCourseModel courseModel;
   private final SysConstantModel constantModel;
+  private final CourseHoursRedisService courseHoursRedisService;
 
   /**
    * 从请求中获取机构ID
@@ -897,6 +899,29 @@ public class StudentService {
     studentCourse.setUpdateTime(LocalDateTime.now());
     studentCourseModel.updateStudentCourse(studentCourse);
 
+    // 5. 缓存缴费课时信息到Redis
+    courseHoursRedisService.cachePaymentHours(
+        institutionId, 
+        campusId, 
+        request.getCourseId(), 
+        request.getStudentId(),
+        request.getCourseHours(), 
+        request.getGiftHours(), 
+        paymentId
+    );
+
+    // 6. 更新课程总课时缓存
+    courseHoursRedisService.updateCourseTotalHours(
+        institutionId, 
+        campusId, 
+        request.getCourseId(), 
+        studentCourse.getTotalHours()
+    );
+
+    log.info("学员缴费成功: studentId={}, courseId={}, paymentId={}, regularHours={}, giftHours={}, totalHours={}", 
+            request.getStudentId(), request.getCourseId(), paymentId, 
+            request.getCourseHours(), request.getGiftHours(), studentCourse.getTotalHours());
+
     return paymentId;
   }
 
@@ -906,6 +931,20 @@ public class StudentService {
                   .where(Tables.EDU_STUDENT.ID.eq(studentId)
                          .and(Tables.EDU_STUDENT.DELETED.eq(0)))
                   .fetchOne();
+  }
+
+  /**
+   * 获取学员的校区ID
+   * 
+   * @param studentId 学员ID
+   * @return 校区ID
+   */
+  public Long getStudentCampusId(Long studentId) {
+    EduStudentRecord student = getStudentByIdOriginal(studentId);
+    if (student == null) {
+      throw new BusinessException("学员不存在: " + studentId);
+    }
+    return student.getCampusId();
   }
 
   /**
