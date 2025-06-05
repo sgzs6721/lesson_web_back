@@ -2,6 +2,7 @@ package com.lesson.vo.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonAlias;
 
 import java.time.LocalDate;
 
@@ -16,6 +17,7 @@ public class FinanceRecordQueryRequest {
      * 交易类型：支出或收入
      */
     @Schema(description = "交易类型", example = "支出")
+    @JsonAlias("type")
     private String transactionType;
     
     /**
