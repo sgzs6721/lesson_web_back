@@ -200,6 +200,16 @@ Content-Type: application/json
     "pageSize": 10
 }
 
+### 打卡记录统计
+POST {{baseUrl}}/api/attendance/record/stat
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+    "startDate": "2023-06-01",
+    "endDate": "2023-06-30"
+}
+
 ### ================================
 ### 9. 缴费记录接口测试
 ### ================================
@@ -230,6 +240,14 @@ Content-Type: application/json
 {
     "startDate": "2023-06-01",
     "endDate": "2023-06-30"
+}
+
+### 查询缴费统计（全时段）
+POST {{baseUrl}}/api/payment/record/stat
+Authorization: {{token}}
+Content-Type: application/json
+
+{
 }
 
 ### ================================
