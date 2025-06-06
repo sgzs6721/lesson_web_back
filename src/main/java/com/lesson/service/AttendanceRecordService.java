@@ -1,5 +1,6 @@
 package com.lesson.service;
 
+import com.lesson.common.exception.BusinessException;
 import com.lesson.vo.request.AttendanceRecordQueryRequest;
 import com.lesson.vo.response.AttendanceRecordListVO;
 import com.lesson.vo.response.AttendanceRecordStatVO;
@@ -30,7 +31,14 @@ import java.time.LocalDateTime;
 public class AttendanceRecordService {
   private final DSLContext dsl;
 
-  public AttendanceRecordListVO listAttendanceRecords(AttendanceRecordQueryRequest request, Long institutionId) {
+  private HttpServletRequest httpServletRequest;
+
+  public AttendanceRecordListVO listAttendanceRecords(AttendanceRecordQueryRequest request) {
+    // 获取机构ID
+    Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
+    if (institutionId == null) {
+      throw new BusinessException("机构ID不能为空");
+    }
     // 使用jOOQ代码生成器对象进行多表关联查询
     SelectOnConditionStep<org.jooq.Record15<Long, Long, String, String, String, LocalDate, LocalTime, LocalTime, BigDecimal, String, Long, Long, LocalDateTime, LocalDateTime, Integer>> select = dsl.select(
         EDU_STUDENT_COURSE_RECORD.ID,
@@ -160,4 +168,4 @@ public class AttendanceRecordService {
     vo.setAttendanceRate(attendanceRate);
     return vo;
   }
-} 
+}

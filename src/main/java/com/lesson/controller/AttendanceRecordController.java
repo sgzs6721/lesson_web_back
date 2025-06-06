@@ -28,11 +28,8 @@ public class AttendanceRecordController {
    */
   @PostMapping("/list")
   @Operation(summary = "打卡消课记录列表", description = "分页查询打卡消课记录")
-  public Result<AttendanceRecordListVO> list(@RequestBody AttendanceRecordQueryRequest request, HttpServletRequest httpServletRequest) {
-    String authHeader = httpServletRequest.getHeader("Authorization");
-    String token = authHeader.substring(7); // "Bearer "
-    Long institutionId = jwtUtil.getOrgId(token);
-    AttendanceRecordListVO vo = attendanceRecordService.listAttendanceRecords(request, institutionId);
+  public Result<AttendanceRecordListVO> list(@RequestBody AttendanceRecordQueryRequest request) {
+    AttendanceRecordListVO vo = attendanceRecordService.listAttendanceRecords(request);
     return Result.success(vo);
   }
 
