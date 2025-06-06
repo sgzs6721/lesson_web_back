@@ -16,6 +16,9 @@ public class AttendanceRecordQueryRequest {
     @Schema(description = "课程ID", example = "1001")
     private Long courseId;
 
+    @Schema(description = "校区ID", example = "1")
+    private Long campusId;
+
     @Schema(description = "出勤状态，如：已到、缺席、请假", example = "已到")
     private String status;
 

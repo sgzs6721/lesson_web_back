@@ -30,7 +30,7 @@ import java.time.LocalDateTime;
 public class AttendanceRecordService {
   private final DSLContext dsl;
 
-  public AttendanceRecordListVO listAttendanceRecords(AttendanceRecordQueryRequest request) {
+  public AttendanceRecordListVO listAttendanceRecords(AttendanceRecordQueryRequest request, Long institutionId) {
     // 使用jOOQ代码生成器对象进行多表关联查询
     SelectOnConditionStep<org.jooq.Record15<Long, Long, String, String, String, LocalDate, LocalTime, LocalTime, BigDecimal, String, Long, Long, LocalDateTime, LocalDateTime, Integer>> select = dsl.select(
         EDU_STUDENT_COURSE_RECORD.ID,
@@ -54,7 +54,7 @@ public class AttendanceRecordService {
     .leftJoin(EDU_COURSE).on(EDU_STUDENT_COURSE_RECORD.COURSE_ID.eq(EDU_COURSE.ID))
     .leftJoin(SYS_COACH).on(EDU_STUDENT_COURSE_RECORD.COACH_ID.eq(SYS_COACH.ID));
 
-    org.jooq.Condition condition = EDU_STUDENT_COURSE_RECORD.DELETED.eq(0);
+    org.jooq.Condition condition = EDU_STUDENT_COURSE_RECORD.DELETED.eq(0).and(EDU_STUDENT_COURSE_RECORD.INSTITUTION_ID.eq(institutionId));
     if (request.getKeyword() != null && !request.getKeyword().isEmpty()) {
       String keyword = "%" + request.getKeyword() + "%";
       condition = condition.and(
@@ -68,6 +68,9 @@ public class AttendanceRecordService {
     }
     if (request.getCourseId() != null) {
       condition = condition.and(EDU_STUDENT_COURSE_RECORD.COURSE_ID.eq(request.getCourseId()));
+    }
+    if (request.getCampusId() != null) {
+      condition = condition.and(EDU_STUDENT_COURSE_RECORD.CAMPUS_ID.eq(request.getCampusId()));
     }
     if (request.getStartDate() != null) {
       condition = condition.and(EDU_STUDENT_COURSE_RECORD.COURSE_DATE.ge(request.getStartDate()));

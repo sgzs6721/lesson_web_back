@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import com.lesson.utils.JwtUtil;
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/attendance/record")
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 public class AttendanceRecordController {
 
   private final AttendanceRecordService attendanceRecordService;
+  private final JwtUtil jwtUtil;
 
   /**
    * 打卡消课记录列表
@@ -25,8 +28,11 @@ public class AttendanceRecordController {
    */
   @PostMapping("/list")
   @Operation(summary = "打卡消课记录列表", description = "分页查询打卡消课记录")
-  public Result<AttendanceRecordListVO> list(@RequestBody AttendanceRecordQueryRequest request) {
-    AttendanceRecordListVO vo = attendanceRecordService.listAttendanceRecords(request);
+  public Result<AttendanceRecordListVO> list(@RequestBody AttendanceRecordQueryRequest request, HttpServletRequest httpServletRequest) {
+    String authHeader = httpServletRequest.getHeader("Authorization");
+    String token = authHeader.substring(7); // "Bearer "
+    Long institutionId = jwtUtil.getOrgId(token);
+    AttendanceRecordListVO vo = attendanceRecordService.listAttendanceRecords(request, institutionId);
     return Result.success(vo);
   }
 
