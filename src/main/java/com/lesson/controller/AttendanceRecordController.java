@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import com.lesson.utils.JwtUtil;
 
 @RestController
 @RequestMapping("/api/attendance/record")
@@ -18,7 +17,6 @@ import com.lesson.utils.JwtUtil;
 public class AttendanceRecordController {
 
   private final AttendanceRecordService attendanceRecordService;
-  private final JwtUtil jwtUtil;
 
   /**
    * 打卡消课记录列表

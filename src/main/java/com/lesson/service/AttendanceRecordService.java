@@ -11,6 +11,7 @@ import org.jooq.SelectConditionStep;
 import org.jooq.SelectJoinStep;
 import org.jooq.SelectOnConditionStep;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -33,6 +34,7 @@ import javax.servlet.http.HttpServletRequest;
 public class AttendanceRecordService {
   private final DSLContext dsl;
 
+  @Autowired
   private HttpServletRequest httpServletRequest;
 
   public AttendanceRecordListVO listAttendanceRecords(AttendanceRecordQueryRequest request) {
