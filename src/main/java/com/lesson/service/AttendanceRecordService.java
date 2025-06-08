@@ -125,6 +125,7 @@ public class AttendanceRecordService {
         item.setCheckTime("");
       }
       item.setStatus("");    // 无状态字段
+      item.setNotes(r.get(EDU_STUDENT_COURSE_RECORD.NOTES, String.class));
       list.add(item);
     }
     AttendanceRecordListVO vo = new AttendanceRecordListVO();
