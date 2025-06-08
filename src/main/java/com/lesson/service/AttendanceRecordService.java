@@ -107,6 +107,7 @@ public class AttendanceRecordService {
 
     List<AttendanceRecordListVO.Item> list = new ArrayList<>();
     DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
     for (org.jooq.Record15<Long, Long, String, String, String, LocalDate, LocalTime, LocalTime, BigDecimal, String, Long, Long, LocalDateTime, LocalDateTime, Integer> r : records) {
       AttendanceRecordListVO.Item item = new AttendanceRecordListVO.Item();
       item.setDate(r.get(EDU_STUDENT_COURSE_RECORD.COURSE_DATE, java.sql.Date.class).toLocalDate().format(dateFormatter));
@@ -117,7 +118,12 @@ public class AttendanceRecordService {
       LocalTime start = r.get(EDU_STUDENT_COURSE_RECORD.START_TIME, LocalTime.class);
       LocalTime end = r.get(EDU_STUDENT_COURSE_RECORD.END_TIME, LocalTime.class);
       item.setClassTime((start != null && end != null) ? (start + "-" + end) : "");
-      item.setCheckTime(""); // 无打卡时间字段
+      LocalDateTime createdTime = r.get(EDU_STUDENT_COURSE_RECORD.CREATED_TIME, LocalDateTime.class);
+      if (createdTime != null) {
+        item.setCheckTime(createdTime.format(timeFormatter));
+      } else {
+        item.setCheckTime("");
+      }
       item.setStatus("");    // 无状态字段
       list.add(item);
     }
