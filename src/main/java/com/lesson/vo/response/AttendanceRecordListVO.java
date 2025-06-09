@@ -3,6 +3,7 @@ package com.lesson.vo.response;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import java.util.List;
+import com.lesson.enums.AttendanceType;
 
 @Data
 @Schema(description = "打卡消课记录列表VO")
@@ -35,7 +36,7 @@ public class AttendanceRecordListVO {
         private String checkTime;
 
         @Schema(description = "打卡类型（CHECK_IN-打卡，LEAVE-请假）", example = "CHECK_IN")
-        private String type;
+        private AttendanceType type;
 
         @Schema(description = "备注", example = "无")
         private String notes;

@@ -125,7 +125,8 @@ public class AttendanceRecordService {
       } else {
         item.setCheckTime("");
       }
-      item.setType(r.get(EDU_STUDENT_COURSE_RECORD.STATUS, String.class));
+      String status = r.get(EDU_STUDENT_COURSE_RECORD.STATUS, String.class);
+      item.setType(status != null ? com.lesson.enums.AttendanceType.valueOf(status) : null);
       item.setNotes(r.get(EDU_STUDENT_COURSE_RECORD.NOTES, String.class));
       list.add(item);
     }
