@@ -37,10 +37,7 @@ public class AttendanceRecordListVO {
         @Schema(description = "打卡类型（CHECK_IN-打卡，LEAVE-请假）", example = "CHECK_IN")
         private String type;
 
-        @Schema(description = "出勤状态", example = "已到")
-        private String status;
-
         @Schema(description = "备注", example = "无")
         private String notes;
     }
-} 
+}
