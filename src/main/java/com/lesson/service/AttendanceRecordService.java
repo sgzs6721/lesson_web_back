@@ -44,7 +44,7 @@ public class AttendanceRecordService {
       throw new BusinessException("机构ID不能为空");
     }
     // 使用jOOQ代码生成器对象进行多表关联查询
-    SelectOnConditionStep<org.jooq.Record15<Long, Long, String, String, String, LocalDate, LocalTime, LocalTime, BigDecimal, String, Long, Long, LocalDateTime, LocalDateTime, Integer>> select = dsl.select(
+    SelectOnConditionStep<org.jooq.Record16<Long, Long, String, String, String, LocalDate, LocalTime, LocalTime, BigDecimal, String, Long, Long, LocalDateTime, LocalDateTime, Integer, String>> select = dsl.select(
         EDU_STUDENT_COURSE_RECORD.ID,
         EDU_STUDENT_COURSE_RECORD.STUDENT_ID,
         EDU_STUDENT.NAME.as("student_name"),
@@ -59,7 +59,8 @@ public class AttendanceRecordService {
         EDU_STUDENT_COURSE_RECORD.INSTITUTION_ID,
         EDU_STUDENT_COURSE_RECORD.CREATED_TIME,
         EDU_STUDENT_COURSE_RECORD.UPDATE_TIME,
-        EDU_STUDENT_COURSE_RECORD.DELETED
+        EDU_STUDENT_COURSE_RECORD.DELETED,
+        EDU_STUDENT_COURSE_RECORD.STATUS
     )
     .from(EDU_STUDENT_COURSE_RECORD)
     .leftJoin(EDU_STUDENT).on(EDU_STUDENT_COURSE_RECORD.STUDENT_ID.eq(EDU_STUDENT.ID))
@@ -99,7 +100,7 @@ public class AttendanceRecordService {
         .where(condition)
         .fetchOne(0, long.class);
 
-    org.jooq.Result<org.jooq.Record15<Long, Long, String, String, String, LocalDate, LocalTime, LocalTime, BigDecimal, String, Long, Long, LocalDateTime, LocalDateTime, Integer>> records = select.where(condition)
+    org.jooq.Result<org.jooq.Record16<Long, Long, String, String, String, LocalDate, LocalTime, LocalTime, BigDecimal, String, Long, Long, LocalDateTime, LocalDateTime, Integer, String>> records = select.where(condition)
         .orderBy(EDU_STUDENT_COURSE_RECORD.COURSE_DATE.desc())
         .limit(request.getPageSize())
         .offset((request.getPageNum() - 1) * request.getPageSize())
@@ -108,7 +109,7 @@ public class AttendanceRecordService {
     List<AttendanceRecordListVO.Item> list = new ArrayList<>();
     DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    for (org.jooq.Record15<Long, Long, String, String, String, LocalDate, LocalTime, LocalTime, BigDecimal, String, Long, Long, LocalDateTime, LocalDateTime, Integer> r : records) {
+    for (org.jooq.Record16<Long, Long, String, String, String, LocalDate, LocalTime, LocalTime, BigDecimal, String, Long, Long, LocalDateTime, LocalDateTime, Integer, String> r : records) {
       AttendanceRecordListVO.Item item = new AttendanceRecordListVO.Item();
       item.setDate(r.get(EDU_STUDENT_COURSE_RECORD.COURSE_DATE, java.sql.Date.class).toLocalDate().format(dateFormatter));
       item.setStudentName(r.get("student_name", String.class));
@@ -124,7 +125,7 @@ public class AttendanceRecordService {
       } else {
         item.setCheckTime("");
       }
-      item.setType(r.get("status", String.class));
+      item.setType(r.get(EDU_STUDENT_COURSE_RECORD.STATUS, String.class));
       item.setNotes(r.get(EDU_STUDENT_COURSE_RECORD.NOTES, String.class));
       list.add(item);
     }
