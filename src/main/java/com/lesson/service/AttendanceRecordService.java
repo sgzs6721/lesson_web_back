@@ -161,16 +161,13 @@ public class AttendanceRecordService {
         .and(request.getEndDate() != null ? "course_date <= '" + request.getEndDate() + "'" : "1=1")
         .fetchOne(0, Long.class);
     // 总请假数
-    long totalLeave = 0; // 数据库无此字段，暂时设为0
-    /*
     long totalLeave = dsl.selectCount()
         .from("edu_student_course_record")
         .where("deleted = 0")
-        .and("status = '请假'") // 数据库无此字段，暂时注释
+        .and("status = 'LEAVE'") // 数据库无此字段，暂时注释
         .and(request.getStartDate() != null ? "course_date >= '" + request.getStartDate() + "'" : "1=1")
         .and(request.getEndDate() != null ? "course_date <= '" + request.getEndDate() + "'" : "1=1")
         .fetchOne(0, Long.class);
-    */
     double attendanceRate = totalAttendance + totalLeave > 0 ? (double) totalAttendance / (totalAttendance + totalLeave) * 100 : 0;
     AttendanceRecordStatVO vo = new AttendanceRecordStatVO();
     vo.setStudentCount(studentCount);

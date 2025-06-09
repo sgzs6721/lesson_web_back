@@ -1,0 +1,1 @@
+ALTER TABLE edu_student_course_record ADD COLUMN status VARCHAR(20) NOT NULL DEFAULT 'CHECK_IN' COMMENT '记录类型：CHECK_IN-打卡, LEAVE-请假'; 

@@ -20,6 +20,7 @@ import com.lesson.vo.request.StudentQueryRequest;
 import com.lesson.vo.request.StudentWithCourseCreateRequest;
 import com.lesson.vo.request.StudentWithCourseUpdateRequest;
 import com.lesson.vo.request.StudentCheckInRequest;
+import com.lesson.vo.request.StudentLeaveRequest;
 import com.lesson.vo.response.StudentCourseListVO;
 import com.lesson.vo.request.StudentAttendanceQueryRequest;
 import com.lesson.vo.response.StudentAttendanceListVO;
@@ -32,6 +33,8 @@ import org.jooq.impl.DSL;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import org.jooq.Record;
@@ -45,7 +48,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.time.LocalDateTime;
 import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -787,6 +789,86 @@ public class StudentService {
         .set(Tables.EDU_COURSE.UPDATE_TIME, LocalDateTime.now())
         .where(Tables.EDU_COURSE.ID.eq(request.getCourseId()))
         .execute();
+  }
+
+  /**
+   * 学员请假（创建请假记录并更新课时）
+   *
+   * @param request 请假请求
+   */
+  @Transactional(rollbackFor = Exception.class)
+  public void leave(StudentLeaveRequest request) {
+    // 1. 验证学员和课程信息
+    EduStudentRecord student = dsl.selectFrom(Tables.EDU_STUDENT)
+            .where(Tables.EDU_STUDENT.ID.eq(request.getStudentId()))
+            .and(Tables.EDU_STUDENT.DELETED.eq(0))
+            .fetchAny();
+    if (student == null) {
+      throw new BusinessException("学员不存在");
+    }
+
+    // 2. 获取学员课程关系
+    List<EduStudentCourseRecord> studentCourses = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
+            .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(request.getStudentId()))
+            .and(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(request.getCourseId()))
+            .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
+            .fetch();
+
+    EduStudentCourseRecord studentCourse = studentCourses.isEmpty() ? null : studentCourses.get(0);
+    if (studentCourse == null) {
+      throw new BusinessException("学员未报名该课程");
+    }
+
+    // 3. 获取校区和机构信息
+    Long campusId = student.getCampusId();
+    Long institutionId = student.getInstitutionId();
+
+    // 4. 获取消耗课时
+    BigDecimal hoursConsumed = request.getDuration();
+
+    // 5. 检查剩余课时是否足够
+    BigDecimal remainingHours = studentCourse.getTotalHours().subtract(studentCourse.getConsumedHours());
+    if (remainingHours.compareTo(hoursConsumed) < 0) {
+      throw new BusinessException("剩余课时不足，无法完成请假");
+    }
+
+    // 6. 创建上课记录 (edu_student_course_record)
+    EduStudentCourseRecordRecord attendanceRecord = dsl.newRecord(Tables.EDU_STUDENT_COURSE_RECORD);
+    attendanceRecord.setStudentId(request.getStudentId());
+    attendanceRecord.setCourseId(request.getCourseId());
+    // 从课程-教练关联表中获取教练ID
+    Long coachId = dsl.select(Tables.SYS_COACH_COURSE.COACH_ID)
+            .from(Tables.SYS_COACH_COURSE)
+            .where(Tables.SYS_COACH_COURSE.COURSE_ID.eq(request.getCourseId()))
+            .and(Tables.SYS_COACH_COURSE.DELETED.eq(0))
+            .fetchOneInto(Long.class);
+    attendanceRecord.setCoachId(coachId); // 使用课程关联的教练ID
+    attendanceRecord.setCourseDate(request.getLeaveDate());
+    // 请假没有开始结束时间，可以设为null或默认值
+    attendanceRecord.setStartTime(LocalTime.of(0, 0));
+    attendanceRecord.setEndTime(LocalTime.of(0, 0));
+    attendanceRecord.setHours(hoursConsumed);
+    attendanceRecord.setNotes(request.getNotes());
+    attendanceRecord.setCampusId(campusId);
+    attendanceRecord.setInstitutionId(institutionId);
+    attendanceRecord.setCreatedTime(LocalDateTime.now());
+    attendanceRecord.setUpdateTime(LocalDateTime.now());
+    attendanceRecord.setDeleted(0);
+    attendanceRecord.setStatus("LEAVE"); // 设置状态为请假
+    attendanceRecord.store();
+
+    // 7. 更新学员课程的已消耗课时 (edu_student_course)
+    studentCourse.setConsumedHours(studentCourse.getConsumedHours().add(hoursConsumed));
+    studentCourse.setUpdateTime(LocalDateTime.now());
+
+    studentCourseModel.updateStudentCourse(studentCourse);
+
+    // 8. 更新课程表的已消耗课时 (edu_course)
+    dsl.update(Tables.EDU_COURSE)
+            .set(Tables.EDU_COURSE.CONSUMED_HOURS, Tables.EDU_COURSE.CONSUMED_HOURS.add(hoursConsumed))
+            .set(Tables.EDU_COURSE.UPDATE_TIME, LocalDateTime.now())
+            .where(Tables.EDU_COURSE.ID.eq(request.getCourseId()))
+            .execute();
   }
 
   /**

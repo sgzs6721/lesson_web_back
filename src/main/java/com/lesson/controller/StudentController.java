@@ -140,6 +140,21 @@ public class StudentController {
     }
 
     /**
+     * 学员请假
+     *
+     * @param request   请假请求体
+     * @return 操作结果
+     */
+    @PostMapping("/leave")
+    @Operation(summary = "学员请假",
+            description = "记录学员请假信息，自动扣除课时")
+    public Result<Void> leave(
+            @RequestBody @Valid StudentLeaveRequest request) {
+        studentService.leave(request);
+        return Result.success();
+    }
+
+    /**
      * 查询学员上课记录列表
      *
      * @param request 查询参数 (包含 studentId, pageNum, pageSize)
