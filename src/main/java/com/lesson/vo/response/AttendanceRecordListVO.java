@@ -31,8 +31,11 @@ public class AttendanceRecordListVO {
         @Schema(description = "上课时间段", example = "09:00-10:30")
         private String classTime;
 
-        @Schema(description = "打卡时间", example = "08:55 / 10:25")
+        @Schema(description = "操作时间（格式：yyyy-MM-dd HH:mm:ss）", example = "2025-05-06 08:55:00")
         private String checkTime;
+
+        @Schema(description = "打卡类型（CHECK_IN-打卡，LEAVE-请假）", example = "CHECK_IN")
+        private String type;
 
         @Schema(description = "出勤状态", example = "已到")
         private String status;

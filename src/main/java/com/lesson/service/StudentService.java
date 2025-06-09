@@ -769,6 +769,7 @@ public class StudentService {
     attendanceRecord.setCreatedTime(LocalDateTime.now());
     attendanceRecord.setUpdateTime(LocalDateTime.now());
     attendanceRecord.setDeleted(0);
+    attendanceRecord.setStatus("CHECK_IN"); // 明确设置打卡类型
     attendanceRecord.store();
 
     // 7. 更新学员课程的已消耗课时 (edu_student_course)
