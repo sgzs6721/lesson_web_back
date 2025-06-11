@@ -145,22 +145,22 @@ public class PaymentRecordService {
         long paymentCount = dsl.selectCount()
                 .from("edu_student_payment")
                 .where(paymentTypeCondition)
-                .fetchOne(0, Long.class);
+                .fetchOptional(0, Long.class).orElse(0L);
 
         double paymentTotal = dsl.select(sum(field("amount", Double.class)))
                 .from("edu_student_payment")
                 .where(paymentTypeCondition)
-                .fetchOne(0, Double.class);
+                .fetchOptional(0, Double.class).orElse(0.0);
 
         long refundCount = dsl.selectCount()
                 .from("edu_student_payment")
                 .where(refundTypeCondition)
-                .fetchOne(0, Long.class);
+                .fetchOptional(0, Long.class).orElse(0L);
 
         double refundTotal = dsl.select(sum(field("amount", Double.class)))
                 .from("edu_student_payment")
                 .where(refundTypeCondition)
-                .fetchOne(0, Double.class);
+                .fetchOptional(0, Double.class).orElse(0.0);
 
         PaymentRecordStatVO vo = new PaymentRecordStatVO();
         vo.setPaymentCount(paymentCount);
