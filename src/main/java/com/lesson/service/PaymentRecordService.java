@@ -122,45 +122,72 @@ public class PaymentRecordService {
     }
 
     public PaymentRecordStatVO statPaymentRecords(PaymentRecordQueryRequest request) {
-        Condition baseCondition = field("deleted").eq(0);
+        // Base condition for all statistics, mirroring listPaymentRecords' conditions
+        Condition baseCondition = Tables.EDU_STUDENT_PAYMENT.DELETED.eq(0);
 
-        Condition paymentTypeCondition = baseCondition.and(field("payment_type").in("新增", "续费"));
-        Condition refundTypeCondition = baseCondition.and(field("payment_type").eq("退费"));
-
+        if (request.getKeyword() != null && !request.getKeyword().isEmpty()) {
+            baseCondition = baseCondition.and(Tables.EDU_STUDENT.NAME.like("%" + request.getKeyword() + "%")
+                    .or(Tables.EDU_STUDENT_PAYMENT.STUDENT_ID.like("%" + request.getKeyword() + "%"))
+                    .or(Tables.EDU_COURSE.NAME.like("%" + request.getKeyword() + "%"))
+            );
+        }
+        if (request.getCourseId() != null) {
+            baseCondition = baseCondition.and(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.eq(request.getCourseId().toString()));
+        }
+        if (request.getLessonType() != null && !request.getLessonType().isEmpty()) {
+            try {
+                baseCondition = baseCondition.and(Tables.EDU_STUDENT_PAYMENT.COURSE_HOURS.eq(new BigDecimal(request.getLessonType())));
+            } catch (NumberFormatException e) {
+                log.warn("无效的 lessonType 格式 (统计查询)：{}", request.getLessonType(), e);
+            }
+        }
+        if (request.getPaymentType() != null && !request.getPaymentType().isEmpty()) {
+            baseCondition = baseCondition.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE.eq(request.getPaymentType()));
+        }
+        if (request.getPayType() != null && !request.getPayType().isEmpty()) {
+            baseCondition = baseCondition.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_METHOD.eq(request.getPayType()));
+        }
         if (request.getCampusId() != null) {
-            paymentTypeCondition = paymentTypeCondition.and(field("campus_id").eq(request.getCampusId()));
-            refundTypeCondition = refundTypeCondition.and(field("campus_id").eq(request.getCampusId()));
+            baseCondition = baseCondition.and(Tables.EDU_STUDENT_PAYMENT.CAMPUS_ID.eq(request.getCampusId()));
         }
-
         if (request.getStartDate() != null) {
-            paymentTypeCondition = paymentTypeCondition.and(field("created_time").greaterOrEqual(request.getStartDate()));
-            refundTypeCondition = refundTypeCondition.and(field("created_time").greaterOrEqual(request.getStartDate()));
+            baseCondition = baseCondition.and(Tables.EDU_STUDENT_PAYMENT.CREATED_TIME.greaterOrEqual(request.getStartDate().atStartOfDay()));
         }
-
         if (request.getEndDate() != null) {
-            paymentTypeCondition = paymentTypeCondition.and(field("created_time").lessOrEqual(request.getEndDate()));
-            refundTypeCondition = refundTypeCondition.and(field("created_time").lessOrEqual(request.getEndDate()));
+            baseCondition = baseCondition.and(Tables.EDU_STUDENT_PAYMENT.CREATED_TIME.lessOrEqual(request.getEndDate().atTime(23, 59, 59)));
         }
 
+        // 缴费次数
         long paymentCount = dsl.selectCount()
-                .from("edu_student_payment")
-                .where(paymentTypeCondition)
+                .from(Tables.EDU_STUDENT_PAYMENT)
+                .leftJoin(Tables.EDU_STUDENT).on(Tables.EDU_STUDENT_PAYMENT.STUDENT_ID.eq(Tables.EDU_STUDENT.ID.cast(String.class)))
+                .leftJoin(Tables.EDU_COURSE).on(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.eq(Tables.EDU_COURSE.ID.cast(String.class)))
+                .where(baseCondition.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE.in("新增", "续费")))
                 .fetchOptional(0, Long.class).orElse(0L);
 
-        double paymentTotal = dsl.select(sum(field("amount", Double.class)))
-                .from("edu_student_payment")
-                .where(paymentTypeCondition)
-                .fetchOptional(0, Double.class).orElse(0.0);
+        // 缴费总额
+        double paymentTotal = dsl.select(sum(Tables.EDU_STUDENT_PAYMENT.AMOUNT))
+                .from(Tables.EDU_STUDENT_PAYMENT)
+                .leftJoin(Tables.EDU_STUDENT).on(Tables.EDU_STUDENT_PAYMENT.STUDENT_ID.eq(Tables.EDU_STUDENT.ID.cast(String.class)))
+                .leftJoin(Tables.EDU_COURSE).on(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.eq(Tables.EDU_COURSE.ID.cast(String.class)))
+                .where(baseCondition.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE.in("新增", "续费")))
+                .fetchOptional(0, BigDecimal.class).orElse(BigDecimal.ZERO).doubleValue();
 
+        // 退费次数
         long refundCount = dsl.selectCount()
-                .from("edu_student_payment")
-                .where(refundTypeCondition)
+                .from(Tables.EDU_STUDENT_PAYMENT)
+                .leftJoin(Tables.EDU_STUDENT).on(Tables.EDU_STUDENT_PAYMENT.STUDENT_ID.eq(Tables.EDU_STUDENT.ID.cast(String.class)))
+                .leftJoin(Tables.EDU_COURSE).on(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.eq(Tables.EDU_COURSE.ID.cast(String.class)))
+                .where(baseCondition.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE.eq("退费")))
                 .fetchOptional(0, Long.class).orElse(0L);
 
-        double refundTotal = dsl.select(sum(field("amount", Double.class)))
-                .from("edu_student_payment")
-                .where(refundTypeCondition)
-                .fetchOptional(0, Double.class).orElse(0.0);
+        // 退费总额
+        double refundTotal = dsl.select(sum(Tables.EDU_STUDENT_PAYMENT.AMOUNT))
+                .from(Tables.EDU_STUDENT_PAYMENT)
+                .leftJoin(Tables.EDU_STUDENT).on(Tables.EDU_STUDENT_PAYMENT.STUDENT_ID.eq(Tables.EDU_STUDENT.ID.cast(String.class)))
+                .leftJoin(Tables.EDU_COURSE).on(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.eq(Tables.EDU_COURSE.ID.cast(String.class)))
+                .where(baseCondition.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE.eq("退费")))
+                .fetchOptional(0, BigDecimal.class).orElse(BigDecimal.ZERO).doubleValue();
 
         PaymentRecordStatVO vo = new PaymentRecordStatVO();
         vo.setPaymentCount(paymentCount);
