@@ -23,17 +23,19 @@ public class PaymentRecordService {
     public PaymentRecordListVO listPaymentRecords(PaymentRecordQueryRequest request) {
         SelectConditionStep<Record> query = dsl.select()
                 .from("edu_student_payment")
-                .where("deleted = 0");
+                .leftJoin("edu_student").on("edu_student_payment.student_id = edu_student.id")
+                .leftJoin("edu_course").on("edu_student_payment.course_id = edu_course.id")
+                .where("edu_student_payment.deleted = 0");
 
         if (request.getKeyword() != null && !request.getKeyword().isEmpty()) {
-            query.and("(student_name like ? or student_id like ? or course_name like ?)",
+            query.and("(edu_student.name like ? or edu_student.id like ? or edu_course.name like ?)",
                     "%" + request.getKeyword() + "%",
                     "%" + request.getKeyword() + "%",
                     "%" + request.getKeyword() + "%"
             );
         }
         if (request.getCourseId() != null) {
-            query.and("course_id = ?", request.getCourseId());
+            query.and("edu_course.id = ?", request.getCourseId());
         }
         if (request.getLessonType() != null && !request.getLessonType().isEmpty()) {
             query.and("lesson_type = ?", request.getLessonType());
@@ -66,8 +68,8 @@ public class PaymentRecordService {
         for (Record r : records) {
             PaymentRecordListVO.Item item = new PaymentRecordListVO.Item();
             item.setDate(r.get("created_time", java.sql.Timestamp.class).toLocalDateTime().format(dateFormatter));
-            item.setStudent(r.get("student_name", String.class) + " (" + r.get("student_id", String.class) + ")");
-            item.setCourse(r.get("course_name", String.class));
+            item.setStudent(r.get("edu_student.name", String.class) + " (" + r.get("student_id", String.class) + ")");
+            item.setCourse(r.get("edu_course.name", String.class));
             item.setAmount(r.get("amount", String.class));
             item.setLessonType(r.get("lesson_type", String.class));
             item.setLessonChange(r.get("lesson_change", String.class));
