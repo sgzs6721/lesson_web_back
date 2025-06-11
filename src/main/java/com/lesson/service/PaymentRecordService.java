@@ -22,43 +22,43 @@ public class PaymentRecordService {
 
     public PaymentRecordListVO listPaymentRecords(PaymentRecordQueryRequest request) {
         SelectConditionStep<Record> query = dsl.select()
-                .from("edu_student_payment")
-                .leftJoin("edu_student").on("edu_student_payment.student_id = edu_student.id")
-                .leftJoin("edu_course").on("edu_student_payment.course_id = edu_course.id")
-                .where("edu_student_payment.deleted = 0");
+            .from("edu_student_payment")
+            .leftJoin("edu_student").on("edu_student_payment.student_id = edu_student.id")
+            .leftJoin("edu_course").on("edu_student_payment.course_id = edu_course.id")
+            .where("edu_student_payment.deleted = 0");
 
         if (request.getKeyword() != null && !request.getKeyword().isEmpty()) {
-            query.and("(edu_student.name like ? or edu_student.id like ? or edu_course.name like ?)",
+            query.and("(edu_student.name like ? or edu_student_payment.student_id like ? or edu_course.name like ?)",
                     "%" + request.getKeyword() + "%",
                     "%" + request.getKeyword() + "%",
                     "%" + request.getKeyword() + "%"
             );
         }
         if (request.getCourseId() != null) {
-            query.and("edu_course.id = ?", request.getCourseId());
+            query.and("edu_student_payment.course_id = ?", request.getCourseId());
         }
         if (request.getLessonType() != null && !request.getLessonType().isEmpty()) {
-            query.and("lesson_type = ?", request.getLessonType());
+            query.and("edu_student_payment.course_hours = ?", request.getLessonType());
         }
         if (request.getPaymentType() != null && !request.getPaymentType().isEmpty()) {
-            query.and("payment_type = ?", request.getPaymentType());
+            query.and("edu_student_payment.payment_type = ?", request.getPaymentType());
         }
         if (request.getPayType() != null && !request.getPayType().isEmpty()) {
-            query.and("pay_type = ?", request.getPayType());
+            query.and("edu_student_payment.payment_method = ?", request.getPayType());
         }
         if (request.getCampusId() != null) {
-            query.and("campus_id = ?", request.getCampusId());
+            query.and("edu_student_payment.campus_id = ?", request.getCampusId());
         }
         if (request.getStartDate() != null) {
-            query.and("created_time >= ?", request.getStartDate());
+            query.and("edu_student_payment.created_time >= ?", request.getStartDate());
         }
         if (request.getEndDate() != null) {
-            query.and("created_time <= ?", request.getEndDate());
+            query.and("edu_student_payment.created_time <= ?", request.getEndDate());
         }
 
         long total = query.fetchCount();
         List<Record> records = query
-                .orderBy(field("created_time", java.sql.Timestamp.class).desc())
+                .orderBy(field("edu_student_payment.created_time", java.sql.Timestamp.class).desc())
                 .limit(request.getPageSize())
                 .offset((request.getPageNum() - 1) * request.getPageSize())
                 .fetch();
@@ -67,14 +67,14 @@ public class PaymentRecordService {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         for (Record r : records) {
             PaymentRecordListVO.Item item = new PaymentRecordListVO.Item();
-            item.setDate(r.get("created_time", java.sql.Timestamp.class).toLocalDateTime().format(dateFormatter));
-            item.setStudent(r.get("edu_student.name", String.class) + " (" + r.get("student_id", String.class) + ")");
+            item.setDate(r.get("edu_student_payment.created_time", java.sql.Timestamp.class).toLocalDateTime().format(dateFormatter));
+            item.setStudent(r.get("edu_student.name", String.class) + " (" + r.get("edu_student_payment.student_id", String.class) + ")");
             item.setCourse(r.get("edu_course.name", String.class));
-            item.setAmount(r.get("amount", String.class));
-            item.setLessonType(r.get("lesson_type", String.class));
-            item.setLessonChange(r.get("lesson_change", String.class));
-            item.setPaymentType(r.get("payment_type", String.class));
-            item.setPayType(r.get("pay_type", String.class));
+            item.setAmount(r.get("edu_student_payment.amount", String.class));
+            item.setLessonType(r.get("edu_student_payment.course_hours", String.class) + "课时");
+            item.setLessonChange("+" + r.get("edu_student_payment.course_hours", String.class) + "节");
+            item.setPaymentType(r.get("edu_student_payment.payment_type", String.class));
+            item.setPayType(r.get("edu_student_payment.payment_method", String.class));
             list.add(item);
         }
         PaymentRecordListVO vo = new PaymentRecordListVO();

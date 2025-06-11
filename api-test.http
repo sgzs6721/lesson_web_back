@@ -1,7 +1,7 @@
 ### 固定课表管理系统 API 测试
 ### 基础配置
 @baseUrl = http://lesson.devtesting.top/lesson
-@token = eyJhbGciOiJIUzM4NCJ9.eyJ1c2VySWQiOjYsIm9yZ0lkIjoyLCJpYXQiOjE3NDg5MjMwNTUsImV4cCI6MTc0OTUyNzg1NX0.4pFmtvZmHJHSqkXyfuqKlNdvZKnoVdsdUnGIlFhEpWeS5juZJ7nawEpTc57bGgBp
+@token = eyJhbGciOiJIUzM4NCJ9.eyJ1c2VySWQiOjYsIm9yZ0lkIjoyLCJpYXQiOjE3NDk2NDY2MDYsImV4cCI6MTc1MDI1MTQwNn0.o1292ZrRY6Pky9J9jwH2RxqU8-IF09VAp-ZJff8iOnmIFsHkz9rXkMqR1Sw2p25B
 
 ### ================================
 ### 1. 用户认证
