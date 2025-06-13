@@ -102,8 +102,7 @@ public class PaymentRecordService {
                     item.setCourse(r.get(Tables.EDU_COURSE.NAME));
                     item.setAmount(r.get(Tables.EDU_STUDENT_PAYMENT.AMOUNT).toPlainString());
                     String courseType = r.get(Tables.SYS_CONSTANT.CONSTANT_VALUE);
-                    BigDecimal courseHours = r.get(Tables.EDU_STUDENT_PAYMENT.COURSE_HOURS);
-                    item.setLessonType(courseType + " " + courseHours.toPlainString() + "课时");
+                    item.setLessonType(courseType);
                     item.setLessonChange("+" + r.get(Tables.EDU_STUDENT_PAYMENT.COURSE_HOURS).toPlainString() + "节");
                     item.setPaymentType(r.get(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE));
                     item.setPayType(r.get(Tables.EDU_STUDENT_PAYMENT.PAYMENT_METHOD));
