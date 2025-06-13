@@ -98,7 +98,7 @@ public class PaymentRecordService {
                 try {
                     PaymentRecordListVO.Item item = new PaymentRecordListVO.Item();
                     item.setDate(r.get(Tables.EDU_STUDENT_PAYMENT.CREATED_TIME).format(dateFormatter));
-                    item.setStudent(r.get(Tables.EDU_STUDENT.NAME) + " (" + r.get(Tables.EDU_STUDENT_PAYMENT.STUDENT_ID) + ")");
+                    item.setStudent(r.get(Tables.EDU_STUDENT.NAME));
                     item.setCourse(r.get(Tables.EDU_COURSE.NAME));
                     item.setAmount(r.get(Tables.EDU_STUDENT_PAYMENT.AMOUNT).toPlainString());
                     String courseType = r.get(Tables.SYS_CONSTANT.CONSTANT_VALUE);
