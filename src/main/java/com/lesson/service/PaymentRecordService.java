@@ -67,7 +67,8 @@ public class PaymentRecordService {
             SelectConditionStep<Record> query = dsl.select()
                 .from(Tables.EDU_STUDENT_PAYMENT)
                 .leftJoin(Tables.EDU_STUDENT).on(Tables.EDU_STUDENT_PAYMENT.STUDENT_ID.eq(Tables.EDU_STUDENT.ID.cast(String.class))) 
-                .leftJoin(Tables.EDU_COURSE).on(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.eq(Tables.EDU_COURSE.ID.cast(String.class))) 
+                .leftJoin(Tables.EDU_COURSE).on(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.eq(Tables.EDU_COURSE.ID.cast(String.class)))
+                .leftJoin(Tables.SYS_CONSTANT).on(Tables.EDU_COURSE.TYPE_ID.eq(Tables.SYS_CONSTANT.ID))
                 .where(listConditions);
 
             log.info("构建的SQL查询：{}", query.getSQL());
@@ -75,7 +76,8 @@ public class PaymentRecordService {
             long total = dsl.selectCount()
                     .from(Tables.EDU_STUDENT_PAYMENT
                             .leftJoin(Tables.EDU_STUDENT).on(Tables.EDU_STUDENT_PAYMENT.STUDENT_ID.eq(Tables.EDU_STUDENT.ID.cast(String.class)))
-                            .leftJoin(Tables.EDU_COURSE).on(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.eq(Tables.EDU_COURSE.ID.cast(String.class))))
+                            .leftJoin(Tables.EDU_COURSE).on(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.eq(Tables.EDU_COURSE.ID.cast(String.class)))
+                            .leftJoin(Tables.SYS_CONSTANT).on(Tables.EDU_COURSE.TYPE_ID.eq(Tables.SYS_CONSTANT.ID)))
                     .where(listConditions)
                     .fetchOne(0, Long.class);
 
@@ -99,7 +101,9 @@ public class PaymentRecordService {
                     item.setStudent(r.get(Tables.EDU_STUDENT.NAME) + " (" + r.get(Tables.EDU_STUDENT_PAYMENT.STUDENT_ID) + ")");
                     item.setCourse(r.get(Tables.EDU_COURSE.NAME));
                     item.setAmount(r.get(Tables.EDU_STUDENT_PAYMENT.AMOUNT).toPlainString());
-                    item.setLessonType(r.get(Tables.EDU_STUDENT_PAYMENT.COURSE_HOURS).toPlainString() + "课时");
+                    String courseType = r.get(Tables.SYS_CONSTANT.CONSTANT_VALUE);
+                    BigDecimal courseHours = r.get(Tables.EDU_STUDENT_PAYMENT.COURSE_HOURS);
+                    item.setLessonType(courseType + " " + courseHours.toPlainString() + "课时");
                     item.setLessonChange("+" + r.get(Tables.EDU_STUDENT_PAYMENT.COURSE_HOURS).toPlainString() + "节");
                     item.setPaymentType(r.get(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE));
                     item.setPayType(r.get(Tables.EDU_STUDENT_PAYMENT.PAYMENT_METHOD));
