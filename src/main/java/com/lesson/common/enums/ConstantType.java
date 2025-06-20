@@ -11,6 +11,7 @@ public enum ConstantType {
     HANDLING_FEE_TYPE("HANDLING_FEE_TYPE", "手续费类型"),
     VALIDITY_PERIOD("VALIDITY_PERIOD", "有效期");
 
+
     @Getter
     private final String name;
 

@@ -21,8 +21,8 @@ public class ConstantServiceImpl implements ConstantService {
     private final SysConstantModel constantModel;
 
     @Override
-    public List<ConstantVO> listByType(ConstantType type) {
-        return constantModel.listByType(type.name())
+    public List<ConstantVO> listAll() {
+        return constantModel.listAll()
             .stream()
             .map(record -> {
                 ConstantVO vo = new ConstantVO();
@@ -39,17 +39,17 @@ public class ConstantServiceImpl implements ConstantService {
         record.setConstantKey(request.getConstantKey());
         record.setConstantValue(request.getConstantValue());
         record.setDescription(request.getDescription());
-        record.setType(request.getType().name());
+        record.setType(request.getType());
         record.setStatus(request.getStatus());
         Long id = constantModel.createConstant(record);
-        
+
         // 创建返回VO对象
         ConstantVO vo = new ConstantVO();
         vo.setId(id);
         vo.setConstantKey(request.getConstantKey());
         vo.setConstantValue(request.getConstantValue());
         vo.setDescription(request.getDescription());
-        vo.setType(request.getType().name());
+        vo.setType(request.getType());
         vo.setStatus(request.getStatus());
         return vo;
     }

@@ -97,4 +97,11 @@ public class SysConstantModel {
             .where(SYS_CONSTANT.ID.eq(id))
             .execute();
     }
+
+    public List<SysConstantRecord> listAll() {
+        return dsl.selectFrom(SYS_CONSTANT)
+            .where(SYS_CONSTANT.DELETED.eq(0))
+            .orderBy(SYS_CONSTANT.CREATED_TIME)
+            .fetch();
+    }
 }

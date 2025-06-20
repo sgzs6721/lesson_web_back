@@ -8,7 +8,7 @@ import com.lesson.vo.constant.ConstantVO;
 import java.util.List;
 
 public interface ConstantService {
-    List<ConstantVO> listByType(ConstantType type);
+    List<ConstantVO> listAll();
     
     /**
      * 创建系统常量

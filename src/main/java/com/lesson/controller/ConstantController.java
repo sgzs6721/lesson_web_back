@@ -22,10 +22,9 @@ public class ConstantController {
     private final ConstantService constantService;
 
     @GetMapping("/list")
-    @Operation(summary = "获取系统常量列表", description = "根据常量类型查询系统常量列表")
-    public Result<List<ConstantVO>> listConstants(
-            @Parameter(description = "常量类型") @RequestParam ConstantType type) {
-        return Result.success(constantService.listByType(type));
+    @Operation(summary = "获取系统常量列表", description = "获取所有系统常量列表")
+    public Result<List<ConstantVO>> listConstants() {
+        return Result.success(constantService.listAll());
     }
 
     @PostMapping("/create")
