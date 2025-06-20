@@ -60,7 +60,7 @@ public class AttendanceRecordService {
         EDU_STUDENT_COURSE_RECORD.CREATED_TIME,
         EDU_STUDENT_COURSE_RECORD.UPDATE_TIME,
         EDU_STUDENT_COURSE_RECORD.DELETED,
-        field("status", String.class)
+        field("lesson.edu_student_course_record.status", String.class).as("status")
     )
     .from(EDU_STUDENT_COURSE_RECORD)
     .leftJoin(EDU_STUDENT).on(EDU_STUDENT_COURSE_RECORD.STUDENT_ID.eq(EDU_STUDENT.ID))
