@@ -721,44 +721,40 @@ public class StudentService {
     Long institutionId = student.getInstitutionId();
 
     // 4. 计算消耗课时
-    BigDecimal hoursConsumed;
-    if (request.getDuration() != null && request.getDuration().compareTo(BigDecimal.ZERO) > 0) {
-      hoursConsumed = request.getDuration();
-    } else {
-      EduCourseRecord courseInfo = dsl.selectFrom(Tables.EDU_COURSE)
-          .where(Tables.EDU_COURSE.ID.eq(request.getCourseId()))
-          .fetchOne();
-      if (courseInfo != null && courseInfo.getUnitHours() != null && courseInfo.getUnitHours().compareTo(BigDecimal.ZERO) > 0) {
-        hoursConsumed = courseInfo.getUnitHours();
+    BigDecimal hoursConsumed = BigDecimal.ZERO;
+    String type = request.getType();
+    if (type == null || !(type.equals("NOMAL") || type.equals("LEAVE") || type.equals("ABSENT"))) {
+      throw new BusinessException("打卡类型不合法");
+    }
+    if (type.equals("NOMAL") || type.equals("ABSENT")) {
+      if (request.getDuration() != null && request.getDuration().compareTo(BigDecimal.ZERO) > 0) {
+        hoursConsumed = request.getDuration();
       } else {
-        long minutes = Duration.between(request.getStartTime(), request.getEndTime()).toMinutes();
-        if (minutes <= 0) {
-          throw new BusinessException("结束时间必须晚于开始时间");
+        EduCourseRecord courseInfo = dsl.selectFrom(Tables.EDU_COURSE)
+            .where(Tables.EDU_COURSE.ID.eq(request.getCourseId()))
+            .fetchOne();
+        if (courseInfo != null && courseInfo.getUnitHours() != null && courseInfo.getUnitHours().compareTo(BigDecimal.ZERO) > 0) {
+          hoursConsumed = courseInfo.getUnitHours();
+        } else {
+          long minutes = Duration.between(request.getStartTime(), request.getEndTime()).toMinutes();
+          if (minutes <= 0) {
+            throw new BusinessException("结束时间必须晚于开始时间");
+          }
+          hoursConsumed = BigDecimal.valueOf(Math.ceil((double) minutes / 60));
         }
-        hoursConsumed = BigDecimal.valueOf(Math.ceil((double) minutes / 60));
       }
     }
-
-    // 5. 检查剩余课时是否足够
-    BigDecimal remainingHours = studentCourse.getTotalHours().subtract(studentCourse.getConsumedHours());
-    if (remainingHours.compareTo(hoursConsumed) < 0) {
+    // 5. 检查剩余课时是否足够（仅NOMAL/ABSENT扣课时时校验）
+    if ((type.equals("NOMAL") || type.equals("ABSENT")) && studentCourse.getTotalHours().subtract(studentCourse.getConsumedHours()).compareTo(hoursConsumed) < 0) {
       throw new BusinessException("剩余课时不足，无法完成打卡");
     }
-
     // 6. 获取教练ID
     Long coachId = dsl.select(Tables.SYS_COACH_COURSE.COACH_ID)
         .from(Tables.SYS_COACH_COURSE)
         .where(Tables.SYS_COACH_COURSE.COURSE_ID.eq(request.getCourseId()))
         .and(Tables.SYS_COACH_COURSE.DELETED.eq(0))
         .fetchOneInto(Long.class);
-
-    // 7. 获取打卡类型
-    String type = request.getType();
-    if (type == null || !(type.equals("NORMAL") || type.equals("LEAVE") || type.equals("ABSENT"))) {
-      throw new BusinessException("打卡类型不合法");
-    }
-
-    // 8. 插入上课记录（用insertInto，兼容jooq未生成status字段的情况）
+    // 7. 插入上课记录
     dsl.insertInto(Tables.EDU_STUDENT_COURSE_RECORD)
         .set(Tables.EDU_STUDENT_COURSE_RECORD.STUDENT_ID, request.getStudentId())
         .set(Tables.EDU_STUDENT_COURSE_RECORD.COURSE_ID, request.getCourseId())
@@ -775,22 +771,23 @@ public class StudentService {
         .set(Tables.EDU_STUDENT_COURSE_RECORD.DELETED, 0)
         .set(org.jooq.impl.DSL.field("status", String.class), type)
         .execute();
-
-    // 9. 三种类型都要扣课时
-    studentCourse.setConsumedHours(studentCourse.getConsumedHours().add(hoursConsumed));
-    studentCourse.setUpdateTime(LocalDateTime.now());
-    // 10. 将学员课程状态更新为"学习中"
-    if (!StudentCourseStatus.STUDYING.getName().equals(studentCourse.getStatus())) {
-      studentCourse.setStatus(StudentCourseStatus.STUDYING.getName());
-      log.info("学员[{}]打卡成功，状态已更新为：学习中", request.getStudentId());
+    // 8. 仅NOMAL/ABSENT类型才扣课时
+    if (type.equals("NOMAL") || type.equals("ABSENT")) {
+      studentCourse.setConsumedHours(studentCourse.getConsumedHours().add(hoursConsumed));
+      studentCourse.setUpdateTime(LocalDateTime.now());
+      // 9. 将学员课程状态更新为"学习中"
+      if (!StudentCourseStatus.STUDYING.getName().equals(studentCourse.getStatus())) {
+        studentCourse.setStatus(StudentCourseStatus.STUDYING.getName());
+        log.info("学员[{}]打卡成功，状态已更新为：学习中", request.getStudentId());
+      }
+      studentCourseModel.updateStudentCourse(studentCourse);
+      // 10. 更新课程表的已消耗课时 (edu_course)
+      dsl.update(Tables.EDU_COURSE)
+          .set(Tables.EDU_COURSE.CONSUMED_HOURS, Tables.EDU_COURSE.CONSUMED_HOURS.add(hoursConsumed))
+          .set(Tables.EDU_COURSE.UPDATE_TIME, LocalDateTime.now())
+          .where(Tables.EDU_COURSE.ID.eq(request.getCourseId()))
+          .execute();
     }
-    studentCourseModel.updateStudentCourse(studentCourse);
-    // 11. 更新课程表的已消耗课时 (edu_course)
-    dsl.update(Tables.EDU_COURSE)
-        .set(Tables.EDU_COURSE.CONSUMED_HOURS, Tables.EDU_COURSE.CONSUMED_HOURS.add(hoursConsumed))
-        .set(Tables.EDU_COURSE.UPDATE_TIME, LocalDateTime.now())
-        .where(Tables.EDU_COURSE.ID.eq(request.getCourseId()))
-        .execute();
   }
 
   /**
