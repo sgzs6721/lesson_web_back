@@ -722,18 +722,15 @@ public class StudentService {
 
     // 4. 计算消耗课时
     BigDecimal hoursConsumed;
-
     if (request.getDuration() != null && request.getDuration().compareTo(BigDecimal.ZERO) > 0) {
       hoursConsumed = request.getDuration();
     } else {
       EduCourseRecord courseInfo = dsl.selectFrom(Tables.EDU_COURSE)
           .where(Tables.EDU_COURSE.ID.eq(request.getCourseId()))
           .fetchOne();
-
       if (courseInfo != null && courseInfo.getUnitHours() != null && courseInfo.getUnitHours().compareTo(BigDecimal.ZERO) > 0) {
         hoursConsumed = courseInfo.getUnitHours();
       } else {
-        // 根据时间计算课时（简单示例：按小时计算，不足1小时算1小时，需要更精确可调整）
         long minutes = Duration.between(request.getStartTime(), request.getEndTime()).toMinutes();
         if (minutes <= 0) {
           throw new BusinessException("结束时间必须晚于开始时间");
@@ -748,43 +745,47 @@ public class StudentService {
       throw new BusinessException("剩余课时不足，无法完成打卡");
     }
 
-    // 6. 创建上课记录 (edu_student_course_record)
-    EduStudentCourseRecordRecord attendanceRecord = dsl.newRecord(Tables.EDU_STUDENT_COURSE_RECORD);
-    attendanceRecord.setStudentId(request.getStudentId());
-    attendanceRecord.setCourseId(request.getCourseId());
-    // 从课程-教练关联表中获取教练ID
+    // 6. 获取教练ID
     Long coachId = dsl.select(Tables.SYS_COACH_COURSE.COACH_ID)
         .from(Tables.SYS_COACH_COURSE)
         .where(Tables.SYS_COACH_COURSE.COURSE_ID.eq(request.getCourseId()))
         .and(Tables.SYS_COACH_COURSE.DELETED.eq(0))
         .fetchOneInto(Long.class);
-    attendanceRecord.setCoachId(coachId); // 使用课程关联的教练ID
-    attendanceRecord.setCourseDate(request.getCourseDate());
-    attendanceRecord.setStartTime(request.getStartTime());
-    attendanceRecord.setEndTime(request.getEndTime());
-    attendanceRecord.setHours(hoursConsumed);
-    attendanceRecord.setNotes(request.getNotes());
-    attendanceRecord.setCampusId(campusId);
-    attendanceRecord.setInstitutionId(institutionId);
-    attendanceRecord.setCreatedTime(LocalDateTime.now());
-    attendanceRecord.setUpdateTime(LocalDateTime.now());
-    attendanceRecord.setDeleted(0);
-    attendanceRecord.setStatus("CHECK_IN"); // 明确设置打卡类型
-    attendanceRecord.store();
 
-    // 7. 更新学员课程的已消耗课时 (edu_student_course)
+    // 7. 获取打卡类型
+    String type = request.getType();
+    if (type == null || !(type.equals("NORMAL") || type.equals("LEAVE") || type.equals("ABSENT"))) {
+      throw new BusinessException("打卡类型不合法");
+    }
+
+    // 8. 插入上课记录（用insertInto，兼容jooq未生成status字段的情况）
+    dsl.insertInto(Tables.EDU_STUDENT_COURSE_RECORD)
+        .set(Tables.EDU_STUDENT_COURSE_RECORD.STUDENT_ID, request.getStudentId())
+        .set(Tables.EDU_STUDENT_COURSE_RECORD.COURSE_ID, request.getCourseId())
+        .set(Tables.EDU_STUDENT_COURSE_RECORD.COACH_ID, coachId)
+        .set(Tables.EDU_STUDENT_COURSE_RECORD.COURSE_DATE, request.getCourseDate())
+        .set(Tables.EDU_STUDENT_COURSE_RECORD.START_TIME, request.getStartTime())
+        .set(Tables.EDU_STUDENT_COURSE_RECORD.END_TIME, request.getEndTime())
+        .set(Tables.EDU_STUDENT_COURSE_RECORD.HOURS, hoursConsumed)
+        .set(Tables.EDU_STUDENT_COURSE_RECORD.NOTES, request.getNotes())
+        .set(Tables.EDU_STUDENT_COURSE_RECORD.CAMPUS_ID, campusId)
+        .set(Tables.EDU_STUDENT_COURSE_RECORD.INSTITUTION_ID, institutionId)
+        .set(Tables.EDU_STUDENT_COURSE_RECORD.CREATED_TIME, LocalDateTime.now())
+        .set(Tables.EDU_STUDENT_COURSE_RECORD.UPDATE_TIME, LocalDateTime.now())
+        .set(Tables.EDU_STUDENT_COURSE_RECORD.DELETED, 0)
+        .set(org.jooq.impl.DSL.field("status", String.class), type)
+        .execute();
+
+    // 9. 三种类型都要扣课时
     studentCourse.setConsumedHours(studentCourse.getConsumedHours().add(hoursConsumed));
     studentCourse.setUpdateTime(LocalDateTime.now());
-
-    // 8. 将学员课程状态更新为"学习中"
+    // 10. 将学员课程状态更新为"学习中"
     if (!StudentCourseStatus.STUDYING.getName().equals(studentCourse.getStatus())) {
       studentCourse.setStatus(StudentCourseStatus.STUDYING.getName());
       log.info("学员[{}]打卡成功，状态已更新为：学习中", request.getStudentId());
     }
-
     studentCourseModel.updateStudentCourse(studentCourse);
-
-    // 9. 更新课程表的已消耗课时 (edu_course)
+    // 11. 更新课程表的已消耗课时 (edu_course)
     dsl.update(Tables.EDU_COURSE)
         .set(Tables.EDU_COURSE.CONSUMED_HOURS, Tables.EDU_COURSE.CONSUMED_HOURS.add(hoursConsumed))
         .set(Tables.EDU_COURSE.UPDATE_TIME, LocalDateTime.now())
@@ -833,38 +834,38 @@ public class StudentService {
       throw new BusinessException("剩余课时不足，无法完成请假");
     }
 
-    // 6. 创建上课记录 (edu_student_course_record)
-    EduStudentCourseRecordRecord attendanceRecord = dsl.newRecord(Tables.EDU_STUDENT_COURSE_RECORD);
-    attendanceRecord.setStudentId(request.getStudentId());
-    attendanceRecord.setCourseId(request.getCourseId());
-    // 从课程-教练关联表中获取教练ID
+    // 6. 获取教练ID
     Long coachId = dsl.select(Tables.SYS_COACH_COURSE.COACH_ID)
             .from(Tables.SYS_COACH_COURSE)
             .where(Tables.SYS_COACH_COURSE.COURSE_ID.eq(request.getCourseId()))
             .and(Tables.SYS_COACH_COURSE.DELETED.eq(0))
             .fetchOneInto(Long.class);
-    attendanceRecord.setCoachId(coachId); // 使用课程关联的教练ID
-    attendanceRecord.setCourseDate(request.getLeaveDate());
-    // 请假没有开始结束时间，可以设为null或默认值
-    attendanceRecord.setStartTime(LocalTime.of(0, 0));
-    attendanceRecord.setEndTime(LocalTime.of(0, 0));
-    attendanceRecord.setHours(hoursConsumed);
-    attendanceRecord.setNotes(request.getNotes());
-    attendanceRecord.setCampusId(campusId);
-    attendanceRecord.setInstitutionId(institutionId);
-    attendanceRecord.setCreatedTime(LocalDateTime.now());
-    attendanceRecord.setUpdateTime(LocalDateTime.now());
-    attendanceRecord.setDeleted(0);
-    attendanceRecord.setStatus("LEAVE"); // 设置状态为请假
-    attendanceRecord.store();
 
-    // 7. 更新学员课程的已消耗课时 (edu_student_course)
+    // 7. 创建上课记录 (edu_student_course_record) for leave
+    dsl.insertInto(Tables.EDU_STUDENT_COURSE_RECORD)
+        .set(Tables.EDU_STUDENT_COURSE_RECORD.STUDENT_ID, request.getStudentId())
+        .set(Tables.EDU_STUDENT_COURSE_RECORD.COURSE_ID, request.getCourseId())
+        .set(Tables.EDU_STUDENT_COURSE_RECORD.COACH_ID, coachId)
+        .set(Tables.EDU_STUDENT_COURSE_RECORD.COURSE_DATE, request.getLeaveDate())
+        .set(Tables.EDU_STUDENT_COURSE_RECORD.START_TIME, LocalTime.of(0, 0))
+        .set(Tables.EDU_STUDENT_COURSE_RECORD.END_TIME, LocalTime.of(0, 0))
+        .set(Tables.EDU_STUDENT_COURSE_RECORD.HOURS, hoursConsumed)
+        .set(Tables.EDU_STUDENT_COURSE_RECORD.NOTES, request.getNotes())
+        .set(Tables.EDU_STUDENT_COURSE_RECORD.CAMPUS_ID, campusId)
+        .set(Tables.EDU_STUDENT_COURSE_RECORD.INSTITUTION_ID, institutionId)
+        .set(Tables.EDU_STUDENT_COURSE_RECORD.CREATED_TIME, LocalDateTime.now())
+        .set(Tables.EDU_STUDENT_COURSE_RECORD.UPDATE_TIME, LocalDateTime.now())
+        .set(Tables.EDU_STUDENT_COURSE_RECORD.DELETED, 0)
+        .set(org.jooq.impl.DSL.field("status", String.class), "LEAVE")
+        .execute();
+
+    // 8. 更新学员课程的已消耗课时 (edu_student_course)
     studentCourse.setConsumedHours(studentCourse.getConsumedHours().add(hoursConsumed));
     studentCourse.setUpdateTime(LocalDateTime.now());
 
     studentCourseModel.updateStudentCourse(studentCourse);
 
-    // 8. 更新课程表的已消耗课时 (edu_course)
+    // 9. 更新课程表的已消耗课时 (edu_course)
     dsl.update(Tables.EDU_COURSE)
             .set(Tables.EDU_COURSE.CONSUMED_HOURS, Tables.EDU_COURSE.CONSUMED_HOURS.add(hoursConsumed))
             .set(Tables.EDU_COURSE.UPDATE_TIME, LocalDateTime.now())
@@ -1003,25 +1004,25 @@ public class StudentService {
 
     // 5. 缓存缴费课时信息到Redis
     courseHoursRedisService.cachePaymentHours(
-        institutionId, 
-        campusId, 
-        request.getCourseId(), 
+        institutionId,
+        campusId,
+        request.getCourseId(),
         request.getStudentId(),
-        request.getCourseHours(), 
-        request.getGiftHours(), 
+        request.getCourseHours(),
+        request.getGiftHours(),
         paymentId
     );
 
     // 6. 更新课程总课时缓存
     courseHoursRedisService.updateCourseTotalHours(
-        institutionId, 
-        campusId, 
-        request.getCourseId(), 
+        institutionId,
+        campusId,
+        request.getCourseId(),
         studentCourse.getTotalHours()
     );
 
-    log.info("学员缴费成功: studentId={}, courseId={}, paymentId={}, regularHours={}, giftHours={}, totalHours={}", 
-            request.getStudentId(), request.getCourseId(), paymentId, 
+    log.info("学员缴费成功: studentId={}, courseId={}, paymentId={}, regularHours={}, giftHours={}, totalHours={}",
+            request.getStudentId(), request.getCourseId(), paymentId,
             request.getCourseHours(), request.getGiftHours(), studentCourse.getTotalHours());
 
     return paymentId;
@@ -1037,7 +1038,7 @@ public class StudentService {
 
   /**
    * 获取学员的校区ID
-   * 
+   *
    * @param studentId 学员ID
    * @return 校区ID
    */

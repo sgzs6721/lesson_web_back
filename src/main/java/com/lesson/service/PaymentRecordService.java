@@ -32,35 +32,35 @@ public class PaymentRecordService {
             
             Condition listConditions = Tables.EDU_STUDENT_PAYMENT.DELETED.eq(0);
 
-            if (request.getKeyword() != null && !request.getKeyword().isEmpty()) {
+        if (request.getKeyword() != null && !request.getKeyword().isEmpty()) {
                 listConditions = listConditions.and(Tables.EDU_STUDENT.NAME.like("%" + request.getKeyword() + "%")
                         .or(Tables.EDU_STUDENT_PAYMENT.STUDENT_ID.like("%" + request.getKeyword() + "%"))
                         .or(Tables.EDU_COURSE.NAME.like("%" + request.getKeyword() + "%"))
-                );
-            }
-            if (request.getCourseId() != null) {
+            );
+        }
+        if (request.getCourseId() != null) {
                 listConditions = listConditions.and(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.eq(request.getCourseId().toString()));
-            }
-            if (request.getLessonType() != null && !request.getLessonType().isEmpty()) {
+        }
+        if (request.getLessonType() != null && !request.getLessonType().isEmpty()) {
                 try {
                     listConditions = listConditions.and(Tables.EDU_STUDENT_PAYMENT.COURSE_HOURS.eq(new BigDecimal(request.getLessonType())));
                 } catch (NumberFormatException e) {
                     log.warn("无效的 lessonType 格式：{}", request.getLessonType(), e);
                 }
-            }
-            if (request.getPaymentType() != null && !request.getPaymentType().isEmpty()) {
+        }
+        if (request.getPaymentType() != null && !request.getPaymentType().isEmpty()) {
                 listConditions = listConditions.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE.eq(request.getPaymentType()));
-            }
-            if (request.getPayType() != null && !request.getPayType().isEmpty()) {
+        }
+        if (request.getPayType() != null && !request.getPayType().isEmpty()) {
                 listConditions = listConditions.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_METHOD.eq(request.getPayType()));
-            }
-            if (request.getCampusId() != null) {
+        }
+        if (request.getCampusId() != null) {
                 listConditions = listConditions.and(Tables.EDU_STUDENT_PAYMENT.CAMPUS_ID.eq(request.getCampusId()));
-            }
-            if (request.getStartDate() != null) {
+        }
+        if (request.getStartDate() != null) {
                 listConditions = listConditions.and(Tables.EDU_STUDENT_PAYMENT.CREATED_TIME.greaterOrEqual(request.getStartDate().atStartOfDay()));
-            }
-            if (request.getEndDate() != null) {
+        }
+        if (request.getEndDate() != null) {
                 listConditions = listConditions.and(Tables.EDU_STUDENT_PAYMENT.CREATED_TIME.lessOrEqual(request.getEndDate().atTime(23, 59, 59)));
             }
 
@@ -83,20 +83,20 @@ public class PaymentRecordService {
 
             log.info("查询到总记录数：{}", total);
             
-            List<Record> records = query
+        List<Record> records = query
                     .orderBy(Tables.EDU_STUDENT_PAYMENT.CREATED_TIME.desc())
-                    .limit(request.getPageSize())
-                    .offset((request.getPageNum() - 1) * request.getPageSize())
-                    .fetch();
+                .limit(request.getPageSize())
+                .offset((request.getPageNum() - 1) * request.getPageSize())
+                .fetch();
 
             log.info("获取到分页数据，记录数：{}", records.size());
 
-            List<PaymentRecordListVO.Item> list = new ArrayList<>();
-            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        List<PaymentRecordListVO.Item> list = new ArrayList<>();
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             
-            for (Record r : records) {
+        for (Record r : records) {
                 try {
-                    PaymentRecordListVO.Item item = new PaymentRecordListVO.Item();
+            PaymentRecordListVO.Item item = new PaymentRecordListVO.Item();
                     item.setDate(r.get(Tables.EDU_STUDENT_PAYMENT.CREATED_TIME).format(dateFormatter));
                     item.setStudent(r.get(Tables.EDU_STUDENT.NAME));
                     item.setCourse(r.get(Tables.EDU_COURSE.NAME));
@@ -106,17 +106,17 @@ public class PaymentRecordService {
                     item.setLessonChange("+" + r.get(Tables.EDU_STUDENT_PAYMENT.COURSE_HOURS).toPlainString() + "节");
                     item.setPaymentType(r.get(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE));
                     item.setPayType(r.get(Tables.EDU_STUDENT_PAYMENT.PAYMENT_METHOD));
-                    list.add(item);
+            list.add(item);
                 } catch (Exception e) {
                     log.error("处理记录时发生错误：", e);
                     log.error("问题记录数据：{}", r);
                 }
-            }
+        }
 
-            PaymentRecordListVO vo = new PaymentRecordListVO();
-            vo.setList(list);
-            vo.setTotal(total);
-            return vo;
+        PaymentRecordListVO vo = new PaymentRecordListVO();
+        vo.setList(list);
+        vo.setTotal(total);
+        return vo;
             
         } catch (Exception e) {
             log.error("查询缴费记录时发生错误：", e);
@@ -199,4 +199,4 @@ public class PaymentRecordService {
         vo.setRefundTotal(refundTotal);
         return vo;
     }
-}
+} 

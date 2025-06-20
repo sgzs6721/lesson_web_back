@@ -60,7 +60,7 @@ public class AttendanceRecordService {
         EDU_STUDENT_COURSE_RECORD.CREATED_TIME,
         EDU_STUDENT_COURSE_RECORD.UPDATE_TIME,
         EDU_STUDENT_COURSE_RECORD.DELETED,
-        EDU_STUDENT_COURSE_RECORD.STATUS
+        field("status", String.class)
     )
     .from(EDU_STUDENT_COURSE_RECORD)
     .leftJoin(EDU_STUDENT).on(EDU_STUDENT_COURSE_RECORD.STUDENT_ID.eq(EDU_STUDENT.ID))
@@ -79,8 +79,8 @@ public class AttendanceRecordService {
     if (request.getStudentId() != null) {
       condition = condition.and(EDU_STUDENT_COURSE_RECORD.STUDENT_ID.eq(request.getStudentId()));
     }
-    if (request.getCourseId() != null) {
-      condition = condition.and(EDU_STUDENT_COURSE_RECORD.COURSE_ID.eq(request.getCourseId()));
+    if (request.getCourseIds() != null && !request.getCourseIds().isEmpty()) {
+      condition = condition.and(EDU_STUDENT_COURSE_RECORD.COURSE_ID.in(request.getCourseIds()));
     }
     if (request.getCampusId() != null) {
       condition = condition.and(EDU_STUDENT_COURSE_RECORD.CAMPUS_ID.eq(request.getCampusId()));
@@ -111,7 +111,12 @@ public class AttendanceRecordService {
     DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     for (org.jooq.Record16<Long, Long, String, String, String, LocalDate, LocalTime, LocalTime, BigDecimal, String, Long, Long, LocalDateTime, LocalDateTime, Integer, String> r : records) {
       AttendanceRecordListVO.Item item = new AttendanceRecordListVO.Item();
-      item.setDate(r.get(EDU_STUDENT_COURSE_RECORD.COURSE_DATE, java.sql.Date.class).toLocalDate().format(dateFormatter));
+      java.sql.Date courseDate = r.get(EDU_STUDENT_COURSE_RECORD.COURSE_DATE, java.sql.Date.class);
+      if (courseDate != null) {
+        item.setDate(courseDate.toLocalDate().format(dateFormatter));
+      } else {
+        item.setDate("");
+      }
       item.setStudentName(r.get("student_name", String.class));
       item.setCourseName(r.get("course_name", String.class));
       item.setCoachName(r.get("coach_name", String.class));
@@ -125,8 +130,12 @@ public class AttendanceRecordService {
       } else {
         item.setCheckTime("");
       }
-      String status = r.get(EDU_STUDENT_COURSE_RECORD.STATUS, String.class);
-      item.setType(status != null ? com.lesson.enums.AttendanceType.valueOf(status) : null);
+      String status = r.get("status", String.class);
+      try {
+        item.setType(status != null ? com.lesson.enums.AttendanceType.valueOf(status) : null);
+      } catch (Exception e) {
+        item.setType(null);
+      }
       item.setNotes(r.get(EDU_STUDENT_COURSE_RECORD.NOTES, String.class));
       list.add(item);
     }
@@ -137,38 +146,28 @@ public class AttendanceRecordService {
   }
 
   public AttendanceRecordStatVO statAttendanceRecords(AttendanceRecordQueryRequest request) {
-    // 假设表名为 edu_student_course_record
-    SelectConditionStep<Record> query = dsl.select()
-        .from("edu_student_course_record")
-        .where("deleted = 0");
+    // 使用 jOOQ Condition 组合筛选条件
+    org.jooq.Condition condition = field("deleted").eq(0);
     if (request.getStartDate() != null) {
-      query.and("course_date >= ?", request.getStartDate());
+      condition = condition.and(field("course_date").ge(request.getStartDate()));
     }
     if (request.getEndDate() != null) {
-      query.and("course_date <= ?", request.getEndDate());
+      condition = condition.and(field("course_date").le(request.getEndDate()));
     }
     // 打卡学员数
     long studentCount = dsl.selectDistinct(field("student_id"))
         .from("edu_student_course_record")
-        .where("deleted = 0")
-        .and(request.getStartDate() != null ? "course_date >= '" + request.getStartDate() + "'" : "1=1")
-        .and(request.getEndDate() != null ? "course_date <= '" + request.getEndDate() + "'" : "1=1")
+        .where(condition)
         .fetch().size();
     // 总打卡数
     long totalAttendance = dsl.selectCount()
         .from("edu_student_course_record")
-        .where("deleted = 0")
-        // .and("status = '已到'") // 数据库无此字段，暂时注释
-        .and(request.getStartDate() != null ? "course_date >= '" + request.getStartDate() + "'" : "1=1")
-        .and(request.getEndDate() != null ? "course_date <= '" + request.getEndDate() + "'" : "1=1")
+        .where(condition)
         .fetchOne(0, Long.class);
-    // 总请假数
+    // 总请假数（如需统计 LEAVE 状态，否则同 totalAttendance）
     long totalLeave = dsl.selectCount()
         .from("edu_student_course_record")
-        .where("deleted = 0")
-        .and("status = 'LEAVE'") // 数据库无此字段，暂时注释
-        .and(request.getStartDate() != null ? "course_date >= '" + request.getStartDate() + "'" : "1=1")
-        .and(request.getEndDate() != null ? "course_date <= '" + request.getEndDate() + "'" : "1=1")
+        .where(condition.and(field("status").eq("LEAVE")))
         .fetchOne(0, Long.class);
     double attendanceRate = totalAttendance + totalLeave > 0 ? (double) totalAttendance / (totalAttendance + totalLeave) * 100 : 0;
     AttendanceRecordStatVO vo = new AttendanceRecordStatVO();

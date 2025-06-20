@@ -49,4 +49,8 @@ public class StudentCheckInRequest {
     @ApiModelProperty(value = "本次打卡消耗课时", required = true, example = "1.5")
     private BigDecimal duration;
 
+    @ApiModelProperty(value = "打卡类型（NORMAL-正常打卡，LEAVE-请假，ABSENT-缺勤）", required = true, example = "NORMAL")
+    @NotNull(message = "打卡类型不能为空")
+    private String type;
+
 } 

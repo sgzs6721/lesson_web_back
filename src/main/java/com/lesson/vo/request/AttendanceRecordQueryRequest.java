@@ -3,6 +3,7 @@ package com.lesson.vo.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @Schema(description = "打卡消课记录查询参数")
@@ -14,7 +15,7 @@ public class AttendanceRecordQueryRequest {
     private String keyword;
 
     @Schema(description = "课程ID", example = "1001")
-    private Long courseId;
+    private List<Long> courseIds;
 
     @Schema(description = "校区ID", example = "1")
     private Long campusId;
@@ -33,4 +34,4 @@ public class AttendanceRecordQueryRequest {
 
     @Schema(description = "每页条数", example = "20")
     private Integer pageSize = 20;
-} 
+}

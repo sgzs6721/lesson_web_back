@@ -22,7 +22,7 @@ import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row14;
+import org.jooq.Row15;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -124,6 +124,11 @@ public class EduStudentCourseRecord extends TableImpl<EduStudentCourseRecordReco
      */
     public final TableField<EduStudentCourseRecordRecord, Integer> DELETED = createField(DSL.name("deleted"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.inline("0", SQLDataType.INTEGER)), this, "是否删除：0-未删除，1-已删除");
 
+    /**
+     * The column <code>lesson.edu_student_course_record.status</code>. 记录类型：CHECK_IN-打卡, LEAVE-请假
+     */
+    public final TableField<EduStudentCourseRecordRecord, String> STATUS = createField(DSL.name("status"), SQLDataType.VARCHAR(20).nullable(false).defaultValue(DSL.inline("CHECK_IN", SQLDataType.VARCHAR)), this, "记录类型：CHECK_IN-打卡, LEAVE-请假");
+
     private EduStudentCourseRecord(Name alias, Table<EduStudentCourseRecordRecord> aliased) {
         this(alias, aliased, null);
     }
@@ -209,11 +214,11 @@ public class EduStudentCourseRecord extends TableImpl<EduStudentCourseRecordReco
     }
 
     // -------------------------------------------------------------------------
-    // Row14 type methods
+    // Row15 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row14<Long, Long, Long, Long, LocalDate, LocalTime, LocalTime, BigDecimal, String, Long, Long, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
-        return (Row14) super.fieldsRow();
+    public Row15<Long, Long, Long, Long, LocalDate, LocalTime, LocalTime, BigDecimal, String, Long, Long, LocalDateTime, LocalDateTime, Integer, String> fieldsRow() {
+        return (Row15) super.fieldsRow();
     }
 }

@@ -22,6 +22,8 @@ import java.util.List;
 import static org.jooq.impl.DSL.field;
 import static org.jooq.impl.DSL.table;
 
+import com.lesson.model.FinanceModel;
+
 /**
  * 财务服务
  */
@@ -30,6 +32,7 @@ import static org.jooq.impl.DSL.table;
 public class FinanceService {
     
     private final DSLContext dsl;
+    private final FinanceModel financeModel;
     
     /**
      * 添加财务记录（支出或收入）
@@ -109,45 +112,23 @@ public class FinanceService {
         FinanceRecordListVO result = new FinanceRecordListVO();
         List<FinanceRecordListVO.Item> list = new ArrayList<>();
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        
-        // 总记录数
         long total = 0;
-        // 总金额
         BigDecimal totalAmount = BigDecimal.ZERO;
-        
         if ("支出".equals(request.getTransactionType()) || request.getTransactionType() == null) {
-            // 查询支出记录
             SelectConditionStep<Record> query = dsl.select()
                     .from("finance_expense")
                     .where("deleted = 0");
-            
             applyExpenseQueryConditions(query, request);
-            
-            long expenseCount = query.fetchCount();
+            long expenseCount = financeModel.countExpense(request, query);
             total += expenseCount;
-            
-            // 计算支出总额
             BigDecimal expenseTotal = BigDecimal.ZERO;
             if (expenseCount > 0) {
-                expenseTotal = dsl.select(field("sum(amount)", BigDecimal.class))
-                        .from("finance_expense")
-                        .where("deleted = 0")
-                        .and(buildExpenseWhereConditions(request))
-                        .fetchOne(0, BigDecimal.class);
-                
+                expenseTotal = financeModel.sumExpense(request, buildExpenseWhereConditions(request));
                 if (expenseTotal != null) {
                     totalAmount = totalAmount.add(expenseTotal);
                 }
             }
-            
-            // 获取分页数据
-            List<Record> records = query
-                    .orderBy(field("expense_date", LocalDate.class).desc())
-                    .limit(request.getPageSize())
-                    .offset((request.getPageNum() - 1) * request.getPageSize())
-                    .fetch();
-            
-            // 转换为VO
+            List<Record> records = financeModel.listExpense(request, query);
             for (Record r : records) {
                 FinanceRecordListVO.Item item = new FinanceRecordListVO.Item();
                 item.setId(r.get("id", Long.class));
@@ -161,40 +142,21 @@ public class FinanceService {
                 list.add(item);
             }
         }
-        
         if ("收入".equals(request.getTransactionType()) || request.getTransactionType() == null) {
-            // 查询收入记录
             SelectConditionStep<Record> query = dsl.select()
                     .from("finance_income")
                     .where("deleted = 0");
-            
             applyIncomeQueryConditions(query, request);
-            
-            long incomeCount = query.fetchCount();
+            long incomeCount = financeModel.countIncome(request, query);
             total += incomeCount;
-            
-            // 计算收入总额
             BigDecimal incomeTotal = BigDecimal.ZERO;
             if (incomeCount > 0) {
-                incomeTotal = dsl.select(field("sum(amount)", BigDecimal.class))
-                        .from("finance_income")
-                        .where("deleted = 0")
-                        .and(buildIncomeWhereConditions(request))
-                        .fetchOne(0, BigDecimal.class);
-                
+                incomeTotal = financeModel.sumIncome(request, buildIncomeWhereConditions(request));
                 if (incomeTotal != null) {
                     totalAmount = totalAmount.add(incomeTotal);
                 }
             }
-            
-            // 获取分页数据
-            List<Record> records = query
-                    .orderBy(field("income_date", LocalDate.class).desc())
-                    .limit(request.getPageSize())
-                    .offset((request.getPageNum() - 1) * request.getPageSize())
-                    .fetch();
-            
-            // 转换为VO
+            List<Record> records = financeModel.listIncome(request, query);
             for (Record r : records) {
                 FinanceRecordListVO.Item item = new FinanceRecordListVO.Item();
                 item.setId(r.get("id", Long.class));
@@ -208,11 +170,9 @@ public class FinanceService {
                 list.add(item);
             }
         }
-        
         result.setList(list);
         result.setTotal(total);
         result.setTotalAmount(totalAmount);
-        
         return result;
     }
     

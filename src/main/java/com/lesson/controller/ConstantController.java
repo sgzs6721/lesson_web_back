@@ -1,13 +1,11 @@
 package com.lesson.controller;
 
 import com.lesson.common.Result;
-import com.lesson.common.enums.ConstantType;
 import com.lesson.service.ConstantService;
 import com.lesson.vo.constant.ConstantCreateRequest;
 import com.lesson.vo.constant.ConstantUpdateRequest;
 import com.lesson.vo.constant.ConstantVO;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
