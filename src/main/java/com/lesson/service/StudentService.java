@@ -723,10 +723,10 @@ public class StudentService {
     // 4. 计算消耗课时
     BigDecimal hoursConsumed = BigDecimal.ZERO;
     String type = request.getType();
-    if (type == null || !(type.equals("NOMAL") || type.equals("LEAVE") || type.equals("ABSENT"))) {
+    if (type == null || !(type.equals("NORMAL") || type.equals("LEAVE") || type.equals("ABSENT"))) {
       throw new BusinessException("打卡类型不合法");
     }
-    if (type.equals("NOMAL") || type.equals("ABSENT")) {
+    if (type.equals("NORMAL") || type.equals("ABSENT")) {
       if (request.getDuration() != null && request.getDuration().compareTo(BigDecimal.ZERO) > 0) {
         hoursConsumed = request.getDuration();
       } else {
@@ -745,7 +745,7 @@ public class StudentService {
       }
     }
     // 5. 检查剩余课时是否足够（仅NOMAL/ABSENT扣课时时校验）
-    if ((type.equals("NOMAL") || type.equals("ABSENT")) && studentCourse.getTotalHours().subtract(studentCourse.getConsumedHours()).compareTo(hoursConsumed) < 0) {
+    if ((type.equals("NORMAL") || type.equals("ABSENT")) && studentCourse.getTotalHours().subtract(studentCourse.getConsumedHours()).compareTo(hoursConsumed) < 0) {
       throw new BusinessException("剩余课时不足，无法完成打卡");
     }
     // 6. 获取教练ID
@@ -772,7 +772,7 @@ public class StudentService {
         .set(org.jooq.impl.DSL.field("status", String.class), type)
         .execute();
     // 8. 仅NOMAL/ABSENT类型才扣课时
-    if (type.equals("NOMAL") || type.equals("ABSENT")) {
+    if (type.equals("NORMAL") || type.equals("ABSENT")) {
       studentCourse.setConsumedHours(studentCourse.getConsumedHours().add(hoursConsumed));
       studentCourse.setUpdateTime(LocalDateTime.now());
       // 9. 将学员课程状态更新为"学习中"
