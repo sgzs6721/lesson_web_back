@@ -19,6 +19,7 @@ import static org.jooq.impl.DSL.field;
 import static org.jooq.impl.DSL.sum;
 import static org.jooq.impl.DSL.count;
 import com.lesson.repository.Tables;
+import org.springframework.util.CollectionUtils;
 
 @Slf4j
 @Service
@@ -29,7 +30,7 @@ public class PaymentRecordService {
     public PaymentRecordListVO listPaymentRecords(PaymentRecordQueryRequest request) {
         try {
             log.info("开始查询缴费记录，请求参数：{}", request);
-            
+
             Condition listConditions = Tables.EDU_STUDENT_PAYMENT.DELETED.eq(0);
 
         if (request.getKeyword() != null && !request.getKeyword().isEmpty()) {
@@ -38,18 +39,18 @@ public class PaymentRecordService {
                         .or(Tables.EDU_COURSE.NAME.like("%" + request.getKeyword() + "%"))
             );
         }
-        if (request.getCourseId() != null) {
-                listConditions = listConditions.and(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.eq(request.getCourseId().toString()));
+        if (!CollectionUtils.isEmpty(request.getCourseIds())) {
+                listConditions = listConditions.and(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.in(request.getCourseIds().toString()));
         }
-        if (request.getLessonType() != null && !request.getLessonType().isEmpty()) {
+        if (!CollectionUtils.isEmpty(request.getPaymentTypes())) {
                 try {
                     listConditions = listConditions.and(Tables.EDU_STUDENT_PAYMENT.COURSE_HOURS.eq(new BigDecimal(request.getLessonType())));
                 } catch (NumberFormatException e) {
                     log.warn("无效的 lessonType 格式：{}", request.getLessonType(), e);
                 }
         }
-        if (request.getPaymentType() != null && !request.getPaymentType().isEmpty()) {
-                listConditions = listConditions.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE.eq(request.getPaymentType()));
+        if (request.getPaymentTypes() != null && !request.getPaymentTypes().isEmpty()) {
+                listConditions = listConditions.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE.in(request.getPaymentTypes()));
         }
         if (request.getPayType() != null && !request.getPayType().isEmpty()) {
                 listConditions = listConditions.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_METHOD.eq(request.getPayType()));
@@ -66,13 +67,13 @@ public class PaymentRecordService {
 
             SelectConditionStep<Record> query = dsl.select()
                 .from(Tables.EDU_STUDENT_PAYMENT)
-                .leftJoin(Tables.EDU_STUDENT).on(Tables.EDU_STUDENT_PAYMENT.STUDENT_ID.eq(Tables.EDU_STUDENT.ID.cast(String.class))) 
+                .leftJoin(Tables.EDU_STUDENT).on(Tables.EDU_STUDENT_PAYMENT.STUDENT_ID.eq(Tables.EDU_STUDENT.ID.cast(String.class)))
                 .leftJoin(Tables.EDU_COURSE).on(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.eq(Tables.EDU_COURSE.ID.cast(String.class)))
                 .leftJoin(Tables.SYS_CONSTANT).on(Tables.EDU_COURSE.TYPE_ID.eq(Tables.SYS_CONSTANT.ID))
                 .where(listConditions);
 
             log.info("构建的SQL查询：{}", query.getSQL());
-            
+
             long total = dsl.selectCount()
                     .from(Tables.EDU_STUDENT_PAYMENT
                             .leftJoin(Tables.EDU_STUDENT).on(Tables.EDU_STUDENT_PAYMENT.STUDENT_ID.eq(Tables.EDU_STUDENT.ID.cast(String.class)))
@@ -82,7 +83,7 @@ public class PaymentRecordService {
                     .fetchOne(0, Long.class);
 
             log.info("查询到总记录数：{}", total);
-            
+
         List<Record> records = query
                     .orderBy(Tables.EDU_STUDENT_PAYMENT.CREATED_TIME.desc())
                 .limit(request.getPageSize())
@@ -93,7 +94,7 @@ public class PaymentRecordService {
 
         List<PaymentRecordListVO.Item> list = new ArrayList<>();
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            
+
         for (Record r : records) {
                 try {
             PaymentRecordListVO.Item item = new PaymentRecordListVO.Item();
@@ -117,7 +118,7 @@ public class PaymentRecordService {
         vo.setList(list);
         vo.setTotal(total);
         return vo;
-            
+
         } catch (Exception e) {
             log.error("查询缴费记录时发生错误：", e);
             throw new RuntimeException("查询缴费记录失败：" + e.getMessage(), e);
@@ -134,8 +135,8 @@ public class PaymentRecordService {
                     .or(Tables.EDU_COURSE.NAME.like("%" + request.getKeyword() + "%"))
             );
         }
-        if (request.getCourseId() != null) {
-            baseCondition = baseCondition.and(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.eq(request.getCourseId().toString()));
+        if (!CollectionUtils.isEmpty(request.getCourseIds())) {
+            baseCondition = baseCondition.and(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.in(request.getCourseIds().toString()));
         }
         if (request.getLessonType() != null && !request.getLessonType().isEmpty()) {
             try {
@@ -144,8 +145,8 @@ public class PaymentRecordService {
                 log.warn("无效的 lessonType 格式 (统计查询)：{}", request.getLessonType(), e);
             }
         }
-        if (request.getPaymentType() != null && !request.getPaymentType().isEmpty()) {
-            baseCondition = baseCondition.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE.eq(request.getPaymentType()));
+        if (!CollectionUtils.isEmpty(request.getPaymentTypes())) {
+            baseCondition = baseCondition.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE.in(request.getPaymentTypes()));
         }
         if (request.getPayType() != null && !request.getPayType().isEmpty()) {
             baseCondition = baseCondition.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_METHOD.eq(request.getPayType()));
@@ -199,4 +200,4 @@ public class PaymentRecordService {
         vo.setRefundTotal(refundTotal);
         return vo;
     }
-} 
+}
