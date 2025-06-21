@@ -159,20 +159,41 @@ public class AttendanceRecordService {
         .from("edu_student_course_record")
         .where(condition)
         .fetch().size();
-    // 总打卡数
-    long totalAttendance = dsl.selectCount()
+    // 总记录数
+    long totalRecords = dsl.selectCount()
         .from("edu_student_course_record")
         .where(condition)
         .fetchOne(0, Long.class);
-    // 总请假数（如需统计 LEAVE 状态，否则同 totalAttendance）
+    // 总请假数
     long totalLeave = dsl.selectCount()
         .from("edu_student_course_record")
         .where(condition.and(field("status").eq("LEAVE")))
         .fetchOne(0, Long.class);
-    double attendanceRate = totalAttendance + totalLeave > 0 ? (double) totalAttendance / (totalAttendance + totalLeave) * 100 : 0;
+    // 总缺勤数
+    long totalAbsent = dsl.selectCount()
+        .from("edu_student_course_record")
+        .where(condition.and(field("status").eq("ABSENT")))
+        .fetchOne(0, Long.class);
+
+    // 正常出勤数 = 总数 - 请假 - 缺勤
+    long totalNormal = totalRecords - totalLeave - totalAbsent;
+
+    double attendanceRate = 0.0;
+    // 出勤率 = 正常出勤 / (正常出勤 + 缺勤)
+    long denominator = totalNormal + totalAbsent;
+    if (denominator > 0) {
+        BigDecimal normalBd = BigDecimal.valueOf(totalNormal);
+        BigDecimal denominatorBd = BigDecimal.valueOf(denominator);
+        // 使用 BigDecimal 计算以确保精度，保留4位小数进行中间计算
+        BigDecimal rate = normalBd.divide(denominatorBd, 4, java.math.RoundingMode.HALF_UP)
+                                  .multiply(BigDecimal.valueOf(100));
+        // 最终结果保留两位小数
+        attendanceRate = rate.setScale(2, java.math.RoundingMode.HALF_UP).doubleValue();
+    }
+
     AttendanceRecordStatVO vo = new AttendanceRecordStatVO();
     vo.setStudentCount(studentCount);
-    vo.setTotalAttendance(totalAttendance);
+    vo.setTotalAttendance(totalRecords);
     vo.setTotalLeave(totalLeave);
     vo.setAttendanceRate(attendanceRate);
     return vo;
