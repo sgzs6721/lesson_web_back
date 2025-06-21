@@ -744,7 +744,7 @@ public class StudentService {
         }
       }
     }
-    // 5. 检查剩余课时是否足够（仅NOMAL/ABSENT扣课时时校验）
+    // 5. 检查剩余课时是否足够（仅NORMAL/ABSENT扣课时时校验）
     if ((type.equals("NORMAL") || type.equals("ABSENT")) && studentCourse.getTotalHours().subtract(studentCourse.getConsumedHours()).compareTo(hoursConsumed) < 0) {
       throw new BusinessException("剩余课时不足，无法完成打卡");
     }
@@ -771,7 +771,7 @@ public class StudentService {
         .set(Tables.EDU_STUDENT_COURSE_RECORD.DELETED, 0)
         .set(org.jooq.impl.DSL.field("status", String.class), type)
         .execute();
-    // 8. 仅NOMAL/ABSENT类型才扣课时
+    // 8. 仅NORMAL/ABSENT类型才扣课时
     if (type.equals("NORMAL") || type.equals("ABSENT")) {
       studentCourse.setConsumedHours(studentCourse.getConsumedHours().add(hoursConsumed));
       studentCourse.setUpdateTime(LocalDateTime.now());
