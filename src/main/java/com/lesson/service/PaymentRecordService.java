@@ -20,6 +20,7 @@ import static org.jooq.impl.DSL.sum;
 import static org.jooq.impl.DSL.count;
 import com.lesson.repository.Tables;
 import org.springframework.util.CollectionUtils;
+import com.lesson.enums.PaymentType;
 
 @Slf4j
 @Service
@@ -50,7 +51,9 @@ public class PaymentRecordService {
                 }
         }
         if (request.getPaymentTypes() != null && !request.getPaymentTypes().isEmpty()) {
-                listConditions = listConditions.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE.in(request.getPaymentTypes()));
+                listConditions = listConditions.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE.in(
+                    request.getPaymentTypes().stream().map(PaymentType::getValue).collect(java.util.stream.Collectors.toList())
+                ));
         }
         if (request.getPayType() != null && !request.getPayType().isEmpty()) {
                 listConditions = listConditions.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_METHOD.eq(request.getPayType()));
@@ -146,7 +149,9 @@ public class PaymentRecordService {
             }
         }
         if (!CollectionUtils.isEmpty(request.getPaymentTypes())) {
-            baseCondition = baseCondition.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE.in(request.getPaymentTypes()));
+            baseCondition = baseCondition.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE.in(
+                    request.getPaymentTypes().stream().map(PaymentType::getValue).collect(java.util.stream.Collectors.toList())
+            ));
         }
         if (request.getPayType() != null && !request.getPayType().isEmpty()) {
             baseCondition = baseCondition.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_METHOD.eq(request.getPayType()));
@@ -166,7 +171,7 @@ public class PaymentRecordService {
                 .from(Tables.EDU_STUDENT_PAYMENT)
                 .leftJoin(Tables.EDU_STUDENT).on(Tables.EDU_STUDENT_PAYMENT.STUDENT_ID.eq(Tables.EDU_STUDENT.ID.cast(String.class)))
                 .leftJoin(Tables.EDU_COURSE).on(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.eq(Tables.EDU_COURSE.ID.cast(String.class)))
-                .where(baseCondition.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE.in("新增", "续费")))
+                .where(baseCondition.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE.in(PaymentType.ADD.getValue(), PaymentType.RENEW.getValue())))
                 .fetchOptional(0, Long.class).orElse(0L);
 
         // 缴费总额
@@ -174,7 +179,7 @@ public class PaymentRecordService {
                 .from(Tables.EDU_STUDENT_PAYMENT)
                 .leftJoin(Tables.EDU_STUDENT).on(Tables.EDU_STUDENT_PAYMENT.STUDENT_ID.eq(Tables.EDU_STUDENT.ID.cast(String.class)))
                 .leftJoin(Tables.EDU_COURSE).on(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.eq(Tables.EDU_COURSE.ID.cast(String.class)))
-                .where(baseCondition.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE.in("新增", "续费")))
+                .where(baseCondition.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE.in(PaymentType.ADD.getValue(), PaymentType.RENEW.getValue())))
                 .fetchOptional(0, BigDecimal.class).orElse(BigDecimal.ZERO).doubleValue();
 
         // 退费次数
@@ -182,7 +187,7 @@ public class PaymentRecordService {
                 .from(Tables.EDU_STUDENT_PAYMENT)
                 .leftJoin(Tables.EDU_STUDENT).on(Tables.EDU_STUDENT_PAYMENT.STUDENT_ID.eq(Tables.EDU_STUDENT.ID.cast(String.class)))
                 .leftJoin(Tables.EDU_COURSE).on(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.eq(Tables.EDU_COURSE.ID.cast(String.class)))
-                .where(baseCondition.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE.eq("退费")))
+                .where(baseCondition.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE.eq(PaymentType.REFUND.getValue())))
                 .fetchOptional(0, Long.class).orElse(0L);
 
         // 退费总额
@@ -190,7 +195,7 @@ public class PaymentRecordService {
                 .from(Tables.EDU_STUDENT_PAYMENT)
                 .leftJoin(Tables.EDU_STUDENT).on(Tables.EDU_STUDENT_PAYMENT.STUDENT_ID.eq(Tables.EDU_STUDENT.ID.cast(String.class)))
                 .leftJoin(Tables.EDU_COURSE).on(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.eq(Tables.EDU_COURSE.ID.cast(String.class)))
-                .where(baseCondition.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE.eq("退费")))
+                .where(baseCondition.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE.eq(PaymentType.REFUND.getValue())))
                 .fetchOptional(0, BigDecimal.class).orElse(BigDecimal.ZERO).doubleValue();
 
         PaymentRecordStatVO vo = new PaymentRecordStatVO();

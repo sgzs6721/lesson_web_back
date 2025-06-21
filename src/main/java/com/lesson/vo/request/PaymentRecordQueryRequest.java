@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import java.time.LocalDate;
 import java.util.List;
+import com.lesson.enums.PaymentType;
 
 @Data
 @Schema(description = "缴费记录查询参数")
@@ -17,8 +18,8 @@ public class PaymentRecordQueryRequest {
     @Schema(description = "课时类型", example = "30次课")
     private String lessonType;
 
-    @Schema(description = "缴费类型", example = "新增")
-    private List<String> paymentTypes;
+    @Schema(description = "缴费类型", example = "ADD")
+    private List<PaymentType> paymentTypes;
 
     @Schema(description = "支付类型", example = "微信支付")
     private String payType;
