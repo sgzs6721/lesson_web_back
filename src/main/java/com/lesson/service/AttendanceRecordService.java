@@ -12,6 +12,7 @@ import org.jooq.SelectJoinStep;
 import org.jooq.SelectOnConditionStep;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -84,6 +85,18 @@ public class AttendanceRecordService {
     }
     if (request.getCampusId() != null) {
       condition = condition.and(EDU_STUDENT_COURSE_RECORD.CAMPUS_ID.eq(request.getCampusId()));
+    }
+    if (StringUtils.hasText(request.getStatus())) {
+        String status = request.getStatus();
+        String dbStatus = status;
+        if ("已到".equals(status)) {
+            dbStatus = "NORMAL";
+        } else if ("请假".equals(status)) {
+            dbStatus = "LEAVE";
+        } else if ("缺勤".equals(status)) {
+            dbStatus = "ABSENT";
+        }
+        condition = condition.and(EDU_STUDENT_COURSE_RECORD.STATUS.eq(dbStatus));
     }
     if (request.getStartDate() != null) {
       condition = condition.and(EDU_STUDENT_COURSE_RECORD.COURSE_DATE.ge(request.getStartDate()));
