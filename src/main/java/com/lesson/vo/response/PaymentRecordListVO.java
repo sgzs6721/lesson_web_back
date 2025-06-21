@@ -3,6 +3,7 @@ package com.lesson.vo.response;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import java.util.List;
+import java.math.BigDecimal;
 
 @Data
 @Schema(description = "缴费记录列表VO")
@@ -27,6 +28,9 @@ public class PaymentRecordListVO {
 
         @Schema(description = "金额", example = "2000")
         private String amount;
+
+        @Schema(description = "课时", example = "20.0")
+        private BigDecimal hours;
 
         @Schema(description = "课时类型", example = "30次课")
         private String lessonType;
