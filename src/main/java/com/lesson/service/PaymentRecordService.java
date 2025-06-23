@@ -171,7 +171,7 @@ public class PaymentRecordService {
                 .from(Tables.EDU_STUDENT_PAYMENT)
                 .leftJoin(Tables.EDU_STUDENT).on(Tables.EDU_STUDENT_PAYMENT.STUDENT_ID.eq(Tables.EDU_STUDENT.ID.cast(String.class)))
                 .leftJoin(Tables.EDU_COURSE).on(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.eq(Tables.EDU_COURSE.ID.cast(String.class)))
-                .where(baseCondition.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE.in(PaymentType.ADD.getValue(), PaymentType.RENEW.getValue())))
+                .where(baseCondition.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE.in(PaymentType.NEW.getValue(), PaymentType.RENEW.getValue())))
                 .fetchOptional(0, Long.class).orElse(0L);
 
         // 缴费总额
@@ -179,7 +179,7 @@ public class PaymentRecordService {
                 .from(Tables.EDU_STUDENT_PAYMENT)
                 .leftJoin(Tables.EDU_STUDENT).on(Tables.EDU_STUDENT_PAYMENT.STUDENT_ID.eq(Tables.EDU_STUDENT.ID.cast(String.class)))
                 .leftJoin(Tables.EDU_COURSE).on(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.eq(Tables.EDU_COURSE.ID.cast(String.class)))
-                .where(baseCondition.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE.in(PaymentType.ADD.getValue(), PaymentType.RENEW.getValue())))
+                .where(baseCondition.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE.in(PaymentType.NEW.getValue(), PaymentType.RENEW.getValue())))
                 .fetchOptional(0, BigDecimal.class).orElse(BigDecimal.ZERO).doubleValue();
 
         // 退费次数
