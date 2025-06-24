@@ -933,9 +933,8 @@ public class StudentService {
     String giftItemsDbString = null; // 用于存储到数据库的字符串
     if (request.getGiftItems() != null && !request.getGiftItems().isEmpty()) {
         List<Long> giftItemIds = request.getGiftItems();
-
         // 查询所有类型为 GIFT_ITEM_TYPE 的有效常量 ID
-        List<SysConstantRecord> validGiftConstants = constantModel.listByType(ConstantType.GIFT_ITEM.getName());
+        List<SysConstantRecord> validGiftConstants = constantModel.list(ConstantType.GIFT_ITEM.getName());
         Set<Long> validGiftIds = validGiftConstants.stream()
                 .filter(c -> c.getStatus() == 1) // 仅考虑启用的常量
                 .map(SysConstantRecord::getId)
