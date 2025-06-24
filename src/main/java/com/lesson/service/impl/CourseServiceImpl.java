@@ -216,7 +216,7 @@ public class CourseServiceImpl implements CourseService {
         // 获取课程类型
         if (record.getTypeId() != null) {
             // 获取所有课程类型常量
-            List<SysConstantRecord> courseTypes = constantModel.listByType(ConstantType.COURSE_TYPE.getName());
+            List<SysConstantRecord> courseTypes = constantModel.list(ConstantType.COURSE_TYPE.getName());
             SysConstantRecord typeRecord = courseTypes.stream()
                 .filter(type -> type.getId().equals(record.getTypeId()))
                 .findFirst()
@@ -261,7 +261,7 @@ public class CourseServiceImpl implements CourseService {
         );
 
         // 获取所有课程类型常量
-        List<SysConstantRecord> courseTypes = constantModel.listByType(ConstantType.COURSE_TYPE.getName());
+        List<SysConstantRecord> courseTypes = constantModel.list(ConstantType.COURSE_TYPE.getName());
         Map<Long, String> courseTypeMap = courseTypes.stream()
             .collect(Collectors.toMap(
                 SysConstantRecord::getId,
@@ -352,7 +352,7 @@ public class CourseServiceImpl implements CourseService {
             }
 
             // 获取所有课程类型
-            List<SysConstantRecord> courseTypes = constantModel.listByType("COURSE_TYPE");
+            List<SysConstantRecord> courseTypes = constantModel.list("COURSE_TYPE");
             Map<Long, String> courseTypeMap = new HashMap<>();
             for (SysConstantRecord record : courseTypes) {
                 courseTypeMap.put(record.getId(), record.getConstantValue());
