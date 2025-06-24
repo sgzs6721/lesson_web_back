@@ -9,6 +9,8 @@ import java.util.List;
 
 public interface ConstantService {
     List<ConstantVO> listAll();
+
+    List<ConstantVO> listByType(String type);
     
     /**
      * 创建系统常量

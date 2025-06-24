@@ -6,6 +6,7 @@ import com.lesson.vo.constant.ConstantCreateRequest;
 import com.lesson.vo.constant.ConstantUpdateRequest;
 import com.lesson.vo.constant.ConstantVO;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -20,9 +21,16 @@ public class ConstantController {
     private final ConstantService constantService;
 
     @GetMapping("/list")
-    @Operation(summary = "获取系统常量列表", description = "获取所有系统常量列表")
+    @Operation(summary = "获取所有系统常量列表", description = "获取所有系统常量列表")
     public Result<List<ConstantVO>> listConstants() {
         return Result.success(constantService.listAll());
+    }
+
+    @GetMapping("/listByType")
+    @Operation(summary = "根据类型获取系统常量列表", description = "根据类型获取系统常量列表")
+    public Result<List<ConstantVO>> listConstantsByType(
+            @Parameter(description = "常量类型", required = true) @RequestParam String type) {
+        return Result.success(constantService.listByType(type));
     }
 
     @PostMapping("/create")

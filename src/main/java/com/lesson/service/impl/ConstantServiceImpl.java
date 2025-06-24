@@ -23,13 +23,23 @@ public class ConstantServiceImpl implements ConstantService {
     @Override
     public List<ConstantVO> listAll() {
         return constantModel.listAll()
-            .stream()
-            .map(record -> {
-                ConstantVO vo = new ConstantVO();
-                BeanUtils.copyProperties(record, vo);
-                return vo;
-            })
-            .collect(Collectors.toList());
+                .stream()
+                .map(this::toConstantVO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ConstantVO> listByType(String type) {
+        return constantModel.listByType(type)
+                .stream()
+                .map(this::toConstantVO)
+                .collect(Collectors.toList());
+    }
+
+    private ConstantVO toConstantVO(SysConstantRecord record) {
+        ConstantVO vo = new ConstantVO();
+        BeanUtils.copyProperties(record, vo);
+        return vo;
     }
 
     @Override
