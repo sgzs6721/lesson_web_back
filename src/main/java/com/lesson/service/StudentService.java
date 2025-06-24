@@ -35,8 +35,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.*;
+
 import org.jooq.Record;
 import org.jooq.SelectConditionStep;
 import com.lesson.vo.response.StudentWithCoursesVO;
@@ -49,9 +49,7 @@ import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.Duration;
-import java.util.List;
 import java.util.stream.Collectors;
-import java.util.Set;
 
 import com.lesson.common.enums.ConstantType;
 import com.lesson.vo.request.StudentCourseTransferRequest;
@@ -934,7 +932,7 @@ public class StudentService {
     if (request.getGiftItems() != null && !request.getGiftItems().isEmpty()) {
         List<Long> giftItemIds = request.getGiftItems();
         // 查询所有类型为 GIFT_ITEM_TYPE 的有效常量 ID
-        List<SysConstantRecord> validGiftConstants = constantModel.list(ConstantType.GIFT_ITEM.getName());
+        List<SysConstantRecord> validGiftConstants = constantModel.list(Arrays.asList(ConstantType.GIFT_ITEM.getName()));
         Set<Long> validGiftIds = validGiftConstants.stream()
                 .filter(c -> c.getStatus() == 1) // 仅考虑启用的常量
                 .map(SysConstantRecord::getId)
