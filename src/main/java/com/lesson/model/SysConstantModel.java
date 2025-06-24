@@ -17,12 +17,12 @@ import static com.lesson.repository.tables.SysConstant.SYS_CONSTANT;
 public class SysConstantModel {
     private final DSLContext dsl;
 
-    public List<SysConstantRecord> list(String type) {
+    public List<SysConstantRecord> list(List<String> type) {
         SelectConditionStep<SysConstantRecord> query = dsl.selectFrom(SYS_CONSTANT)
                 .where(SYS_CONSTANT.DELETED.eq(0));
 
         if (type != null && !type.isEmpty()) {
-            query.and(SYS_CONSTANT.TYPE.eq(type));
+            query.and(SYS_CONSTANT.TYPE.in(type));
         }
 
         return query.orderBy(SYS_CONSTANT.CREATED_TIME)
