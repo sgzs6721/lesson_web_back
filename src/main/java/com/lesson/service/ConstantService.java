@@ -8,10 +8,8 @@ import com.lesson.vo.constant.ConstantVO;
 import java.util.List;
 
 public interface ConstantService {
-    List<ConstantVO> listAll();
+    List<ConstantVO> list(String type);
 
-    List<ConstantVO> listByType(String type);
-    
     /**
      * 创建系统常量
      *
@@ -19,14 +17,14 @@ public interface ConstantService {
      * @return 创建的常量详情
      */
     ConstantVO createConstant(ConstantCreateRequest request);
-    
+
     /**
      * 更新系统常量
      *
      * @param request 更新请求
      */
     void updateConstant(ConstantUpdateRequest request);
-    
+
     /**
      * 删除系统常量
      *

@@ -21,16 +21,10 @@ public class ConstantController {
     private final ConstantService constantService;
 
     @GetMapping("/list")
-    @Operation(summary = "获取所有系统常量列表", description = "获取所有系统常量列表")
-    public Result<List<ConstantVO>> listConstants() {
-        return Result.success(constantService.listAll());
-    }
-
-    @GetMapping("/listByType")
-    @Operation(summary = "根据类型获取系统常量列表", description = "根据类型获取系统常量列表")
-    public Result<List<ConstantVO>> listConstantsByType(
-            @Parameter(description = "常量类型", required = true) @RequestParam String type) {
-        return Result.success(constantService.listByType(type));
+    @Operation(summary = "获取系统常量列表", description = "根据类型获取系统常量列表，如果类型为空则获取所有")
+    public Result<List<ConstantVO>> listConstants(
+            @Parameter(description = "常量类型") @RequestParam(required = false) String type) {
+        return Result.success(constantService.list(type));
     }
 
     @PostMapping("/create")

@@ -21,16 +21,8 @@ public class ConstantServiceImpl implements ConstantService {
     private final SysConstantModel constantModel;
 
     @Override
-    public List<ConstantVO> listAll() {
-        return constantModel.listAll()
-                .stream()
-                .map(this::toConstantVO)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<ConstantVO> listByType(String type) {
-        return constantModel.listByType(type)
+    public List<ConstantVO> list(String type) {
+        return constantModel.list(type)
                 .stream()
                 .map(this::toConstantVO)
                 .collect(Collectors.toList());

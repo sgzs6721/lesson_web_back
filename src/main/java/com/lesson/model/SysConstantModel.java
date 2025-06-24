@@ -4,6 +4,7 @@ import com.lesson.common.exception.BusinessException;
 import com.lesson.repository.tables.records.SysConstantRecord;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
+import org.jooq.SelectConditionStep;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -16,13 +17,16 @@ import static com.lesson.repository.tables.SysConstant.SYS_CONSTANT;
 public class SysConstantModel {
     private final DSLContext dsl;
 
-    public List<SysConstantRecord> listByType(String type) {
-        return dsl.selectFrom(SYS_CONSTANT)
-            .where(SYS_CONSTANT.TYPE.eq(type))
-            //.and(SYS_CONSTANT.STATUS.eq(1))
-            .and(SYS_CONSTANT.DELETED.eq(0))
-            .orderBy(SYS_CONSTANT.CREATED_TIME)
-            .fetch();
+    public List<SysConstantRecord> list(String type) {
+        SelectConditionStep<SysConstantRecord> query = dsl.selectFrom(SYS_CONSTANT)
+                .where(SYS_CONSTANT.DELETED.eq(0));
+
+        if (type != null && !type.isEmpty()) {
+            query.and(SYS_CONSTANT.TYPE.eq(type));
+        }
+
+        return query.orderBy(SYS_CONSTANT.CREATED_TIME)
+                .fetch();
     }
 
     /**
@@ -98,10 +102,13 @@ public class SysConstantModel {
             .execute();
     }
 
+    // This method is now replaced by list(String type)
+    /*
     public List<SysConstantRecord> listAll() {
         return dsl.selectFrom(SYS_CONSTANT)
             .where(SYS_CONSTANT.DELETED.eq(0))
             .orderBy(SYS_CONSTANT.CREATED_TIME)
             .fetch();
     }
+    */
 }
