@@ -31,10 +31,10 @@ import com.lesson.enums.FinanceType;
 @Service
 @RequiredArgsConstructor
 public class FinanceService {
-    
+
     private final DSLContext dsl;
     private final FinanceModel financeModel;
-    
+
     /**
      * 添加财务记录（支出或收入）
      */
@@ -97,7 +97,7 @@ public class FinanceService {
             .execute();
         }
     }
-    
+
     /**
      * 查询财务记录列表
      */
@@ -166,7 +166,7 @@ public class FinanceService {
         result.setTotalAmount(totalAmount);
         return result;
     }
-    
+
     /**
      * 应用支出查询条件
      */
@@ -177,29 +177,25 @@ public class FinanceService {
                     "%" + request.getKeyword() + "%"
             );
         }
-        
-        if (request.getCategory() != null && !request.getCategory().isEmpty()) {
-            query.and("category = ?", request.getCategory());
-        }
-        
+
         if (request.getStartDate() != null) {
             query.and("expense_date >= ?", request.getStartDate());
         }
-        
+
         if (request.getEndDate() != null) {
             query.and("expense_date <= ?", request.getEndDate());
         }
-        
+
         if (request.getCampusId() != null) {
             query.and("campus_id = ?", request.getCampusId());
         }
-        
+
         if (request.getCategoryId() != null && !request.getCategoryId().isEmpty()) {
             String inClause = request.getCategoryId().stream().map(String::valueOf).collect(java.util.stream.Collectors.joining(","));
             query.and("category_id IN (" + inClause + ")");
         }
     }
-    
+
     /**
      * 应用收入查询条件
      */
@@ -210,115 +206,103 @@ public class FinanceService {
                     "%" + request.getKeyword() + "%"
             );
         }
-        
-        if (request.getCategory() != null && !request.getCategory().isEmpty()) {
-            query.and("category = ?", request.getCategory());
-        }
-        
+
         if (request.getStartDate() != null) {
             query.and("income_date >= ?", request.getStartDate());
         }
-        
+
         if (request.getEndDate() != null) {
             query.and("income_date <= ?", request.getEndDate());
         }
-        
+
         if (request.getCampusId() != null) {
             query.and("campus_id = ?", request.getCampusId());
         }
-        
+
         if (request.getCategoryId() != null && !request.getCategoryId().isEmpty()) {
             String inClause = request.getCategoryId().stream().map(String::valueOf).collect(java.util.stream.Collectors.joining(","));
             query.and("category_id IN (" + inClause + ")");
         }
     }
-    
+
     /**
      * 构建支出条件字符串
      */
     private String buildExpenseWhereConditions(FinanceRecordQueryRequest request) {
         StringBuilder sb = new StringBuilder("deleted = 0");
-        
+
         if (request.getKeyword() != null && !request.getKeyword().isEmpty()) {
             sb.append(" AND (expense_item LIKE '%").append(request.getKeyword()).append("%'")
                     .append(" OR notes LIKE '%").append(request.getKeyword()).append("%')");
         }
-        
-        if (request.getCategory() != null && !request.getCategory().isEmpty()) {
-            sb.append(" AND category = '").append(request.getCategory()).append("'");
-        }
-        
+
         if (request.getStartDate() != null) {
             sb.append(" AND expense_date >= '").append(request.getStartDate()).append("'");
         }
-        
+
         if (request.getEndDate() != null) {
             sb.append(" AND expense_date <= '").append(request.getEndDate()).append("'");
         }
-        
+
         if (request.getCampusId() != null) {
             sb.append(" AND campus_id = ").append(request.getCampusId());
         }
-        
+
         if (request.getCategoryId() != null && !request.getCategoryId().isEmpty()) {
             String inClause = request.getCategoryId().stream().map(String::valueOf).collect(java.util.stream.Collectors.joining(","));
             sb.append(" AND category_id IN (" + inClause + ")");
         }
-        
+
         return sb.toString();
     }
-    
+
     /**
      * 构建收入条件字符串
      */
     private String buildIncomeWhereConditions(FinanceRecordQueryRequest request) {
         StringBuilder sb = new StringBuilder("deleted = 0");
-        
+
         if (request.getKeyword() != null && !request.getKeyword().isEmpty()) {
             sb.append(" AND (income_item LIKE '%").append(request.getKeyword()).append("%'")
                     .append(" OR notes LIKE '%").append(request.getKeyword()).append("%')");
         }
-        
-        if (request.getCategory() != null && !request.getCategory().isEmpty()) {
-            sb.append(" AND category = '").append(request.getCategory()).append("'");
-        }
-        
+
         if (request.getStartDate() != null) {
             sb.append(" AND income_date >= '").append(request.getStartDate()).append("'");
         }
-        
+
         if (request.getEndDate() != null) {
             sb.append(" AND income_date <= '").append(request.getEndDate()).append("'");
         }
-        
+
         if (request.getCampusId() != null) {
             sb.append(" AND campus_id = ").append(request.getCampusId());
         }
-        
+
         if (request.getCategoryId() != null && !request.getCategoryId().isEmpty()) {
             String inClause = request.getCategoryId().stream().map(String::valueOf).collect(java.util.stream.Collectors.joining(","));
             sb.append(" AND category_id IN (" + inClause + ")");
         }
-        
+
         return sb.toString();
     }
-    
+
     /**
      * 统计财务记录
      */
     public FinanceStatVO statFinanceRecords(FinanceRecordQueryRequest request) {
         FinanceStatVO vo = new FinanceStatVO();
-        
+
         // 查询支出记录数量和总额
         SelectConditionStep<Record> expenseQuery = dsl.select()
                 .from("finance_expense")
                 .where("deleted = 0");
-        
+
         applyExpenseQueryConditions(expenseQuery, request);
-        
+
         long expenseCount = expenseQuery.fetchCount();
         vo.setExpenseCount(expenseCount);
-        
+
         BigDecimal expenseTotal = BigDecimal.ZERO;
         if (expenseCount > 0) {
             expenseTotal = dsl.select(field("sum(amount)", BigDecimal.class))
@@ -326,23 +310,23 @@ public class FinanceService {
                     .where("deleted = 0")
                     .and(buildExpenseWhereConditions(request))
                     .fetchOne(0, BigDecimal.class);
-            
+
             if (expenseTotal == null) {
                 expenseTotal = BigDecimal.ZERO;
             }
         }
         vo.setExpenseTotal(expenseTotal);
-        
+
         // 查询收入记录数量和总额
         SelectConditionStep<Record> incomeQuery = dsl.select()
                 .from("finance_income")
                 .where("deleted = 0");
-        
+
         applyIncomeQueryConditions(incomeQuery, request);
-        
+
         long incomeCount = incomeQuery.fetchCount();
         vo.setIncomeCount(incomeCount);
-        
+
         BigDecimal incomeTotal = BigDecimal.ZERO;
         if (incomeCount > 0) {
             incomeTotal = dsl.select(field("sum(amount)", BigDecimal.class))
@@ -350,19 +334,19 @@ public class FinanceService {
                     .where("deleted = 0")
                     .and(buildIncomeWhereConditions(request))
                     .fetchOne(0, BigDecimal.class);
-            
+
             if (incomeTotal == null) {
                 incomeTotal = BigDecimal.ZERO;
             }
         }
         vo.setIncomeTotal(incomeTotal);
-        
+
         // 计算收支差额
         vo.setBalance(incomeTotal.subtract(expenseTotal));
-        
+
         return vo;
     }
-    
+
     /**
      * 获取支出类别列表
      */
@@ -372,7 +356,7 @@ public class FinanceService {
                 .where("deleted = 0")
                 .fetch(0, String.class);
     }
-    
+
     /**
      * 获取收入类别列表
      */
@@ -382,4 +366,4 @@ public class FinanceService {
                 .where("deleted = 0")
                 .fetch(0, String.class);
     }
-} 
+}
