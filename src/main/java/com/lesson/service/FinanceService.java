@@ -38,7 +38,7 @@ public class FinanceService {
     /**
      * 添加财务记录（支出或收入）
      */
-    public void addFinanceRecord(FinanceRecordRequest request) {
+    public void addFinanceRecord(FinanceRecordRequest request, Long institutionId) {
         if (request.getType() == FinanceType.EXPEND) {
             // 添加支出记录
             dsl.insertInto(
@@ -49,6 +49,7 @@ public class FinanceService {
                     field("category"),
                     field("notes"),
                     field("campus_id"),
+                    field("institution_id"),
                     field("created_time"),
                     field("update_time"),
                     field("deleted")
@@ -60,6 +61,7 @@ public class FinanceService {
                     request.getCategory(),
                     request.getNotes(),
                     request.getCampusId(),
+                    institutionId,
                     LocalDateTime.now(),
                     LocalDateTime.now(),
                     0
@@ -75,6 +77,7 @@ public class FinanceService {
                     field("category"),
                     field("notes"),
                     field("campus_id"),
+                    field("institution_id"),
                     field("created_time"),
                     field("update_time"),
                     field("deleted")
@@ -86,6 +89,7 @@ public class FinanceService {
                     request.getCategory(),
                     request.getNotes(),
                     request.getCampusId(),
+                    institutionId,
                     LocalDateTime.now(),
                     LocalDateTime.now(),
                     0

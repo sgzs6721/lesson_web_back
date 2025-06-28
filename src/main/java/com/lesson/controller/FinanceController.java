@@ -13,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * 财务收支管理控制器
@@ -30,8 +31,12 @@ public class FinanceController {
      */
     @PostMapping("/record")
     @Operation(summary = "添加财务记录", description = "添加收入或支出记录")
-    public Result<Void> addFinanceRecord(@RequestBody @Validated FinanceRecordRequest request) {
-        financeService.addFinanceRecord(request);
+    public Result<Void> addFinanceRecord(@RequestBody @Validated FinanceRecordRequest request, HttpServletRequest httpServletRequest) {
+        Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
+        if (institutionId == null) {
+            institutionId = 1L;
+        }
+        financeService.addFinanceRecord(request, institutionId);
         return Result.success();
     }
 
