@@ -23,7 +23,7 @@ public class ConstantController {
     @GetMapping("/list")
     @Operation(summary = "获取系统常量列表", description = "根据类型获取系统常量列表，如果类型为空则获取所有")
     public Result<List<ConstantVO>> listConstants(
-            @Parameter(description = "常量类型") @RequestParam(required = false) List<String> type) {
+            @Parameter(description = "常量类型列表") @RequestParam(required = false) List<String> type) {
         return Result.success(constantService.list(type));
     }
 

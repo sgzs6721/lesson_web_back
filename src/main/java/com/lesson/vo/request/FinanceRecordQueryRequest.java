@@ -3,6 +3,7 @@ package com.lesson.vo.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.lesson.enums.FinanceType;
 
 import java.time.LocalDate;
 
@@ -14,11 +15,11 @@ import java.time.LocalDate;
 public class FinanceRecordQueryRequest {
     
     /**
-     * 交易类型：支出或收入
+     * 交易类型：INCOME/EXPEND
      */
-    @Schema(description = "交易类型", example = "支出")
+    @Schema(description = "交易类型", example = "INCOME/EXPEND")
     @JsonAlias("type")
-    private String transactionType;
+    private FinanceType transactionType;
     
     /**
      * 关键词（项目名称、备注）
@@ -31,12 +32,6 @@ public class FinanceRecordQueryRequest {
      */
     @Schema(description = "类别", example = "办公费用")
     private String category;
-    
-    /**
-     * 支付方式
-     */
-    @Schema(description = "支付方式", example = "现金")
-    private String paymentMethod;
     
     /**
      * 开始日期
@@ -55,12 +50,6 @@ public class FinanceRecordQueryRequest {
      */
     @Schema(description = "校区ID", example = "1")
     private Long campusId;
-    
-    /**
-     * 机构ID
-     */
-    @Schema(description = "机构ID", example = "1")
-    private Long institutionId;
     
     /**
      * 页码，从1开始

@@ -73,11 +73,5 @@ public class FinanceRecordRequest {
     @NotNull(message = "校区ID不能为空")
     @Schema(description = "校区ID", required = true, example = "1")
     private Long campusId;
-    
-    /**
-     * 校区名称
-     */
-    @Schema(description = "校区名称", example = "总校区")
-    private String campusName;
 
 } 

@@ -23,6 +23,7 @@ import static org.jooq.impl.DSL.field;
 import static org.jooq.impl.DSL.table;
 
 import com.lesson.model.FinanceModel;
+import com.lesson.enums.FinanceType;
 
 /**
  * 财务服务
@@ -49,8 +50,6 @@ public class FinanceService {
                     field("payment_method"),
                     field("notes"),
                     field("campus_id"),
-                    field("campus_name"),
-                    field("institution_id"),
                     field("created_time"),
                     field("update_time"),
                     field("deleted")
@@ -63,8 +62,6 @@ public class FinanceService {
                     request.getPaymentMethod(),
                     request.getNotes(),
                     request.getCampusId(),
-                    request.getCampusName(),
-                    1L,
                     LocalDateTime.now(),
                     LocalDateTime.now(),
                     0
@@ -81,8 +78,6 @@ public class FinanceService {
                     field("payment_method"),
                     field("notes"),
                     field("campus_id"),
-                    field("campus_name"),
-                    field("institution_id"),
                     field("created_time"),
                     field("update_time"),
                     field("deleted")
@@ -95,8 +90,6 @@ public class FinanceService {
                     request.getPaymentMethod(),
                     request.getNotes(),
                     request.getCampusId(),
-                    request.getCampusName(),
-                    1L,
                     LocalDateTime.now(),
                     LocalDateTime.now(),
                     0
@@ -114,7 +107,7 @@ public class FinanceService {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         long total = 0;
         BigDecimal totalAmount = BigDecimal.ZERO;
-        if ("支出".equals(request.getTransactionType()) || request.getTransactionType() == null) {
+        if (request.getTransactionType() == FinanceType.EXPEND || request.getTransactionType() == null) {
             SelectConditionStep<Record> query = dsl.select()
                     .from("finance_expense")
                     .where("deleted = 0");
@@ -136,13 +129,12 @@ public class FinanceService {
                 item.setItem(r.get("expense_item", String.class));
                 item.setAmount(r.get("amount", BigDecimal.class).toString());
                 item.setCategory(r.get("category", String.class));
-                item.setPaymentMethod(r.get("payment_method", String.class));
                 item.setNotes(r.get("notes", String.class));
                 item.setCampusName(r.get("campus_name", String.class));
                 list.add(item);
             }
         }
-        if ("收入".equals(request.getTransactionType()) || request.getTransactionType() == null) {
+        if (request.getTransactionType() == FinanceType.INCOME || request.getTransactionType() == null) {
             SelectConditionStep<Record> query = dsl.select()
                     .from("finance_income")
                     .where("deleted = 0");
@@ -164,7 +156,6 @@ public class FinanceService {
                 item.setItem(r.get("income_item", String.class));
                 item.setAmount(r.get("amount", BigDecimal.class).toString());
                 item.setCategory(r.get("category", String.class));
-                item.setPaymentMethod(r.get("payment_method", String.class));
                 item.setNotes(r.get("notes", String.class));
                 item.setCampusName(r.get("campus_name", String.class));
                 list.add(item);
@@ -191,10 +182,6 @@ public class FinanceService {
             query.and("category = ?", request.getCategory());
         }
         
-        if (request.getPaymentMethod() != null && !request.getPaymentMethod().isEmpty()) {
-            query.and("payment_method = ?", request.getPaymentMethod());
-        }
-        
         if (request.getStartDate() != null) {
             query.and("expense_date >= ?", request.getStartDate());
         }
@@ -205,10 +192,6 @@ public class FinanceService {
         
         if (request.getCampusId() != null) {
             query.and("campus_id = ?", request.getCampusId());
-        }
-        
-        if (request.getInstitutionId() != null) {
-            query.and("institution_id = ?", request.getInstitutionId());
         }
     }
     
@@ -227,10 +210,6 @@ public class FinanceService {
             query.and("category = ?", request.getCategory());
         }
         
-        if (request.getPaymentMethod() != null && !request.getPaymentMethod().isEmpty()) {
-            query.and("payment_method = ?", request.getPaymentMethod());
-        }
-        
         if (request.getStartDate() != null) {
             query.and("income_date >= ?", request.getStartDate());
         }
@@ -241,10 +220,6 @@ public class FinanceService {
         
         if (request.getCampusId() != null) {
             query.and("campus_id = ?", request.getCampusId());
-        }
-        
-        if (request.getInstitutionId() != null) {
-            query.and("institution_id = ?", request.getInstitutionId());
         }
     }
     
@@ -263,10 +238,6 @@ public class FinanceService {
             sb.append(" AND category = '").append(request.getCategory()).append("'");
         }
         
-        if (request.getPaymentMethod() != null && !request.getPaymentMethod().isEmpty()) {
-            sb.append(" AND payment_method = '").append(request.getPaymentMethod()).append("'");
-        }
-        
         if (request.getStartDate() != null) {
             sb.append(" AND expense_date >= '").append(request.getStartDate()).append("'");
         }
@@ -277,10 +248,6 @@ public class FinanceService {
         
         if (request.getCampusId() != null) {
             sb.append(" AND campus_id = ").append(request.getCampusId());
-        }
-        
-        if (request.getInstitutionId() != null) {
-            sb.append(" AND institution_id = ").append(request.getInstitutionId());
         }
         
         return sb.toString();
@@ -301,10 +268,6 @@ public class FinanceService {
             sb.append(" AND category = '").append(request.getCategory()).append("'");
         }
         
-        if (request.getPaymentMethod() != null && !request.getPaymentMethod().isEmpty()) {
-            sb.append(" AND payment_method = '").append(request.getPaymentMethod()).append("'");
-        }
-        
         if (request.getStartDate() != null) {
             sb.append(" AND income_date >= '").append(request.getStartDate()).append("'");
         }
@@ -315,10 +278,6 @@ public class FinanceService {
         
         if (request.getCampusId() != null) {
             sb.append(" AND campus_id = ").append(request.getCampusId());
-        }
-        
-        if (request.getInstitutionId() != null) {
-            sb.append(" AND institution_id = ").append(request.getInstitutionId());
         }
         
         return sb.toString();
