@@ -137,6 +137,7 @@ public class FinanceService {
                 item.setCategoryId(r.get("category_id", Long.class));
                 item.setCategoryName(r.get("category_name", String.class));
                 item.setNotes(r.get("notes", String.class));
+                item.setTransactionType(request.getTransactionType());
                 list.add(item);
             }
         }
@@ -169,6 +170,7 @@ public class FinanceService {
                 item.setCategoryId(r.get("category_id", Long.class));
                 item.setCategoryName(r.get("category_name", String.class));
                 item.setNotes(r.get("notes", String.class));
+                item.setTransactionType(request.getTransactionType());
                 list.add(item);
             }
         }

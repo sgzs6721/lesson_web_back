@@ -74,10 +74,10 @@ public class FinanceRecordListVO {
         private String categoryName;
         
         /**
-         * 支付方式
+         * 交易类型
          */
-        @Schema(description = "支付方式", example = "现金")
-        private String paymentMethod;
+        @Schema(description = "交易类型", example = "INCOME/EXPEND")
+        private com.lesson.enums.FinanceType transactionType;
         
         /**
          * 备注
