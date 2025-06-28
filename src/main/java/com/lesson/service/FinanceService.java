@@ -39,7 +39,7 @@ public class FinanceService {
      * 添加财务记录（支出或收入）
      */
     public void addFinanceRecord(FinanceRecordRequest request) {
-        if ("支出".equals(request.getTransactionType())) {
+        if (request.getType() == FinanceType.EXPEND) {
             // 添加支出记录
             dsl.insertInto(
                     table("finance_expense"),
@@ -47,7 +47,6 @@ public class FinanceService {
                     field("expense_item"),
                     field("amount"),
                     field("category"),
-                    field("payment_method"),
                     field("notes"),
                     field("campus_id"),
                     field("created_time"),
@@ -59,7 +58,6 @@ public class FinanceService {
                     request.getItem(),
                     request.getAmount(),
                     request.getCategory(),
-                    request.getPaymentMethod(),
                     request.getNotes(),
                     request.getCampusId(),
                     LocalDateTime.now(),
@@ -67,7 +65,7 @@ public class FinanceService {
                     0
             )
             .execute();
-        } else if ("收入".equals(request.getTransactionType())) {
+        } else if (request.getType() == FinanceType.INCOME) {
             // 添加收入记录
             dsl.insertInto(
                     table("finance_income"),
@@ -75,7 +73,6 @@ public class FinanceService {
                     field("income_item"),
                     field("amount"),
                     field("category"),
-                    field("payment_method"),
                     field("notes"),
                     field("campus_id"),
                     field("created_time"),
@@ -87,7 +84,6 @@ public class FinanceService {
                     request.getItem(),
                     request.getAmount(),
                     request.getCategory(),
-                    request.getPaymentMethod(),
                     request.getNotes(),
                     request.getCampusId(),
                     LocalDateTime.now(),

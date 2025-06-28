@@ -1,8 +1,8 @@
 package com.lesson.vo.request;
 
+import com.lesson.enums.FinanceType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import com.fasterxml.jackson.annotation.JsonAlias;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -20,23 +20,22 @@ public class FinanceRecordRequest {
     /**
      * 交易类型：支出或收入
      */
-    @NotBlank(message = "交易类型不能为空")
-    @Schema(description = "交易类型", required = true, example = "支出")
-    @JsonAlias("type")
-    private String transactionType;
+    @NotNull(message = "交易类型不能为空")
+    @Schema(description = "交易类型", required = true, example = "EXPEND")
+    private FinanceType type;
     
     /**
      * 日期
      */
     @NotNull(message = "日期不能为空")
-    @Schema(description = "日期", required = true, example = "2023-10-01")
+    @Schema(description = "日期", required = true, example = "2024-06-01")
     private LocalDate date;
     
     /**
      * 项目名称
      */
-    @NotBlank(message = "项目名称不能为空")
-    @Schema(description = "项目名称", required = true, example = "购买办公用品")
+    @NotBlank(message = "项目不能为空")
+    @Schema(description = "项目", required = true, example = "办公用品")
     private String item;
     
     /**
@@ -55,16 +54,9 @@ public class FinanceRecordRequest {
     private String category;
     
     /**
-     * 支付方式
-     */
-    @NotBlank(message = "支付方式不能为空")
-    @Schema(description = "支付方式", required = true, example = "现金")
-    private String paymentMethod;
-    
-    /**
      * 备注
      */
-    @Schema(description = "备注", example = "购买了打印纸和笔")
+    @Schema(description = "备注", example = "采购办公用品")
     private String notes;
     
     /**

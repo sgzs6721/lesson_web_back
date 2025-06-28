@@ -1,7 +1,7 @@
 ### 固定课表管理系统 API 测试
 ### 基础配置
 @baseUrl = http://lesson.devtesting.top/lesson
-@token = eyJhbGciOiJIUzM4NCJ9.eyJ1c2VySWQiOjYsIm9yZ0lkIjoyLCJpYXQiOjE3NTA0MzMzNjAsImV4cCI6MTc1MTAzODE2MH0.i0rJV9Qx-oSWno5wtc3YyLmgs_zHJvPuWEN7FhOh5P1ZbLxgOQT59-S0xx5Qw41x
+@token = eyJhbGciOiJIUzM4NCJ9.eyJ1c2VySWQiOjYsIm9yZ0lkIjoyLCJpYXQiOjE3NTEwNzMxMTAsImV4cCI6MTc1MTY3NzkxMH0.IXD_qXLuL34_TbbAkvUL4LuXQnZUh5tpWLiatBt7U6RO1rZAlUvp_T2eV7Ybh8KA
 
 ### ================================
 ### 1. 用户认证
@@ -167,23 +167,39 @@ Content-Type: application/json
 
 {
     "type": "INCOME",
+    "date": "2024-06-01",
+    "item": "学费收入",
     "amount": 2000.00,
-    "description": "学员缴费",
-    "categoryId": 1,
+    "category": "学费",
+    "notes": "2024年6月学费",
     "campusId": 1
 }
 
-### 查询财务记录
+### 查询财务记录列表
 POST {{baseUrl}}/api/finance/list
 Authorization: {{token}}
 Content-Type: application/json
 
 {
+    "transactionType": "INCOME",
+    "keyword": "学费",
+    "category": "学费",
+    "startDate": "2024-06-01",
+    "endDate": "2024-06-30",
+    "campusId": 1,
     "pageNum": 1,
-    "pageSize": 10,
-    "type": "INCOME",
-    "startDate": "2024-01-01",
-    "endDate": "2024-12-31"
+    "pageSize": 10
+}
+
+### 查询全部财务记录（不传类型）
+POST {{baseUrl}}/api/finance/list
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+    "keyword": "",
+    "pageNum": 1,
+    "pageSize": 10
 }
 
 ### ================================
