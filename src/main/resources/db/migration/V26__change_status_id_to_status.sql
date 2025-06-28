@@ -1,5 +1,5 @@
--- 1. 新增status字段
-ALTER TABLE edu_student_course_record ADD COLUMN status VARCHAR(20) DEFAULT NULL COMMENT '出勤状态（枚举值：NORMAL/LEAVE/ABSENT）';
+-- 1. 新增status字段（如已存在则跳过）
+ALTER TABLE edu_student_course_record ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT NULL COMMENT '出勤状态（枚举值：NORMAL/LEAVE/ABSENT）';
 
 -- 2. 数据迁移（假设1=正常，2=请假，3=缺席，如有不同请手动调整）
 UPDATE edu_student_course_record SET status = 'NORMAL' WHERE status_id = 1;
