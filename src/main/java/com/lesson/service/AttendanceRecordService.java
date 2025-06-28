@@ -28,6 +28,7 @@ import java.time.LocalDate;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import javax.servlet.http.HttpServletRequest;
+import com.lesson.enums.AttendanceType;
 
 
 @Service
@@ -61,7 +62,7 @@ public class AttendanceRecordService {
         EDU_STUDENT_COURSE_RECORD.CREATED_TIME,
         EDU_STUDENT_COURSE_RECORD.UPDATE_TIME,
         EDU_STUDENT_COURSE_RECORD.DELETED,
-        field("lesson.edu_student_course_record.status", String.class).as("status")
+        EDU_STUDENT_COURSE_RECORD.STATUS
     )
     .from(EDU_STUDENT_COURSE_RECORD)
     .leftJoin(EDU_STUDENT).on(EDU_STUDENT_COURSE_RECORD.STUDENT_ID.eq(EDU_STUDENT.ID))
@@ -86,17 +87,9 @@ public class AttendanceRecordService {
     if (request.getCampusId() != null) {
       condition = condition.and(EDU_STUDENT_COURSE_RECORD.CAMPUS_ID.eq(request.getCampusId()));
     }
-    if (StringUtils.hasText(request.getStatus())) {
-        String status = request.getStatus();
-        String dbStatus = status;
-        if ("已到".equals(status)) {
-            dbStatus = "NORMAL";
-        } else if ("请假".equals(status)) {
-            dbStatus = "LEAVE";
-        } else if ("缺勤".equals(status)) {
-            dbStatus = "ABSENT";
-        }
-        condition = condition.and(EDU_STUDENT_COURSE_RECORD.STATUS.eq(dbStatus));
+    if (request.getStatus() != null) {
+        // 直接使用枚举的name值
+        condition = condition.and(EDU_STUDENT_COURSE_RECORD.STATUS.eq(request.getStatus().name()));
     }
     if (request.getStartDate() != null) {
       condition = condition.and(EDU_STUDENT_COURSE_RECORD.COURSE_DATE.ge(request.getStartDate()));
@@ -143,11 +136,12 @@ public class AttendanceRecordService {
       } else {
         item.setCheckTime("");
       }
-      String status = r.get("status", String.class);
+      // 直接使用枚举值
+      String status = r.get(EDU_STUDENT_COURSE_RECORD.STATUS, String.class);
       try {
-        item.setType(status != null ? com.lesson.enums.AttendanceType.valueOf(status) : null);
+        item.setStatus(status != null ? AttendanceType.valueOf(status) : null);
       } catch (Exception e) {
-        item.setType(null);
+        item.setStatus(null);
       }
       item.setNotes(r.get(EDU_STUDENT_COURSE_RECORD.NOTES, String.class));
       list.add(item);

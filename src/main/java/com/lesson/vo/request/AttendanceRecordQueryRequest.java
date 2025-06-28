@@ -1,5 +1,6 @@
 package com.lesson.vo.request;
 
+import com.lesson.enums.AttendanceType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import java.time.LocalDate;
@@ -20,8 +21,8 @@ public class AttendanceRecordQueryRequest {
     @Schema(description = "校区ID", example = "1")
     private Long campusId;
 
-    @Schema(description = "出勤状态，如：已到、缺席、请假", example = "已到")
-    private String status;
+    @Schema(description = "出勤状态", example = "NORMAL")
+    private AttendanceType status;
 
     @Schema(description = "开始日期，格式yyyy-MM-dd", example = "2024-05-01")
     private LocalDate startDate;
