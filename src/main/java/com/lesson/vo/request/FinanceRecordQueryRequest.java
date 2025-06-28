@@ -32,6 +32,7 @@ public class FinanceRecordQueryRequest {
      * 类别ID列表
      */
     @Schema(description = "类别ID列表", example = "[40,41]")
+    @JsonAlias("category")
     private List<Long> categoryId;
 
     /**

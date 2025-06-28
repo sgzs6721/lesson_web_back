@@ -14,6 +14,8 @@ import java.util.List;
 
 import static org.jooq.impl.DSL.field;
 import static org.jooq.impl.DSL.table;
+import org.jooq.Condition;
+import org.jooq.Result;
 
 @Repository
 @RequiredArgsConstructor
@@ -33,11 +35,47 @@ public class FinanceModel {
         return total == null ? BigDecimal.ZERO : total;
     }
 
-    public List<Record> listExpense(FinanceRecordQueryRequest request, SelectConditionStep<Record> query) {
-        return query.orderBy(field("expense_date", LocalDate.class).desc())
-                .limit(request.getPageSize())
-                .offset((request.getPageNum() - 1) * request.getPageSize())
-                .fetch();
+    public Result<? extends Record> listExpense(FinanceRecordQueryRequest request) {
+        Condition condition = field("finance_expense.deleted").eq(0);
+        if (request.getKeyword() != null && !request.getKeyword().isEmpty()) {
+            condition = condition.and(
+                field("finance_expense.expense_item").like("%" + request.getKeyword() + "%")
+                .or(field("finance_expense.notes").like("%" + request.getKeyword() + "%"))
+            );
+        }
+        if (request.getCategoryId() != null && !request.getCategoryId().isEmpty()) {
+            condition = condition.and(field("finance_expense.category_id").in(request.getCategoryId()));
+        }
+        if (request.getStartDate() != null) {
+            condition = condition.and(field("finance_expense.expense_date").ge(request.getStartDate()));
+        }
+        if (request.getEndDate() != null) {
+            condition = condition.and(field("finance_expense.expense_date").le(request.getEndDate()));
+        }
+        if (request.getCampusId() != null) {
+            condition = condition.and(field("finance_expense.campus_id").eq(request.getCampusId()));
+        }
+        return dsl.select(
+                field("finance_expense.id").as("id"),
+                field("finance_expense.expense_date").as("expense_date"),
+                field("finance_expense.expense_item").as("expense_item"),
+                field("finance_expense.amount").as("amount"),
+                field("finance_expense.category_id").as("category_id"),
+                field("sys_constant.constant_value").as("category_name"),
+                field("finance_expense.notes").as("notes"),
+                field("finance_expense.campus_id").as("campus_id"),
+                field("finance_expense.institution_id").as("institution_id"),
+                field("finance_expense.created_time").as("created_time"),
+                field("finance_expense.update_time").as("update_time"),
+                field("finance_expense.deleted").as("deleted")
+        )
+        .from(table("finance_expense"))
+        .leftJoin(table("sys_constant")).on(field("finance_expense.category_id").eq(field("sys_constant.id")))
+        .where(condition)
+        .orderBy(field("finance_expense.expense_date", LocalDate.class).desc())
+        .limit(request.getPageSize())
+        .offset((request.getPageNum() - 1) * request.getPageSize())
+        .fetch();
     }
 
     public long countIncome(FinanceRecordQueryRequest request, SelectConditionStep<Record> query) {
@@ -53,10 +91,46 @@ public class FinanceModel {
         return total == null ? BigDecimal.ZERO : total;
     }
 
-    public List<Record> listIncome(FinanceRecordQueryRequest request, SelectConditionStep<Record> query) {
-        return query.orderBy(field("income_date", LocalDate.class).desc())
-                .limit(request.getPageSize())
-                .offset((request.getPageNum() - 1) * request.getPageSize())
-                .fetch();
+    public Result<? extends Record> listIncome(FinanceRecordQueryRequest request) {
+        Condition condition = field("finance_income.deleted").eq(0);
+        if (request.getKeyword() != null && !request.getKeyword().isEmpty()) {
+            condition = condition.and(
+                field("finance_income.income_item").like("%" + request.getKeyword() + "%")
+                .or(field("finance_income.notes").like("%" + request.getKeyword() + "%"))
+            );
+        }
+        if (request.getCategoryId() != null && !request.getCategoryId().isEmpty()) {
+            condition = condition.and(field("finance_income.category_id").in(request.getCategoryId()));
+        }
+        if (request.getStartDate() != null) {
+            condition = condition.and(field("finance_income.income_date").ge(request.getStartDate()));
+        }
+        if (request.getEndDate() != null) {
+            condition = condition.and(field("finance_income.income_date").le(request.getEndDate()));
+        }
+        if (request.getCampusId() != null) {
+            condition = condition.and(field("finance_income.campus_id").eq(request.getCampusId()));
+        }
+        return dsl.select(
+                field("finance_income.id").as("id"),
+                field("finance_income.income_date").as("income_date"),
+                field("finance_income.income_item").as("income_item"),
+                field("finance_income.amount").as("amount"),
+                field("finance_income.category_id").as("category_id"),
+                field("sys_constant.constant_value").as("category_name"),
+                field("finance_income.notes").as("notes"),
+                field("finance_income.campus_id").as("campus_id"),
+                field("finance_income.institution_id").as("institution_id"),
+                field("finance_income.created_time").as("created_time"),
+                field("finance_income.update_time").as("update_time"),
+                field("finance_income.deleted").as("deleted")
+        )
+        .from(table("finance_income"))
+        .leftJoin(table("sys_constant")).on(field("finance_income.category_id").eq(field("sys_constant.id")))
+        .where(condition)
+        .orderBy(field("finance_income.income_date", LocalDate.class).desc())
+        .limit(request.getPageSize())
+        .offset((request.getPageNum() - 1) * request.getPageSize())
+        .fetch();
     }
 } 

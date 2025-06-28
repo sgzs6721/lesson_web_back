@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.SelectConditionStep;
+import org.jooq.Result;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -121,7 +122,7 @@ public class FinanceService {
                     totalAmount = totalAmount.add(expenseTotal);
                 }
             }
-            List<Record> records = financeModel.listExpense(request, query);
+            Result<? extends Record> records = financeModel.listExpense(request);
             for (Record r : records) {
                 FinanceRecordListVO.Item item = new FinanceRecordListVO.Item();
                 item.setId(r.get("id", Long.class));
@@ -148,7 +149,7 @@ public class FinanceService {
                     totalAmount = totalAmount.add(incomeTotal);
                 }
             }
-            List<Record> records = financeModel.listIncome(request, query);
+            Result<? extends Record> records = financeModel.listIncome(request);
             for (Record r : records) {
                 FinanceRecordListVO.Item item = new FinanceRecordListVO.Item();
                 item.setId(r.get("id", Long.class));

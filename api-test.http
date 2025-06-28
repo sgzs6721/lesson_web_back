@@ -182,8 +182,6 @@ Content-Type: application/json
 
 {
     "transactionType": "EXPEND",
-    "keyword": "学费",
-    "category": "学费",
     "startDate": "2024-06-01",
     "endDate": "2024-06-30",
     "campusId": 1,
