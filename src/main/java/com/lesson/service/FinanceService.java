@@ -126,7 +126,12 @@ public class FinanceService {
             for (Record r : records) {
                 FinanceRecordListVO.Item item = new FinanceRecordListVO.Item();
                 item.setId(r.get("id", Long.class));
-                item.setDate(r.get("expense_date", LocalDate.class).format(dateFormatter));
+                Object dateObj = r.get("expense_date");
+                if (dateObj instanceof java.sql.Date) {
+                    item.setDate(((java.sql.Date) dateObj).toLocalDate().format(dateFormatter));
+                } else if (dateObj instanceof LocalDate) {
+                    item.setDate(((LocalDate) dateObj).format(dateFormatter));
+                }
                 item.setItem(r.get("expense_item", String.class));
                 item.setAmount(r.get("amount", BigDecimal.class).toString());
                 item.setCategoryId(r.get("category_id", Long.class));
@@ -153,7 +158,12 @@ public class FinanceService {
             for (Record r : records) {
                 FinanceRecordListVO.Item item = new FinanceRecordListVO.Item();
                 item.setId(r.get("id", Long.class));
-                item.setDate(r.get("income_date", LocalDate.class).format(dateFormatter));
+                Object dateObj = r.get("income_date");
+                if (dateObj instanceof java.sql.Date) {
+                    item.setDate(((java.sql.Date) dateObj).toLocalDate().format(dateFormatter));
+                } else if (dateObj instanceof LocalDate) {
+                    item.setDate(((LocalDate) dateObj).format(dateFormatter));
+                }
                 item.setItem(r.get("income_item", String.class));
                 item.setAmount(r.get("amount", BigDecimal.class).toString());
                 item.setCategoryId(r.get("category_id", Long.class));
