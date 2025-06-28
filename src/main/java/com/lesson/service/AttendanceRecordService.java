@@ -88,7 +88,6 @@ public class AttendanceRecordService {
       condition = condition.and(EDU_STUDENT_COURSE_RECORD.CAMPUS_ID.eq(request.getCampusId()));
     }
     if (request.getStatus() != null) {
-        // 直接使用枚举的name值
         condition = condition.and(EDU_STUDENT_COURSE_RECORD.STATUS.eq(request.getStatus().name()));
     }
     if (request.getStartDate() != null) {
@@ -136,7 +135,6 @@ public class AttendanceRecordService {
       } else {
         item.setCheckTime("");
       }
-      // 直接使用枚举值
       String status = r.get(EDU_STUDENT_COURSE_RECORD.STATUS, String.class);
       try {
         item.setStatus(status != null ? AttendanceType.valueOf(status) : null);
