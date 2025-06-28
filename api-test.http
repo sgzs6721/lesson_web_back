@@ -166,9 +166,9 @@ Authorization: {{token}}
 Content-Type: application/json
 
 {
-    "type": "INCOME",
+    "type": "EXPEND",
     "date": "2024-06-01",
-    "item": "学费收入",
+    "item": "学费12121212",
     "amount": 2000.00,
     "category": "学费",
     "notes": "2024年6月学费",
@@ -181,7 +181,7 @@ Authorization: {{token}}
 Content-Type: application/json
 
 {
-    "transactionType": "INCOME",
+    "transactionType": "EXPEND",
     "keyword": "学费",
     "category": "学费",
     "startDate": "2024-06-01",

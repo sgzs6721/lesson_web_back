@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonAlias;
 import com.lesson.enums.FinanceType;
 
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * 财务记录查询请求
@@ -32,6 +33,12 @@ public class FinanceRecordQueryRequest {
      */
     @Schema(description = "类别", example = "办公费用")
     private String category;
+    
+    /**
+     * 类别ID列表
+     */
+    @Schema(description = "类别ID列表", example = "[40,41]")
+    private List<Long> categoryId;
     
     /**
      * 开始日期

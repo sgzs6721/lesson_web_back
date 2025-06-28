@@ -47,11 +47,11 @@ public class FinanceRecordRequest {
     private BigDecimal amount;
     
     /**
-     * 类别
+     * 类别ID
      */
-    @NotBlank(message = "类别不能为空")
-    @Schema(description = "类别", required = true, example = "办公费用")
-    private String category;
+    @NotNull(message = "类别ID不能为空")
+    @Schema(description = "类别ID", required = true, example = "40")
+    private Long categoryId;
     
     /**
      * 备注

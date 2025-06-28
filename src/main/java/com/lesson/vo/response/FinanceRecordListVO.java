@@ -62,10 +62,16 @@ public class FinanceRecordListVO {
         private String amount;
         
         /**
-         * 类别
+         * 类别ID
          */
-        @Schema(description = "类别", example = "办公费用")
-        private String category;
+        @Schema(description = "类别ID", example = "40")
+        private Long categoryId;
+        
+        /**
+         * 类别名称
+         */
+        @Schema(description = "类别名称", example = "固定支出")
+        private String categoryName;
         
         /**
          * 支付方式

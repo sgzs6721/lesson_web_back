@@ -46,7 +46,7 @@ public class FinanceService {
                     field("expense_date"),
                     field("expense_item"),
                     field("amount"),
-                    field("category"),
+                    field("category_id"),
                     field("notes"),
                     field("campus_id"),
                     field("institution_id"),
@@ -58,7 +58,7 @@ public class FinanceService {
                     request.getDate(),
                     request.getItem(),
                     request.getAmount(),
-                    request.getCategory(),
+                    request.getCategoryId(),
                     request.getNotes(),
                     request.getCampusId(),
                     institutionId,
@@ -74,7 +74,7 @@ public class FinanceService {
                     field("income_date"),
                     field("income_item"),
                     field("amount"),
-                    field("category"),
+                    field("category_id"),
                     field("notes"),
                     field("campus_id"),
                     field("institution_id"),
@@ -86,7 +86,7 @@ public class FinanceService {
                     request.getDate(),
                     request.getItem(),
                     request.getAmount(),
-                    request.getCategory(),
+                    request.getCategoryId(),
                     request.getNotes(),
                     request.getCampusId(),
                     institutionId,
@@ -128,7 +128,8 @@ public class FinanceService {
                 item.setDate(r.get("expense_date", LocalDate.class).format(dateFormatter));
                 item.setItem(r.get("expense_item", String.class));
                 item.setAmount(r.get("amount", BigDecimal.class).toString());
-                item.setCategory(r.get("category", String.class));
+                item.setCategoryId(r.get("category_id", Long.class));
+                item.setCategoryName(r.get("category_name", String.class));
                 item.setNotes(r.get("notes", String.class));
                 list.add(item);
             }
@@ -154,7 +155,8 @@ public class FinanceService {
                 item.setDate(r.get("income_date", LocalDate.class).format(dateFormatter));
                 item.setItem(r.get("income_item", String.class));
                 item.setAmount(r.get("amount", BigDecimal.class).toString());
-                item.setCategory(r.get("category", String.class));
+                item.setCategoryId(r.get("category_id", Long.class));
+                item.setCategoryName(r.get("category_name", String.class));
                 item.setNotes(r.get("notes", String.class));
                 list.add(item);
             }
@@ -191,6 +193,11 @@ public class FinanceService {
         if (request.getCampusId() != null) {
             query.and("campus_id = ?", request.getCampusId());
         }
+        
+        if (request.getCategoryId() != null && !request.getCategoryId().isEmpty()) {
+            String inClause = request.getCategoryId().stream().map(String::valueOf).collect(java.util.stream.Collectors.joining(","));
+            query.and("category_id IN (" + inClause + ")");
+        }
     }
     
     /**
@@ -218,6 +225,11 @@ public class FinanceService {
         
         if (request.getCampusId() != null) {
             query.and("campus_id = ?", request.getCampusId());
+        }
+        
+        if (request.getCategoryId() != null && !request.getCategoryId().isEmpty()) {
+            String inClause = request.getCategoryId().stream().map(String::valueOf).collect(java.util.stream.Collectors.joining(","));
+            query.and("category_id IN (" + inClause + ")");
         }
     }
     
@@ -248,6 +260,11 @@ public class FinanceService {
             sb.append(" AND campus_id = ").append(request.getCampusId());
         }
         
+        if (request.getCategoryId() != null && !request.getCategoryId().isEmpty()) {
+            String inClause = request.getCategoryId().stream().map(String::valueOf).collect(java.util.stream.Collectors.joining(","));
+            sb.append(" AND category_id IN (" + inClause + ")");
+        }
+        
         return sb.toString();
     }
     
@@ -276,6 +293,11 @@ public class FinanceService {
         
         if (request.getCampusId() != null) {
             sb.append(" AND campus_id = ").append(request.getCampusId());
+        }
+        
+        if (request.getCategoryId() != null && !request.getCategoryId().isEmpty()) {
+            String inClause = request.getCategoryId().stream().map(String::valueOf).collect(java.util.stream.Collectors.joining(","));
+            sb.append(" AND category_id IN (" + inClause + ")");
         }
         
         return sb.toString();
