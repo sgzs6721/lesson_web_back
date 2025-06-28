@@ -78,11 +78,5 @@ public class FinanceRecordListVO {
          */
         @Schema(description = "备注", example = "购买了打印纸和笔")
         private String notes;
-        
-        /**
-         * 校区名称
-         */
-        @Schema(description = "校区名称", example = "总校区")
-        private String campusName;
     }
 } 

@@ -130,7 +130,6 @@ public class FinanceService {
                 item.setAmount(r.get("amount", BigDecimal.class).toString());
                 item.setCategory(r.get("category", String.class));
                 item.setNotes(r.get("notes", String.class));
-                item.setCampusName(r.get("campus_name", String.class));
                 list.add(item);
             }
         }
@@ -157,7 +156,6 @@ public class FinanceService {
                 item.setAmount(r.get("amount", BigDecimal.class).toString());
                 item.setCategory(r.get("category", String.class));
                 item.setNotes(r.get("notes", String.class));
-                item.setCampusName(r.get("campus_name", String.class));
                 list.add(item);
             }
         }
