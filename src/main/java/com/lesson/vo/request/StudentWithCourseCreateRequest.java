@@ -80,6 +80,11 @@ public class StudentWithCourseCreateRequest {
         @ApiModelProperty("校区ID")
         private Long campusId;
 
+        /**
+         * 学员来源ID（关联sys_constant表）
+         */
+        @ApiModelProperty("学员来源ID（关联sys_constant表）")
+        private Long sourceId;
 
     }
 

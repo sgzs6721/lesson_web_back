@@ -58,6 +58,7 @@ import com.lesson.vo.response.StudentRefundDetailVO;
 import com.lesson.vo.response.StudentCourseOperationRecordVO;
 import com.lesson.vo.request.StudentWithinCourseTransferRequest;
 import com.lesson.service.CourseHoursRedisService;
+import com.lesson.service.CampusStatsRedisService;
 
 /**
  * 学员服务
@@ -76,6 +77,7 @@ public class StudentService {
   private final EduCourseModel courseModel;
   private final SysConstantModel constantModel;
   private final CourseHoursRedisService courseHoursRedisService;
+  private final CampusStatsRedisService campusStatsRedisService;
 
   /**
    * 从请求中获取机构ID
@@ -110,6 +112,7 @@ public class StudentService {
     studentRecord.setPhone(studentInfo.getPhone());
     studentRecord.setCampusId(studentInfo.getCampusId());
     studentRecord.setInstitutionId(institutionId);
+    studentRecord.setSourceId(studentInfo.getSourceId()); // 设置学员来源ID
     studentRecord.setStatus("STUDYING"); // 学员状态默认为在学
 
     // 3. 存储学员记录
@@ -151,9 +154,12 @@ public class StudentService {
         throw new RuntimeException("序列化固定排课时间失败", e);
       }
 
-      // 6. 存储学员课程关系
+      // 7. 存储学员课程关系
       studentCourseModel.createStudentCourse(studentCourseRecord);
     }
+
+    // 7. 更新Redis统计数据
+    campusStatsRedisService.incrementStudentCount(institutionId, studentInfo.getCampusId());
 
     return studentId;
   }
@@ -192,13 +198,20 @@ public class StudentService {
     // 3. 存储学员记录
     studentModel.updateStudent(studentRecord);
 
-    // 4. 先将该学员所有课程逻辑删除
+    // 4. 更新Redis统计数据（如果校区发生变化）
+    Long oldCampusId = studentRecord.getCampusId();
+    if (!oldCampusId.equals(studentInfo.getCampusId())) {
+      campusStatsRedisService.decrementStudentCount(institutionId, oldCampusId);
+      campusStatsRedisService.incrementStudentCount(institutionId, studentInfo.getCampusId());
+    }
+
+    // 5. 先将该学员所有课程逻辑删除
     dsl.update(Tables.EDU_STUDENT_COURSE)
         .set(Tables.EDU_STUDENT_COURSE.DELETED, 1)
         .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(request.getStudentId()))
         .execute();
 
-    // 5. 处理课程信息
+    // 6. 处理课程信息
     for (StudentWithCourseUpdateRequest.CourseInfo courseInfo : request.getCourseInfoList()) {
       // 获取课程信息
       EduCourseRecord courseRecord = dsl.selectFrom(Tables.EDU_COURSE)

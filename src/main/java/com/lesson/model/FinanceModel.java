@@ -73,9 +73,9 @@ public class FinanceModel {
         .leftJoin(table("sys_constant")).on(field("finance_expense.category_id").eq(field("sys_constant.id")))
         .where(condition)
         .orderBy(field("finance_expense.expense_date", LocalDate.class).desc())
-        .limit(request.getPageSize())
-        .offset((request.getPageNum() - 1) * request.getPageSize())
-        .fetch();
+                .limit(request.getPageSize())
+                .offset((request.getPageNum() - 1) * request.getPageSize())
+                .fetch();
     }
 
     public long countIncome(FinanceRecordQueryRequest request, SelectConditionStep<Record> query) {
@@ -129,8 +129,8 @@ public class FinanceModel {
         .leftJoin(table("sys_constant")).on(field("finance_income.category_id").eq(field("sys_constant.id")))
         .where(condition)
         .orderBy(field("finance_income.income_date", LocalDate.class).desc())
-        .limit(request.getPageSize())
-        .offset((request.getPageNum() - 1) * request.getPageSize())
-        .fetch();
+                .limit(request.getPageSize())
+                .offset((request.getPageNum() - 1) * request.getPageSize())
+                .fetch();
     }
 } 

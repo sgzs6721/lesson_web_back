@@ -26,7 +26,7 @@ public class SysConstantModel {
         }
 
         return query.orderBy(SYS_CONSTANT.CREATED_TIME)
-                .fetch();
+            .fetch();
     }
 
     /**

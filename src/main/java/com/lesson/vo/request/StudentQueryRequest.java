@@ -65,6 +65,12 @@ public class StudentQueryRequest {
     private Long institutionId;
 
     /**
+     * 学员来源ID（关联sys_constant表）
+     */
+    @ApiModelProperty("学员来源ID（关联sys_constant表）")
+    private Long sourceId;
+
+    /**
      * 已消耗课时
      */
     @ApiModelProperty(value = "已消耗课时", example = "10.5")

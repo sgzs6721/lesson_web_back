@@ -170,7 +170,7 @@ Content-Type: application/json
     "date": "2024-06-01",
     "item": "学费12121212",
     "amount": 2000.00,
-    "category": "学费",
+    "categoryId": 40,
     "notes": "2024年6月学费",
     "campusId": 1
 }
@@ -313,3 +313,693 @@ Content-Type: application/json
 ### 获取课程进度
 GET {{baseUrl}}/api/student/courses/1/progress
 Authorization: {{token}} 
+
+### 学员分析统计接口测试
+
+### 获取学员分析统计数据 - 月度统计
+POST http://localhost:8080/api/statistics/student-analysis
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 获取学员分析统计数据 - 周度统计
+POST http://localhost:8080/api/statistics/student-analysis
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "timeType": "WEEKLY"
+}
+
+### 获取学员分析统计数据 - 季度统计
+POST http://localhost:8080/api/statistics/student-analysis
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "timeType": "QUARTERLY"
+}
+
+### 获取学员分析统计数据 - 年度统计
+POST http://localhost:8080/api/statistics/student-analysis
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "timeType": "YEARLY"
+}
+
+### 获取学员分析统计数据 - 无过滤条件
+POST http://localhost:8080/api/statistics/student-analysis
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "timeType": "MONTHLY"
+}
+
+### 课程分析统计接口测试
+
+### 获取课程分析统计数据 - 月度统计
+POST http://localhost:8080/api/statistics/course-analysis
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 获取课程分析统计数据 - 周度统计
+POST http://localhost:8080/api/statistics/course-analysis
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "timeType": "WEEKLY"
+}
+
+### 获取课程分析统计数据 - 季度统计
+POST http://localhost:8080/api/statistics/course-analysis
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "timeType": "QUARTERLY"
+}
+
+### 获取课程分析统计数据 - 年度统计
+POST http://localhost:8080/api/statistics/course-analysis
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "timeType": "YEARLY"
+}
+
+### 获取课程分析统计数据 - 无过滤条件
+POST http://localhost:8080/api/statistics/course-analysis
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "timeType": "MONTHLY"
+} 
+
+### 教练分析统计 - 月度统计
+POST http://localhost:8080/api/statistics/coach-analysis
+Content-Type: application/json
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 教练分析统计 - 周度统计
+POST http://localhost:8080/api/statistics/coach-analysis
+Content-Type: application/json
+
+{
+  "timeType": "WEEKLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 教练分析统计 - 季度统计
+POST http://localhost:8080/api/statistics/coach-analysis
+Content-Type: application/json
+
+{
+  "timeType": "QUARTERLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 教练分析统计 - 年度统计
+POST http://localhost:8080/api/statistics/coach-analysis
+Content-Type: application/json
+
+{
+  "timeType": "YEARLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 教练分析统计 - 按课时排名
+POST http://localhost:8080/api/statistics/coach-analysis
+Content-Type: application/json
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1,
+  "rankingType": "CLASS_HOURS",
+  "limit": 5
+}
+
+### 教练分析统计 - 按学员数排名
+POST http://localhost:8080/api/statistics/coach-analysis
+Content-Type: application/json
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1,
+  "rankingType": "STUDENTS",
+  "limit": 5
+}
+
+### 教练分析统计 - 按创收排名
+POST http://localhost:8080/api/statistics/coach-analysis
+Content-Type: application/json
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1,
+  "rankingType": "REVENUE",
+  "limit": 5
+}
+
+### 教练分析统计 - 无过滤条件
+POST http://localhost:8080/api/statistics/coach-analysis
+Content-Type: application/json
+
+{
+  "timeType": "MONTHLY"
+} 
+
+### 学员分析统计 - 完整版
+POST http://localhost:8080/api/statistics/student-analysis
+Content-Type: application/json
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 学员指标统计
+POST http://localhost:8080/api/statistics/student/metrics
+Content-Type: application/json
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 学员增长趋势
+POST http://localhost:8080/api/statistics/student/growth-trend
+Content-Type: application/json
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 学员续费金额趋势
+POST http://localhost:8080/api/statistics/student/renewal-trend
+Content-Type: application/json
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 学员来源分布
+POST http://localhost:8080/api/statistics/student/source-distribution
+Content-Type: application/json
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 新增学员来源分布
+POST http://localhost:8080/api/statistics/student/new-student-source
+Content-Type: application/json
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 课程分析统计 - 完整版
+POST http://localhost:8080/api/statistics/course-analysis
+Content-Type: application/json
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 课程指标统计
+POST http://localhost:8080/api/statistics/course/metrics
+Content-Type: application/json
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 课程类型分析
+POST http://localhost:8080/api/statistics/course/type-analysis
+Content-Type: application/json
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 课程销售趋势
+POST http://localhost:8080/api/statistics/course/sales-trend
+Content-Type: application/json
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 课程销售表现
+POST http://localhost:8080/api/statistics/course/sales-performance
+Content-Type: application/json
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 课程销售排行
+POST http://localhost:8080/api/statistics/course/sales-ranking
+Content-Type: application/json
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1,
+  "rankingType": "REVENUE",
+  "limit": 10
+}
+
+### 课程收入分析
+POST http://localhost:8080/api/statistics/course/revenue-analysis
+Content-Type: application/json
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 课程收入分布
+POST http://localhost:8080/api/statistics/course/revenue-distribution
+Content-Type: application/json
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 教练分析统计 - 完整版
+POST http://localhost:8080/api/statistics/coach-analysis
+Content-Type: application/json
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 教练绩效指标
+POST http://localhost:8080/api/statistics/coach/metrics
+Content-Type: application/json
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 教练课时统计趋势
+POST http://localhost:8080/api/statistics/coach/class-hour-trend
+Content-Type: application/json
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 教练TOP5多维度对比
+POST http://localhost:8080/api/statistics/coach/top5-comparison
+Content-Type: application/json
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1,
+  "rankingType": "CLASS_HOURS",
+  "limit": 5
+}
+
+### 教练类型分布
+POST http://localhost:8080/api/statistics/coach/type-distribution
+Content-Type: application/json
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 教练薪资分析
+POST http://localhost:8080/api/statistics/coach/salary-analysis
+Content-Type: application/json
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 教练绩效排名
+POST http://localhost:8080/api/statistics/coach/performance-ranking
+Content-Type: application/json
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 学员分析统计 - 周度统计
+POST http://localhost:8080/api/statistics/student-analysis
+Content-Type: application/json
+
+{
+  "timeType": "WEEKLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 学员分析统计 - 季度统计
+POST http://localhost:8080/api/statistics/student-analysis
+Content-Type: application/json
+
+{
+  "timeType": "QUARTERLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 学员分析统计 - 年度统计
+POST http://localhost:8080/api/statistics/student-analysis
+Content-Type: application/json
+
+{
+  "timeType": "YEARLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 学员分析统计 - 无过滤条件
+POST http://localhost:8080/api/statistics/student-analysis
+Content-Type: application/json
+
+{
+  "timeType": "MONTHLY"
+}
+
+### 课程分析统计 - 周度统计
+POST http://localhost:8080/api/statistics/course-analysis
+Content-Type: application/json
+
+{
+  "timeType": "WEEKLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 课程分析统计 - 季度统计
+POST http://localhost:8080/api/statistics/course-analysis
+Content-Type: application/json
+
+{
+  "timeType": "QUARTERLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 课程分析统计 - 年度统计
+POST http://localhost:8080/api/statistics/course-analysis
+Content-Type: application/json
+
+{
+  "timeType": "YEARLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 课程分析统计 - 按销量排行
+POST http://localhost:8080/api/statistics/course-analysis
+Content-Type: application/json
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1,
+  "rankingType": "SALES_QUANTITY",
+  "limit": 10
+}
+
+### 课程分析统计 - 按单价排行
+POST http://localhost:8080/api/statistics/course-analysis
+Content-Type: application/json
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1,
+  "rankingType": "UNIT_PRICE",
+  "limit": 10
+}
+
+### 课程分析统计 - 无过滤条件
+POST http://localhost:8080/api/statistics/course-analysis
+Content-Type: application/json
+
+{
+  "timeType": "MONTHLY"
+}
+
+### 教练分析统计 - 周度统计
+POST http://localhost:8080/api/statistics/coach-analysis
+Content-Type: application/json
+
+{
+  "timeType": "WEEKLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 教练分析统计 - 季度统计
+POST http://localhost:8080/api/statistics/coach-analysis
+Content-Type: application/json
+
+{
+  "timeType": "QUARTERLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 教练分析统计 - 年度统计
+POST http://localhost:8080/api/statistics/coach-analysis
+Content-Type: application/json
+
+{
+  "timeType": "YEARLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 教练分析统计 - 按课时排名
+POST http://localhost:8080/api/statistics/coach-analysis
+Content-Type: application/json
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1,
+  "rankingType": "CLASS_HOURS",
+  "limit": 5
+}
+
+### 教练分析统计 - 按学员数排名
+POST http://localhost:8080/api/statistics/coach-analysis
+Content-Type: application/json
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1,
+  "rankingType": "STUDENTS",
+  "limit": 5
+}
+
+### 教练分析统计 - 按创收排名
+POST http://localhost:8080/api/statistics/coach-analysis
+Content-Type: application/json
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1,
+  "rankingType": "REVENUE",
+  "limit": 5
+}
+
+### 教练分析统计 - 无过滤条件
+POST http://localhost:8080/api/statistics/coach-analysis
+Content-Type: application/json
+
+{
+  "timeType": "MONTHLY"
+} 
+
+### ==================== 财务分析接口测试 ====================
+
+### 财务分析统计 - 完整版
+POST http://localhost:8080/api/statistics/finance-analysis
+Content-Type: application/json
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 财务分析统计 - 周度统计
+POST http://localhost:8080/api/statistics/finance-analysis
+Content-Type: application/json
+
+{
+  "timeType": "WEEKLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 财务分析统计 - 季度统计
+POST http://localhost:8080/api/statistics/finance-analysis
+Content-Type: application/json
+
+{
+  "timeType": "QUARTERLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 财务分析统计 - 年度统计
+POST http://localhost:8080/api/statistics/finance-analysis
+Content-Type: application/json
+
+{
+  "timeType": "YEARLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 财务分析统计 - 无过滤条件
+POST http://localhost:8080/api/statistics/finance-analysis
+Content-Type: application/json
+
+{
+  "timeType": "MONTHLY"
+}
+
+### 获取财务核心指标
+POST http://localhost:8080/api/statistics/finance/metrics
+Content-Type: application/json
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 获取收入与成本趋势
+POST http://localhost:8080/api/statistics/finance/revenue-cost-trend
+Content-Type: application/json
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 获取成本结构分析
+POST http://localhost:8080/api/statistics/finance/cost-structure
+Content-Type: application/json
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 获取财务指标趋势
+POST http://localhost:8080/api/statistics/finance/trend
+Content-Type: application/json
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 获取收入分析
+POST http://localhost:8080/api/statistics/finance/revenue-analysis
+Content-Type: application/json
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 获取成本分析
+POST http://localhost:8080/api/statistics/finance/cost-analysis
+Content-Type: application/json
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 获取利润分析
+POST http://localhost:8080/api/statistics/finance/profit-analysis
+Content-Type: application/json
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1
+} 

@@ -1,0 +1,595 @@
+### 系统接口全面测试文件
+### 基础配置
+@baseUrl = http://localhost:8080/lesson
+@contentType = application/json
+
+### ==================== 认证管理接口测试 ====================
+
+### 1. 用户注册
+POST {{baseUrl}}/api/auth/register
+Content-Type: {{contentType}}
+
+{
+  "username": "testuser",
+  "password": "123456",
+  "name": "测试用户",
+  "phone": "13800138000",
+  "email": "test@example.com",
+  "institutionName": "测试机构",
+  "institutionType": "EDUCATION"
+}
+
+### 2. 用户登录
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{contentType}}
+
+{
+  "username": "testuser",
+  "password": "123456"
+}
+
+### ==================== 用户管理接口测试 ====================
+
+### 3. 查询用户列表
+GET {{baseUrl}}/api/user/list?pageNum=1&pageSize=10
+
+### 4. 创建用户
+POST {{baseUrl}}/api/user/create
+Content-Type: {{contentType}}
+
+{
+  "name": "新用户",
+  "phone": "13900139000",
+  "email": "newuser@example.com",
+  "roleId": 1,
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 5. 更新用户
+POST {{baseUrl}}/api/user/update
+Content-Type: {{contentType}}
+
+{
+  "id": 1,
+  "name": "更新用户",
+  "phone": "13900139001",
+  "email": "updated@example.com",
+  "roleId": 1
+}
+
+### 6. 删除用户
+POST {{baseUrl}}/api/user/delete?id=1
+
+### 7. 重置密码
+POST {{baseUrl}}/api/user/reset-password
+Content-Type: {{contentType}}
+
+{
+  "userId": 1,
+  "newPassword": "newpassword123"
+}
+
+### 8. 更新用户状态
+POST {{baseUrl}}/api/user/status
+Content-Type: {{contentType}}
+
+{
+  "userId": 1,
+  "status": "ACTIVE"
+}
+
+### 9. 获取角色列表
+GET {{baseUrl}}/api/user/roles
+
+### ==================== 角色管理接口测试 ====================
+
+### 10. 获取可分配的角色列表
+GET {{baseUrl}}/api/roles/assignable
+
+### 11. 获取所有角色列表
+GET {{baseUrl}}/api/roles
+
+### 12. 创建新角色
+POST {{baseUrl}}/api/roles
+Content-Type: {{contentType}}
+
+{
+  "name": "测试角色",
+  "description": "这是一个测试角色",
+  "permissions": ["user:list", "user:create"]
+}
+
+### ==================== 机构管理接口测试 ====================
+
+### 13. 获取机构详情
+GET {{baseUrl}}/api/institution/detail?id=1
+
+### ==================== 校区管理接口测试 ====================
+
+### 14. 创建校区
+POST {{baseUrl}}/api/campus/create
+Content-Type: {{contentType}}
+
+{
+  "name": "测试校区",
+  "address": "测试地址",
+  "rent": 5000.00,
+  "institutionId": 1
+}
+
+### 15. 更新校区
+POST {{baseUrl}}/api/campus/update
+Content-Type: {{contentType}}
+
+{
+  "id": 1,
+  "name": "更新校区",
+  "address": "更新地址",
+  "rent": 6000.00
+}
+
+### 16. 删除校区
+POST {{baseUrl}}/api/campus/delete?id=1
+
+### 17. 获取校区详情
+GET {{baseUrl}}/api/campus/detail?id=1
+
+### 18. 查询校区列表
+GET {{baseUrl}}/api/campus/list?pageNum=1&pageSize=10
+
+### 19. 更新校区状态
+POST {{baseUrl}}/api/campus/updateStatus?id=1&status=OPEN
+
+### 20. 获取校区简单列表
+GET {{baseUrl}}/api/campus/simple/list
+
+### ==================== 教练管理接口测试 ====================
+
+### 21. 创建教练
+POST {{baseUrl}}/api/coach/create
+Content-Type: {{contentType}}
+
+{
+  "name": "测试教练",
+  "phone": "13700137000",
+  "email": "coach@example.com",
+  "gender": "MALE",
+  "birthDate": "1990-01-01",
+  "idCard": "123456789012345678",
+  "address": "教练地址",
+  "campusId": 1,
+  "institutionId": 1,
+  "coachTypeId": 1,
+  "baseSalary": 5000.00,
+  "hourlyRate": 100.00
+}
+
+### 22. 更新教练
+POST {{baseUrl}}/api/coach/update
+Content-Type: {{contentType}}
+
+{
+  "id": 1,
+  "name": "更新教练",
+  "phone": "13700137001",
+  "email": "updatedcoach@example.com",
+  "baseSalary": 6000.00,
+  "hourlyRate": 120.00
+}
+
+### 23. 删除教练
+POST {{baseUrl}}/api/coach/delete?id=1
+
+### 24. 获取教练详情
+GET {{baseUrl}}/api/coach/detail?id=1
+
+### 25. 查询教练列表
+GET {{baseUrl}}/api/coach/list?pageNum=1&pageSize=10
+
+### 26. 更新教练状态
+POST {{baseUrl}}/api/coach/updateStatus
+Content-Type: {{contentType}}
+
+{
+  "id": 1,
+  "status": "ACTIVE"
+}
+
+### 27. 获取教练简单列表
+GET {{baseUrl}}/api/coach/simple/list?campusId=1
+
+### ==================== 课程管理接口测试 ====================
+
+### 28. 创建课程
+POST {{baseUrl}}/api/courses/create
+Content-Type: {{contentType}}
+
+{
+  "name": "测试课程",
+  "description": "这是一个测试课程",
+  "courseTypeId": 1,
+  "price": 1000.00,
+  "hours": 20,
+  "campusId": 1,
+  "institutionId": 1,
+  "coachId": 1
+}
+
+### 29. 更新课程
+POST {{baseUrl}}/api/courses/update
+Content-Type: {{contentType}}
+
+{
+  "id": 1,
+  "name": "更新课程",
+  "description": "更新后的课程描述",
+  "price": 1200.00,
+  "hours": 24
+}
+
+### 30. 删除课程
+POST {{baseUrl}}/api/courses/delete?id=1
+
+### 31. 获取课程详情
+GET {{baseUrl}}/api/courses/detail?id=1
+
+### 32. 分页查询课程列表
+GET {{baseUrl}}/api/courses/list?pageNum=1&pageSize=10
+
+### 33. 更新课程状态
+POST {{baseUrl}}/api/courses/status
+Content-Type: {{contentType}}
+
+{
+  "id": 1,
+  "status": "PUBLISHED"
+}
+
+### 34. 获取课程简要信息列表
+GET {{baseUrl}}/api/courses/simple?campusId=1
+
+### ==================== 学员管理接口测试 ====================
+
+### 35. 创建学员及课程
+POST {{baseUrl}}/api/student/create
+Content-Type: {{contentType}}
+
+{
+  "student": {
+    "name": "测试学员",
+    "phone": "13600136000",
+    "gender": "MALE",
+    "birthDate": "2000-01-01",
+    "parentName": "家长姓名",
+    "parentPhone": "13500135000",
+    "address": "学员地址",
+    "source": "推荐",
+    "campusId": 1,
+    "institutionId": 1
+  },
+  "course": {
+    "courseId": 1,
+    "paymentType": "NEW",
+    "paymentMethod": "CASH",
+    "amount": 1000.00,
+    "transactionDate": "2024-01-01"
+  }
+}
+
+### 36. 更新学员及课程
+POST {{baseUrl}}/api/student/update
+Content-Type: {{contentType}}
+
+{
+  "studentId": 1,
+  "student": {
+    "name": "更新学员",
+    "phone": "13600136001"
+  },
+  "course": {
+    "courseId": 1,
+    "status": "ACTIVE"
+  }
+}
+
+### 37. 删除学员
+POST {{baseUrl}}/api/student/delete?id=1
+
+### 38. 获取学员详情
+GET {{baseUrl}}/api/student/detail?id=1
+
+### 39. 查询学员列表
+GET {{baseUrl}}/api/student/list?pageNum=1&pageSize=10
+
+### 40. 学员缴费
+POST {{baseUrl}}/api/student/payment
+Content-Type: {{contentType}}
+
+{
+  "studentId": 1,
+  "courseId": 1,
+  "paymentType": "RENEWAL",
+  "paymentMethod": "ALIPAY",
+  "amount": 500.00,
+  "transactionDate": "2024-01-01"
+}
+
+### 41. 学员退费
+POST {{baseUrl}}/api/student/refund
+Content-Type: {{contentType}}
+
+{
+  "studentId": 1,
+  "courseId": 1,
+  "refundHours": 5.0,
+  "refundAmount": 250.00,
+  "handlingFee": 10.00,
+  "deductionAmount": 5.00,
+  "refundMethod": "CASH",
+  "refundReason": "个人原因"
+}
+
+### 42. 学员转课
+POST {{baseUrl}}/api/student/transfer
+Content-Type: {{contentType}}
+
+{
+  "studentId": 1,
+  "targetStudentId": 2,
+  "courseId": 1,
+  "targetCourseId": 2,
+  "transferHours": 10.0,
+  "validityPeriod": 365,
+  "compensationFee": 100.00,
+  "transferCause": "课程调整"
+}
+
+### 43. 学员转班
+POST {{baseUrl}}/api/student/class-transfer
+Content-Type: {{contentType}}
+
+{
+  "studentId": 1,
+  "courseId": 1,
+  "targetCourseId": 2,
+  "transferHours": 10.0,
+  "transferReason": "班级调整"
+}
+
+### 44. 获取学员课程操作记录
+GET {{baseUrl}}/api/student/operation-records?studentId=1&courseId=1
+
+### 45. 获取学员出勤记录
+GET {{baseUrl}}/api/student/attendance-records?studentId=1&courseId=1
+
+### 46. 获取学员缴费信息
+GET {{baseUrl}}/api/student/payment-info?studentId=1&courseId=1
+
+### 47. 获取学员退费详情
+GET {{baseUrl}}/api/student/refund-detail?studentId=1&courseId=1
+
+### ==================== 打卡消课记录接口测试 ====================
+
+### 48. 打卡消课记录列表
+POST {{baseUrl}}/api/attendance/record/list
+Content-Type: {{contentType}}
+
+{
+  "pageNum": 1,
+  "pageSize": 10,
+  "studentId": 1,
+  "courseId": 1,
+  "startDate": "2024-01-01",
+  "endDate": "2024-12-31"
+}
+
+### 49. 打卡消课统计
+POST {{baseUrl}}/api/attendance/record/stat
+Content-Type: {{contentType}}
+
+{
+  "studentId": 1,
+  "courseId": 1,
+  "startDate": "2024-01-01",
+  "endDate": "2024-12-31"
+}
+
+### ==================== 缴费记录接口测试 ====================
+
+### 50. 缴费记录列表
+POST {{baseUrl}}/api/payment/record/list
+Content-Type: {{contentType}}
+
+{
+  "pageNum": 1,
+  "pageSize": 10,
+  "studentId": 1,
+  "courseId": 1,
+  "startDate": "2024-01-01",
+  "endDate": "2024-12-31"
+}
+
+### 51. 缴费统计
+POST {{baseUrl}}/api/payment/record/stat
+Content-Type: {{contentType}}
+
+{
+  "studentId": 1,
+  "courseId": 1,
+  "startDate": "2024-01-01",
+  "endDate": "2024-12-31"
+}
+
+### ==================== 财务管理接口测试 ====================
+
+### 52. 添加财务记录
+POST {{baseUrl}}/api/finance/record
+Content-Type: {{contentType}}
+
+{
+  "type": "EXPEND",
+  "date": "2024-01-01",
+  "item": "办公用品",
+  "amount": 1000.00,
+  "categoryId": 40,
+  "notes": "采购办公用品",
+  "campusId": 1
+}
+
+### 53. 查询财务记录列表
+POST {{baseUrl}}/api/finance/list
+Content-Type: {{contentType}}
+
+{
+  "pageNum": 1,
+  "pageSize": 10,
+  "transactionType": "EXPEND",
+  "startDate": "2024-01-01",
+  "endDate": "2024-12-31"
+}
+
+### 54. 财务统计
+POST {{baseUrl}}/api/finance/stat
+Content-Type: {{contentType}}
+
+{
+  "transactionType": "EXPEND",
+  "startDate": "2024-01-01",
+  "endDate": "2024-12-31"
+}
+
+### 55. 获取支出类别列表
+GET {{baseUrl}}/api/finance/expense/categories
+
+### 56. 获取收入类别列表
+GET {{baseUrl}}/api/finance/income/categories
+
+### ==================== 系统常量管理接口测试 ====================
+
+### 57. 获取系统常量列表
+GET {{baseUrl}}/api/constants/list?type=COURSE_TYPE
+
+### 58. 创建系统常量
+POST {{baseUrl}}/api/constants/create
+Content-Type: {{contentType}}
+
+{
+  "type": "TEST_TYPE",
+  "name": "测试常量",
+  "value": "test_value",
+  "description": "这是一个测试常量"
+}
+
+### 59. 更新系统常量
+POST {{baseUrl}}/api/constants/update
+Content-Type: {{contentType}}
+
+{
+  "id": 1,
+  "name": "更新常量",
+  "value": "updated_value",
+  "description": "更新后的描述"
+}
+
+### 60. 删除系统常量
+POST {{baseUrl}}/api/constants/delete?id=1
+
+### ==================== 固定课表接口测试 ====================
+
+### 61. 获取固定课表
+GET {{baseUrl}}/api/fixed-schedule/list?campusId=1
+
+### ==================== 统计接口测试 ====================
+
+### 62. 获取学员指标统计
+POST {{baseUrl}}/api/statistics/student/metrics
+Content-Type: {{contentType}}
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 63. 获取课程指标统计
+POST {{baseUrl}}/api/statistics/course/metrics
+Content-Type: {{contentType}}
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 64. 获取教练绩效指标
+POST {{baseUrl}}/api/statistics/coach/metrics
+Content-Type: {{contentType}}
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### 65. 获取财务核心指标
+POST {{baseUrl}}/api/statistics/finance/metrics
+Content-Type: {{contentType}}
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 1,
+  "institutionId": 1
+}
+
+### ==================== 边界条件测试 ====================
+
+### 66. 测试无效参数
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{contentType}}
+
+{
+  "username": "",
+  "password": ""
+}
+
+### 67. 测试缺少必填参数
+POST {{baseUrl}}/api/campus/create
+Content-Type: {{contentType}}
+
+{
+  "name": "测试校区"
+}
+
+### 68. 测试不存在的ID
+GET {{baseUrl}}/api/campus/detail?id=99999
+
+### 69. 测试无效的枚举值
+POST {{baseUrl}}/api/campus/updateStatus?id=1&status=INVALID_STATUS
+
+### ==================== 性能测试 ====================
+
+### 70. 测试大量数据查询
+GET {{baseUrl}}/api/campus/list?pageNum=1&pageSize=100
+
+### 71. 测试复杂条件查询
+GET {{baseUrl}}/api/student/list?pageNum=1&pageSize=50&keyword=测试&campusId=1&institutionId=1
+
+### ==================== 安全性测试 ====================
+
+### 72. 测试未授权访问
+GET {{baseUrl}}/api/user/list
+
+### 73. 测试SQL注入防护
+GET {{baseUrl}}/api/campus/list?name=1' OR '1'='1
+
+### 74. 测试XSS防护
+POST {{baseUrl}}/api/campus/create
+Content-Type: {{contentType}}
+
+{
+  "name": "<script>alert('xss')</script>",
+  "address": "测试地址",
+  "rent": 5000.00,
+  "institutionId": 1
+} 

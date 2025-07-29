@@ -19,7 +19,7 @@ import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row11;
+import org.jooq.Row12;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -87,6 +87,11 @@ public class EduStudent extends TableImpl<EduStudentRecord> {
     public final TableField<EduStudentRecord, Long> INSTITUTION_ID = createField(DSL.name("institution_id"), SQLDataType.BIGINT.nullable(false), this, "机构ID");
 
     /**
+     * The column <code>lesson.edu_student.source_id</code>. 学员来源ID（关联sys_constant表）
+     */
+    public final TableField<EduStudentRecord, Long> SOURCE_ID = createField(DSL.name("source_id"), SQLDataType.BIGINT, this, "学员来源ID（关联sys_constant表）");
+
+    /**
      * The column <code>lesson.edu_student.status</code>. 状态：STUDYING-在学，SUSPENDED-停课，GRADUATED-结业
      */
     public final TableField<EduStudentRecord, String> STATUS = createField(DSL.name("status"), SQLDataType.VARCHAR(20).nullable(false), this, "状态：STUDYING-在学，SUSPENDED-停课，GRADUATED-结业");
@@ -146,7 +151,7 @@ public class EduStudent extends TableImpl<EduStudentRecord> {
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.EDU_STUDENT_IDX_CAMPUS_ID, Indexes.EDU_STUDENT_IDX_INSTITUTION_ID, Indexes.EDU_STUDENT_IDX_NAME, Indexes.EDU_STUDENT_IDX_PHONE, Indexes.EDU_STUDENT_IDX_STATUS);
+        return Arrays.<Index>asList(Indexes.EDU_STUDENT_IDX_CAMPUS_ID, Indexes.EDU_STUDENT_IDX_INSTITUTION_ID, Indexes.EDU_STUDENT_IDX_NAME, Indexes.EDU_STUDENT_IDX_PHONE, Indexes.EDU_STUDENT_IDX_SOURCE_ID, Indexes.EDU_STUDENT_IDX_STATUS);
     }
 
     @Override
@@ -191,11 +196,11 @@ public class EduStudent extends TableImpl<EduStudentRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row11 type methods
+    // Row12 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row11<Long, String, String, Integer, String, Long, Long, String, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
-        return (Row11) super.fieldsRow();
+    public Row12<Long, String, String, Integer, String, Long, Long, Long, String, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
+        return (Row12) super.fieldsRow();
     }
 }

@@ -32,10 +32,10 @@ import com.lesson.enums.FinanceType;
 @Service
 @RequiredArgsConstructor
 public class FinanceService {
-
+    
     private final DSLContext dsl;
     private final FinanceModel financeModel;
-
+    
     /**
      * 添加财务记录（支出或收入）
      */
@@ -98,7 +98,7 @@ public class FinanceService {
             .execute();
         }
     }
-
+    
     /**
      * 查询财务记录列表
      */
@@ -108,13 +108,16 @@ public class FinanceService {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         long total = 0;
         BigDecimal totalAmount = BigDecimal.ZERO;
-        if (request.getTransactionType() == FinanceType.EXPEND || request.getTransactionType() == null) {
+        
+        // 如果指定了交易类型，只查询对应类型的记录
+        if (request.getTransactionType() == FinanceType.EXPEND) {
+            // 只查询支出记录
             SelectConditionStep<Record> query = dsl.select()
                     .from("finance_expense")
                     .where("deleted = 0");
             applyExpenseQueryConditions(query, request);
             long expenseCount = financeModel.countExpense(request, query);
-            total += expenseCount;
+            total = expenseCount;
             BigDecimal expenseTotal = BigDecimal.ZERO;
             if (expenseCount > 0) {
                 expenseTotal = financeModel.sumExpense(request, buildExpenseWhereConditions(request));
@@ -140,14 +143,14 @@ public class FinanceService {
                 item.setTransactionType(com.lesson.enums.FinanceType.EXPEND);
                 list.add(item);
             }
-        }
-        if (request.getTransactionType() == FinanceType.INCOME || request.getTransactionType() == null) {
+        } else if (request.getTransactionType() == FinanceType.INCOME) {
+            // 只查询收入记录
             SelectConditionStep<Record> query = dsl.select()
                     .from("finance_income")
                     .where("deleted = 0");
             applyIncomeQueryConditions(query, request);
             long incomeCount = financeModel.countIncome(request, query);
-            total += incomeCount;
+            total = incomeCount;
             BigDecimal incomeTotal = BigDecimal.ZERO;
             if (incomeCount > 0) {
                 incomeTotal = financeModel.sumIncome(request, buildIncomeWhereConditions(request));
@@ -173,13 +176,130 @@ public class FinanceService {
                 item.setTransactionType(com.lesson.enums.FinanceType.INCOME);
                 list.add(item);
             }
+        } else {
+            // 查询全部记录（收入和支出），需要合并后分页
+            // 先获取所有符合条件的记录
+            List<FinanceRecordListVO.Item> allItems = new ArrayList<>();
+            
+            // 获取支出记录
+            SelectConditionStep<Record> expenseQuery = dsl.select()
+                    .from("finance_expense")
+                    .where("deleted = 0");
+            applyExpenseQueryConditions(expenseQuery, request);
+            long expenseCount = financeModel.countExpense(request, expenseQuery);
+            BigDecimal expenseTotal = BigDecimal.ZERO;
+            if (expenseCount > 0) {
+                expenseTotal = financeModel.sumExpense(request, buildExpenseWhereConditions(request));
+                if (expenseTotal != null) {
+                    totalAmount = totalAmount.add(expenseTotal);
+                }
+            }
+            
+            // 获取收入记录
+            SelectConditionStep<Record> incomeQuery = dsl.select()
+                    .from("finance_income")
+                    .where("deleted = 0");
+            applyIncomeQueryConditions(incomeQuery, request);
+            long incomeCount = financeModel.countIncome(request, incomeQuery);
+            BigDecimal incomeTotal = BigDecimal.ZERO;
+            if (incomeCount > 0) {
+                incomeTotal = financeModel.sumIncome(request, buildIncomeWhereConditions(request));
+                if (incomeTotal != null) {
+                    totalAmount = totalAmount.add(incomeTotal);
+                }
+            }
+            
+            total = expenseCount + incomeCount;
+            
+            // 获取所有支出记录（不分页）
+            Result<? extends Record> expenseRecords = dsl.select(
+                    field("finance_expense.id").as("id"),
+                    field("finance_expense.expense_date").as("date"),
+                    field("finance_expense.expense_item").as("item"),
+                    field("finance_expense.amount").as("amount"),
+                    field("finance_expense.category_id").as("category_id"),
+                    field("sys_constant.constant_value").as("category_name"),
+                    field("finance_expense.notes").as("notes")
+            )
+            .from(table("finance_expense"))
+            .leftJoin(table("sys_constant")).on(field("finance_expense.category_id").eq(field("sys_constant.id")))
+            .where(buildExpenseWhereConditions(request))
+            .orderBy(field("finance_expense.expense_date", LocalDate.class).desc())
+            .fetch();
+            
+            for (Record r : expenseRecords) {
+                FinanceRecordListVO.Item item = new FinanceRecordListVO.Item();
+                item.setId(r.get("id", Long.class));
+                Object dateObj = r.get("date");
+                if (dateObj instanceof java.sql.Date) {
+                    item.setDate(((java.sql.Date) dateObj).toLocalDate().format(dateFormatter));
+                } else if (dateObj instanceof LocalDate) {
+                    item.setDate(((LocalDate) dateObj).format(dateFormatter));
+                }
+                item.setItem(r.get("item", String.class));
+                item.setAmount(r.get("amount", BigDecimal.class).toString());
+                item.setCategoryId(r.get("category_id", Long.class));
+                item.setCategoryName(r.get("category_name", String.class));
+                item.setNotes(r.get("notes", String.class));
+                item.setTransactionType(com.lesson.enums.FinanceType.EXPEND);
+                allItems.add(item);
+            }
+            
+            // 获取所有收入记录（不分页）
+            Result<? extends Record> incomeRecords = dsl.select(
+                    field("finance_income.id").as("id"),
+                    field("finance_income.income_date").as("date"),
+                    field("finance_income.income_item").as("item"),
+                    field("finance_income.amount").as("amount"),
+                    field("finance_income.category_id").as("category_id"),
+                    field("sys_constant.constant_value").as("category_name"),
+                    field("finance_income.notes").as("notes")
+            )
+            .from(table("finance_income"))
+            .leftJoin(table("sys_constant")).on(field("finance_income.category_id").eq(field("sys_constant.id")))
+            .where(buildIncomeWhereConditions(request))
+            .orderBy(field("finance_income.income_date", LocalDate.class).desc())
+            .fetch();
+            
+            for (Record r : incomeRecords) {
+                FinanceRecordListVO.Item item = new FinanceRecordListVO.Item();
+                item.setId(r.get("id", Long.class));
+                Object dateObj = r.get("date");
+                if (dateObj instanceof java.sql.Date) {
+                    item.setDate(((java.sql.Date) dateObj).toLocalDate().format(dateFormatter));
+                } else if (dateObj instanceof LocalDate) {
+                    item.setDate(((LocalDate) dateObj).format(dateFormatter));
+                }
+                item.setItem(r.get("item", String.class));
+                item.setAmount(r.get("amount", BigDecimal.class).toString());
+                item.setCategoryId(r.get("category_id", Long.class));
+                item.setCategoryName(r.get("category_name", String.class));
+                item.setNotes(r.get("notes", String.class));
+                item.setTransactionType(com.lesson.enums.FinanceType.INCOME);
+                allItems.add(item);
+            }
+            
+            // 按日期排序（降序）
+            allItems.sort((a, b) -> {
+                LocalDate dateA = LocalDate.parse(a.getDate(), dateFormatter);
+                LocalDate dateB = LocalDate.parse(b.getDate(), dateFormatter);
+                return dateB.compareTo(dateA);
+            });
+            
+            // 手动分页
+            int startIndex = (request.getPageNum() - 1) * request.getPageSize();
+            int endIndex = Math.min(startIndex + request.getPageSize(), allItems.size());
+            if (startIndex < allItems.size()) {
+                list = allItems.subList(startIndex, endIndex);
+            }
         }
+        
         result.setList(list);
         result.setTotal(total);
         result.setTotalAmount(totalAmount);
         return result;
     }
-
+    
     /**
      * 应用支出查询条件
      */
@@ -190,25 +310,25 @@ public class FinanceService {
                     "%" + request.getKeyword() + "%"
             );
         }
-
+        
         if (request.getStartDate() != null) {
             query.and("expense_date >= ?", request.getStartDate());
         }
-
+        
         if (request.getEndDate() != null) {
             query.and("expense_date <= ?", request.getEndDate());
         }
-
+        
         if (request.getCampusId() != null) {
             query.and("campus_id = ?", request.getCampusId());
         }
-
+        
         if (request.getCategoryId() != null && !request.getCategoryId().isEmpty()) {
             String inClause = request.getCategoryId().stream().map(String::valueOf).collect(java.util.stream.Collectors.joining(","));
             query.and("category_id IN (" + inClause + ")");
         }
     }
-
+    
     /**
      * 应用收入查询条件
      */
@@ -219,103 +339,103 @@ public class FinanceService {
                     "%" + request.getKeyword() + "%"
             );
         }
-
+        
         if (request.getStartDate() != null) {
             query.and("income_date >= ?", request.getStartDate());
         }
-
+        
         if (request.getEndDate() != null) {
             query.and("income_date <= ?", request.getEndDate());
         }
-
+        
         if (request.getCampusId() != null) {
             query.and("campus_id = ?", request.getCampusId());
         }
-
+        
         if (request.getCategoryId() != null && !request.getCategoryId().isEmpty()) {
             String inClause = request.getCategoryId().stream().map(String::valueOf).collect(java.util.stream.Collectors.joining(","));
             query.and("category_id IN (" + inClause + ")");
         }
     }
-
+    
     /**
      * 构建支出条件字符串
      */
     private String buildExpenseWhereConditions(FinanceRecordQueryRequest request) {
         StringBuilder sb = new StringBuilder("deleted = 0");
-
+        
         if (request.getKeyword() != null && !request.getKeyword().isEmpty()) {
             sb.append(" AND (expense_item LIKE '%").append(request.getKeyword()).append("%'")
                     .append(" OR notes LIKE '%").append(request.getKeyword()).append("%')");
         }
-
+        
         if (request.getStartDate() != null) {
             sb.append(" AND expense_date >= '").append(request.getStartDate()).append("'");
         }
-
+        
         if (request.getEndDate() != null) {
             sb.append(" AND expense_date <= '").append(request.getEndDate()).append("'");
         }
-
+        
         if (request.getCampusId() != null) {
             sb.append(" AND campus_id = ").append(request.getCampusId());
         }
-
+        
         if (request.getCategoryId() != null && !request.getCategoryId().isEmpty()) {
             String inClause = request.getCategoryId().stream().map(String::valueOf).collect(java.util.stream.Collectors.joining(","));
             sb.append(" AND category_id IN (" + inClause + ")");
         }
-
+        
         return sb.toString();
     }
-
+    
     /**
      * 构建收入条件字符串
      */
     private String buildIncomeWhereConditions(FinanceRecordQueryRequest request) {
         StringBuilder sb = new StringBuilder("deleted = 0");
-
+        
         if (request.getKeyword() != null && !request.getKeyword().isEmpty()) {
             sb.append(" AND (income_item LIKE '%").append(request.getKeyword()).append("%'")
                     .append(" OR notes LIKE '%").append(request.getKeyword()).append("%')");
         }
-
+        
         if (request.getStartDate() != null) {
             sb.append(" AND income_date >= '").append(request.getStartDate()).append("'");
         }
-
+        
         if (request.getEndDate() != null) {
             sb.append(" AND income_date <= '").append(request.getEndDate()).append("'");
         }
-
+        
         if (request.getCampusId() != null) {
             sb.append(" AND campus_id = ").append(request.getCampusId());
         }
-
+        
         if (request.getCategoryId() != null && !request.getCategoryId().isEmpty()) {
             String inClause = request.getCategoryId().stream().map(String::valueOf).collect(java.util.stream.Collectors.joining(","));
             sb.append(" AND category_id IN (" + inClause + ")");
         }
-
+        
         return sb.toString();
     }
-
+    
     /**
      * 统计财务记录
      */
     public FinanceStatVO statFinanceRecords(FinanceRecordQueryRequest request) {
         FinanceStatVO vo = new FinanceStatVO();
-
+        
         // 查询支出记录数量和总额
         SelectConditionStep<Record> expenseQuery = dsl.select()
                 .from("finance_expense")
                 .where("deleted = 0");
-
+        
         applyExpenseQueryConditions(expenseQuery, request);
-
+        
         long expenseCount = expenseQuery.fetchCount();
         vo.setExpenseCount(expenseCount);
-
+        
         BigDecimal expenseTotal = BigDecimal.ZERO;
         if (expenseCount > 0) {
             expenseTotal = dsl.select(field("sum(amount)", BigDecimal.class))
@@ -323,23 +443,23 @@ public class FinanceService {
                     .where("deleted = 0")
                     .and(buildExpenseWhereConditions(request))
                     .fetchOne(0, BigDecimal.class);
-
+            
             if (expenseTotal == null) {
                 expenseTotal = BigDecimal.ZERO;
             }
         }
         vo.setExpenseTotal(expenseTotal);
-
+        
         // 查询收入记录数量和总额
         SelectConditionStep<Record> incomeQuery = dsl.select()
                 .from("finance_income")
                 .where("deleted = 0");
-
+        
         applyIncomeQueryConditions(incomeQuery, request);
-
+        
         long incomeCount = incomeQuery.fetchCount();
         vo.setIncomeCount(incomeCount);
-
+        
         BigDecimal incomeTotal = BigDecimal.ZERO;
         if (incomeCount > 0) {
             incomeTotal = dsl.select(field("sum(amount)", BigDecimal.class))
@@ -347,36 +467,40 @@ public class FinanceService {
                     .where("deleted = 0")
                     .and(buildIncomeWhereConditions(request))
                     .fetchOne(0, BigDecimal.class);
-
+            
             if (incomeTotal == null) {
                 incomeTotal = BigDecimal.ZERO;
             }
         }
         vo.setIncomeTotal(incomeTotal);
-
+        
         // 计算收支差额
         vo.setBalance(incomeTotal.subtract(expenseTotal));
-
+        
         return vo;
     }
-
+    
     /**
      * 获取支出类别列表
      */
     public List<String> getExpenseCategories() {
-        return dsl.selectDistinct(field("category", String.class))
+        return dsl.selectDistinct(field("sys_constant.constant_value", String.class))
                 .from("finance_expense")
-                .where("deleted = 0")
+                .leftJoin(table("sys_constant")).on(field("finance_expense.category_id").eq(field("sys_constant.id")))
+                .where("finance_expense.deleted = 0")
+                .and("sys_constant.type = 'EXPEND'")
                 .fetch(0, String.class);
     }
-
+    
     /**
      * 获取收入类别列表
      */
     public List<String> getIncomeCategories() {
-        return dsl.selectDistinct(field("category", String.class))
+        return dsl.selectDistinct(field("sys_constant.constant_value", String.class))
                 .from("finance_income")
-                .where("deleted = 0")
+                .leftJoin(table("sys_constant")).on(field("finance_income.category_id").eq(field("sys_constant.id")))
+                .where("finance_income.deleted = 0")
+                .and("sys_constant.type = 'INCOME'")
                 .fetch(0, String.class);
     }
-}
+} 

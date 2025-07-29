@@ -12,6 +12,7 @@ import com.lesson.model.record.CourseDetailRecord;
 import com.lesson.repository.tables.records.SysConstantRecord;
 import com.lesson.service.CourseService;
 import com.lesson.service.CourseHoursRedisService;
+import com.lesson.service.CampusStatsRedisService;
 import com.lesson.vo.CourseSimpleVO;
 import com.lesson.vo.CourseVO;
 import com.lesson.vo.request.CourseCreateRequest;
@@ -39,6 +40,7 @@ public class CourseServiceImpl implements CourseService {
     private final SysConstantModel constantModel;
     private final SysCoachModel sysCoachModel;
     private final CourseHoursRedisService courseHoursRedisService;
+    private final CampusStatsRedisService campusStatsRedisService;
 
     @Override
     @Transactional
@@ -81,6 +83,9 @@ public class CourseServiceImpl implements CourseService {
 
             log.info("课程创建成功: courseId={}, name={}, coachIds={}",
                      courseId, request.getName(), request.getCoachIds());
+
+            // 更新Redis统计数据
+            campusStatsRedisService.incrementCourseCount(institutionId, request.getCampusId());
 
             return courseId;
         } catch (BusinessException e) {
@@ -150,6 +155,12 @@ public class CourseServiceImpl implements CourseService {
 
             log.info("课程更新成功: courseId={}, name={}, coachIds={}",
                      request.getId(), request.getName(), request.getCoachIds());
+
+            // 如果校区发生变化，更新Redis统计数据
+            if (!existingCourse.getCampusId().equals(request.getCampusId())) {
+                campusStatsRedisService.decrementCourseCount(institutionId, existingCourse.getCampusId());
+                campusStatsRedisService.incrementCourseCount(institutionId, request.getCampusId());
+            }
         } catch (BusinessException e) {
             log.warn("更新课程失败: id={}, error={}", request.getId(), e.getMessage());
             throw e;
@@ -179,6 +190,12 @@ public class CourseServiceImpl implements CourseService {
     @Override
     @Transactional
     public void deleteCourse(Long id) {
+        // 获取课程信息用于更新统计
+        CourseDetailRecord course = courseModel.getCourseById(id);
+        if (course != null) {
+            // 更新Redis统计数据
+            campusStatsRedisService.decrementCourseCount(course.getInstitutionId(), course.getCampusId());
+        }
         courseModel.deleteCourse(id);
     }
 

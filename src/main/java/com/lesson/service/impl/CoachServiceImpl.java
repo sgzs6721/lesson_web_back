@@ -220,6 +220,7 @@ public class CoachServiceImpl implements CoachService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteCoach(Long id) {
         try {
+            // 教练模型中的deleteCoach方法已经包含了Redis统计更新
             coachModel.deleteCoach(id);
         } catch (RuntimeException e) {
             log.error("删除教练失败", e);

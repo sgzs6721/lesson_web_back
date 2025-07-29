@@ -5,6 +5,7 @@ import com.lesson.model.EduStudentModel;
 import com.lesson.model.EduStudentCourseModel;
 import com.lesson.service.StudentService;
 import com.lesson.service.CourseHoursRedisService;
+import com.lesson.service.CampusStatsRedisService;
 import com.lesson.vo.PageResult;
 import com.lesson.vo.request.*;
 import com.lesson.vo.response.StudentAttendanceListVO;
@@ -36,7 +37,9 @@ public class StudentController {
     private final StudentService studentService;
     private final EduStudentCourseModel studentCourseModel;
     private final CourseHoursRedisService courseHoursRedisService;
+    private final CampusStatsRedisService campusStatsRedisService;
     private final HttpServletRequest httpServletRequest;
+    private final org.jooq.DSLContext dsl;
 
 
     /**
@@ -78,6 +81,17 @@ public class StudentController {
                description = "根据学员ID删除学员（逻辑删除）")
     public Result<Void> delete(
             @Parameter(description = "学员ID", required = true) @RequestParam Long id) {
+        // 获取学员信息用于更新统计
+        com.lesson.repository.tables.records.EduStudentRecord student = dsl.selectFrom(com.lesson.repository.tables.EduStudent.EDU_STUDENT)
+            .where(com.lesson.repository.tables.EduStudent.EDU_STUDENT.ID.eq(id))
+            .and(com.lesson.repository.tables.EduStudent.EDU_STUDENT.DELETED.eq(0))
+            .fetchOne();
+        
+        if (student != null) {
+            // 更新Redis统计数据
+            campusStatsRedisService.decrementStudentCount(student.getInstitutionId(), student.getCampusId());
+        }
+        
         studentModel.deleteStudent(id);
         return Result.success();
     }

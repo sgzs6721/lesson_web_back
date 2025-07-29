@@ -39,4 +39,4 @@ logging:
     org.springframework.security: DEBUG
     org.springframework.web.servlet.DispatcherServlet: DEBUG
     org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: TRACE
-    org.jooq: DEBUG
+    org.jooq: DEBUG 

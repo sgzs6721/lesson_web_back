@@ -1,0 +1,160 @@
+### 新增接口测试文件
+### 基础配置
+@baseUrl = http://localhost:8080/lesson
+@contentType = application/json
+
+### ==================== 新增接口测试 ====================
+
+### 1. 获取学员管理页面统计数据
+GET {{baseUrl}}/api/statistics/student-management/summary
+Authorization: Bearer {{authToken}}
+
+### 2. 刷新整个机构的统计数据
+POST {{baseUrl}}/api/statistics/refresh-stats
+Authorization: Bearer {{authToken}}
+
+### 3. 刷新指定校区的统计数据
+POST {{baseUrl}}/api/statistics/refresh-stats?campusId=8
+Authorization: Bearer {{authToken}}
+
+### ==================== 权限验证测试 ====================
+
+### 4. 不带Token调用学员管理页面统计接口（应该返回401）
+GET {{baseUrl}}/api/statistics/student-management/summary
+
+### 5. 不带Token调用刷新统计数据接口（应该返回401）
+POST {{baseUrl}}/api/statistics/refresh-stats
+
+### ==================== 数据一致性测试 ====================
+
+### 6. 创建新学员后检查统计数据更新
+# 先创建学员
+POST {{baseUrl}}/api/student/create
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "studentInfo": {
+    "name": "测试学员",
+    "gender": "MALE",
+    "age": 25,
+    "phone": "13800138004",
+    "campusId": 8
+  },
+  "courseInfoList": [
+    {
+      "courseId": 1,
+      "enrollDate": "2024-01-01",
+      "status": "STUDYING"
+    }
+  ]
+}
+
+### 7. 检查学员数量是否更新
+GET {{baseUrl}}/api/statistics/student-management/summary
+Authorization: Bearer {{authToken}}
+
+### 8. 创建新课程后检查统计数据更新
+# 先创建课程
+POST {{baseUrl}}/api/courses/create
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "name": "测试课程2",
+  "description": "这是第二个测试课程",
+  "typeId": 19,
+  "unitHours": 2.0,
+  "price": 1000.00,
+  "coachFee": 200.00,
+  "campusId": 8,
+  "coachIds": [1018]
+}
+
+### 9. 检查课程数量是否更新
+GET {{baseUrl}}/api/statistics/student-management/summary
+Authorization: Bearer {{authToken}}
+
+### ==================== 性能测试 ====================
+
+### 10. 并发测试 - 同时调用多个统计接口
+# 这个测试需要在实际环境中进行并发调用
+# 可以使用工具如Apache Bench或JMeter进行测试
+
+### ==================== 边界条件测试 ====================
+
+### 11. 测试无效的校区ID
+POST {{baseUrl}}/api/statistics/refresh-stats?campusId=99999
+Authorization: Bearer {{authToken}}
+
+### 12. 测试空校区ID
+POST {{baseUrl}}/api/statistics/refresh-stats?campusId=
+Authorization: Bearer {{authToken}}
+
+### ==================== 学员增长趋势接口测试 ====================
+
+### 13. 测试学员增长趋势接口（验证前端分类功能）
+POST {{baseUrl}}/api/statistics/student/growth-trend
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 8,
+  "institutionId": 6
+}
+
+### 14. 测试学员增长趋势按分类接口
+POST {{baseUrl}}/api/statistics/student/growth-trend-by-category?category=TOTAL
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 8,
+  "institutionId": 6
+}
+
+### 15. 测试学员增长趋势按分类接口 - 新增
+POST {{baseUrl}}/api/statistics/student/growth-trend-by-category?category=NEW
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 8,
+  "institutionId": 6
+}
+
+### 16. 测试学员增长趋势按分类接口 - 续费
+POST {{baseUrl}}/api/statistics/student/growth-trend-by-category?category=RENEWAL
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 8,
+  "institutionId": 6
+}
+
+### 17. 测试学员增长趋势按分类接口 - 流失
+POST {{baseUrl}}/api/statistics/student/growth-trend-by-category?category=LOST
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 8,
+  "institutionId": 6
+}
+
+### 18. 测试学员增长趋势按分类接口 - 留存率
+POST {{baseUrl}}/api/statistics/student/growth-trend-by-category?category=RETENTION
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "timeType": "MONTHLY",
+  "campusId": 8,
+  "institutionId": 6
+} 
