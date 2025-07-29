@@ -179,22 +179,6 @@ public class StatisticsController {
     // ==================== 课程分析统计接口 ====================
 
     /**
-     * 获取课程分析统计数据（完整版）
-     */
-    @PostMapping("/course-analysis")
-    @ApiOperation("获取课程分析统计数据（完整版）")
-    public Result<CourseAnalysisVO> getCourseAnalysis(@Valid @RequestBody CourseAnalysisRequest request) {
-        log.info("获取课程分析统计数据（完整版），请求参数：{}", request);
-        try {
-            CourseAnalysisVO result = statisticsService.getCourseAnalysis(request);
-            return Result.success(result);
-        } catch (Exception e) {
-            log.error("获取课程分析统计数据失败", e);
-            return Result.error("获取课程分析统计数据失败");
-        }
-    }
-
-    /**
      * 获取课程指标统计
      */
     @PostMapping("/course/metrics")
@@ -308,21 +292,6 @@ public class StatisticsController {
 
     // ==================== 教练分析统计接口 ====================
 
-    /**
-     * 获取教练分析统计数据（完整版）
-     */
-    @PostMapping("/coach-analysis")
-    @ApiOperation("获取教练分析统计数据（完整版）")
-    public Result<CoachAnalysisVO> getCoachAnalysis(@Valid @RequestBody CoachAnalysisRequest request) {
-        log.info("获取教练分析统计数据（完整版），请求参数：{}", request);
-        try {
-            CoachAnalysisVO result = statisticsService.getCoachAnalysis(request);
-            return Result.success(result);
-        } catch (Exception e) {
-            log.error("获取教练分析统计数据失败", e);
-            return Result.error("获取教练分析统计数据失败");
-        }
-    }
 
     /**
      * 获取教练绩效指标
@@ -422,21 +391,6 @@ public class StatisticsController {
 
     // ==================== 财务分析完整版接口 ====================
 
-    /**
-     * 获取财务分析统计数据（完整版）
-     */
-    @PostMapping("/finance-analysis")
-    @ApiOperation("获取财务分析统计数据（完整版）")
-    public Result<FinanceAnalysisVO> getFinanceAnalysis(@Valid @RequestBody FinanceAnalysisRequest request) {
-        log.info("获取财务分析统计数据（完整版），请求参数：{}", request);
-        try {
-            FinanceAnalysisVO result = statisticsService.getFinanceAnalysis(request);
-            return Result.success(result);
-        } catch (Exception e) {
-            log.error("获取财务分析统计数据失败", e);
-            return Result.error("获取财务分析统计数据失败");
-        }
-    }
 
     // ==================== 财务分析拆分接口 ====================
 

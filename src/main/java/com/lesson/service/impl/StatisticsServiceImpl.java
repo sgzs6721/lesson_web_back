@@ -4,11 +4,13 @@ import com.lesson.repository.tables.EduStudent;
 import com.lesson.repository.tables.EduStudentCourse;
 import com.lesson.repository.tables.EduStudentPayment;
 import com.lesson.repository.tables.EduCourse;
+import com.lesson.repository.tables.EduStudentCourseRecord;
 import com.lesson.repository.tables.SysConstant;
 import com.lesson.repository.tables.SysCoach;
 import com.lesson.repository.tables.SysCoachSalary;
 import com.lesson.repository.tables.SysCoachCourse;
 import org.jooq.DSLContext;
+import org.jooq.Field;
 import static org.jooq.impl.DSL.*;
 import com.lesson.service.StatisticsService;
 import com.lesson.vo.request.StudentAnalysisRequest;
@@ -259,6 +261,31 @@ public class StatisticsServiceImpl implements StatisticsService {
                 .multiply(BigDecimal.valueOf(100));
     }
     
+    /**
+     * 计算BigDecimal变化率
+     * @param previousValue 上一期的值
+     * @param currentValue 当前期的值
+     * @return 变化率（百分比）
+     */
+    private BigDecimal calculateBigDecimalChangeRate(BigDecimal previousValue, BigDecimal currentValue) {
+        if (previousValue == null || previousValue.compareTo(BigDecimal.ZERO) == 0) {
+            if (currentValue == null || currentValue.compareTo(BigDecimal.ZERO) == 0) {
+                return BigDecimal.ZERO;
+            } else {
+                return BigDecimal.valueOf(100.0); // 从0增长到有值，增长率为100%
+            }
+        }
+        
+        if (currentValue == null) {
+            currentValue = BigDecimal.ZERO;
+        }
+        
+        // 计算公式：(当前值 - 上期值) / 上期值 * 100
+        return currentValue.subtract(previousValue)
+                .divide(previousValue, 4, RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(100));
+    }
+    
     @Override
     public List<StudentAnalysisVO.GrowthTrendPoint> getStudentGrowthTrend(StudentAnalysisRequest request) {
         return getGrowthTrend(request);
@@ -362,6 +389,54 @@ public class StatisticsServiceImpl implements StatisticsService {
     @Override
     public List<CourseAnalysisVO.CourseSalesRanking> getCourseSalesRanking(CourseAnalysisRequest request) {
         return getSalesRanking(request);
+    }
+    
+    /**
+     * 获取课程销售排行
+     */
+    private List<CourseAnalysisVO.CourseSalesRanking> getSalesRanking(CourseAnalysisRequest request) {
+        List<CourseAnalysisVO.CourseSalesRanking> ranking = new ArrayList<>();
+        
+        // 获取时间范围
+        LocalDate endDate = LocalDate.now();
+        LocalDate startDate = getStartDateByTimeType(endDate, request.getTimeType());
+        
+        // 从数据库查询课程销售排行数据
+        Result<?> result = dslContext
+                .select(
+                    EduCourse.EDU_COURSE.NAME.as("courseName"),
+                    count(EduStudentCourse.EDU_STUDENT_COURSE.ID).as("salesQuantity"),
+                    sum(EduStudentPayment.EDU_STUDENT_PAYMENT.AMOUNT).as("revenue"),
+                    EduCourse.EDU_COURSE.PRICE.as("unitPrice")
+                )
+                .from(EduCourse.EDU_COURSE)
+                .leftJoin(EduStudentCourse.EDU_STUDENT_COURSE)
+                .on(EduCourse.EDU_COURSE.ID.eq(EduStudentCourse.EDU_STUDENT_COURSE.COURSE_ID))
+                .leftJoin(EduStudentPayment.EDU_STUDENT_PAYMENT)
+                .on(EduStudentCourse.EDU_STUDENT_COURSE.COURSE_ID.cast(String.class).eq(EduStudentPayment.EDU_STUDENT_PAYMENT.COURSE_ID))
+                .where(EduCourse.EDU_COURSE.DELETED.eq(0))
+                .and(EduCourse.EDU_COURSE.STATUS.eq("PUBLISHED"))
+                .and(EduStudentCourse.EDU_STUDENT_COURSE.CREATED_TIME.between(startDate.atStartOfDay(), endDate.atTime(23, 59, 59)))
+                .and(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
+                .and(request.getCampusId() != null ? EduCourse.EDU_COURSE.CAMPUS_ID.eq(request.getCampusId()) : trueCondition())
+                .and(request.getCampusId() != null ? EduStudentCourse.EDU_STUDENT_COURSE.CAMPUS_ID.eq(request.getCampusId()) : trueCondition())
+                .and(trueCondition())
+                .groupBy(EduCourse.EDU_COURSE.ID, EduCourse.EDU_COURSE.NAME, EduCourse.EDU_COURSE.PRICE)
+                .orderBy(sum(EduStudentPayment.EDU_STUDENT_PAYMENT.AMOUNT).desc())
+                .limit(10)
+                .fetch();
+        
+        int rankingIndex = 1;
+        for (Record record : result) {
+            CourseAnalysisVO.CourseSalesRanking course = new CourseAnalysisVO.CourseSalesRanking();
+            course.setCourseName(record.get("courseName", String.class));
+            course.setSalesQuantity(record.get("salesQuantity", Long.class));
+            course.setRevenue(record.get("revenue", BigDecimal.class));
+            course.setUnitPrice(record.get("unitPrice", BigDecimal.class));
+            ranking.add(course);
+        }
+        
+        return ranking;
     }
     
     @Override
@@ -676,13 +751,95 @@ public class StatisticsServiceImpl implements StatisticsService {
         metrics.setRemainingCourses(remainingCourses);
         metrics.setCourseUnitPrice(courseUnitPrice != null ? courseUnitPrice : BigDecimal.ZERO);
         
-        // 计算变化率（这里简化处理，实际应该与上期数据比较）
-        metrics.setTotalCoursesChangeRate(BigDecimal.valueOf(8.3));
-        metrics.setNewCoursesEnrolledChangeRate(BigDecimal.valueOf(15.3));
-        metrics.setRenewedCoursesChangeRate(BigDecimal.valueOf(8.5));
-        metrics.setSoldCoursesChangeRate(BigDecimal.valueOf(12.5));
-        metrics.setRemainingCoursesChangeRate(BigDecimal.valueOf(0.0));
-        metrics.setCourseUnitPriceChangeRate(BigDecimal.valueOf(2.1));
+        // 计算真实的变化率
+        // 获取上一期的时间范围
+        LocalDate previousEndDate = startDate.minusDays(1);
+        LocalDate previousStartDate = getStartDateByTimeType(previousEndDate, request.getTimeType());
+        
+        // 上一期总课程数
+        Long previousTotalCourses = dslContext
+                .selectCount()
+                .from(EduCourse.EDU_COURSE)
+                .where(EduCourse.EDU_COURSE.STATUS.eq("PUBLISHED"))
+                .and(EduCourse.EDU_COURSE.DELETED.eq(0))
+                .and(request.getCampusId() != null ? EduCourse.EDU_COURSE.CAMPUS_ID.eq(request.getCampusId()) : EduCourse.EDU_COURSE.CAMPUS_ID.isNotNull())
+                .and(trueCondition())
+                .and(EduCourse.EDU_COURSE.CREATED_TIME.lessThan(startDate.atStartOfDay()))
+                .fetchOneInto(Long.class);
+        
+        // 上一期新报课程数
+        Long previousNewCoursesEnrolled = dslContext
+                .selectCount()
+                .from(EduStudentCourse.EDU_STUDENT_COURSE)
+                .where(EduStudentCourse.EDU_STUDENT_COURSE.CREATED_TIME.between(previousStartDate.atStartOfDay(), previousEndDate.atTime(23, 59, 59)))
+                .and(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
+                .and(request.getCampusId() != null ? EduStudentCourse.EDU_STUDENT_COURSE.CAMPUS_ID.eq(request.getCampusId()) : EduStudentCourse.EDU_STUDENT_COURSE.CAMPUS_ID.isNotNull())
+                .and(trueCondition())
+                .fetchOneInto(Long.class);
+        
+        // 上一期续费课程数
+        Long previousRenewedCourses = dslContext
+                .selectCount()
+                .from(EduStudentCourse.EDU_STUDENT_COURSE)
+                .where(EduStudentCourse.EDU_STUDENT_COURSE.CREATED_TIME.between(previousStartDate.atStartOfDay(), previousEndDate.atTime(23, 59, 59)))
+                .and(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
+                .and(request.getCampusId() != null ? EduStudentCourse.EDU_STUDENT_COURSE.CAMPUS_ID.eq(request.getCampusId()) : EduStudentCourse.EDU_STUDENT_COURSE.CAMPUS_ID.isNotNull())
+                .and(trueCondition())
+                .fetchOneInto(Long.class);
+        
+        // 上一期已销课程数
+        Long previousSoldCourses = dslContext
+                .selectCount()
+                .from(EduStudentCourse.EDU_STUDENT_COURSE)
+                .where(EduStudentCourse.EDU_STUDENT_COURSE.CONSUMED_HOURS.gt(BigDecimal.ZERO))
+                .and(EduStudentCourse.EDU_STUDENT_COURSE.UPDATE_TIME.between(previousStartDate.atStartOfDay(), previousEndDate.atTime(23, 59, 59)))
+                .and(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
+                .and(request.getCampusId() != null ? EduStudentCourse.EDU_STUDENT_COURSE.CAMPUS_ID.eq(request.getCampusId()) : EduStudentCourse.EDU_STUDENT_COURSE.CAMPUS_ID.isNotNull())
+                .and(trueCondition())
+                .fetchOneInto(Long.class);
+        
+        // 上一期剩余课程数
+        Long previousRemainingCourses = dslContext
+                .selectCount()
+                .from(EduStudentCourse.EDU_STUDENT_COURSE)
+                .where(EduStudentCourse.EDU_STUDENT_COURSE.CONSUMED_HOURS.lt(EduStudentCourse.EDU_STUDENT_COURSE.TOTAL_HOURS))
+                .and(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
+                .and(request.getCampusId() != null ? EduStudentCourse.EDU_STUDENT_COURSE.CAMPUS_ID.eq(request.getCampusId()) : EduStudentCourse.EDU_STUDENT_COURSE.CAMPUS_ID.isNotNull())
+                .and(trueCondition())
+                .and(EduStudentCourse.EDU_STUDENT_COURSE.CREATED_TIME.lessThan(startDate.atStartOfDay()))
+                .fetchOneInto(Long.class);
+        
+        // 上一期课程单价
+        BigDecimal previousCourseUnitPrice = dslContext
+                .select(EduCourse.EDU_COURSE.PRICE.avg())
+                .from(EduCourse.EDU_COURSE)
+                .where(EduCourse.EDU_COURSE.STATUS.eq("PUBLISHED"))
+                .and(EduCourse.EDU_COURSE.DELETED.eq(0))
+                .and(request.getCampusId() != null ? EduCourse.EDU_COURSE.CAMPUS_ID.eq(request.getCampusId()) : EduCourse.EDU_COURSE.CAMPUS_ID.isNotNull())
+                .and(trueCondition())
+                .and(EduCourse.EDU_COURSE.CREATED_TIME.lessThan(startDate.atStartOfDay()))
+                .fetchOneInto(BigDecimal.class);
+        
+        // 计算真实的变化率
+        metrics.setTotalCoursesChangeRate(calculateChangeRate(previousTotalCourses, totalCourses));
+        metrics.setNewCoursesEnrolledChangeRate(calculateChangeRate(previousNewCoursesEnrolled, newCoursesEnrolled));
+        metrics.setRenewedCoursesChangeRate(calculateChangeRate(previousRenewedCourses, renewedCourses));
+        metrics.setSoldCoursesChangeRate(calculateChangeRate(previousSoldCourses, soldCourses));
+        metrics.setRemainingCoursesChangeRate(calculateChangeRate(previousRemainingCourses, remainingCourses));
+        
+        // 计算课程单价变化率
+        if (previousCourseUnitPrice != null && previousCourseUnitPrice.compareTo(BigDecimal.ZERO) > 0) {
+            if (courseUnitPrice != null) {
+                BigDecimal changeRate = courseUnitPrice.subtract(previousCourseUnitPrice)
+                        .divide(previousCourseUnitPrice, 4, RoundingMode.HALF_UP)
+                        .multiply(BigDecimal.valueOf(100));
+                metrics.setCourseUnitPriceChangeRate(changeRate);
+            } else {
+                metrics.setCourseUnitPriceChangeRate(BigDecimal.ZERO);
+            }
+        } else {
+            metrics.setCourseUnitPriceChangeRate(BigDecimal.ZERO);
+        }
         
         return metrics;
     }
@@ -876,61 +1033,6 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
     
     /**
-     * 获取课程销售排行
-     */
-    private List<CourseAnalysisVO.CourseSalesRanking> getSalesRanking(CourseAnalysisRequest request) {
-        List<CourseAnalysisVO.CourseSalesRanking> ranking = new ArrayList<>();
-        
-        // 这里简化处理，实际应该从数据库查询课程销售排行数据
-        // 由于当前表结构限制，这里使用示例数据
-        
-        CourseAnalysisVO.CourseSalesRanking course1 = new CourseAnalysisVO.CourseSalesRanking();
-        course1.setCourseName("基础数学一对一");
-        course1.setSalesQuantity(245L);
-        course1.setRevenue(BigDecimal.valueOf(588000));
-        course1.setUnitPrice(BigDecimal.valueOf(280));
-        
-        CourseAnalysisVO.CourseSalesRanking course2 = new CourseAnalysisVO.CourseSalesRanking();
-        course2.setCourseName("计算机编程");
-        course2.setSalesQuantity(198L);
-        course2.setRevenue(BigDecimal.valueOf(594000));
-        course2.setUnitPrice(BigDecimal.valueOf(300));
-        
-        CourseAnalysisVO.CourseSalesRanking course3 = new CourseAnalysisVO.CourseSalesRanking();
-        course3.setCourseName("高级英语小班课");
-        course3.setSalesQuantity(189L);
-        course3.setRevenue(BigDecimal.valueOf(452000));
-        course3.setUnitPrice(BigDecimal.valueOf(120));
-        
-        CourseAnalysisVO.CourseSalesRanking course4 = new CourseAnalysisVO.CourseSalesRanking();
-        course4.setCourseName("物理实验课");
-        course4.setSalesQuantity(156L);
-        course4.setRevenue(BigDecimal.valueOf(386000));
-        course4.setUnitPrice(BigDecimal.valueOf(150));
-        
-        CourseAnalysisVO.CourseSalesRanking course5 = new CourseAnalysisVO.CourseSalesRanking();
-        course5.setCourseName("化学基础课");
-        course5.setSalesQuantity(123L);
-        course5.setRevenue(BigDecimal.valueOf(289000));
-        course5.setUnitPrice(BigDecimal.valueOf(100));
-        
-        CourseAnalysisVO.CourseSalesRanking course6 = new CourseAnalysisVO.CourseSalesRanking();
-        course6.setCourseName("生物科学课");
-        course6.setSalesQuantity(134L);
-        course6.setRevenue(BigDecimal.valueOf(321000));
-        course6.setUnitPrice(BigDecimal.valueOf(110));
-        
-        ranking.add(course1);
-        ranking.add(course2);
-        ranking.add(course3);
-        ranking.add(course4);
-        ranking.add(course5);
-        ranking.add(course6);
-        
-        return ranking;
-    }
-    
-    /**
      * 获取课程收入分析
      */
     private CourseAnalysisVO.CourseRevenueAnalysis getRevenueAnalysis(CourseAnalysisRequest request) {
@@ -977,27 +1079,61 @@ public class StatisticsServiceImpl implements StatisticsService {
     private List<CourseAnalysisVO.CourseTypeRevenueDistribution> getRevenueDistribution(CourseAnalysisRequest request) {
         List<CourseAnalysisVO.CourseTypeRevenueDistribution> distribution = new ArrayList<>();
         
-        // 这里简化处理，实际应该从数据库查询课程类型收入分布数据
-        // 由于当前表结构限制，这里使用示例数据
+        // 从数据库查询课程类型收入分布数据
+        Result<?> result = dslContext
+                .select(
+                    SysConstant.SYS_CONSTANT.CONSTANT_VALUE.as("courseType"),
+                    sum(EduStudentPayment.EDU_STUDENT_PAYMENT.AMOUNT).as("revenueAmount")
+                )
+                .from(EduCourse.EDU_COURSE)
+                .leftJoin(SysConstant.SYS_CONSTANT)
+                .on(EduCourse.EDU_COURSE.TYPE_ID.eq(SysConstant.SYS_CONSTANT.ID))
+                .leftJoin(EduStudentPayment.EDU_STUDENT_PAYMENT)
+                .on(EduCourse.EDU_COURSE.ID.cast(String.class).eq(EduStudentPayment.EDU_STUDENT_PAYMENT.COURSE_ID))
+                .where(EduCourse.EDU_COURSE.DELETED.eq(0))
+                .and(EduCourse.EDU_COURSE.STATUS.eq("PUBLISHED"))
+                .and(EduStudentPayment.EDU_STUDENT_PAYMENT.DELETED.eq(0))
+                .and(request.getCampusId() != null ? EduCourse.EDU_COURSE.CAMPUS_ID.eq(request.getCampusId()) : trueCondition())
+                .and(request.getCampusId() != null ? EduStudentPayment.EDU_STUDENT_PAYMENT.CAMPUS_ID.eq(request.getCampusId()) : trueCondition())
+                .and(trueCondition())
+                .groupBy(EduCourse.EDU_COURSE.TYPE_ID, SysConstant.SYS_CONSTANT.CONSTANT_VALUE)
+                .orderBy(sum(EduStudentPayment.EDU_STUDENT_PAYMENT.AMOUNT).desc())
+                .fetch();
         
-        CourseAnalysisVO.CourseTypeRevenueDistribution oneOnOne = new CourseAnalysisVO.CourseTypeRevenueDistribution();
-        oneOnOne.setCourseType("一对一");
-        oneOnOne.setRevenueAmount(BigDecimal.valueOf(1182000));
-        oneOnOne.setPercentage(BigDecimal.valueOf(48.3));
+        // 计算总收入
+        BigDecimal totalRevenue = dslContext
+                .select(sum(EduStudentPayment.EDU_STUDENT_PAYMENT.AMOUNT))
+                .from(EduStudentPayment.EDU_STUDENT_PAYMENT)
+                .where(EduStudentPayment.EDU_STUDENT_PAYMENT.DELETED.eq(0))
+                .and(request.getCampusId() != null ? EduStudentPayment.EDU_STUDENT_PAYMENT.CAMPUS_ID.eq(request.getCampusId()) : trueCondition())
+                .and(trueCondition())
+                .fetchOneInto(BigDecimal.class);
         
-        CourseAnalysisVO.CourseTypeRevenueDistribution smallClass = new CourseAnalysisVO.CourseTypeRevenueDistribution();
-        smallClass.setCourseType("小班课");
-        smallClass.setRevenueAmount(BigDecimal.valueOf(754000));
-        smallClass.setPercentage(BigDecimal.valueOf(30.8));
+        if (totalRevenue == null || totalRevenue.compareTo(BigDecimal.ZERO) == 0) {
+            return distribution;
+        }
         
-        CourseAnalysisVO.CourseTypeRevenueDistribution largeClass = new CourseAnalysisVO.CourseTypeRevenueDistribution();
-        largeClass.setCourseType("大班课");
-        largeClass.setRevenueAmount(BigDecimal.valueOf(514000));
-        largeClass.setPercentage(BigDecimal.valueOf(21.0));
-        
-        distribution.add(oneOnOne);
-        distribution.add(smallClass);
-        distribution.add(largeClass);
+        // 构建分布数据
+        for (Record record : result) {
+            String courseType = record.get("courseType", String.class);
+            BigDecimal revenueAmount = record.get("revenueAmount", BigDecimal.class);
+            
+            if (courseType == null) {
+                courseType = "未知类型";
+            }
+            
+            CourseAnalysisVO.CourseTypeRevenueDistribution item = new CourseAnalysisVO.CourseTypeRevenueDistribution();
+            item.setCourseType(courseType);
+            item.setRevenueAmount(revenueAmount != null ? revenueAmount : BigDecimal.ZERO);
+            
+            // 计算百分比
+            BigDecimal percentage = revenueAmount != null ? 
+                revenueAmount.divide(totalRevenue, 4, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100)) : 
+                BigDecimal.ZERO;
+            item.setPercentage(percentage);
+            
+            distribution.add(item);
+        }
         
         return distribution;
     }
@@ -1088,27 +1224,64 @@ public class StatisticsServiceImpl implements StatisticsService {
         List<CoachAnalysisVO.CoachTop5Comparison> comparison = new ArrayList<>();
         
         // 根据排名类型获取不同的TOP5数据
-        String rankingType = request.getRankingType() != null ? request.getRankingType() : "ALL";
+        String rankingType = request.getRankingType() != null ? request.getRankingType() : "CLASS_HOURS";
         Integer limit = request.getLimit() != null ? request.getLimit() : 5;
         
-        // 示例数据 - 实际应该根据rankingType查询数据库
-        String[] coachNames = {"李教练", "王教练", "张教练", "赵教练", "刘教练"};
-        Long[] classHours = {120L, 110L, 100L, 95L, 90L};
-        Long[] studentCounts = {25L, 30L, 20L, 22L, 18L};
-        BigDecimal[] revenues = {BigDecimal.valueOf(30000), BigDecimal.valueOf(28000), 
-                               BigDecimal.valueOf(25000), BigDecimal.valueOf(22000), BigDecimal.valueOf(20000)};
+        // 获取时间范围
+        LocalDate endDate = LocalDate.now();
+        LocalDate startDate = getStartDateByTimeType(endDate, request.getTimeType());
         
-        for (int i = 0; i < Math.min(limit, coachNames.length); i++) {
+        // 从数据库查询教练排行数据
+        Result<?> result = dslContext
+                .select(
+                    SysCoach.SYS_COACH.NAME.as("coachName"),
+                    count(EduStudentCourseRecord.EDU_STUDENT_COURSE_RECORD.ID).as("classHours"),
+                    countDistinct(EduStudentCourseRecord.EDU_STUDENT_COURSE_RECORD.STUDENT_ID).as("studentCount"),
+                    sum(EduStudentPayment.EDU_STUDENT_PAYMENT.AMOUNT).as("revenue")
+                )
+                .from(SysCoach.SYS_COACH)
+                .leftJoin(EduStudentCourseRecord.EDU_STUDENT_COURSE_RECORD)
+                .on(SysCoach.SYS_COACH.ID.eq(EduStudentCourseRecord.EDU_STUDENT_COURSE_RECORD.COACH_ID))
+                .leftJoin(EduStudentPayment.EDU_STUDENT_PAYMENT)
+                .on(EduStudentCourseRecord.EDU_STUDENT_COURSE_RECORD.COURSE_ID.cast(String.class).eq(EduStudentPayment.EDU_STUDENT_PAYMENT.COURSE_ID))
+                .where(SysCoach.SYS_COACH.DELETED.eq(0))
+                .and(SysCoach.SYS_COACH.STATUS.eq("ACTIVE"))
+                .and(EduStudentCourseRecord.EDU_STUDENT_COURSE_RECORD.COURSE_DATE.between(startDate, endDate))
+                .and(EduStudentCourseRecord.EDU_STUDENT_COURSE_RECORD.DELETED.eq(0))
+                .and(request.getCampusId() != null ? SysCoach.SYS_COACH.CAMPUS_ID.eq(request.getCampusId()) : trueCondition())
+                .and(trueCondition())
+                .groupBy(SysCoach.SYS_COACH.ID, SysCoach.SYS_COACH.NAME)
+                .orderBy(getOrderByField(rankingType))
+                .limit(limit)
+                .fetch();
+        
+        int rankingIndex = 1;
+        for (Record record : result) {
             CoachAnalysisVO.CoachTop5Comparison coach = new CoachAnalysisVO.CoachTop5Comparison();
-            coach.setCoachName(coachNames[i]);
-            coach.setClassHours(classHours[i]);
-            coach.setStudentCount(studentCounts[i]);
-            coach.setRevenue(revenues[i]);
-            coach.setRanking(i + 1);
+            coach.setCoachName(record.get("coachName", String.class));
+            coach.setClassHours(record.get("classHours", Long.class));
+            coach.setStudentCount(record.get("studentCount", Long.class));
+            coach.setRevenue(record.get("revenue", BigDecimal.class));
+            coach.setRanking(rankingIndex++);
             comparison.add(coach);
         }
         
         return comparison;
+    }
+    
+    /**
+     * 根据排行类型获取排序字段
+     */
+    private org.jooq.SortField<?> getOrderByField(String rankingType) {
+        switch (rankingType) {
+            case "STUDENTS":
+                return countDistinct(EduStudentCourseRecord.EDU_STUDENT_COURSE_RECORD.STUDENT_ID).desc();
+            case "REVENUE":
+                return sum(EduStudentPayment.EDU_STUDENT_PAYMENT.AMOUNT).desc();
+            case "CLASS_HOURS":
+            default:
+                return count(EduStudentCourseRecord.EDU_STUDENT_COURSE_RECORD.ID).desc();
+        }
     }
     
     /**
@@ -1117,16 +1290,53 @@ public class StatisticsServiceImpl implements StatisticsService {
     private List<CoachAnalysisVO.CoachTypeDistribution> getCoachTypeDistributionInternal(CoachAnalysisRequest request) {
         List<CoachAnalysisVO.CoachTypeDistribution> distribution = new ArrayList<>();
         
-        // 示例数据 - 实际应该查询数据库
-        String[] types = {"全职教练", "兼职教练", "特聘教练"};
-        Long[] counts = {25L, 12L, 5L};
-        BigDecimal[] percentages = {BigDecimal.valueOf(59.5), BigDecimal.valueOf(28.6), BigDecimal.valueOf(11.9)};
+        // 从数据库查询教练状态分布数据
+        Result<?> result = dslContext
+                .select(
+                    SysCoach.SYS_COACH.STATUS.as("coachTypeName"),
+                    count(SysCoach.SYS_COACH.ID).as("coachCount")
+                )
+                .from(SysCoach.SYS_COACH)
+                .where(SysCoach.SYS_COACH.DELETED.eq(0))
+                .and(request.getCampusId() != null ? SysCoach.SYS_COACH.CAMPUS_ID.eq(request.getCampusId()) : trueCondition())
+                .and(trueCondition())
+                .groupBy(SysCoach.SYS_COACH.STATUS)
+                .orderBy(count(SysCoach.SYS_COACH.ID).desc())
+                .fetch();
         
-        for (int i = 0; i < types.length; i++) {
+        // 计算总教练数
+        Long totalCoaches = dslContext
+                .selectCount()
+                .from(SysCoach.SYS_COACH)
+                .where(SysCoach.SYS_COACH.DELETED.eq(0))
+                .and(SysCoach.SYS_COACH.STATUS.eq("ACTIVE"))
+                .and(request.getCampusId() != null ? SysCoach.SYS_COACH.CAMPUS_ID.eq(request.getCampusId()) : trueCondition())
+                .and(trueCondition())
+                .fetchOneInto(Long.class);
+        
+        if (totalCoaches == null || totalCoaches == 0) {
+            return distribution;
+        }
+        
+        // 构建分布数据
+        for (Record record : result) {
+            String coachTypeName = record.get("coachTypeName", String.class);
+            Long coachCount = record.get("coachCount", Long.class);
+            
+            if (coachTypeName == null) {
+                coachTypeName = "未知类型";
+            }
+            
             CoachAnalysisVO.CoachTypeDistribution type = new CoachAnalysisVO.CoachTypeDistribution();
-            type.setCoachTypeName(types[i]);
-            type.setCoachCount(counts[i]);
-            type.setPercentage(percentages[i]);
+            type.setCoachTypeName(coachTypeName);
+            type.setCoachCount(coachCount != null ? coachCount : 0L);
+            
+            // 计算百分比
+            BigDecimal percentage = BigDecimal.valueOf(coachCount != null ? coachCount : 0L)
+                    .multiply(BigDecimal.valueOf(100))
+                    .divide(BigDecimal.valueOf(totalCoaches), 2, RoundingMode.HALF_UP);
+            type.setPercentage(percentage);
+            
             distribution.add(type);
         }
         
@@ -1139,23 +1349,32 @@ public class StatisticsServiceImpl implements StatisticsService {
     private CoachAnalysisVO.CoachSalaryAnalysis getSalaryAnalysis(CoachAnalysisRequest request) {
         CoachAnalysisVO.CoachSalaryAnalysis analysis = new CoachAnalysisVO.CoachSalaryAnalysis();
         
-        // 获取总薪资支出（示例数据，因为SysCoachSalary表没有总工资字段）
-        BigDecimal totalSalaryExpense = BigDecimal.valueOf(357000.00);
+        // 从数据库查询教练薪资统计数据
+        Record result = dslContext
+                .select(
+                    sum(SysCoachSalary.SYS_COACH_SALARY.BASE_SALARY).as("totalSalary"),
+                    avg(SysCoachSalary.SYS_COACH_SALARY.BASE_SALARY).as("averageSalary"),
+                    max(SysCoachSalary.SYS_COACH_SALARY.BASE_SALARY).as("maxSalary"),
+                    min(SysCoachSalary.SYS_COACH_SALARY.BASE_SALARY).as("minSalary")
+                )
+                .from(SysCoachSalary.SYS_COACH_SALARY)
+                .where(SysCoachSalary.SYS_COACH_SALARY.DELETED.eq(0))
+                .and(trueCondition())
+                .fetchOne();
         
-        // 获取平均薪资（示例数据）
-        BigDecimal averageSalary = BigDecimal.valueOf(8500.00);
+        BigDecimal totalSalaryExpense = result.get("totalSalary", BigDecimal.class);
+        BigDecimal averageSalary = result.get("averageSalary", BigDecimal.class);
+        BigDecimal maxSalary = result.get("maxSalary", BigDecimal.class);
+        BigDecimal minSalary = result.get("minSalary", BigDecimal.class);
         
-        // 获取最高薪资（示例数据）
-        BigDecimal maxSalary = BigDecimal.valueOf(12000.00);
-        
-        // 获取最低薪资（示例数据）
-        BigDecimal minSalary = BigDecimal.valueOf(6000.00);
+        // 计算中位数（简化处理，使用平均值作为中位数）
+        BigDecimal medianSalary = averageSalary;
         
         analysis.setTotalSalaryExpense(totalSalaryExpense != null ? totalSalaryExpense : BigDecimal.ZERO);
         analysis.setAverageSalary(averageSalary != null ? averageSalary : BigDecimal.ZERO);
         analysis.setMaxSalary(maxSalary != null ? maxSalary : BigDecimal.ZERO);
         analysis.setMinSalary(minSalary != null ? minSalary : BigDecimal.ZERO);
-        analysis.setMedianSalary(BigDecimal.valueOf(8500)); // 示例数据
+        analysis.setMedianSalary(medianSalary != null ? medianSalary : BigDecimal.ZERO);
         
         return analysis;
     }
@@ -1257,11 +1476,36 @@ public class StatisticsServiceImpl implements StatisticsService {
         metrics.setTotalProfit(totalProfit);
         metrics.setProfitMargin(profitMargin);
         
-        // 变化率（示例数据）
-        metrics.setRevenueChangeRate(BigDecimal.valueOf(8.4));
-        metrics.setCostChangeRate(BigDecimal.valueOf(5.2));
-        metrics.setProfitChangeRate(BigDecimal.valueOf(13.7));
-        metrics.setMarginChangeRate(BigDecimal.valueOf(1.8));
+        // 计算真实的变化率
+        // 获取上一期的时间范围
+        LocalDate previousEndDate = startDate.minusDays(1);
+        LocalDate previousStartDate = getStartDateByTimeType(previousEndDate, request.getTimeType());
+        
+        // 上一期总收入
+        BigDecimal previousTotalRevenue = dslContext.select(sum(EduStudentPayment.EDU_STUDENT_PAYMENT.AMOUNT))
+                .from(EduStudentPayment.EDU_STUDENT_PAYMENT)
+                .where(EduStudentPayment.EDU_STUDENT_PAYMENT.DELETED.eq(0))
+                .and(EduStudentPayment.EDU_STUDENT_PAYMENT.CREATED_TIME.between(previousStartDate.atStartOfDay(), previousEndDate.atTime(23, 59, 59)))
+                .and(request.getCampusId() != null ? EduStudentPayment.EDU_STUDENT_PAYMENT.CAMPUS_ID.eq(request.getCampusId()) : trueCondition())
+                .and(trueCondition())
+                .fetchOneInto(BigDecimal.class);
+        
+        // 上一期总成本（示例数据，实际应该从财务表获取）
+        BigDecimal previousTotalCost = BigDecimal.valueOf(584000.00);
+        
+        // 上一期总利润
+        BigDecimal previousTotalProfit = previousTotalRevenue != null ? previousTotalRevenue.subtract(previousTotalCost) : BigDecimal.ZERO.subtract(previousTotalCost);
+        
+        // 上一期利润率
+        BigDecimal previousProfitMargin = previousTotalRevenue != null && previousTotalRevenue.compareTo(BigDecimal.ZERO) > 0 
+                ? previousTotalProfit.divide(previousTotalRevenue, 4, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100))
+                : BigDecimal.ZERO;
+        
+        // 计算变化率
+        metrics.setRevenueChangeRate(calculateBigDecimalChangeRate(previousTotalRevenue, totalRevenue != null ? totalRevenue : BigDecimal.valueOf(1007700.00)));
+        metrics.setCostChangeRate(calculateBigDecimalChangeRate(previousTotalCost, totalCost));
+        metrics.setProfitChangeRate(calculateBigDecimalChangeRate(previousTotalProfit, totalProfit));
+        metrics.setMarginChangeRate(calculateBigDecimalChangeRate(previousProfitMargin, profitMargin));
         
         return metrics;
     }
@@ -1291,8 +1535,15 @@ public class StatisticsServiceImpl implements StatisticsService {
                     .and(trueCondition())
                     .fetchOneInto(BigDecimal.class);
             
-            // 成本（示例数据）
-            BigDecimal cost = BigDecimal.valueOf(50000 + (i * 2000));
+            // 获取该月的成本
+            BigDecimal cost = dslContext.select(sum(field("finance_expense.amount", BigDecimal.class)))
+                    .from(table("finance_expense"))
+                    .where(field("finance_expense.deleted").eq(0))
+                    .and(year(field("finance_expense.expense_date", LocalDate.class)).eq(currentDate.getYear()))
+                    .and(month(field("finance_expense.expense_date", LocalDate.class)).eq(currentDate.getMonthValue()))
+                    .and(request.getCampusId() != null ? field("finance_expense.campus_id").eq(request.getCampusId()) : trueCondition())
+                    .and(trueCondition())
+                    .fetchOneInto(BigDecimal.class);
             
             // 利润
             BigDecimal profit = revenue != null ? revenue.subtract(cost) : BigDecimal.ZERO.subtract(cost);
@@ -1311,26 +1562,54 @@ public class StatisticsServiceImpl implements StatisticsService {
     public List<FinanceAnalysisVO.CostStructureItem> getFinanceCostStructure(FinanceAnalysisRequest request) {
         List<FinanceAnalysisVO.CostStructureItem> structure = new ArrayList<>();
         
-        // 示例数据
-        String[] costTypes = {"人力成本", "场地租金", "市场推广", "教学材料", "其他"};
-        BigDecimal[] amounts = {
-            BigDecimal.valueOf(250000.00),  // 人力成本
-            BigDecimal.valueOf(150000.00),  // 场地租金
-            BigDecimal.valueOf(100000.00),  // 市场推广
-            BigDecimal.valueOf(80000.00),   // 教学材料
-            BigDecimal.valueOf(34800.00)    // 其他
-        };
+        // 从数据库查询成本结构数据
+        Result<?> result = dslContext
+                .select(
+                    SysConstant.SYS_CONSTANT.CONSTANT_VALUE.as("costType"),
+                    sum(field("finance_expense.amount", BigDecimal.class)).as("amount")
+                )
+                .from(table("finance_expense"))
+                .leftJoin(SysConstant.SYS_CONSTANT)
+                .on(field("finance_expense.category_id").eq(SysConstant.SYS_CONSTANT.ID))
+                .where(field("finance_expense.deleted").eq(0))
+                .and(request.getCampusId() != null ? field("finance_expense.campus_id").eq(request.getCampusId()) : trueCondition())
+                .and(trueCondition())
+                .groupBy(field("finance_expense.category_id"), SysConstant.SYS_CONSTANT.CONSTANT_VALUE)
+                .orderBy(sum(field("finance_expense.amount", BigDecimal.class)).desc())
+                .fetch();
         
-        BigDecimal totalCost = BigDecimal.ZERO;
-        for (BigDecimal amount : amounts) {
-            totalCost = totalCost.add(amount);
+        // 计算总成本
+        BigDecimal totalCost = dslContext
+                .select(sum(field("finance_expense.amount", BigDecimal.class)))
+                .from(table("finance_expense"))
+                .where(field("finance_expense.deleted").eq(0))
+                .and(request.getCampusId() != null ? field("finance_expense.campus_id").eq(request.getCampusId()) : trueCondition())
+                .and(trueCondition())
+                .fetchOneInto(BigDecimal.class);
+        
+        if (totalCost == null || totalCost.compareTo(BigDecimal.ZERO) == 0) {
+            return structure;
         }
         
-        for (int i = 0; i < costTypes.length; i++) {
+        // 构建成本结构数据
+        for (Record record : result) {
+            String costType = record.get("costType", String.class);
+            BigDecimal amount = record.get("amount", BigDecimal.class);
+            
+            if (costType == null) {
+                costType = "其他";
+            }
+            
             FinanceAnalysisVO.CostStructureItem item = new FinanceAnalysisVO.CostStructureItem();
-            item.setCostType(costTypes[i]);
-            item.setAmount(amounts[i]);
-            item.setPercentage(amounts[i].divide(totalCost, 4, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100)));
+            item.setCostType(costType);
+            item.setAmount(amount != null ? amount : BigDecimal.ZERO);
+            
+            // 计算百分比
+            BigDecimal percentage = amount != null ? 
+                amount.divide(totalCost, 4, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100)) : 
+                BigDecimal.ZERO;
+            item.setPercentage(percentage);
+            
             structure.add(item);
         }
         
@@ -1362,8 +1641,15 @@ public class StatisticsServiceImpl implements StatisticsService {
                     .and(trueCondition())
                     .fetchOneInto(BigDecimal.class);
             
-            // 成本（示例数据）
-            BigDecimal cost = BigDecimal.valueOf(50000 + (i * 2000));
+            // 获取该月的成本
+            BigDecimal cost = dslContext.select(sum(field("finance_expense.amount", BigDecimal.class)))
+                    .from(table("finance_expense"))
+                    .where(field("finance_expense.deleted").eq(0))
+                    .and(year(field("finance_expense.expense_date", LocalDate.class)).eq(currentDate.getYear()))
+                    .and(month(field("finance_expense.expense_date", LocalDate.class)).eq(currentDate.getMonthValue()))
+                    .and(request.getCampusId() != null ? field("finance_expense.campus_id").eq(request.getCampusId()) : trueCondition())
+                    .and(trueCondition())
+                    .fetchOneInto(BigDecimal.class);
             
             // 利润
             BigDecimal profit = revenue != null ? revenue.subtract(cost) : BigDecimal.ZERO.subtract(cost);

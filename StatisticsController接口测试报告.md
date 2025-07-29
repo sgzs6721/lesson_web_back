@@ -7,11 +7,11 @@
 ## 测试环境
 
 - **应用地址**: http://localhost:8080/lesson
-- **测试时间**: 2025-07-28 23:45:00
+- **测试时间**: 2025-07-29 21:05:00
 - **测试工具**: curl命令行工具
 - **数据库**: MySQL
 - **应用状态**: 正常运行
-- **JWT Token**: eyJhbGciOiJIUzM4NCJ9.eyJ1c2VySWQiOjE2LCJvcmdJZCI6NiwiaWF0IjoxNzUzNzE3MjI4LCJleHAiOjE3NTQzMjIwMjh9.5_gVrrl8IDZtWyJlL5pUntiIrGwqRxCMLbqQYgDrcrP50ZP3ZMkD1DXltS8YXfjP
+- **JWT Token**: eyJhbGciOiJIUzM4NCJ9.eyJ1c2VySWQiOjE2LCJvcmdJZCI6NiwiaWF0IjoxNzUzNzk0MjY1LCJleHAiOjE3NTQzOTkwNjV9.vtESHN3klYUPZSoiJt2_ycCUSeWvHUWysKQLvlTSk16idyakxpTNVeTVengzS8Xc
 
 ## 测试结果总览
 
@@ -48,10 +48,10 @@
       "newStudents": 0,
       "renewingStudents": 0,
       "lostStudents": 1,
-      "totalStudentsChangeRate": 12.5,
-      "newStudentsChangeRate": 15.3,
-      "renewingStudentsChangeRate": 8.7,
-      "lostStudentsChangeRate": -5.2
+      "totalStudentsChangeRate": 0.0000,
+      "newStudentsChangeRate": -100.0000,
+      "renewingStudentsChangeRate": 0,
+      "lostStudentsChangeRate": 100.0
     },
     "growthTrend": [...],
     "renewalAmountTrend": [...],
@@ -87,14 +87,47 @@
     "newStudents": 0,
     "renewingStudents": 0,
     "lostStudents": 1,
-    "totalStudentsChangeRate": 12.5,
-    "newStudentsChangeRate": 15.3,
-    "renewingStudentsChangeRate": 8.7,
-    "lostStudentsChangeRate": -5.2
+    "totalStudentsChangeRate": 0.0000,
+    "newStudentsChangeRate": -100.0000,
+    "renewingStudentsChangeRate": 0,
+    "lostStudentsChangeRate": 100.0
   }
 }
 ```
 - **测试状态**: ✅ 通过
+- **重要改进**: 🎉 **真实增长率计算** - 不再使用写死的示例数据，而是根据时间类型（周/月/季度/年）与上一期进行真实对比计算
+
+**不同时间类型的测试结果**：
+
+**周度对比** (`timeType: "WEEKLY"`):
+```json
+{
+  "totalStudentsChangeRate": 0.0000,
+  "newStudentsChangeRate": 0,
+  "renewingStudentsChangeRate": 0,
+  "lostStudentsChangeRate": 100.0
+}
+```
+
+**月度对比** (`timeType: "MONTHLY"`):
+```json
+{
+  "totalStudentsChangeRate": 0.0000,
+  "newStudentsChangeRate": -100.0000,
+  "renewingStudentsChangeRate": 0,
+  "lostStudentsChangeRate": 100.0
+}
+```
+
+**季度对比** (`timeType: "QUARTERLY"`):
+```json
+{
+  "totalStudentsChangeRate": 100.0,
+  "newStudentsChangeRate": 36.3600,
+  "renewingStudentsChangeRate": 100.0,
+  "lostStudentsChangeRate": 100.0
+}
+```
 
 #### 1.3 获取学员增长趋势
 - **接口地址**: `POST /api/statistics/student/growth-trend`
@@ -363,6 +396,21 @@
 3. **数据返回**: ✅ 所有接口都返回了正确的数据结构
 4. **错误处理**: ✅ 接口在参数错误时能正确返回错误信息
 
+### 重要改进
+
+🎉 **学员指标统计真实增长率计算**：
+- **改进前**: 使用写死的示例数据（12.5%, 15.3%, 8.7%, -5.2%）
+- **改进后**: 根据时间类型与上一期进行真实对比计算
+  - **周度**: 与上周对比
+  - **月度**: 与上月对比  
+  - **季度**: 与上季度对比
+  - **年度**: 与上一年对比
+- **计算公式**: `(当前值 - 上期值) / 上期值 * 100`
+- **特殊处理**: 
+  - 上期值为0时，当前值有增长则显示100%
+  - 当前值为0时，上期值有数据则显示-100%
+  - 都为0时显示0%
+
 ### 发现的问题
 
 1. **学员来源分布**: 目前所有学员都显示为"其他"来源，说明学员来源功能需要进一步完善
@@ -375,6 +423,7 @@
 2. **数据统计优化**: 确保各接口返回的数据保持一致
 3. **接口文档**: 建议为所有统计接口添加详细的API文档
 4. **性能优化**: 对于大数据量的统计查询，建议添加缓存机制
+5. **扩展真实计算**: 将其他模块（课程、教练、财务）的增长率也改为真实计算
 
 ### 测试覆盖情况
 
