@@ -127,6 +127,10 @@ public class StatisticsServiceImpl implements StatisticsService {
         LocalDate endDate = LocalDate.now();
         LocalDate startDate = getStartDateByTimeType(endDate, request.getTimeType());
         
+        // 计算上一期的时间范围
+        LocalDate previousEndDate = startDate.minusDays(1);
+        LocalDate previousStartDate = getStartDateByTimeType(previousEndDate, request.getTimeType());
+        
         // 总学员数（当前在学状态）
         Long totalStudents = dslContext
                 .selectCount()
@@ -137,11 +141,32 @@ public class StatisticsServiceImpl implements StatisticsService {
                 .and(trueCondition())
                 .fetchOneInto(Long.class);
         
+        // 上一期总学员数
+        Long previousTotalStudents = dslContext
+                .selectCount()
+                .from(EduStudent.EDU_STUDENT)
+                .where(EduStudent.EDU_STUDENT.STATUS.eq("STUDYING"))
+                .and(EduStudent.EDU_STUDENT.DELETED.eq(0))
+                .and(request.getCampusId() != null ? EduStudent.EDU_STUDENT.CAMPUS_ID.eq(request.getCampusId()) : EduStudent.EDU_STUDENT.CAMPUS_ID.isNotNull())
+                .and(trueCondition())
+                .and(EduStudent.EDU_STUDENT.CREATED_TIME.lessThan(startDate.atStartOfDay()))
+                .fetchOneInto(Long.class);
+        
         // 新增学员数（指定时间范围内创建的学员）
         Long newStudents = dslContext
                 .selectCount()
                 .from(EduStudent.EDU_STUDENT)
                 .where(EduStudent.EDU_STUDENT.CREATED_TIME.between(startDate.atStartOfDay(), endDate.atTime(23, 59, 59)))
+                .and(EduStudent.EDU_STUDENT.DELETED.eq(0))
+                .and(request.getCampusId() != null ? EduStudent.EDU_STUDENT.CAMPUS_ID.eq(request.getCampusId()) : EduStudent.EDU_STUDENT.CAMPUS_ID.isNotNull())
+                .and(trueCondition())
+                .fetchOneInto(Long.class);
+        
+        // 上一期新增学员数
+        Long previousNewStudents = dslContext
+                .selectCount()
+                .from(EduStudent.EDU_STUDENT)
+                .where(EduStudent.EDU_STUDENT.CREATED_TIME.between(previousStartDate.atStartOfDay(), previousEndDate.atTime(23, 59, 59)))
                 .and(EduStudent.EDU_STUDENT.DELETED.eq(0))
                 .and(request.getCampusId() != null ? EduStudent.EDU_STUDENT.CAMPUS_ID.eq(request.getCampusId()) : EduStudent.EDU_STUDENT.CAMPUS_ID.isNotNull())
                 .and(trueCondition())
@@ -158,6 +183,17 @@ public class StatisticsServiceImpl implements StatisticsService {
                 .and(trueCondition())
                 .fetchOneInto(Long.class);
         
+        // 上一期续费学员数
+        Long previousRenewingStudents = dslContext
+                .selectCount()
+                .from(EduStudentPayment.EDU_STUDENT_PAYMENT)
+                .where(EduStudentPayment.EDU_STUDENT_PAYMENT.PAYMENT_TYPE.eq("RENEWAL"))
+                .and(EduStudentPayment.EDU_STUDENT_PAYMENT.CREATED_TIME.between(previousStartDate.atStartOfDay(), previousEndDate.atTime(23, 59, 59)))
+                .and(EduStudentPayment.EDU_STUDENT_PAYMENT.DELETED.eq(0))
+                .and(request.getCampusId() != null ? EduStudentPayment.EDU_STUDENT_PAYMENT.CAMPUS_ID.eq(request.getCampusId()) : EduStudentPayment.EDU_STUDENT_PAYMENT.CAMPUS_ID.isNotNull())
+                .and(trueCondition())
+                .fetchOneInto(Long.class);
+        
         // 流失学员数（状态为结业的学员）
         Long lostStudents = dslContext
                 .selectCount()
@@ -169,17 +205,58 @@ public class StatisticsServiceImpl implements StatisticsService {
                 .and(trueCondition())
                 .fetchOneInto(Long.class);
         
-        // 计算变化率（这里简化处理，实际应该与上期数据比较）
-        metrics.setTotalStudents(totalStudents);
-        metrics.setNewStudents(newStudents);
-        metrics.setRenewingStudents(renewingStudents);
-        metrics.setLostStudents(lostStudents);
-        metrics.setTotalStudentsChangeRate(BigDecimal.valueOf(12.5)); // 示例数据
-        metrics.setNewStudentsChangeRate(BigDecimal.valueOf(15.3)); // 示例数据
-        metrics.setRenewingStudentsChangeRate(BigDecimal.valueOf(8.7)); // 示例数据
-        metrics.setLostStudentsChangeRate(BigDecimal.valueOf(-5.2)); // 示例数据
+        // 上一期流失学员数
+        Long previousLostStudents = dslContext
+                .selectCount()
+                .from(EduStudent.EDU_STUDENT)
+                .where(EduStudent.EDU_STUDENT.STATUS.eq("GRADUATED"))
+                .and(EduStudent.EDU_STUDENT.UPDATE_TIME.between(previousStartDate.atStartOfDay(), previousEndDate.atTime(23, 59, 59)))
+                .and(EduStudent.EDU_STUDENT.DELETED.eq(0))
+                .and(request.getCampusId() != null ? EduStudent.EDU_STUDENT.CAMPUS_ID.eq(request.getCampusId()) : EduStudent.EDU_STUDENT.CAMPUS_ID.isNotNull())
+                .and(trueCondition())
+                .fetchOneInto(Long.class);
+        
+        // 设置基础数据
+        metrics.setTotalStudents(totalStudents != null ? totalStudents : 0L);
+        metrics.setNewStudents(newStudents != null ? newStudents : 0L);
+        metrics.setRenewingStudents(renewingStudents != null ? renewingStudents : 0L);
+        metrics.setLostStudents(lostStudents != null ? lostStudents : 0L);
+        
+        // 计算真实的变化率
+        metrics.setTotalStudentsChangeRate(calculateChangeRate(previousTotalStudents, totalStudents));
+        metrics.setNewStudentsChangeRate(calculateChangeRate(previousNewStudents, newStudents));
+        metrics.setRenewingStudentsChangeRate(calculateChangeRate(previousRenewingStudents, renewingStudents));
+        metrics.setLostStudentsChangeRate(calculateChangeRate(previousLostStudents, lostStudents));
         
         return metrics;
+    }
+    
+    /**
+     * 计算变化率
+     * @param previousValue 上一期的值
+     * @param currentValue 当前期的值
+     * @return 变化率（百分比）
+     */
+    private BigDecimal calculateChangeRate(Long previousValue, Long currentValue) {
+        if (previousValue == null || previousValue == 0) {
+            if (currentValue == null || currentValue == 0) {
+                return BigDecimal.ZERO;
+            } else {
+                return BigDecimal.valueOf(100.0); // 从0增长到有值，增长率为100%
+            }
+        }
+        
+        if (currentValue == null) {
+            currentValue = 0L;
+        }
+        
+        BigDecimal previous = BigDecimal.valueOf(previousValue);
+        BigDecimal current = BigDecimal.valueOf(currentValue);
+        
+        // 计算公式：(当前值 - 上期值) / 上期值 * 100
+        return current.subtract(previous)
+                .divide(previous, 4, RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(100));
     }
     
     @Override

@@ -42,31 +42,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Validated
 @Tag(name = "统计管理")
 public class StatisticsController {
-    
+
     private final StatisticsService statisticsService;
     private final CampusStatsRedisService campusStatsRedisService;
     private final DSLContext dslContext;
-    
+
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(StatisticsController.class);
-    
+
     // ==================== 学员分析统计接口 ====================
-    
-    /**
-     * 获取学员分析统计数据（完整版）
-     */
-    @PostMapping("/student-analysis")
-    @ApiOperation("获取学员分析统计数据（完整版）")
-    public Result<StudentAnalysisVO> getStudentAnalysis(@Valid @RequestBody StudentAnalysisRequest request) {
-        log.info("获取学员分析统计数据（完整版），请求参数：{}", request);
-        try {
-            StudentAnalysisVO result = statisticsService.getStudentAnalysis(request);
-            return Result.success(result);
-        } catch (Exception e) {
-            log.error("获取学员分析统计数据失败", e);
-            return Result.error("获取学员分析统计数据失败");
-        }
-    }
-    
+
     /**
      * 获取学员指标统计
      */
@@ -82,7 +66,7 @@ public class StatisticsController {
             return Result.error("获取学员指标统计失败");
         }
     }
-    
+
     /**
      * 获取学员增长趋势
      */
@@ -106,16 +90,16 @@ public class StatisticsController {
     @ApiOperation("获取学员增长趋势（按分类）")
     public Result<java.util.Map<String, Object>> getStudentGrowthTrendByCategory(
             @Valid @RequestBody StudentAnalysisRequest request,
-            @Parameter(description = "分类类型：TOTAL-总计，NEW-新增，RENEWAL-续费，LOST-流失，RETENTION-留存率") 
+            @Parameter(description = "分类类型：TOTAL-总计，NEW-新增，RENEWAL-续费，LOST-流失，RETENTION-留存率")
             @RequestParam(defaultValue = "TOTAL") String category) {
         log.info("获取学员增长趋势（按分类），请求参数：{}，分类：{}", request, category);
         try {
             java.util.List<StudentAnalysisVO.GrowthTrendPoint> allData = statisticsService.getStudentGrowthTrend(request);
-            
+
             java.util.Map<String, Object> result = new java.util.HashMap<>();
             result.put("category", category);
             result.put("data", allData);
-            
+
             // 根据分类返回对应的数据
             switch (category.toUpperCase()) {
                 case "TOTAL":
@@ -136,14 +120,14 @@ public class StatisticsController {
                 default:
                     result.put("description", "学员增长趋势");
             }
-            
+
             return Result.success(result);
         } catch (Exception e) {
             log.error("获取学员增长趋势（按分类）失败", e);
             return Result.error("获取学员增长趋势（按分类）失败");
         }
     }
-    
+
     /**
      * 获取学员续费金额趋势
      */
@@ -159,7 +143,7 @@ public class StatisticsController {
             return Result.error("获取学员续费金额趋势失败");
         }
     }
-    
+
     /**
      * 获取学员来源分布
      */
@@ -175,7 +159,7 @@ public class StatisticsController {
             return Result.error("获取学员来源分布失败");
         }
     }
-    
+
     /**
      * 获取新增学员来源分布
      */
@@ -191,9 +175,9 @@ public class StatisticsController {
             return Result.error("获取新增学员来源分布失败");
         }
     }
-    
+
     // ==================== 课程分析统计接口 ====================
-    
+
     /**
      * 获取课程分析统计数据（完整版）
      */
@@ -209,7 +193,7 @@ public class StatisticsController {
             return Result.error("获取课程分析统计数据失败");
         }
     }
-    
+
     /**
      * 获取课程指标统计
      */
@@ -225,7 +209,7 @@ public class StatisticsController {
             return Result.error("获取课程指标统计失败");
         }
     }
-    
+
     /**
      * 获取课程类型分析
      */
@@ -241,7 +225,7 @@ public class StatisticsController {
             return Result.error("获取课程类型分析失败");
         }
     }
-    
+
     /**
      * 获取课程销售趋势
      */
@@ -257,7 +241,7 @@ public class StatisticsController {
             return Result.error("获取课程销售趋势失败");
         }
     }
-    
+
     /**
      * 获取课程销售表现
      */
@@ -273,7 +257,7 @@ public class StatisticsController {
             return Result.error("获取课程销售表现失败");
         }
     }
-    
+
     /**
      * 获取课程销售排行
      */
@@ -289,7 +273,7 @@ public class StatisticsController {
             return Result.error("获取课程销售排行失败");
         }
     }
-    
+
     /**
      * 获取课程收入分析
      */
@@ -305,7 +289,7 @@ public class StatisticsController {
             return Result.error("获取课程收入分析失败");
         }
     }
-    
+
     /**
      * 获取课程收入分布
      */
@@ -321,9 +305,9 @@ public class StatisticsController {
             return Result.error("获取课程收入分布失败");
         }
     }
-    
+
     // ==================== 教练分析统计接口 ====================
-    
+
     /**
      * 获取教练分析统计数据（完整版）
      */
@@ -339,7 +323,7 @@ public class StatisticsController {
             return Result.error("获取教练分析统计数据失败");
         }
     }
-    
+
     /**
      * 获取教练绩效指标
      */
@@ -355,7 +339,7 @@ public class StatisticsController {
             return Result.error("获取教练绩效指标失败");
         }
     }
-    
+
     /**
      * 获取教练课时统计趋势
      */
@@ -371,7 +355,7 @@ public class StatisticsController {
             return Result.error("获取教练课时统计趋势失败");
         }
     }
-    
+
     /**
      * 获取教练TOP5多维度对比
      */
@@ -387,7 +371,7 @@ public class StatisticsController {
             return Result.error("获取教练TOP5多维度对比失败");
         }
     }
-    
+
     /**
      * 获取教练类型分布
      */
@@ -403,7 +387,7 @@ public class StatisticsController {
             return Result.error("获取教练类型分布失败");
         }
     }
-    
+
     /**
      * 获取教练薪资分析
      */
@@ -419,7 +403,7 @@ public class StatisticsController {
             return Result.error("获取教练薪资分析失败");
         }
     }
-    
+
     /**
      * 获取教练绩效排名
      */
@@ -435,9 +419,9 @@ public class StatisticsController {
             return Result.error("获取教练绩效排名失败");
         }
     }
-    
+
     // ==================== 财务分析完整版接口 ====================
-    
+
     /**
      * 获取财务分析统计数据（完整版）
      */
@@ -453,9 +437,9 @@ public class StatisticsController {
             return Result.error("获取财务分析统计数据失败");
         }
     }
-    
+
     // ==================== 财务分析拆分接口 ====================
-    
+
     /**
      * 获取财务核心指标
      */
@@ -471,7 +455,7 @@ public class StatisticsController {
             return Result.error("获取财务核心指标失败");
         }
     }
-    
+
     /**
      * 获取收入与成本趋势
      */
@@ -487,7 +471,7 @@ public class StatisticsController {
             return Result.error("获取收入与成本趋势失败");
         }
     }
-    
+
     /**
      * 获取成本结构分析
      */
@@ -503,7 +487,7 @@ public class StatisticsController {
             return Result.error("获取成本结构分析失败");
         }
     }
-    
+
     /**
      * 获取财务指标趋势
      */
@@ -519,7 +503,7 @@ public class StatisticsController {
             return Result.error("获取财务指标趋势失败");
         }
     }
-    
+
     /**
      * 获取收入分析
      */
@@ -535,7 +519,7 @@ public class StatisticsController {
             return Result.error("获取收入分析失败");
         }
     }
-    
+
     /**
      * 获取成本分析
      */
@@ -551,7 +535,7 @@ public class StatisticsController {
             return Result.error("获取成本分析失败");
         }
     }
-    
+
     /**
      * 获取利润分析
      */
@@ -578,11 +562,11 @@ public class StatisticsController {
         if (institutionId == null) {
             throw new BusinessException("无法获取机构ID");
         }
-        
+
         // 从Redis获取统计数据
         Integer totalStudents = campusStatsRedisService.getInstitutionStudentCount(institutionId);
         Integer totalCourses = campusStatsRedisService.getInstitutionCourseCount(institutionId);
-        
+
         // 如果Redis中没有数据，则从数据库查询并缓存
         if (totalStudents == null) {
             totalStudents = dslContext.selectCount()
@@ -592,7 +576,7 @@ public class StatisticsController {
                     .fetchOneInto(Integer.class);
             campusStatsRedisService.setInstitutionStudentCount(institutionId, totalStudents);
         }
-        
+
         if (totalCourses == null) {
             totalCourses = dslContext.selectCount()
                     .from(EduCourse.EDU_COURSE)
@@ -601,11 +585,11 @@ public class StatisticsController {
                     .fetchOneInto(Integer.class);
             campusStatsRedisService.setInstitutionCourseCount(institutionId, totalCourses);
         }
-        
+
         Map<String, Object> result = new HashMap<>();
         result.put("totalStudents", totalStudents != null ? totalStudents : 0);
         result.put("totalCourses", totalCourses != null ? totalCourses : 0);
-        
+
         return Result.success(result);
     }
 
@@ -617,12 +601,12 @@ public class StatisticsController {
     public Result<Void> refreshStats(
             @Parameter(description = "校区ID") @RequestParam(required = false) Long campusId,
             HttpServletRequest request) {
-        
+
         Long institutionId = (Long) request.getAttribute("orgId");
         if (institutionId == null) {
             throw new BusinessException("无法获取机构ID");
         }
-        
+
         if (campusId != null) {
             // 刷新指定校区的统计数据
             campusStatsRedisService.refreshCampusStats(institutionId, campusId);
@@ -630,7 +614,7 @@ public class StatisticsController {
             // 刷新整个机构的统计数据
             campusStatsRedisService.refreshInstitutionStats(institutionId);
         }
-        
+
         return Result.success();
     }
-} 
+}
