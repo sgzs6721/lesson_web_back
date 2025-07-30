@@ -29,6 +29,12 @@ public class StudentCourseListVO {
     @Schema(description = "学员联系电话", example = "13900000000")
     private String studentPhone;
 
+    @Schema(description = "学员来源ID（关联sys_constant表）", example = "1")
+    private Long sourceId;
+
+    @Schema(description = "学员来源名称", example = "线上推广")
+    private String sourceName;
+
     @Schema(description = "课程类型名称", example = "体育类")
     private String courseTypeName;
 

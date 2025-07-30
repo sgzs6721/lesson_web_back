@@ -107,6 +107,7 @@ public class EduStudentModel {
         detailRecord.setGender(record.get(Tables.EDU_STUDENT.GENDER));
         detailRecord.setCampusId(record.get(Tables.EDU_STUDENT.CAMPUS_ID));
         detailRecord.setInstitutionId(record.get(Tables.EDU_STUDENT.INSTITUTION_ID));
+        detailRecord.setSourceId(record.get(Tables.EDU_STUDENT.SOURCE_ID));
 
         return detailRecord;
     }

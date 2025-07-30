@@ -16,6 +16,7 @@ import com.lesson.vo.PageResult;
 import com.lesson.vo.user.UserVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jooq.DSLContext;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,10 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.lesson.repository.tables.EduStudent.EDU_STUDENT;
+import static com.lesson.repository.tables.EduCourse.EDU_COURSE;
+import static com.lesson.repository.tables.SysCoach.SYS_COACH;
 
 /**
  * 校区服务实现
@@ -36,6 +41,7 @@ public class CampusServiceImpl implements CampusService {
     private final SysUserModel userModel;
     private final HttpServletRequest httpServletRequest; // 注入HttpServletRequest
     private final CampusStatsRedisService campusStatsRedisService;
+    private final DSLContext dslContext;
  
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -125,10 +131,64 @@ public class CampusServiceImpl implements CampusService {
             campusVO.setManagerPhone(manager.getPhone());
         }
 
-        // 3. 从Redis获取统计数据
+        // 3. 从Redis获取统计数据，如果缓存没有数据则从数据库查询
+        
+        // 获取教练数量
         Integer coachCount = campusStatsRedisService.getCoachCount(institutionId, id);
+        if (coachCount == null) {
+            // 从数据库查询教练数量
+            coachCount = dslContext.selectCount()
+                    .from(SYS_COACH)
+                    .where(SYS_COACH.CAMPUS_ID.eq(id))
+                    .and(SYS_COACH.INSTITUTION_ID.eq(institutionId))
+                    .and(SYS_COACH.DELETED.eq(0))
+                    .fetchOneInto(Integer.class);
+            // 缓存到Redis
+            if (coachCount != null) {
+                campusStatsRedisService.setTeacherCount(institutionId, id, coachCount.longValue());
+            }
+        }
+        
+        // 获取学员数量
         Integer studentCount = campusStatsRedisService.getStudentCount(institutionId, id);
+        if (studentCount == null) {
+            // 从数据库查询学员数量
+            studentCount = dslContext.selectCount()
+                    .from(EDU_STUDENT)
+                    .where(EDU_STUDENT.CAMPUS_ID.eq(id))
+                    .and(EDU_STUDENT.INSTITUTION_ID.eq(institutionId))
+                    .and(EDU_STUDENT.DELETED.eq(0))
+                    .and(EDU_STUDENT.STATUS.eq("STUDYING"))
+                    .fetchOneInto(Integer.class);
+            // 缓存到Redis
+            if (studentCount != null) {
+                campusStatsRedisService.setStudentCount(institutionId, id, studentCount);
+            }
+        }
+        
+        // 获取课程数量
+        Integer courseCount = campusStatsRedisService.getCourseCount(institutionId, id);
+        if (courseCount == null) {
+            // 从数据库查询课程数量
+            courseCount = dslContext.selectCount()
+                    .from(EDU_COURSE)
+                    .where(EDU_COURSE.CAMPUS_ID.eq(id))
+                    .and(EDU_COURSE.INSTITUTION_ID.eq(institutionId))
+                    .and(EDU_COURSE.DELETED.eq(0))
+                    .and(EDU_COURSE.STATUS.eq("PUBLISHED"))
+                    .fetchOneInto(Integer.class);
+            // 缓存到Redis
+            if (courseCount != null) {
+                campusStatsRedisService.setCourseCount(institutionId, id, courseCount);
+            }
+        }
+        
+        // 获取待上课时数量（暂时设为0，因为需要复杂的课时计算逻辑）
         Integer lessonCount = campusStatsRedisService.getLessonCount(institutionId, id);
+        if (lessonCount == null) {
+            lessonCount = 0; // 暂时设为0，后续可以添加课时计算逻辑
+            campusStatsRedisService.setPendingLessonHours(institutionId, id, lessonCount);
+        }
 
         campusVO.setCoachCount(coachCount != null ? coachCount : 0);
         campusVO.setStudentCount(studentCount != null ? studentCount : 0);
@@ -186,11 +246,65 @@ public class CampusServiceImpl implements CampusService {
                 campusVO.setManagerPhone(manager.getPhone());
             }
 
-            // 从Redis获取统计数据
+            // 从Redis获取统计数据，如果缓存没有数据则从数据库查询
             Long campusId = record.getId();
+            
+            // 获取教练数量
             Integer coachCount = campusStatsRedisService.getCoachCount(finalInstitutionId, campusId);
+            if (coachCount == null) {
+                // 从数据库查询教练数量
+                coachCount = dslContext.selectCount()
+                        .from(SYS_COACH)
+                        .where(SYS_COACH.CAMPUS_ID.eq(campusId))
+                        .and(SYS_COACH.INSTITUTION_ID.eq(finalInstitutionId))
+                        .and(SYS_COACH.DELETED.eq(0))
+                        .fetchOneInto(Integer.class);
+                // 缓存到Redis
+                if (coachCount != null) {
+                    campusStatsRedisService.setTeacherCount(finalInstitutionId, campusId, coachCount.longValue());
+                }
+            }
+            
+            // 获取学员数量
             Integer studentCount = campusStatsRedisService.getStudentCount(finalInstitutionId, campusId);
+            if (studentCount == null) {
+                // 从数据库查询学员数量
+                studentCount = dslContext.selectCount()
+                        .from(EDU_STUDENT)
+                        .where(EDU_STUDENT.CAMPUS_ID.eq(campusId))
+                        .and(EDU_STUDENT.INSTITUTION_ID.eq(finalInstitutionId))
+                        .and(EDU_STUDENT.DELETED.eq(0))
+                        .and(EDU_STUDENT.STATUS.eq("STUDYING"))
+                        .fetchOneInto(Integer.class);
+                // 缓存到Redis
+                if (studentCount != null) {
+                    campusStatsRedisService.setStudentCount(finalInstitutionId, campusId, studentCount);
+                }
+            }
+            
+            // 获取课程数量
+            Integer courseCount = campusStatsRedisService.getCourseCount(finalInstitutionId, campusId);
+            if (courseCount == null) {
+                // 从数据库查询课程数量
+                courseCount = dslContext.selectCount()
+                        .from(EDU_COURSE)
+                        .where(EDU_COURSE.CAMPUS_ID.eq(campusId))
+                        .and(EDU_COURSE.INSTITUTION_ID.eq(finalInstitutionId))
+                        .and(EDU_COURSE.DELETED.eq(0))
+                        .and(EDU_COURSE.STATUS.eq("PUBLISHED"))
+                        .fetchOneInto(Integer.class);
+                // 缓存到Redis
+                if (courseCount != null) {
+                    campusStatsRedisService.setCourseCount(finalInstitutionId, campusId, courseCount);
+                }
+            }
+            
+            // 获取待上课时数量（暂时设为0，因为需要复杂的课时计算逻辑）
             Integer lessonCount = campusStatsRedisService.getLessonCount(finalInstitutionId, campusId);
+            if (lessonCount == null) {
+                lessonCount = 0; // 暂时设为0，后续可以添加课时计算逻辑
+                campusStatsRedisService.setPendingLessonHours(finalInstitutionId, campusId, lessonCount);
+            }
 
             campusVO.setCoachCount(coachCount != null ? coachCount : 0);
             campusVO.setStudentCount(studentCount != null ? studentCount : 0);

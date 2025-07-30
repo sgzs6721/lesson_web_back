@@ -56,6 +56,11 @@ public class StudentDetailRecord {
     private String institutionName;
     
     /**
+     * 学员来源ID（关联sys_constant表）
+     */
+    private Long sourceId;
+    
+    /**
      * 状态
      */
     private StudentCourseStatus status;

@@ -39,6 +39,12 @@ public class StudentWithCoursesVO {
     @Schema(description = "机构名称", example = "测试机构")
     private String institutionName;
 
+    @Schema(description = "学员来源ID（关联sys_constant表）", example = "1")
+    private Long sourceId;
+
+    @Schema(description = "学员来源名称", example = "线上推广")
+    private String sourceName;
+
     // 学员状态移动到课程信息中
 
     /**

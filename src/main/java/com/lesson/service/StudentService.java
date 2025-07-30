@@ -349,6 +349,16 @@ public class StudentService {
     vo.setStudentGender(studentDetail.getGender());
     vo.setStudentAge(studentDetail.getAge());
     vo.setStudentPhone(studentDetail.getPhone());
+    vo.setSourceId(studentDetail.getSourceId());
+
+    // 查询学员来源名称
+    if (studentDetail.getSourceId() != null) {
+      String sourceName = dsl.select(Tables.SYS_CONSTANT.CONSTANT_VALUE)
+          .from(Tables.SYS_CONSTANT)
+          .where(Tables.SYS_CONSTANT.ID.eq(studentDetail.getSourceId()))
+          .fetchOneInto(String.class);
+      vo.setSourceName(sourceName);
+    }
     vo.setStudentCourseId(studentCourse.getId());
     vo.setCourseId(studentCourse.getCourseId());
     vo.setCourseName(course.getName());
@@ -455,6 +465,7 @@ public class StudentService {
       studentVO.setStudentPhone(student.getPhone());
       studentVO.setCampusId(student.getCampusId());
       studentVO.setInstitutionId(student.getInstitutionId());
+      studentVO.setSourceId(student.getSourceId());
 
       // 查询校区名称
       if (student.getCampusId() != null) {
@@ -472,6 +483,15 @@ public class StudentService {
             .where(Tables.SYS_INSTITUTION.ID.eq(student.getInstitutionId()))
             .fetchOneInto(String.class);
         studentVO.setInstitutionName(institutionName);
+      }
+
+      // 查询学员来源名称
+      if (student.getSourceId() != null) {
+        String sourceName = dsl.select(Tables.SYS_CONSTANT.CONSTANT_VALUE)
+            .from(Tables.SYS_CONSTANT)
+            .where(Tables.SYS_CONSTANT.ID.eq(student.getSourceId()))
+            .fetchOneInto(String.class);
+        studentVO.setSourceName(sourceName);
       }
 
       // 查询学员的课程列表
