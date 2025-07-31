@@ -251,7 +251,9 @@ public class CampusServiceImpl implements CampusService {
             
             // 获取教练数量
             Integer coachCount = campusStatsRedisService.getCoachCount(finalInstitutionId, campusId);
+            log.info("校区 {} 的教练数量从Redis获取: {}", campusId, coachCount);
             if (coachCount == null) {
+                log.info("Redis中没有教练数量数据，从数据库查询校区 {} 的教练数量", campusId);
                 // 从数据库查询教练数量
                 coachCount = dslContext.selectCount()
                         .from(SYS_COACH)
@@ -259,9 +261,11 @@ public class CampusServiceImpl implements CampusService {
                         .and(SYS_COACH.INSTITUTION_ID.eq(finalInstitutionId))
                         .and(SYS_COACH.DELETED.eq(0))
                         .fetchOneInto(Integer.class);
+                log.info("从数据库查询到校区 {} 的教练数量: {}", campusId, coachCount);
                 // 缓存到Redis
                 if (coachCount != null) {
                     campusStatsRedisService.setTeacherCount(finalInstitutionId, campusId, coachCount.longValue());
+                    log.info("已将校区 {} 的教练数量 {} 缓存到Redis", campusId, coachCount);
                 }
             }
             

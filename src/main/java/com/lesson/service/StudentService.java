@@ -234,6 +234,11 @@ public class StudentService {
         if (studentCourseRecord == null) {
           throw new IllegalArgumentException("学员课程关系不存在：" + courseInfo.getStudentCourseId());
         }
+        
+        // 更新现有记录的状态
+        if (courseInfo.getStatus() != null) {
+          studentCourseRecord.setStatus(courseInfo.getStatus().getName());
+        }
       } else {
         // 如果没有ID，则创建新记录
         studentCourseRecord = new EduStudentCourseRecord();
@@ -800,7 +805,7 @@ public class StudentService {
         .set(Tables.EDU_STUDENT_COURSE_RECORD.CREATED_TIME, LocalDateTime.now())
         .set(Tables.EDU_STUDENT_COURSE_RECORD.UPDATE_TIME, LocalDateTime.now())
         .set(Tables.EDU_STUDENT_COURSE_RECORD.DELETED, 0)
-        .set(org.jooq.impl.DSL.field("status", String.class), type)
+        .set(Tables.EDU_STUDENT_COURSE_RECORD.STATUS, type)
         .execute();
     // 8. 仅NORMAL/ABSENT类型才扣课时
     if (type.equals("NORMAL") || type.equals("ABSENT")) {
@@ -884,7 +889,7 @@ public class StudentService {
         .set(Tables.EDU_STUDENT_COURSE_RECORD.CREATED_TIME, LocalDateTime.now())
         .set(Tables.EDU_STUDENT_COURSE_RECORD.UPDATE_TIME, LocalDateTime.now())
         .set(Tables.EDU_STUDENT_COURSE_RECORD.DELETED, 0)
-        .set(org.jooq.impl.DSL.field("status", String.class), "LEAVE")
+        .set(Tables.EDU_STUDENT_COURSE_RECORD.STATUS, "LEAVE")
         .execute();
 
     // 8. 更新学员课程的已消耗课时 (edu_student_course)
