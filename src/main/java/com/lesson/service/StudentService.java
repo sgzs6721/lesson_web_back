@@ -1081,6 +1081,9 @@ public class StudentService {
     BigDecimal addedTotalHours = request.getCourseHours().add(request.getGiftHours());
     studentCourse.setTotalHours(studentCourse.getTotalHours().add(addedTotalHours));
     studentCourse.setEndDate(request.getValidUntil()); // 直接使用新的有效期覆盖
+    
+    log.info("设置学员课程有效期: studentId={}, courseId={}, validUntil={}, endDate={}", 
+            request.getStudentId(), request.getCourseId(), request.getValidUntil(), studentCourse.getEndDate());
 
     // 更新课程状态为学习中（缴费后直接进入学习状态）
     studentCourse.setStatus(StudentCourseStatus.STUDYING.getName());
