@@ -3,7 +3,6 @@ package com.lesson.controller;
 import com.lesson.common.PageResult;
 import com.lesson.common.Result;
 import com.lesson.service.CourseService;
-import com.lesson.vo.CourseSimpleResponseVO;
 import com.lesson.vo.CourseSimpleVO;
 import com.lesson.vo.CourseVO;
 import com.lesson.vo.request.CourseCreateRequest;
@@ -81,11 +80,9 @@ public class CourseController {
 
     @GetMapping("/simple")
     @Operation(summary = "获取课程简要信息列表",
-               description = "返回课程的ID、名称、教练名称、课程类型和状态等简要信息，以及课程总数")
-    public Result<CourseSimpleResponseVO> simple(
+               description = "返回课程的ID、名称、教练名称、课程类型和状态等简要信息")
+    public Result<List<CourseSimpleVO>> simple(
         @Parameter(description = "校区ID", required = true) @RequestParam Long campusId) {
-        List<CourseSimpleVO> courseList = courseService.listCourseSimple(campusId);
-        Long total = (long) courseList.size();
-        return Result.success(new CourseSimpleResponseVO(total, courseList));
+        return Result.success(courseService.listCourseSimple(campusId));
     }
 }
