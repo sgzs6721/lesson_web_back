@@ -26,6 +26,7 @@ import java.util.Map;
 
 import com.lesson.repository.tables.EduStudent;
 import com.lesson.repository.tables.EduCourse;
+import com.lesson.repository.tables.SysUser;
 import com.lesson.service.CampusStatsRedisService;
 import org.jooq.DSLContext;
 import io.swagger.v3.oas.annotations.Operation;
@@ -517,27 +518,66 @@ public class StatisticsController {
             throw new BusinessException("无法获取机构ID");
         }
 
-        // 从Redis获取统计数据
-        Integer totalStudents = campusStatsRedisService.getInstitutionStudentCount(institutionId);
-        Integer totalCourses = campusStatsRedisService.getInstitutionCourseCount(institutionId);
+        // 获取当前用户ID和校区ID（用于权限隔离）
+        Long currentUserId = (Long) request.getAttribute("userId");
+        Long userCampusId = null;
+        
+        if (currentUserId != null) {
+            // 从数据库查询用户的校区ID
+            userCampusId = dslContext.select(SysUser.SYS_USER.CAMPUS_ID)
+                    .from(SysUser.SYS_USER)
+                    .where(SysUser.SYS_USER.ID.eq(currentUserId))
+                    .and(SysUser.SYS_USER.DELETED.eq(0))
+                    .fetchOneInto(Long.class);
+            log.info("用户 {} 的校区ID: {}", currentUserId, userCampusId);
+        }
 
-        // 如果Redis中没有数据，则从数据库查询并缓存
-        if (totalStudents == null) {
+        Integer totalStudents;
+        Integer totalCourses;
+
+        if (userCampusId != null && userCampusId > 0) {
+            // 校区管理员：只统计自己校区的数据
+            log.info("校区管理员统计 - 机构ID: {}, 校区ID: {}", institutionId, userCampusId);
+            
+            // 强制从数据库查询，不使用Redis缓存
             totalStudents = dslContext.selectCount()
                     .from(EduStudent.EDU_STUDENT)
                     .where(EduStudent.EDU_STUDENT.DELETED.eq(0))
                     .and(EduStudent.EDU_STUDENT.INSTITUTION_ID.eq(institutionId))
+                    .and(EduStudent.EDU_STUDENT.CAMPUS_ID.eq(userCampusId))
                     .fetchOneInto(Integer.class);
-            campusStatsRedisService.setInstitutionStudentCount(institutionId, totalStudents);
-        }
-
-        if (totalCourses == null) {
+            log.info("从数据库查询学员数量: {}", totalStudents);
+            
             totalCourses = dslContext.selectCount()
                     .from(EduCourse.EDU_COURSE)
                     .where(EduCourse.EDU_COURSE.DELETED.eq(0))
                     .and(EduCourse.EDU_COURSE.INSTITUTION_ID.eq(institutionId))
+                    .and(EduCourse.EDU_COURSE.CAMPUS_ID.eq(userCampusId))
                     .fetchOneInto(Integer.class);
-            campusStatsRedisService.setInstitutionCourseCount(institutionId, totalCourses);
+            log.info("从数据库查询课程数量: {}", totalCourses);
+        } else {
+            // 超级管理员：统计整个机构的数据
+            totalStudents = campusStatsRedisService.getInstitutionStudentCount(institutionId);
+            totalCourses = campusStatsRedisService.getInstitutionCourseCount(institutionId);
+
+            // 如果Redis中没有数据，则从数据库查询并缓存
+            if (totalStudents == null) {
+                totalStudents = dslContext.selectCount()
+                        .from(EduStudent.EDU_STUDENT)
+                        .where(EduStudent.EDU_STUDENT.DELETED.eq(0))
+                        .and(EduStudent.EDU_STUDENT.INSTITUTION_ID.eq(institutionId))
+                        .fetchOneInto(Integer.class);
+                campusStatsRedisService.setInstitutionStudentCount(institutionId, totalStudents);
+            }
+
+            if (totalCourses == null) {
+                totalCourses = dslContext.selectCount()
+                        .from(EduCourse.EDU_COURSE)
+                        .where(EduCourse.EDU_COURSE.DELETED.eq(0))
+                        .and(EduCourse.EDU_COURSE.INSTITUTION_ID.eq(institutionId))
+                        .fetchOneInto(Integer.class);
+                campusStatsRedisService.setInstitutionCourseCount(institutionId, totalCourses);
+            }
         }
 
         Map<String, Object> result = new HashMap<>();
