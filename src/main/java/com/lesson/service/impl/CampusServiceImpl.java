@@ -269,6 +269,11 @@ public class CampusServiceImpl implements CampusService {
             CampusVO campusVO = new CampusVO();
             // 设置基本信息
             BeanUtils.copyProperties(record, campusVO);
+            
+            // 手动设置状态，将Integer转换为CampusStatus枚举
+            if (record.getStatus() != null) {
+                campusVO.setStatus(CampusStatus.fromCode(record.getStatus()));
+            }
 
             // 设置管理员信息
             UserVO manager = campusManagerMap.get(record.getId());
