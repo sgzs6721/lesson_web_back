@@ -588,6 +588,7 @@ public class StudentService {
 
         // 设置其他信息
         courseInfo.setEnrollmentDate(studentCourse.getStartDate());
+        courseInfo.setEndDate(studentCourse.getEndDate()); // 设置有效期
         courseInfo.setStatus(studentCourse.getStatus() != null ? studentCourse.getStatus() : StudentCourseStatus.STUDYING.getName());
         courseInfo.setFixedSchedule(studentCourse.getFixedSchedule());
 
@@ -743,6 +744,7 @@ public class StudentService {
 
         vo.setLastClassTime(lastClassTime);
         vo.setEnrollmentDate(studentCourse.getStartDate());
+        vo.setEndDate(studentCourse.getEndDate()); // 设置有效期
         vo.setStatus(studentCourse.getStatus());
 
         vo.setCampusId(studentCourse.getCampusId());
@@ -821,7 +823,7 @@ public class StudentService {
         .from(Tables.SYS_COACH_COURSE)
         .where(Tables.SYS_COACH_COURSE.COURSE_ID.eq(request.getCourseId()))
         .and(Tables.SYS_COACH_COURSE.DELETED.eq(0))
-        .fetchOneInto(Long.class);
+        .fetchAnyInto(Long.class);
     // 7. 插入上课记录
     dsl.insertInto(Tables.EDU_STUDENT_COURSE_RECORD)
         .set(Tables.EDU_STUDENT_COURSE_RECORD.STUDENT_ID, request.getStudentId())
@@ -843,11 +845,21 @@ public class StudentService {
     if (type.equals("NORMAL") || type.equals("ABSENT")) {
       studentCourse.setConsumedHours(studentCourse.getConsumedHours().add(hoursConsumed));
       studentCourse.setUpdateTime(LocalDateTime.now());
-      // 9. 将学员课程状态更新为"学习中"
-      if (!StudentCourseStatus.STUDYING.getName().equals(studentCourse.getStatus())) {
+      
+      // 检查剩余课时
+      BigDecimal remainingHours = studentCourse.getTotalHours().subtract(studentCourse.getConsumedHours());
+      
+      // 9. 根据剩余课时更新学员课程状态
+      if (remainingHours.compareTo(BigDecimal.ZERO) <= 0) {
+        // 课时为0或负数，设置为待续费状态
+        studentCourse.setStatus(StudentCourseStatus.WAITING_RENEWAL.getName());
+        log.info("学员[{}]课时已用完，状态已更新为：待续费", request.getStudentId());
+      } else if (!StudentCourseStatus.STUDYING.getName().equals(studentCourse.getStatus())) {
+        // 还有剩余课时，设置为学习中状态
         studentCourse.setStatus(StudentCourseStatus.STUDYING.getName());
         log.info("学员[{}]打卡成功，状态已更新为：学习中", request.getStudentId());
       }
+      
       studentCourseModel.updateStudentCourse(studentCourse);
       // 10. 更新课程表的已消耗课时 (edu_course)
       dsl.update(Tables.EDU_COURSE)
@@ -904,7 +916,7 @@ public class StudentService {
             .from(Tables.SYS_COACH_COURSE)
             .where(Tables.SYS_COACH_COURSE.COURSE_ID.eq(request.getCourseId()))
             .and(Tables.SYS_COACH_COURSE.DELETED.eq(0))
-            .fetchOneInto(Long.class);
+            .fetchAnyInto(Long.class);
 
     // 7. 创建上课记录 (edu_student_course_record) for leave
     dsl.insertInto(Tables.EDU_STUDENT_COURSE_RECORD)
@@ -927,6 +939,16 @@ public class StudentService {
     // 8. 更新学员课程的已消耗课时 (edu_student_course)
     studentCourse.setConsumedHours(studentCourse.getConsumedHours().add(hoursConsumed));
     studentCourse.setUpdateTime(LocalDateTime.now());
+    
+    // 检查剩余课时
+    BigDecimal remainingHoursAfterLeave = studentCourse.getTotalHours().subtract(studentCourse.getConsumedHours());
+    
+    // 根据剩余课时更新学员课程状态
+    if (remainingHoursAfterLeave.compareTo(BigDecimal.ZERO) <= 0) {
+      // 课时为0或负数，设置为待续费状态
+      studentCourse.setStatus(StudentCourseStatus.WAITING_RENEWAL.getName());
+      log.info("学员[{}]请假后课时已用完，状态已更新为：待续费", request.getStudentId());
+    }
 
     studentCourseModel.updateStudentCourse(studentCourse);
 
