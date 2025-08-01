@@ -66,6 +66,10 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
         UserContext.setCurrentUserId(user.getUserId());
         UserContext.setCurrentInstitutionId(user.getInstitutionId());
 
+        // 设置请求属性，用于权限控制
+        request.setAttribute("orgId", user.getInstitutionId());
+        request.setAttribute("campusId", user.getCampusId());
+
         return true;
     }
 

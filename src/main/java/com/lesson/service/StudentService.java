@@ -91,6 +91,22 @@ public class StudentService {
   }
 
   /**
+   * 获取当前用户的校区ID
+   * 如果是校区管理员，返回其所属校区ID；如果是超级管理员或协同管理员，返回null（表示可以查看所有校区）
+   */
+  private Long getCurrentUserCampusId() {
+    Long campusId = (Long) httpServletRequest.getAttribute("campusId");
+    log.info("从请求属性中获取的校区ID: {}", campusId);
+    if (campusId != null && campusId == -1L) {
+      // campusId为-1表示超级管理员或协同管理员，可以查看所有校区
+      log.info("用户是超级管理员或协同管理员，可以查看所有校区");
+      return null;
+    }
+    log.info("用户校区ID: {}", campusId);
+    return campusId;
+  }
+
+  /**
    * 创建学员及课程
    *
    * @param request 学员及课程创建请求
@@ -403,6 +419,10 @@ public class StudentService {
       log.warn("无法从请求中获取机构ID (orgId)，将不按机构筛选");
     }
 
+    // 获取当前用户的校区ID（权限控制）
+    Long currentUserCampusId = getCurrentUserCampusId();
+    log.info("当前用户校区ID: {}, 请求校区ID: {}", currentUserCampusId, request.getCampusId());
+
     // 查询学员列表
     List<EduStudentRecord> students;
     long total;
@@ -415,6 +435,12 @@ public class StudentService {
           .fetchOne();
 
       if (student != null) {
+        // 权限检查：校区管理员只能查看自己校区的学员
+        if (currentUserCampusId != null && !currentUserCampusId.equals(student.getCampusId())) {
+          log.warn("校区管理员尝试访问其他校区的学员，学员ID: {}, 当前用户校区: {}, 学员校区: {}", 
+                   request.getStudentId(), currentUserCampusId, student.getCampusId());
+          return PageResult.of(Collections.emptyList(), 0, request.getPageNum(), request.getPageSize());
+        }
         students = Collections.singletonList(student);
         total = 1;
       } else {
@@ -431,7 +457,11 @@ public class StudentService {
         query.and(Tables.EDU_STUDENT.INSTITUTION_ID.eq(institutionId));
       }
 
-      if (request.getCampusId() != null) {
+      // 校区权限控制：校区管理员只能查看自己校区的学员
+      if (currentUserCampusId != null) {
+        query.and(Tables.EDU_STUDENT.CAMPUS_ID.eq(currentUserCampusId));
+      } else if (request.getCampusId() != null) {
+        // 超级管理员或协同管理员可以指定校区查看
         query.and(Tables.EDU_STUDENT.CAMPUS_ID.eq(request.getCampusId()));
       }
 
@@ -444,7 +474,8 @@ public class StudentService {
           .from(Tables.EDU_STUDENT)
           .where(Tables.EDU_STUDENT.DELETED.eq(0))
           .and(institutionId != null ? Tables.EDU_STUDENT.INSTITUTION_ID.eq(institutionId) : DSL.noCondition())
-          .and(request.getCampusId() != null ? Tables.EDU_STUDENT.CAMPUS_ID.eq(request.getCampusId()) : DSL.noCondition())
+          .and(currentUserCampusId != null ? Tables.EDU_STUDENT.CAMPUS_ID.eq(currentUserCampusId) : 
+               (request.getCampusId() != null ? Tables.EDU_STUDENT.CAMPUS_ID.eq(request.getCampusId()) : DSL.noCondition()))
           .and(request.getKeyword() != null && !request.getKeyword().isEmpty() ?
                Tables.EDU_STUDENT.NAME.like("%" + request.getKeyword() + "%") : DSL.noCondition())
           .fetchOne(0, Long.class);

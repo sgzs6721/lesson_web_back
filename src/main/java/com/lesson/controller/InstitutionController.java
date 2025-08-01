@@ -1,16 +1,16 @@
 package com.lesson.controller;
 
 import com.lesson.common.Result;
+import com.lesson.request.institution.InstitutionRegisterRequest;
 import com.lesson.service.InstitutionService;
 import com.lesson.vo.institution.InstitutionDetailVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 /**
  * 机构管理接口
@@ -23,6 +23,19 @@ import org.springframework.web.bind.annotation.RestController;
 public class InstitutionController {
 
     private final InstitutionService institutionService;
+
+    /**
+     * 机构注册
+     *
+     * @param request 机构注册请求
+     * @return 注册结果
+     */
+    @Operation(summary = "机构注册", description = "注册新机构，同时创建超级管理员账号")
+    @PostMapping("/register")
+    public Result<InstitutionDetailVO> register(@RequestBody @Valid InstitutionRegisterRequest request) {
+        InstitutionDetailVO registerResult = institutionService.registerInstitution(request);
+        return Result.success(registerResult);
+    }
 
     /**
      * 获取机构详情

@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 import java.util.stream.Collectors;
+import io.jsonwebtoken.Claims;
 
 /**
  * 用户服务实现
@@ -152,6 +153,7 @@ public class UserServiceImpl implements UserService {
     loginVO.setRoleId(roles.get(0).getId());
     loginVO.setRoleName(roles.get(0).getName());  // 设置角色名称
     loginVO.setInstitutionId(institution.getId());
+    loginVO.setInstitutionName(institution.getName());  // 设置机构名称
     loginVO.setCampusId(user.getCampusId());      // 设置校区ID
     loginVO.setToken(token);
 
@@ -503,7 +505,43 @@ public class UserServiceImpl implements UserService {
       return user;
     }
 
-    // 如果token不匹配格式或已过期，返回null
-    return null;
+    // 尝试从JWT token中解析用户信息
+    try {
+      Claims claims = jwtUtil.parseToken(token);
+      Long userId = Long.valueOf(claims.get("userId").toString());
+      Long orgId = Long.valueOf(claims.get("orgId").toString());
+      
+      // 从数据库获取用户信息
+      SysUserRecord userRecord = userModel.getById(userId);
+      if (userRecord == null) {
+        return null;
+      }
+      
+      // 获取用户角色
+      List<RoleVO> roles = roleModel.getUserRoles(userId);
+      if (roles == null || roles.isEmpty()) {
+        return null;
+      }
+      
+              // 获取机构信息
+        SysInstitutionRecord institution = institutionModel.getById(userRecord.getInstitutionId());
+        
+        // 构建返回结果
+        UserLoginVO user = new UserLoginVO();
+        user.setUserId(userRecord.getId());
+        user.setPhone(userRecord.getPhone());
+        user.setRealName(userRecord.getRealName());
+        user.setRoleId(roles.get(0).getId());
+        user.setRoleName(roles.get(0).getName());
+        user.setInstitutionId(userRecord.getInstitutionId()); // 使用数据库中的机构ID
+        user.setInstitutionName(institution != null ? institution.getName() : null); // 设置机构名称
+        user.setCampusId(userRecord.getCampusId());
+        user.setToken(token);
+      
+      return user;
+    } catch (Exception e) {
+      // 如果解析失败，返回null
+      return null;
+    }
   }
 } 

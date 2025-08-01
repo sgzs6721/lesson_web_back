@@ -47,6 +47,12 @@ public class UserLoginVO {
     private Long institutionId;
     
     /**
+     * 机构名称
+     */
+    @Schema(description = "所属机构名称", example = "北京朝阳校区")
+    private String institutionName;
+    
+    /**
      * 校区ID
      */
     @Schema(description = "所属校区ID", example = "1")

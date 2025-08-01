@@ -3,6 +3,7 @@ package com.lesson.service.impl;
 import com.lesson.common.enums.CampusStatus;
 import com.lesson.common.enums.InstitutionStatusEnum;
 import com.lesson.common.enums.InstitutionTypeEnum;
+import com.lesson.common.enums.UserStatus;
 import com.lesson.common.exception.BusinessException;
 import com.lesson.constant.RoleConstant;
 import com.lesson.model.SysCampusModel;
@@ -12,11 +13,14 @@ import com.lesson.model.SysUserModel;
 import com.lesson.repository.tables.records.SysCampusRecord;
 import com.lesson.repository.tables.records.SysInstitutionRecord;
 import com.lesson.repository.tables.records.SysUserRecord;
+import com.lesson.request.institution.InstitutionRegisterRequest;
 import com.lesson.service.InstitutionService;
 import com.lesson.vo.institution.InstitutionDetailVO;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,6 +42,52 @@ public class InstitutionServiceImpl implements InstitutionService {
     private final SysUserModel userModel;
     private final SysRoleModel roleModel;
     private final DSLContext dsl;
+    private final PasswordEncoder passwordEncoder;
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public InstitutionDetailVO registerInstitution(InstitutionRegisterRequest request) {
+        try {
+            // 1. 检查用户名是否已存在
+            if (userModel.existsByPhone(request.getUsername())) {
+                throw new BusinessException("用户名已存在");
+            }
+
+            // 2. 获取超级管理员角色ID
+            Long superAdminRoleId = roleModel.getSuperAdminRoleId();
+            if (superAdminRoleId == null) {
+                throw new BusinessException("系统错误：未找到超级管理员角色");
+            }
+
+            // 3. 创建机构
+            Long institutionId = institutionModel.createInstitution(
+                request.getName(),
+                InstitutionTypeEnum.SPORTS.getCode(), // 默认体育类型
+                "新注册机构",
+                request.getContactName(),
+                request.getUsername()
+            );
+
+            // 4. 创建超级管理员用户
+            Long userId = userModel.createUser(
+                request.getUsername(),
+                request.getPassword(),
+                request.getContactName(),
+                institutionId,
+                superAdminRoleId,
+                -1L, // 超级管理员的校区ID设为-1
+                passwordEncoder,
+                UserStatus.ENABLED
+            );
+
+            // 5. 返回机构详情
+            return getInstitutionDetail(institutionId);
+        } catch (BusinessException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BusinessException("机构注册失败: " + e.getMessage());
+        }
+    }
 
     @Override
     public InstitutionDetailVO getInstitutionDetail(Long id) {
