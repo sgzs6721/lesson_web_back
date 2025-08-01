@@ -824,23 +824,24 @@ public class StudentService {
         .where(Tables.SYS_COACH_COURSE.COURSE_ID.eq(request.getCourseId()))
         .and(Tables.SYS_COACH_COURSE.DELETED.eq(0))
         .fetchAnyInto(Long.class);
-    // 7. 插入上课记录
-    dsl.insertInto(Tables.EDU_STUDENT_COURSE_RECORD)
-        .set(Tables.EDU_STUDENT_COURSE_RECORD.STUDENT_ID, request.getStudentId())
-        .set(Tables.EDU_STUDENT_COURSE_RECORD.COURSE_ID, request.getCourseId())
-        .set(Tables.EDU_STUDENT_COURSE_RECORD.COACH_ID, coachId)
-        .set(Tables.EDU_STUDENT_COURSE_RECORD.COURSE_DATE, request.getCourseDate())
-        .set(Tables.EDU_STUDENT_COURSE_RECORD.START_TIME, request.getStartTime())
-        .set(Tables.EDU_STUDENT_COURSE_RECORD.END_TIME, request.getEndTime())
-        .set(Tables.EDU_STUDENT_COURSE_RECORD.HOURS, hoursConsumed)
-        .set(Tables.EDU_STUDENT_COURSE_RECORD.NOTES, request.getNotes())
-        .set(Tables.EDU_STUDENT_COURSE_RECORD.CAMPUS_ID, campusId)
-        .set(Tables.EDU_STUDENT_COURSE_RECORD.INSTITUTION_ID, institutionId)
-        .set(Tables.EDU_STUDENT_COURSE_RECORD.CREATED_TIME, LocalDateTime.now())
-        .set(Tables.EDU_STUDENT_COURSE_RECORD.UPDATE_TIME, LocalDateTime.now())
-        .set(Tables.EDU_STUDENT_COURSE_RECORD.DELETED, 0)
-        .set(Tables.EDU_STUDENT_COURSE_RECORD.STATUS, type)
-        .execute();
+    // 7. 插入上课记录（使用原生SQL以支持status_id字段）
+    dsl.execute("INSERT INTO edu_student_course_record (student_id, course_id, coach_id, course_date, start_time, end_time, hours, notes, campus_id, institution_id, created_time, update_time, deleted, status_id, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        request.getStudentId(),
+        request.getCourseId(),
+        coachId,
+        request.getCourseDate(),
+        request.getStartTime(),
+        request.getEndTime(),
+        hoursConsumed,
+        request.getNotes(),
+        campusId,
+        institutionId,
+        LocalDateTime.now(),
+        LocalDateTime.now(),
+        0,
+        44L, // 设置status_id为44（已到）
+        type
+    );
     // 8. 仅NORMAL/ABSENT类型才扣课时
     if (type.equals("NORMAL") || type.equals("ABSENT")) {
       studentCourse.setConsumedHours(studentCourse.getConsumedHours().add(hoursConsumed));
