@@ -19,7 +19,7 @@ spring:
       auto-commit: true
       pool-name: LessonHikariCP
   redis:
-    host: localhost
+    host: 121.36.91.199
     port: 6379
     database: 0
     password: bg-league--redis-password-dont-change
@@ -39,4 +39,4 @@ logging:
     org.springframework.security: DEBUG
     org.springframework.web.servlet.DispatcherServlet: DEBUG
     org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: TRACE
-    org.jooq: DEBUG 
+    org.jooq: DEBUG
