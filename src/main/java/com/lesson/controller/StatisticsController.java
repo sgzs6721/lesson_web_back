@@ -610,13 +610,14 @@ public class StatisticsController {
                 campusStatsRedisService.setInstitutionStudentCount(institutionId, totalStudents);
             }
 
-            // 统计学员报名的课程总数
+            // 统计学员报名的课程总数（不重复的课程ID）
             totalStudentCourses = dslContext.selectCount()
-                    .from(EduStudentCourse.EDU_STUDENT_COURSE)
-                    .where(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
-                    .and(EduStudentCourse.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
+                    .from(dslContext.selectDistinct(EduStudentCourse.EDU_STUDENT_COURSE.COURSE_ID)
+                            .from(EduStudentCourse.EDU_STUDENT_COURSE)
+                            .where(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
+                            .and(EduStudentCourse.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId)))
                     .fetchOneInto(Integer.class);
-            log.info("从数据库查询学员报名课程数量: {}", totalStudentCourses);
+            log.info("从数据库查询学员报名课程数量（不重复）: {}", totalStudentCourses);
             
             // 按状态统计学员数量
             studyingStudents = dslContext.selectCount()
@@ -710,13 +711,14 @@ public class StatisticsController {
                     .and(EduCourse.EDU_COURSE.CAMPUS_ID.eq(userCampusId))
                     .fetchOneInto(Integer.class);
             
-            // 统计学员报名的课程总数
+            // 统计学员报名的课程总数（不重复的课程ID）
             totalStudentCourses = dslContext.selectCount()
-                    .from(EduStudentCourse.EDU_STUDENT_COURSE)
-                    .where(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
-                    .and(EduStudentCourse.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
-                    .and(EduStudentCourse.EDU_STUDENT_COURSE.CAMPUS_ID.eq(userCampusId))
+                    .from(dslContext.selectDistinct(EduStudentCourse.EDU_STUDENT_COURSE.COURSE_ID)
+                            .from(EduStudentCourse.EDU_STUDENT_COURSE)
+                            .where(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
+                            .and(EduStudentCourse.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId)))
                     .fetchOneInto(Integer.class);
+            log.info("从数据库查询学员报名课程数量（不重复）: {}", totalStudentCourses);
             
             log.info("校区管理员统计结果 - 学员: {}, 课程: {}, 报名课程: {}", totalStudents, totalCourses, totalStudentCourses);
         } else {

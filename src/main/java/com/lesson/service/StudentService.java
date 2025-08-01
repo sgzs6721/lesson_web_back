@@ -59,6 +59,7 @@ import com.lesson.vo.response.StudentCourseOperationRecordVO;
 import com.lesson.vo.request.StudentWithinCourseTransferRequest;
 import com.lesson.service.CourseHoursRedisService;
 import com.lesson.service.CampusStatsRedisService;
+import com.lesson.vo.response.StudentPaymentResponseVO;
 
 /**
  * 学员服务
@@ -975,10 +976,10 @@ public class StudentService {
    * 处理学员缴费
    *
    * @param request 缴费请求
-   * @return 缴费记录ID
+   * @return 缴费响应信息
    */
   @Transactional(rollbackFor = Exception.class)
-  public Long processPayment(StudentPaymentRequest request) {
+  public StudentPaymentResponseVO processPayment(StudentPaymentRequest request) {
     // 0. 获取机构和校区ID
     Long institutionId = getInstitutionId();
     Long campusId = null; // 需要确定校区ID来源
@@ -1059,8 +1060,8 @@ public class StudentService {
     studentCourse.setTotalHours(studentCourse.getTotalHours().add(addedTotalHours));
     studentCourse.setEndDate(request.getValidUntil()); // 直接使用新的有效期覆盖
 
-    // 更新课程状态为待上课
-    studentCourse.setStatus(StudentCourseStatus.WAITING_CLASS.getName());
+    // 更新课程状态为学习中（缴费后直接进入学习状态）
+    studentCourse.setStatus(StudentCourseStatus.STUDYING.getName());
 
     studentCourse.setUpdateTime(LocalDateTime.now());
     studentCourseModel.updateStudentCourse(studentCourse);
@@ -1088,7 +1089,20 @@ public class StudentService {
             request.getStudentId(), request.getCourseId(), paymentId,
             request.getCourseHours(), request.getGiftHours(), studentCourse.getTotalHours());
 
-    return paymentId;
+    // 构建响应对象
+    StudentPaymentResponseVO response = new StudentPaymentResponseVO();
+    response.setPaymentId(paymentId);
+    response.setStatus(studentCourse.getStatus());
+    
+    // 设置状态描述
+    StudentCourseStatus statusEnum = StudentCourseStatus.getByName(studentCourse.getStatus());
+    response.setStatusDesc(statusEnum != null ? statusEnum.getDesc() : studentCourse.getStatus());
+    
+    // 设置总课时和有效期
+    response.setTotalHours(studentCourse.getTotalHours().toString());
+    response.setValidUntil(studentCourse.getEndDate() != null ? studentCourse.getEndDate().toString() : null);
+
+    return response;
   }
 
   // 辅助方法获取原始 EduStudentRecord

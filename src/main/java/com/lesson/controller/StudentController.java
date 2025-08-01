@@ -13,6 +13,7 @@ import com.lesson.vo.response.StudentCourseOperationRecordVO;
 import com.lesson.vo.response.StudentWithCoursesVO;
 import com.lesson.vo.response.StudentRefundDetailVO;
 import com.lesson.vo.response.PaymentHoursInfoVO;
+import com.lesson.vo.response.StudentPaymentResponseVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -186,14 +187,14 @@ public class StudentController {
      * 学员缴费
      *
      * @param request 缴费请求体 (包含 studentId, courseId 等)
-     * @return 缴费记录ID
+     * @return 缴费响应信息（包含缴费记录ID和学员状态）
      */
     @PostMapping("/payment")
     @Operation(summary = "学员缴费",
-               description = "记录学员缴费信息，并更新对应课程的课时和有效期")
-    public Result<Long> payment(@RequestBody @Valid StudentPaymentRequest request) {
-        Long paymentId = studentService.processPayment(request);
-        return Result.success(paymentId);
+               description = "记录学员缴费信息，并更新对应课程的课时和有效期，返回缴费记录ID和更新后的学员状态")
+    public Result<StudentPaymentResponseVO> payment(@RequestBody @Valid StudentPaymentRequest request) {
+        StudentPaymentResponseVO response = studentService.processPayment(request);
+        return Result.success(response);
     }
 
     /**
