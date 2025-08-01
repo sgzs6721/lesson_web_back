@@ -133,6 +133,32 @@ public class SysCampusModel {
     }
 
     /**
+     * 按校区ID查询校区列表（用于校区管理员权限过滤）
+     */
+    public List<CampusDetailRecord> listCampusesByCampusId(String keyword, CampusStatus status, Long institutionId, Long campusId, Integer pageNum, Integer pageSize) {
+        SelectConditionStep<Record> query = dsl.select(SYS_CAMPUS.asterisk())
+            .from(SYS_CAMPUS)
+            .where(SYS_CAMPUS.DELETED.eq(0))
+            .and(SYS_CAMPUS.INSTITUTION_ID.eq(institutionId))
+            .and(SYS_CAMPUS.ID.eq(campusId));
+
+        if (StringUtils.hasText(keyword)) {
+            query.and(SYS_CAMPUS.NAME.like("%" + keyword + "%")
+                    .or(SYS_CAMPUS.ADDRESS.like("%" + keyword + "%")));
+        }
+
+        if (status != null) {
+            query.and(SYS_CAMPUS.STATUS.eq(status.getCode()));
+        }
+
+        return query
+            .orderBy(SYS_CAMPUS.CREATED_TIME.desc())
+            .limit(pageSize)
+            .offset((pageNum - 1) * pageSize)
+            .fetchInto(CampusDetailRecord.class);
+    }
+
+    /**
      * 获取校区总数
      */
     public long countCampuses(String keyword, CampusStatus status, Long institutionId) {
@@ -140,6 +166,28 @@ public class SysCampusModel {
                 .from(SYS_CAMPUS)
                 .where(SYS_CAMPUS.DELETED.eq( 0))
                 .and(SYS_CAMPUS.INSTITUTION_ID.eq(institutionId));
+
+        if (StringUtils.hasText(keyword)) {
+            query.and(SYS_CAMPUS.NAME.like("%" + keyword + "%")
+                    .or(SYS_CAMPUS.ADDRESS.like("%" + keyword + "%")));
+        }
+
+        if (status != null) {
+            query.and(SYS_CAMPUS.STATUS.eq(status.getCode()));
+        }
+
+        return query.fetchOne(0, long.class);
+    }
+
+    /**
+     * 按校区ID获取校区总数（用于校区管理员权限过滤）
+     */
+    public long countCampusesByCampusId(String keyword, CampusStatus status, Long institutionId, Long campusId) {
+        SelectConditionStep<Record1<Integer>> query = dsl.selectCount()
+                .from(SYS_CAMPUS)
+                .where(SYS_CAMPUS.DELETED.eq( 0))
+                .and(SYS_CAMPUS.INSTITUTION_ID.eq(institutionId))
+                .and(SYS_CAMPUS.ID.eq(campusId));
 
         if (StringUtils.hasText(keyword)) {
             query.and(SYS_CAMPUS.NAME.like("%" + keyword + "%")

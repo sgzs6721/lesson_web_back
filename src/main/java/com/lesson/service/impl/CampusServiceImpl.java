@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 import static com.lesson.repository.tables.EduStudent.EDU_STUDENT;
 import static com.lesson.repository.tables.EduCourse.EDU_COURSE;
 import static com.lesson.repository.tables.SysCoach.SYS_COACH;
+import static com.lesson.repository.tables.SysUser.SYS_USER;
 
 /**
  * 校区服务实现
@@ -206,14 +207,44 @@ public class CampusServiceImpl implements CampusService {
             institutionId = 1L;
         }
 
+        // 获取当前用户ID
+        Long currentUserId = (Long) httpServletRequest.getAttribute("userId");
+        log.info("当前用户ID: {}", currentUserId);
+        
+        // 获取当前用户的校区ID（用于权限过滤）
+        Long userCampusId = null;
+        if (currentUserId != null) {
+            // 从数据库查询用户的校区ID
+            userCampusId = dslContext.select(SYS_USER.CAMPUS_ID)
+                    .from(SYS_USER)
+                    .where(SYS_USER.ID.eq(currentUserId))
+                    .and(SYS_USER.DELETED.eq(0))
+                    .fetchOneInto(Long.class);
+            log.info("用户 {} 的校区ID: {}", currentUserId, userCampusId);
+        }
+
         // 1. 获取校区基本信息列表
-        List<CampusDetailRecord> campusRecords = campusModel.listCampuses(
-            request.getKeyword(),
-            request.getStatus(),
-            institutionId,
-            request.getPageNum(),
-            request.getPageSize()
-        );
+        List<CampusDetailRecord> campusRecords;
+        if (userCampusId != null && userCampusId > 0) {
+            // 校区管理员只能看到自己管理的校区
+            campusRecords = campusModel.listCampusesByCampusId(
+                request.getKeyword(),
+                request.getStatus(),
+                institutionId,
+                userCampusId,
+                request.getPageNum(),
+                request.getPageSize()
+            );
+        } else {
+            // 超级管理员或机构管理员可以看到所有校区
+            campusRecords = campusModel.listCampuses(
+                request.getKeyword(),
+                request.getStatus(),
+                institutionId,
+                request.getPageNum(),
+                request.getPageSize()
+            );
+        }
 
         // 2. 获取校区管理员信息
         List<Long> campusIds = campusRecords.stream()
@@ -312,17 +343,29 @@ public class CampusServiceImpl implements CampusService {
 
             campusVO.setCoachCount(coachCount != null ? coachCount : 0);
             campusVO.setStudentCount(studentCount != null ? studentCount : 0);
-            campusVO.setPendingLessonCount(lessonCount != null ? lessonCount : 0);
-            campusVO.setStatus(CampusStatus.fromCode(record.getStatus()));
+            campusVO.setPendingLessonCount(courseCount != null ? courseCount : 0);
+            
             return campusVO;
         }).collect(Collectors.toList());
 
-        // 4. 获取总记录数
-        long total = campusModel.countCampuses(
-            request.getKeyword(),
-            request.getStatus(),
-            institutionId
-        );
+        // 4. 获取总数
+        long total;
+        if (userCampusId != null && userCampusId > 0) {
+            // 校区管理员只能看到自己管理的校区
+            total = campusModel.countCampusesByCampusId(
+                request.getKeyword(),
+                request.getStatus(),
+                institutionId,
+                userCampusId
+            );
+        } else {
+            // 超级管理员或机构管理员可以看到所有校区
+            total = campusModel.countCampuses(
+                request.getKeyword(),
+                request.getStatus(),
+                institutionId
+            );
+        }
 
         return PageResult.of(campusList, total, request.getPageNum(), request.getPageSize());
     }

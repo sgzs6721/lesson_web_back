@@ -36,9 +36,9 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
         String requestUri = request.getRequestURI();
         log.info("AuthenticationInterceptor - 请求URI: {}", requestUri);
         
-        // 如果是认证相关的接口，直接放行
-        if (requestUri.startsWith("/lesson/api/auth")) {
-            log.info("AuthenticationInterceptor - 认证接口放行");
+        // 如果是认证相关的接口或机构注册接口，直接放行
+        if (requestUri.startsWith("/lesson/api/auth") || requestUri.startsWith("/lesson/api/institution/register")) {
+            log.info("AuthenticationInterceptor - 认证接口或机构注册接口放行");
             return true;
         }
 

@@ -21,6 +21,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .excludePathPatterns(    // 排除不需要token验证的路径
                         "/api/auth/login",    // 登录接口
                         "/api/auth/register", // 注册接口
+                        "/api/institution/register", // 机构注册接口
                         "/error"          // 错误页面
                 );
     }

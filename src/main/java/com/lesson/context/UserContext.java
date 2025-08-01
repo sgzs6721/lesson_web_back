@@ -6,6 +6,7 @@ package com.lesson.context;
 public class UserContext {
     private static final ThreadLocal<Long> currentUserId = new ThreadLocal<>();
     private static final ThreadLocal<Long> currentInstitutionId = new ThreadLocal<>();
+    private static final ThreadLocal<Long> currentCampusId = new ThreadLocal<>();
 
     /**
      * 设置当前用户ID
@@ -36,10 +37,25 @@ public class UserContext {
     }
 
     /**
+     * 设置当前校区ID
+     */
+    public static void setCurrentCampusId(Long campusId) {
+        currentCampusId.set(campusId);
+    }
+
+    /**
+     * 获取当前校区ID
+     */
+    public static Long getCurrentCampusId() {
+        return currentCampusId.get();
+    }
+
+    /**
      * 清除当前用户信息
      */
     public static void clear() {
         currentUserId.remove();
         currentInstitutionId.remove();
+        currentCampusId.remove();
     }
 } 
