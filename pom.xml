@@ -303,7 +303,7 @@
                             <excludes></excludes>
                             <schemata>
                                 <schema>
-                                    <inputSchema>lesson</inputSchema>
+                                    <inputSchema>${db.user}</inputSchema>
                                 </schema>
                             </schemata>
                         </database>

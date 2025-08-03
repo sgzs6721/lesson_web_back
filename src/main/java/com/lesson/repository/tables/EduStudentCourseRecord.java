@@ -22,7 +22,7 @@ import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row15;
+import org.jooq.Row16;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -125,9 +125,14 @@ public class EduStudentCourseRecord extends TableImpl<EduStudentCourseRecordReco
     public final TableField<EduStudentCourseRecordRecord, Integer> DELETED = createField(DSL.name("deleted"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.inline("0", SQLDataType.INTEGER)), this, "是否删除：0-未删除，1-已删除");
 
     /**
-     * The column <code>lesson.edu_student_course_record.status</code>. 记录类型：CHECK_IN-打卡, LEAVE-请假
+     * The column <code>lesson.edu_student_course_record.status_id</code>. 状态ID：1-正常，2-异常
      */
-    public final TableField<EduStudentCourseRecordRecord, String> STATUS = createField(DSL.name("status"), SQLDataType.VARCHAR(20).nullable(false).defaultValue(DSL.inline("CHECK_IN", SQLDataType.VARCHAR)), this, "记录类型：CHECK_IN-打卡, LEAVE-请假");
+    public final TableField<EduStudentCourseRecordRecord, Long> STATUS_ID = createField(DSL.name("status_id"), SQLDataType.BIGINT.nullable(false).defaultValue(DSL.inline("1", SQLDataType.BIGINT)), this, "状态ID：1-正常，2-异常");
+
+    /**
+     * The column <code>lesson.edu_student_course_record.status</code>. 出勤状态（枚举值：NORMAL/LEAVE/ABSENT）
+     */
+    public final TableField<EduStudentCourseRecordRecord, String> STATUS = createField(DSL.name("status"), SQLDataType.VARCHAR(20), this, "出勤状态（枚举值：NORMAL/LEAVE/ABSENT）");
 
     private EduStudentCourseRecord(Name alias, Table<EduStudentCourseRecordRecord> aliased) {
         this(alias, aliased, null);
@@ -188,6 +193,20 @@ public class EduStudentCourseRecord extends TableImpl<EduStudentCourseRecordReco
     }
 
     @Override
+    public List<ForeignKey<EduStudentCourseRecordRecord, ?>> getReferences() {
+        return Arrays.<ForeignKey<EduStudentCourseRecordRecord, ?>>asList(Keys.FK_ATTENDANCE_STATUS);
+    }
+
+    private transient SysConstant _sysConstant;
+
+    public SysConstant sysConstant() {
+        if (_sysConstant == null)
+            _sysConstant = new SysConstant(this, Keys.FK_ATTENDANCE_STATUS);
+
+        return _sysConstant;
+    }
+
+    @Override
     public EduStudentCourseRecord as(String alias) {
         return new EduStudentCourseRecord(DSL.name(alias), this);
     }
@@ -214,11 +233,11 @@ public class EduStudentCourseRecord extends TableImpl<EduStudentCourseRecordReco
     }
 
     // -------------------------------------------------------------------------
-    // Row15 type methods
+    // Row16 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row15<Long, Long, Long, Long, LocalDate, LocalTime, LocalTime, BigDecimal, String, Long, Long, LocalDateTime, LocalDateTime, Integer, String> fieldsRow() {
-        return (Row15) super.fieldsRow();
+    public Row16<Long, Long, Long, Long, LocalDate, LocalTime, LocalTime, BigDecimal, String, Long, Long, LocalDateTime, LocalDateTime, Integer, Long, String> fieldsRow() {
+        return (Row16) super.fieldsRow();
     }
 }
