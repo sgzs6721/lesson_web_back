@@ -27,7 +27,7 @@ jobs:
       - name: Build application lesson_web_back
         run: mvn clean package -Pprod -DskipTests
       - name: Verify jar file exists
-        run: ls -la target/lesson-web-back-prod-1.0-SNAPSHOT.jar
+        run: ls -la target/lesson_web_back-prod.jar
       - name: Scp jar To HW Server
         uses: appleboy/scp-action@master
         with:
