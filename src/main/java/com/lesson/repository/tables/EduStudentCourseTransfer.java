@@ -6,7 +6,7 @@ package com.lesson.repository.tables;
 
 import com.lesson.repository.Indexes;
 import com.lesson.repository.Keys;
-import com.lesson.repository.LessonProd;
+import com.lesson.repository.Lesson;
 import com.lesson.repository.tables.records.EduStudentCourseTransferRecord;
 
 import java.math.BigDecimal;
@@ -41,7 +41,7 @@ public class EduStudentCourseTransfer extends TableImpl<EduStudentCourseTransfer
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>lesson_prod.edu_student_course_transfer</code>
+     * The reference instance of <code>lesson.edu_student_course_transfer</code>
      */
     public static final EduStudentCourseTransfer EDU_STUDENT_COURSE_TRANSFER = new EduStudentCourseTransfer();
 
@@ -54,67 +54,67 @@ public class EduStudentCourseTransfer extends TableImpl<EduStudentCourseTransfer
     }
 
     /**
-     * The column <code>lesson_prod.edu_student_course_transfer.id</code>. 记录ID
+     * The column <code>lesson.edu_student_course_transfer.id</code>. 记录ID
      */
     public final TableField<EduStudentCourseTransferRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "记录ID");
 
     /**
-     * The column <code>lesson_prod.edu_student_course_transfer.student_id</code>. 学员ID
+     * The column <code>lesson.edu_student_course_transfer.student_id</code>. 学员ID
      */
     public final TableField<EduStudentCourseTransferRecord, String> STUDENT_ID = createField(DSL.name("student_id"), SQLDataType.VARCHAR(32).nullable(false), this, "学员ID");
 
     /**
-     * The column <code>lesson_prod.edu_student_course_transfer.original_course_id</code>. 原课程ID
+     * The column <code>lesson.edu_student_course_transfer.original_course_id</code>. 原课程ID
      */
     public final TableField<EduStudentCourseTransferRecord, Long> ORIGINAL_COURSE_ID = createField(DSL.name("original_course_id"), SQLDataType.BIGINT.nullable(false), this, "原课程ID");
 
     /**
-     * The column <code>lesson_prod.edu_student_course_transfer.target_course_id</code>. 目标课程ID
+     * The column <code>lesson.edu_student_course_transfer.target_course_id</code>. 目标课程ID
      */
     public final TableField<EduStudentCourseTransferRecord, Long> TARGET_COURSE_ID = createField(DSL.name("target_course_id"), SQLDataType.BIGINT.nullable(false), this, "目标课程ID");
 
     /**
-     * The column <code>lesson_prod.edu_student_course_transfer.transfer_hours</code>. 转课课时
+     * The column <code>lesson.edu_student_course_transfer.transfer_hours</code>. 转课课时
      */
     public final TableField<EduStudentCourseTransferRecord, BigDecimal> TRANSFER_HOURS = createField(DSL.name("transfer_hours"), SQLDataType.DECIMAL(10, 2).nullable(false), this, "转课课时");
 
     /**
-     * The column <code>lesson_prod.edu_student_course_transfer.compensation_fee</code>. 补差价
+     * The column <code>lesson.edu_student_course_transfer.compensation_fee</code>. 补差价
      */
     public final TableField<EduStudentCourseTransferRecord, BigDecimal> COMPENSATION_FEE = createField(DSL.name("compensation_fee"), SQLDataType.DECIMAL(10, 2).nullable(false).defaultValue(DSL.inline("0.00", SQLDataType.DECIMAL)), this, "补差价");
 
     /**
-     * The column <code>lesson_prod.edu_student_course_transfer.valid_until</code>. 有效期至
+     * The column <code>lesson.edu_student_course_transfer.valid_until</code>. 有效期至
      */
     public final TableField<EduStudentCourseTransferRecord, LocalDate> VALID_UNTIL = createField(DSL.name("valid_until"), SQLDataType.LOCALDATE.nullable(false), this, "有效期至");
 
     /**
-     * The column <code>lesson_prod.edu_student_course_transfer.reason</code>. 转课原因
+     * The column <code>lesson.edu_student_course_transfer.reason</code>. 转课原因
      */
     public final TableField<EduStudentCourseTransferRecord, String> REASON = createField(DSL.name("reason"), SQLDataType.VARCHAR(500).nullable(false), this, "转课原因");
 
     /**
-     * The column <code>lesson_prod.edu_student_course_transfer.campus_id</code>. 校区ID
+     * The column <code>lesson.edu_student_course_transfer.campus_id</code>. 校区ID
      */
     public final TableField<EduStudentCourseTransferRecord, Long> CAMPUS_ID = createField(DSL.name("campus_id"), SQLDataType.BIGINT.nullable(false), this, "校区ID");
 
     /**
-     * The column <code>lesson_prod.edu_student_course_transfer.institution_id</code>. 机构ID
+     * The column <code>lesson.edu_student_course_transfer.institution_id</code>. 机构ID
      */
     public final TableField<EduStudentCourseTransferRecord, Long> INSTITUTION_ID = createField(DSL.name("institution_id"), SQLDataType.BIGINT.nullable(false), this, "机构ID");
 
     /**
-     * The column <code>lesson_prod.edu_student_course_transfer.created_time</code>. 创建时间
+     * The column <code>lesson.edu_student_course_transfer.created_time</code>. 创建时间
      */
     public final TableField<EduStudentCourseTransferRecord, LocalDateTime> CREATED_TIME = createField(DSL.name("created_time"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "创建时间");
 
     /**
-     * The column <code>lesson_prod.edu_student_course_transfer.update_time</code>. 更新时间
+     * The column <code>lesson.edu_student_course_transfer.update_time</code>. 更新时间
      */
     public final TableField<EduStudentCourseTransferRecord, LocalDateTime> UPDATE_TIME = createField(DSL.name("update_time"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "更新时间");
 
     /**
-     * The column <code>lesson_prod.edu_student_course_transfer.deleted</code>. 是否删除：0-未删除，1-已删除
+     * The column <code>lesson.edu_student_course_transfer.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public final TableField<EduStudentCourseTransferRecord, Integer> DELETED = createField(DSL.name("deleted"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.inline("0", SQLDataType.INTEGER)), this, "是否删除：0-未删除，1-已删除");
 
@@ -127,21 +127,21 @@ public class EduStudentCourseTransfer extends TableImpl<EduStudentCourseTransfer
     }
 
     /**
-     * Create an aliased <code>lesson_prod.edu_student_course_transfer</code> table reference
+     * Create an aliased <code>lesson.edu_student_course_transfer</code> table reference
      */
     public EduStudentCourseTransfer(String alias) {
         this(DSL.name(alias), EDU_STUDENT_COURSE_TRANSFER);
     }
 
     /**
-     * Create an aliased <code>lesson_prod.edu_student_course_transfer</code> table reference
+     * Create an aliased <code>lesson.edu_student_course_transfer</code> table reference
      */
     public EduStudentCourseTransfer(Name alias) {
         this(alias, EDU_STUDENT_COURSE_TRANSFER);
     }
 
     /**
-     * Create a <code>lesson_prod.edu_student_course_transfer</code> table reference
+     * Create a <code>lesson.edu_student_course_transfer</code> table reference
      */
     public EduStudentCourseTransfer() {
         this(DSL.name("edu_student_course_transfer"), null);
@@ -153,7 +153,7 @@ public class EduStudentCourseTransfer extends TableImpl<EduStudentCourseTransfer
 
     @Override
     public Schema getSchema() {
-        return LessonProd.LESSON_PROD;
+        return Lesson.LESSON;
     }
 
     @Override

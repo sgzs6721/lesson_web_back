@@ -24,126 +24,126 @@ public class SysConstantRecord extends UpdatableRecordImpl<SysConstantRecord> im
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>lesson_prod.sys_constant.id</code>. 主键ID
+     * Setter for <code>lesson.sys_constant.id</code>. 主键ID
      */
     public void setId(Long value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_constant.id</code>. 主键ID
+     * Getter for <code>lesson.sys_constant.id</code>. 主键ID
      */
     public Long getId() {
         return (Long) get(0);
     }
 
     /**
-     * Setter for <code>lesson_prod.sys_constant.constant_key</code>. 常量键
+     * Setter for <code>lesson.sys_constant.constant_key</code>. 常量键
      */
     public void setConstantKey(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_constant.constant_key</code>. 常量键
+     * Getter for <code>lesson.sys_constant.constant_key</code>. 常量键
      */
     public String getConstantKey() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>lesson_prod.sys_constant.constant_value</code>. 常量值
+     * Setter for <code>lesson.sys_constant.constant_value</code>. 常量值
      */
     public void setConstantValue(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_constant.constant_value</code>. 常量值
+     * Getter for <code>lesson.sys_constant.constant_value</code>. 常量值
      */
     public String getConstantValue() {
         return (String) get(2);
     }
 
     /**
-     * Setter for <code>lesson_prod.sys_constant.description</code>. 描述
+     * Setter for <code>lesson.sys_constant.description</code>. 描述
      */
     public void setDescription(String value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_constant.description</code>. 描述
+     * Getter for <code>lesson.sys_constant.description</code>. 描述
      */
     public String getDescription() {
         return (String) get(3);
     }
 
     /**
-     * Setter for <code>lesson_prod.sys_constant.type</code>. 常量类型：SYSTEM-系统常量，BUSINESS-业务常量
+     * Setter for <code>lesson.sys_constant.type</code>. 常量类型：SYSTEM-系统常量，BUSINESS-业务常量
      */
     public void setType(String value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_constant.type</code>. 常量类型：SYSTEM-系统常量，BUSINESS-业务常量
+     * Getter for <code>lesson.sys_constant.type</code>. 常量类型：SYSTEM-系统常量，BUSINESS-业务常量
      */
     public String getType() {
         return (String) get(4);
     }
 
     /**
-     * Setter for <code>lesson_prod.sys_constant.status</code>. 状态：0-禁用，1-启用
+     * Setter for <code>lesson.sys_constant.status</code>. 状态：0-禁用，1-启用
      */
     public void setStatus(Integer value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_constant.status</code>. 状态：0-禁用，1-启用
+     * Getter for <code>lesson.sys_constant.status</code>. 状态：0-禁用，1-启用
      */
     public Integer getStatus() {
         return (Integer) get(5);
     }
 
     /**
-     * Setter for <code>lesson_prod.sys_constant.created_time</code>. 创建时间
+     * Setter for <code>lesson.sys_constant.created_time</code>. 创建时间
      */
     public void setCreatedTime(LocalDateTime value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_constant.created_time</code>. 创建时间
+     * Getter for <code>lesson.sys_constant.created_time</code>. 创建时间
      */
     public LocalDateTime getCreatedTime() {
         return (LocalDateTime) get(6);
     }
 
     /**
-     * Setter for <code>lesson_prod.sys_constant.update_time</code>. 更新时间
+     * Setter for <code>lesson.sys_constant.update_time</code>. 更新时间
      */
     public void setUpdateTime(LocalDateTime value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_constant.update_time</code>. 更新时间
+     * Getter for <code>lesson.sys_constant.update_time</code>. 更新时间
      */
     public LocalDateTime getUpdateTime() {
         return (LocalDateTime) get(7);
     }
 
     /**
-     * Setter for <code>lesson_prod.sys_constant.deleted</code>. 是否删除：0-未删除，1-已删除
+     * Setter for <code>lesson.sys_constant.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public void setDeleted(Integer value) {
         set(8, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_constant.deleted</code>. 是否删除：0-未删除，1-已删除
+     * Getter for <code>lesson.sys_constant.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public Integer getDeleted() {
         return (Integer) get(8);

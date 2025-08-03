@@ -27,7 +27,7 @@ import com.lesson.repository.tables.SysUser;
 
 
 /**
- * Convenience access to all tables in lesson_prod.
+ * Convenience access to all tables in lesson.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Tables {

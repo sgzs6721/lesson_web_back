@@ -24,182 +24,182 @@ public class SysUserRecord extends UpdatableRecordImpl<SysUserRecord> implements
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>lesson_prod.sys_user.id</code>. 主键ID
+     * Setter for <code>lesson.sys_user.id</code>. 主键ID
      */
     public void setId(Long value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_user.id</code>. 主键ID
+     * Getter for <code>lesson.sys_user.id</code>. 主键ID
      */
     public Long getId() {
         return (Long) get(0);
     }
 
     /**
-     * Setter for <code>lesson_prod.sys_user.password</code>. 密码
+     * Setter for <code>lesson.sys_user.password</code>. 密码
      */
     public void setPassword(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_user.password</code>. 密码
+     * Getter for <code>lesson.sys_user.password</code>. 密码
      */
     public String getPassword() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>lesson_prod.sys_user.real_name</code>. 真实姓名
+     * Setter for <code>lesson.sys_user.real_name</code>. 真实姓名
      */
     public void setRealName(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_user.real_name</code>. 真实姓名
+     * Getter for <code>lesson.sys_user.real_name</code>. 真实姓名
      */
     public String getRealName() {
         return (String) get(2);
     }
 
     /**
-     * Setter for <code>lesson_prod.sys_user.phone</code>. 手机号
+     * Setter for <code>lesson.sys_user.phone</code>. 手机号
      */
     public void setPhone(String value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_user.phone</code>. 手机号
+     * Getter for <code>lesson.sys_user.phone</code>. 手机号
      */
     public String getPhone() {
         return (String) get(3);
     }
 
     /**
-     * Setter for <code>lesson_prod.sys_user.role_id</code>. 角色ID
+     * Setter for <code>lesson.sys_user.role_id</code>. 角色ID
      */
     public void setRoleId(Long value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_user.role_id</code>. 角色ID
+     * Getter for <code>lesson.sys_user.role_id</code>. 角色ID
      */
     public Long getRoleId() {
         return (Long) get(4);
     }
 
     /**
-     * Setter for <code>lesson_prod.sys_user.institution_id</code>. 所属机构ID（超级管理员可为空或设为0）
+     * Setter for <code>lesson.sys_user.institution_id</code>. 所属机构ID（超级管理员可为空或设为0）
      */
     public void setInstitutionId(Long value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_user.institution_id</code>. 所属机构ID（超级管理员可为空或设为0）
+     * Getter for <code>lesson.sys_user.institution_id</code>. 所属机构ID（超级管理员可为空或设为0）
      */
     public Long getInstitutionId() {
         return (Long) get(5);
     }
 
     /**
-     * Setter for <code>lesson_prod.sys_user.campus_id</code>. 所属校区ID（超级管理员可为空）
+     * Setter for <code>lesson.sys_user.campus_id</code>. 所属校区ID（超级管理员可为空）
      */
     public void setCampusId(Long value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_user.campus_id</code>. 所属校区ID（超级管理员可为空）
+     * Getter for <code>lesson.sys_user.campus_id</code>. 所属校区ID（超级管理员可为空）
      */
     public Long getCampusId() {
         return (Long) get(6);
     }
 
     /**
-     * Setter for <code>lesson_prod.sys_user.avatar</code>. 头像URL
+     * Setter for <code>lesson.sys_user.avatar</code>. 头像URL
      */
     public void setAvatar(String value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_user.avatar</code>. 头像URL
+     * Getter for <code>lesson.sys_user.avatar</code>. 头像URL
      */
     public String getAvatar() {
         return (String) get(7);
     }
 
     /**
-     * Setter for <code>lesson_prod.sys_user.status</code>. 状态：0-禁用，1-启用
+     * Setter for <code>lesson.sys_user.status</code>. 状态：0-禁用，1-启用
      */
     public void setStatus(Integer value) {
         set(8, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_user.status</code>. 状态：0-禁用，1-启用
+     * Getter for <code>lesson.sys_user.status</code>. 状态：0-禁用，1-启用
      */
     public Integer getStatus() {
         return (Integer) get(8);
     }
 
     /**
-     * Setter for <code>lesson_prod.sys_user.last_login_time</code>. 最后登录时间
+     * Setter for <code>lesson.sys_user.last_login_time</code>. 最后登录时间
      */
     public void setLastLoginTime(LocalDateTime value) {
         set(9, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_user.last_login_time</code>. 最后登录时间
+     * Getter for <code>lesson.sys_user.last_login_time</code>. 最后登录时间
      */
     public LocalDateTime getLastLoginTime() {
         return (LocalDateTime) get(9);
     }
 
     /**
-     * Setter for <code>lesson_prod.sys_user.created_time</code>. 创建时间
+     * Setter for <code>lesson.sys_user.created_time</code>. 创建时间
      */
     public void setCreatedTime(LocalDateTime value) {
         set(10, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_user.created_time</code>. 创建时间
+     * Getter for <code>lesson.sys_user.created_time</code>. 创建时间
      */
     public LocalDateTime getCreatedTime() {
         return (LocalDateTime) get(10);
     }
 
     /**
-     * Setter for <code>lesson_prod.sys_user.update_time</code>. 更新时间
+     * Setter for <code>lesson.sys_user.update_time</code>. 更新时间
      */
     public void setUpdateTime(LocalDateTime value) {
         set(11, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_user.update_time</code>. 更新时间
+     * Getter for <code>lesson.sys_user.update_time</code>. 更新时间
      */
     public LocalDateTime getUpdateTime() {
         return (LocalDateTime) get(11);
     }
 
     /**
-     * Setter for <code>lesson_prod.sys_user.deleted</code>. 是否删除：0-未删除，1-已删除
+     * Setter for <code>lesson.sys_user.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public void setDeleted(Integer value) {
         set(12, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_user.deleted</code>. 是否删除：0-未删除，1-已删除
+     * Getter for <code>lesson.sys_user.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public Integer getDeleted() {
         return (Integer) get(12);

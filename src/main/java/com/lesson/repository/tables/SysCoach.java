@@ -6,7 +6,7 @@ package com.lesson.repository.tables;
 
 import com.lesson.repository.Indexes;
 import com.lesson.repository.Keys;
-import com.lesson.repository.LessonProd;
+import com.lesson.repository.Lesson;
 import com.lesson.repository.tables.records.SysCoachRecord;
 
 import java.time.LocalDate;
@@ -40,7 +40,7 @@ public class SysCoach extends TableImpl<SysCoachRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>lesson_prod.sys_coach</code>
+     * The reference instance of <code>lesson.sys_coach</code>
      */
     public static final SysCoach SYS_COACH = new SysCoach();
 
@@ -53,77 +53,77 @@ public class SysCoach extends TableImpl<SysCoachRecord> {
     }
 
     /**
-     * The column <code>lesson_prod.sys_coach.id</code>. 教练ID
+     * The column <code>lesson.sys_coach.id</code>. 教练ID
      */
     public final TableField<SysCoachRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "教练ID");
 
     /**
-     * The column <code>lesson_prod.sys_coach.name</code>. 姓名
+     * The column <code>lesson.sys_coach.name</code>. 姓名
      */
     public final TableField<SysCoachRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(50).nullable(false), this, "姓名");
 
     /**
-     * The column <code>lesson_prod.sys_coach.gender</code>. 性别
+     * The column <code>lesson.sys_coach.gender</code>. 性别
      */
     public final TableField<SysCoachRecord, String> GENDER = createField(DSL.name("gender"), SQLDataType.VARCHAR(20).nullable(false), this, "性别");
 
     /**
-     * The column <code>lesson_prod.sys_coach.age</code>. 年龄
+     * The column <code>lesson.sys_coach.age</code>. 年龄
      */
     public final TableField<SysCoachRecord, Integer> AGE = createField(DSL.name("age"), SQLDataType.INTEGER.nullable(false), this, "年龄");
 
     /**
-     * The column <code>lesson_prod.sys_coach.phone</code>. 联系电话
+     * The column <code>lesson.sys_coach.phone</code>. 联系电话
      */
     public final TableField<SysCoachRecord, String> PHONE = createField(DSL.name("phone"), SQLDataType.VARCHAR(20).nullable(false), this, "联系电话");
 
     /**
-     * The column <code>lesson_prod.sys_coach.avatar</code>. 头像URL
+     * The column <code>lesson.sys_coach.avatar</code>. 头像URL
      */
     public final TableField<SysCoachRecord, String> AVATAR = createField(DSL.name("avatar"), SQLDataType.VARCHAR(255), this, "头像URL");
 
     /**
-     * The column <code>lesson_prod.sys_coach.job_title</code>. 职位
+     * The column <code>lesson.sys_coach.job_title</code>. 职位
      */
     public final TableField<SysCoachRecord, String> JOB_TITLE = createField(DSL.name("job_title"), SQLDataType.VARCHAR(50).nullable(false), this, "职位");
 
     /**
-     * The column <code>lesson_prod.sys_coach.hire_date</code>. 入职日期
+     * The column <code>lesson.sys_coach.hire_date</code>. 入职日期
      */
     public final TableField<SysCoachRecord, LocalDate> HIRE_DATE = createField(DSL.name("hire_date"), SQLDataType.LOCALDATE.nullable(false), this, "入职日期");
 
     /**
-     * The column <code>lesson_prod.sys_coach.experience</code>. 教龄(年)
+     * The column <code>lesson.sys_coach.experience</code>. 教龄(年)
      */
     public final TableField<SysCoachRecord, Integer> EXPERIENCE = createField(DSL.name("experience"), SQLDataType.INTEGER.nullable(false), this, "教龄(年)");
 
     /**
-     * The column <code>lesson_prod.sys_coach.status</code>. 状态：在职/休假中/离职
+     * The column <code>lesson.sys_coach.status</code>. 状态：在职/休假中/离职
      */
     public final TableField<SysCoachRecord, String> STATUS = createField(DSL.name("status"), SQLDataType.VARCHAR(20).nullable(false), this, "状态：在职/休假中/离职");
 
     /**
-     * The column <code>lesson_prod.sys_coach.campus_id</code>. 所属校区ID
+     * The column <code>lesson.sys_coach.campus_id</code>. 所属校区ID
      */
     public final TableField<SysCoachRecord, Long> CAMPUS_ID = createField(DSL.name("campus_id"), SQLDataType.BIGINT.nullable(false), this, "所属校区ID");
 
     /**
-     * The column <code>lesson_prod.sys_coach.institution_id</code>. 所属机构ID
+     * The column <code>lesson.sys_coach.institution_id</code>. 所属机构ID
      */
     public final TableField<SysCoachRecord, Long> INSTITUTION_ID = createField(DSL.name("institution_id"), SQLDataType.BIGINT.nullable(false), this, "所属机构ID");
 
     /**
-     * The column <code>lesson_prod.sys_coach.created_time</code>. 创建时间
+     * The column <code>lesson.sys_coach.created_time</code>. 创建时间
      */
     public final TableField<SysCoachRecord, LocalDateTime> CREATED_TIME = createField(DSL.name("created_time"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "创建时间");
 
     /**
-     * The column <code>lesson_prod.sys_coach.update_time</code>. 更新时间
+     * The column <code>lesson.sys_coach.update_time</code>. 更新时间
      */
     public final TableField<SysCoachRecord, LocalDateTime> UPDATE_TIME = createField(DSL.name("update_time"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "更新时间");
 
     /**
-     * The column <code>lesson_prod.sys_coach.deleted</code>. 是否删除：0-未删除，1-已删除
+     * The column <code>lesson.sys_coach.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public final TableField<SysCoachRecord, Integer> DELETED = createField(DSL.name("deleted"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.inline("0", SQLDataType.INTEGER)), this, "是否删除：0-未删除，1-已删除");
 
@@ -136,21 +136,21 @@ public class SysCoach extends TableImpl<SysCoachRecord> {
     }
 
     /**
-     * Create an aliased <code>lesson_prod.sys_coach</code> table reference
+     * Create an aliased <code>lesson.sys_coach</code> table reference
      */
     public SysCoach(String alias) {
         this(DSL.name(alias), SYS_COACH);
     }
 
     /**
-     * Create an aliased <code>lesson_prod.sys_coach</code> table reference
+     * Create an aliased <code>lesson.sys_coach</code> table reference
      */
     public SysCoach(Name alias) {
         this(alias, SYS_COACH);
     }
 
     /**
-     * Create a <code>lesson_prod.sys_coach</code> table reference
+     * Create a <code>lesson.sys_coach</code> table reference
      */
     public SysCoach() {
         this(DSL.name("sys_coach"), null);
@@ -162,7 +162,7 @@ public class SysCoach extends TableImpl<SysCoachRecord> {
 
     @Override
     public Schema getSchema() {
-        return LessonProd.LESSON_PROD;
+        return Lesson.LESSON;
     }
 
     @Override

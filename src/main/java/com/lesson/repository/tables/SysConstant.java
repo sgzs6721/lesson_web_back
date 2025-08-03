@@ -6,7 +6,7 @@ package com.lesson.repository.tables;
 
 import com.lesson.repository.Indexes;
 import com.lesson.repository.Keys;
-import com.lesson.repository.LessonProd;
+import com.lesson.repository.Lesson;
 import com.lesson.repository.tables.records.SysConstantRecord;
 
 import java.time.LocalDateTime;
@@ -39,7 +39,7 @@ public class SysConstant extends TableImpl<SysConstantRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>lesson_prod.sys_constant</code>
+     * The reference instance of <code>lesson.sys_constant</code>
      */
     public static final SysConstant SYS_CONSTANT = new SysConstant();
 
@@ -52,47 +52,47 @@ public class SysConstant extends TableImpl<SysConstantRecord> {
     }
 
     /**
-     * The column <code>lesson_prod.sys_constant.id</code>. 主键ID
+     * The column <code>lesson.sys_constant.id</code>. 主键ID
      */
     public final TableField<SysConstantRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "主键ID");
 
     /**
-     * The column <code>lesson_prod.sys_constant.constant_key</code>. 常量键
+     * The column <code>lesson.sys_constant.constant_key</code>. 常量键
      */
     public final TableField<SysConstantRecord, String> CONSTANT_KEY = createField(DSL.name("constant_key"), SQLDataType.VARCHAR(100).nullable(false), this, "常量键");
 
     /**
-     * The column <code>lesson_prod.sys_constant.constant_value</code>. 常量值
+     * The column <code>lesson.sys_constant.constant_value</code>. 常量值
      */
     public final TableField<SysConstantRecord, String> CONSTANT_VALUE = createField(DSL.name("constant_value"), SQLDataType.VARCHAR(255).nullable(false), this, "常量值");
 
     /**
-     * The column <code>lesson_prod.sys_constant.description</code>. 描述
+     * The column <code>lesson.sys_constant.description</code>. 描述
      */
     public final TableField<SysConstantRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.VARCHAR(500), this, "描述");
 
     /**
-     * The column <code>lesson_prod.sys_constant.type</code>. 常量类型：SYSTEM-系统常量，BUSINESS-业务常量
+     * The column <code>lesson.sys_constant.type</code>. 常量类型：SYSTEM-系统常量，BUSINESS-业务常量
      */
     public final TableField<SysConstantRecord, String> TYPE = createField(DSL.name("type"), SQLDataType.VARCHAR(50).nullable(false), this, "常量类型：SYSTEM-系统常量，BUSINESS-业务常量");
 
     /**
-     * The column <code>lesson_prod.sys_constant.status</code>. 状态：0-禁用，1-启用
+     * The column <code>lesson.sys_constant.status</code>. 状态：0-禁用，1-启用
      */
     public final TableField<SysConstantRecord, Integer> STATUS = createField(DSL.name("status"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.inline("1", SQLDataType.INTEGER)), this, "状态：0-禁用，1-启用");
 
     /**
-     * The column <code>lesson_prod.sys_constant.created_time</code>. 创建时间
+     * The column <code>lesson.sys_constant.created_time</code>. 创建时间
      */
     public final TableField<SysConstantRecord, LocalDateTime> CREATED_TIME = createField(DSL.name("created_time"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "创建时间");
 
     /**
-     * The column <code>lesson_prod.sys_constant.update_time</code>. 更新时间
+     * The column <code>lesson.sys_constant.update_time</code>. 更新时间
      */
     public final TableField<SysConstantRecord, LocalDateTime> UPDATE_TIME = createField(DSL.name("update_time"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "更新时间");
 
     /**
-     * The column <code>lesson_prod.sys_constant.deleted</code>. 是否删除：0-未删除，1-已删除
+     * The column <code>lesson.sys_constant.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public final TableField<SysConstantRecord, Integer> DELETED = createField(DSL.name("deleted"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.inline("0", SQLDataType.INTEGER)), this, "是否删除：0-未删除，1-已删除");
 
@@ -105,21 +105,21 @@ public class SysConstant extends TableImpl<SysConstantRecord> {
     }
 
     /**
-     * Create an aliased <code>lesson_prod.sys_constant</code> table reference
+     * Create an aliased <code>lesson.sys_constant</code> table reference
      */
     public SysConstant(String alias) {
         this(DSL.name(alias), SYS_CONSTANT);
     }
 
     /**
-     * Create an aliased <code>lesson_prod.sys_constant</code> table reference
+     * Create an aliased <code>lesson.sys_constant</code> table reference
      */
     public SysConstant(Name alias) {
         this(alias, SYS_CONSTANT);
     }
 
     /**
-     * Create a <code>lesson_prod.sys_constant</code> table reference
+     * Create a <code>lesson.sys_constant</code> table reference
      */
     public SysConstant() {
         this(DSL.name("sys_constant"), null);
@@ -131,7 +131,7 @@ public class SysConstant extends TableImpl<SysConstantRecord> {
 
     @Override
     public Schema getSchema() {
-        return LessonProd.LESSON_PROD;
+        return Lesson.LESSON;
     }
 
     @Override

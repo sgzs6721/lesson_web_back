@@ -6,7 +6,7 @@ package com.lesson.repository.tables;
 
 import com.lesson.repository.Indexes;
 import com.lesson.repository.Keys;
-import com.lesson.repository.LessonProd;
+import com.lesson.repository.Lesson;
 import com.lesson.repository.tables.records.EduStudentRefundRecord;
 
 import java.math.BigDecimal;
@@ -40,7 +40,7 @@ public class EduStudentRefund extends TableImpl<EduStudentRefundRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>lesson_prod.edu_student_refund</code>
+     * The reference instance of <code>lesson.edu_student_refund</code>
      */
     public static final EduStudentRefund EDU_STUDENT_REFUND = new EduStudentRefund();
 
@@ -53,72 +53,72 @@ public class EduStudentRefund extends TableImpl<EduStudentRefundRecord> {
     }
 
     /**
-     * The column <code>lesson_prod.edu_student_refund.id</code>. 记录ID
+     * The column <code>lesson.edu_student_refund.id</code>. 记录ID
      */
     public final TableField<EduStudentRefundRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "记录ID");
 
     /**
-     * The column <code>lesson_prod.edu_student_refund.student_id</code>. 学员ID
+     * The column <code>lesson.edu_student_refund.student_id</code>. 学员ID
      */
     public final TableField<EduStudentRefundRecord, String> STUDENT_ID = createField(DSL.name("student_id"), SQLDataType.VARCHAR(32).nullable(false), this, "学员ID");
 
     /**
-     * The column <code>lesson_prod.edu_student_refund.course_id</code>. 课程ID
+     * The column <code>lesson.edu_student_refund.course_id</code>. 课程ID
      */
     public final TableField<EduStudentRefundRecord, String> COURSE_ID = createField(DSL.name("course_id"), SQLDataType.VARCHAR(32).nullable(false), this, "课程ID");
 
     /**
-     * The column <code>lesson_prod.edu_student_refund.refund_hours</code>. 退课课时
+     * The column <code>lesson.edu_student_refund.refund_hours</code>. 退课课时
      */
     public final TableField<EduStudentRefundRecord, BigDecimal> REFUND_HOURS = createField(DSL.name("refund_hours"), SQLDataType.DECIMAL(10, 2).nullable(false), this, "退课课时");
 
     /**
-     * The column <code>lesson_prod.edu_student_refund.refund_amount</code>. 退款金额
+     * The column <code>lesson.edu_student_refund.refund_amount</code>. 退款金额
      */
     public final TableField<EduStudentRefundRecord, BigDecimal> REFUND_AMOUNT = createField(DSL.name("refund_amount"), SQLDataType.DECIMAL(10, 2).nullable(false), this, "退款金额");
 
     /**
-     * The column <code>lesson_prod.edu_student_refund.handling_fee</code>. 手续费
+     * The column <code>lesson.edu_student_refund.handling_fee</code>. 手续费
      */
     public final TableField<EduStudentRefundRecord, BigDecimal> HANDLING_FEE = createField(DSL.name("handling_fee"), SQLDataType.DECIMAL(10, 2).nullable(false).defaultValue(DSL.inline("0.00", SQLDataType.DECIMAL)), this, "手续费");
 
     /**
-     * The column <code>lesson_prod.edu_student_refund.deduction_amount</code>. 其他费用扣除
+     * The column <code>lesson.edu_student_refund.deduction_amount</code>. 其他费用扣除
      */
     public final TableField<EduStudentRefundRecord, BigDecimal> DEDUCTION_AMOUNT = createField(DSL.name("deduction_amount"), SQLDataType.DECIMAL(10, 2).nullable(false).defaultValue(DSL.inline("0.00", SQLDataType.DECIMAL)), this, "其他费用扣除");
 
     /**
-     * The column <code>lesson_prod.edu_student_refund.actual_refund</code>. 实际退款金额
+     * The column <code>lesson.edu_student_refund.actual_refund</code>. 实际退款金额
      */
     public final TableField<EduStudentRefundRecord, BigDecimal> ACTUAL_REFUND = createField(DSL.name("actual_refund"), SQLDataType.DECIMAL(10, 2).nullable(false), this, "实际退款金额");
 
     /**
-     * The column <code>lesson_prod.edu_student_refund.reason</code>. 退费原因
+     * The column <code>lesson.edu_student_refund.reason</code>. 退费原因
      */
     public final TableField<EduStudentRefundRecord, String> REASON = createField(DSL.name("reason"), SQLDataType.VARCHAR(500).nullable(false), this, "退费原因");
 
     /**
-     * The column <code>lesson_prod.edu_student_refund.campus_id</code>. 校区ID
+     * The column <code>lesson.edu_student_refund.campus_id</code>. 校区ID
      */
     public final TableField<EduStudentRefundRecord, Long> CAMPUS_ID = createField(DSL.name("campus_id"), SQLDataType.BIGINT.nullable(false), this, "校区ID");
 
     /**
-     * The column <code>lesson_prod.edu_student_refund.institution_id</code>. 机构ID
+     * The column <code>lesson.edu_student_refund.institution_id</code>. 机构ID
      */
     public final TableField<EduStudentRefundRecord, Long> INSTITUTION_ID = createField(DSL.name("institution_id"), SQLDataType.BIGINT.nullable(false), this, "机构ID");
 
     /**
-     * The column <code>lesson_prod.edu_student_refund.created_time</code>. 创建时间
+     * The column <code>lesson.edu_student_refund.created_time</code>. 创建时间
      */
     public final TableField<EduStudentRefundRecord, LocalDateTime> CREATED_TIME = createField(DSL.name("created_time"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "创建时间");
 
     /**
-     * The column <code>lesson_prod.edu_student_refund.update_time</code>. 更新时间
+     * The column <code>lesson.edu_student_refund.update_time</code>. 更新时间
      */
     public final TableField<EduStudentRefundRecord, LocalDateTime> UPDATE_TIME = createField(DSL.name("update_time"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "更新时间");
 
     /**
-     * The column <code>lesson_prod.edu_student_refund.deleted</code>. 是否删除：0-未删除，1-已删除
+     * The column <code>lesson.edu_student_refund.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public final TableField<EduStudentRefundRecord, Integer> DELETED = createField(DSL.name("deleted"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.inline("0", SQLDataType.INTEGER)), this, "是否删除：0-未删除，1-已删除");
 
@@ -131,21 +131,21 @@ public class EduStudentRefund extends TableImpl<EduStudentRefundRecord> {
     }
 
     /**
-     * Create an aliased <code>lesson_prod.edu_student_refund</code> table reference
+     * Create an aliased <code>lesson.edu_student_refund</code> table reference
      */
     public EduStudentRefund(String alias) {
         this(DSL.name(alias), EDU_STUDENT_REFUND);
     }
 
     /**
-     * Create an aliased <code>lesson_prod.edu_student_refund</code> table reference
+     * Create an aliased <code>lesson.edu_student_refund</code> table reference
      */
     public EduStudentRefund(Name alias) {
         this(alias, EDU_STUDENT_REFUND);
     }
 
     /**
-     * Create a <code>lesson_prod.edu_student_refund</code> table reference
+     * Create a <code>lesson.edu_student_refund</code> table reference
      */
     public EduStudentRefund() {
         this(DSL.name("edu_student_refund"), null);
@@ -157,7 +157,7 @@ public class EduStudentRefund extends TableImpl<EduStudentRefundRecord> {
 
     @Override
     public Schema getSchema() {
-        return LessonProd.LESSON_PROD;
+        return Lesson.LESSON;
     }
 
     @Override

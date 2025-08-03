@@ -6,7 +6,7 @@ package com.lesson.repository.tables;
 
 import com.lesson.repository.Indexes;
 import com.lesson.repository.Keys;
-import com.lesson.repository.LessonProd;
+import com.lesson.repository.Lesson;
 import com.lesson.repository.tables.records.SysRolePermissionRecord;
 
 import java.time.LocalDateTime;
@@ -39,7 +39,7 @@ public class SysRolePermission extends TableImpl<SysRolePermissionRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>lesson_prod.sys_role_permission</code>
+     * The reference instance of <code>lesson.sys_role_permission</code>
      */
     public static final SysRolePermission SYS_ROLE_PERMISSION = new SysRolePermission();
 
@@ -52,32 +52,32 @@ public class SysRolePermission extends TableImpl<SysRolePermissionRecord> {
     }
 
     /**
-     * The column <code>lesson_prod.sys_role_permission.id</code>. 主键ID
+     * The column <code>lesson.sys_role_permission.id</code>. 主键ID
      */
     public final TableField<SysRolePermissionRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "主键ID");
 
     /**
-     * The column <code>lesson_prod.sys_role_permission.role_id</code>. 角色ID
+     * The column <code>lesson.sys_role_permission.role_id</code>. 角色ID
      */
     public final TableField<SysRolePermissionRecord, Long> ROLE_ID = createField(DSL.name("role_id"), SQLDataType.BIGINT.nullable(false), this, "角色ID");
 
     /**
-     * The column <code>lesson_prod.sys_role_permission.permission</code>. 权限标识
+     * The column <code>lesson.sys_role_permission.permission</code>. 权限标识
      */
     public final TableField<SysRolePermissionRecord, String> PERMISSION = createField(DSL.name("permission"), SQLDataType.VARCHAR(100).nullable(false), this, "权限标识");
 
     /**
-     * The column <code>lesson_prod.sys_role_permission.created_time</code>. 创建时间
+     * The column <code>lesson.sys_role_permission.created_time</code>. 创建时间
      */
     public final TableField<SysRolePermissionRecord, LocalDateTime> CREATED_TIME = createField(DSL.name("created_time"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "创建时间");
 
     /**
-     * The column <code>lesson_prod.sys_role_permission.update_time</code>. 更新时间
+     * The column <code>lesson.sys_role_permission.update_time</code>. 更新时间
      */
     public final TableField<SysRolePermissionRecord, LocalDateTime> UPDATE_TIME = createField(DSL.name("update_time"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "更新时间");
 
     /**
-     * The column <code>lesson_prod.sys_role_permission.deleted</code>. 是否删除：0-未删除，1-已删除
+     * The column <code>lesson.sys_role_permission.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public final TableField<SysRolePermissionRecord, Integer> DELETED = createField(DSL.name("deleted"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.inline("0", SQLDataType.INTEGER)), this, "是否删除：0-未删除，1-已删除");
 
@@ -90,21 +90,21 @@ public class SysRolePermission extends TableImpl<SysRolePermissionRecord> {
     }
 
     /**
-     * Create an aliased <code>lesson_prod.sys_role_permission</code> table reference
+     * Create an aliased <code>lesson.sys_role_permission</code> table reference
      */
     public SysRolePermission(String alias) {
         this(DSL.name(alias), SYS_ROLE_PERMISSION);
     }
 
     /**
-     * Create an aliased <code>lesson_prod.sys_role_permission</code> table reference
+     * Create an aliased <code>lesson.sys_role_permission</code> table reference
      */
     public SysRolePermission(Name alias) {
         this(alias, SYS_ROLE_PERMISSION);
     }
 
     /**
-     * Create a <code>lesson_prod.sys_role_permission</code> table reference
+     * Create a <code>lesson.sys_role_permission</code> table reference
      */
     public SysRolePermission() {
         this(DSL.name("sys_role_permission"), null);
@@ -116,7 +116,7 @@ public class SysRolePermission extends TableImpl<SysRolePermissionRecord> {
 
     @Override
     public Schema getSchema() {
-        return LessonProd.LESSON_PROD;
+        return Lesson.LESSON;
     }
 
     @Override

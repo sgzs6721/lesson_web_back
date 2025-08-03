@@ -24,140 +24,140 @@ public class SysInstitutionRecord extends UpdatableRecordImpl<SysInstitutionReco
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>lesson_prod.sys_institution.id</code>. 主键ID
+     * Setter for <code>lesson.sys_institution.id</code>. 主键ID
      */
     public void setId(Long value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_institution.id</code>. 主键ID
+     * Getter for <code>lesson.sys_institution.id</code>. 主键ID
      */
     public Long getId() {
         return (Long) get(0);
     }
 
     /**
-     * Setter for <code>lesson_prod.sys_institution.name</code>. 机构名称
+     * Setter for <code>lesson.sys_institution.name</code>. 机构名称
      */
     public void setName(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_institution.name</code>. 机构名称
+     * Getter for <code>lesson.sys_institution.name</code>. 机构名称
      */
     public String getName() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>lesson_prod.sys_institution.type</code>. 机构类型：1-培训机构，2-学校，3-教育集团
+     * Setter for <code>lesson.sys_institution.type</code>. 机构类型：1-培训机构，2-学校，3-教育集团
      */
     public void setType(Integer value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_institution.type</code>. 机构类型：1-培训机构，2-学校，3-教育集团
+     * Getter for <code>lesson.sys_institution.type</code>. 机构类型：1-培训机构，2-学校，3-教育集团
      */
     public Integer getType() {
         return (Integer) get(2);
     }
 
     /**
-     * Setter for <code>lesson_prod.sys_institution.description</code>. 机构简介
+     * Setter for <code>lesson.sys_institution.description</code>. 机构简介
      */
     public void setDescription(String value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_institution.description</code>. 机构简介
+     * Getter for <code>lesson.sys_institution.description</code>. 机构简介
      */
     public String getDescription() {
         return (String) get(3);
     }
 
     /**
-     * Setter for <code>lesson_prod.sys_institution.manager_name</code>. 负责人姓名
+     * Setter for <code>lesson.sys_institution.manager_name</code>. 负责人姓名
      */
     public void setManagerName(String value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_institution.manager_name</code>. 负责人姓名
+     * Getter for <code>lesson.sys_institution.manager_name</code>. 负责人姓名
      */
     public String getManagerName() {
         return (String) get(4);
     }
 
     /**
-     * Setter for <code>lesson_prod.sys_institution.manager_phone</code>. 负责人电话
+     * Setter for <code>lesson.sys_institution.manager_phone</code>. 负责人电话
      */
     public void setManagerPhone(String value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_institution.manager_phone</code>. 负责人电话
+     * Getter for <code>lesson.sys_institution.manager_phone</code>. 负责人电话
      */
     public String getManagerPhone() {
         return (String) get(5);
     }
 
     /**
-     * Setter for <code>lesson_prod.sys_institution.status</code>. 状态：0-禁用，1-启用
+     * Setter for <code>lesson.sys_institution.status</code>. 状态：0-禁用，1-启用
      */
     public void setStatus(Integer value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_institution.status</code>. 状态：0-禁用，1-启用
+     * Getter for <code>lesson.sys_institution.status</code>. 状态：0-禁用，1-启用
      */
     public Integer getStatus() {
         return (Integer) get(6);
     }
 
     /**
-     * Setter for <code>lesson_prod.sys_institution.created_time</code>. 创建时间
+     * Setter for <code>lesson.sys_institution.created_time</code>. 创建时间
      */
     public void setCreatedTime(LocalDateTime value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_institution.created_time</code>. 创建时间
+     * Getter for <code>lesson.sys_institution.created_time</code>. 创建时间
      */
     public LocalDateTime getCreatedTime() {
         return (LocalDateTime) get(7);
     }
 
     /**
-     * Setter for <code>lesson_prod.sys_institution.update_time</code>. 更新时间
+     * Setter for <code>lesson.sys_institution.update_time</code>. 更新时间
      */
     public void setUpdateTime(LocalDateTime value) {
         set(8, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_institution.update_time</code>. 更新时间
+     * Getter for <code>lesson.sys_institution.update_time</code>. 更新时间
      */
     public LocalDateTime getUpdateTime() {
         return (LocalDateTime) get(8);
     }
 
     /**
-     * Setter for <code>lesson_prod.sys_institution.deleted</code>. 是否删除：0-未删除，1-已删除
+     * Setter for <code>lesson.sys_institution.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public void setDeleted(Integer value) {
         set(9, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_institution.deleted</code>. 是否删除：0-未删除，1-已删除
+     * Getter for <code>lesson.sys_institution.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public Integer getDeleted() {
         return (Integer) get(9);

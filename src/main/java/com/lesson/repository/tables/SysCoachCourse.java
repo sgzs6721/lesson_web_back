@@ -6,7 +6,7 @@ package com.lesson.repository.tables;
 
 import com.lesson.repository.Indexes;
 import com.lesson.repository.Keys;
-import com.lesson.repository.LessonProd;
+import com.lesson.repository.Lesson;
 import com.lesson.repository.tables.records.SysCoachCourseRecord;
 
 import java.time.LocalDateTime;
@@ -39,7 +39,7 @@ public class SysCoachCourse extends TableImpl<SysCoachCourseRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>lesson_prod.sys_coach_course</code>
+     * The reference instance of <code>lesson.sys_coach_course</code>
      */
     public static final SysCoachCourse SYS_COACH_COURSE = new SysCoachCourse();
 
@@ -52,32 +52,32 @@ public class SysCoachCourse extends TableImpl<SysCoachCourseRecord> {
     }
 
     /**
-     * The column <code>lesson_prod.sys_coach_course.id</code>. 主键ID
+     * The column <code>lesson.sys_coach_course.id</code>. 主键ID
      */
     public final TableField<SysCoachCourseRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "主键ID");
 
     /**
-     * The column <code>lesson_prod.sys_coach_course.coach_id</code>. 关联教练ID
+     * The column <code>lesson.sys_coach_course.coach_id</code>. 关联教练ID
      */
     public final TableField<SysCoachCourseRecord, Long> COACH_ID = createField(DSL.name("coach_id"), SQLDataType.BIGINT.nullable(false), this, "关联教练ID");
 
     /**
-     * The column <code>lesson_prod.sys_coach_course.course_id</code>. 关联课程ID
+     * The column <code>lesson.sys_coach_course.course_id</code>. 关联课程ID
      */
     public final TableField<SysCoachCourseRecord, Long> COURSE_ID = createField(DSL.name("course_id"), SQLDataType.BIGINT.nullable(false), this, "关联课程ID");
 
     /**
-     * The column <code>lesson_prod.sys_coach_course.created_time</code>. 创建时间
+     * The column <code>lesson.sys_coach_course.created_time</code>. 创建时间
      */
     public final TableField<SysCoachCourseRecord, LocalDateTime> CREATED_TIME = createField(DSL.name("created_time"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "创建时间");
 
     /**
-     * The column <code>lesson_prod.sys_coach_course.update_time</code>. 更新时间
+     * The column <code>lesson.sys_coach_course.update_time</code>. 更新时间
      */
     public final TableField<SysCoachCourseRecord, LocalDateTime> UPDATE_TIME = createField(DSL.name("update_time"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "更新时间");
 
     /**
-     * The column <code>lesson_prod.sys_coach_course.deleted</code>. 是否删除：0-未删除，1-已删除
+     * The column <code>lesson.sys_coach_course.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public final TableField<SysCoachCourseRecord, Integer> DELETED = createField(DSL.name("deleted"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.inline("0", SQLDataType.INTEGER)), this, "是否删除：0-未删除，1-已删除");
 
@@ -90,21 +90,21 @@ public class SysCoachCourse extends TableImpl<SysCoachCourseRecord> {
     }
 
     /**
-     * Create an aliased <code>lesson_prod.sys_coach_course</code> table reference
+     * Create an aliased <code>lesson.sys_coach_course</code> table reference
      */
     public SysCoachCourse(String alias) {
         this(DSL.name(alias), SYS_COACH_COURSE);
     }
 
     /**
-     * Create an aliased <code>lesson_prod.sys_coach_course</code> table reference
+     * Create an aliased <code>lesson.sys_coach_course</code> table reference
      */
     public SysCoachCourse(Name alias) {
         this(alias, SYS_COACH_COURSE);
     }
 
     /**
-     * Create a <code>lesson_prod.sys_coach_course</code> table reference
+     * Create a <code>lesson.sys_coach_course</code> table reference
      */
     public SysCoachCourse() {
         this(DSL.name("sys_coach_course"), null);
@@ -116,7 +116,7 @@ public class SysCoachCourse extends TableImpl<SysCoachCourseRecord> {
 
     @Override
     public Schema getSchema() {
-        return LessonProd.LESSON_PROD;
+        return Lesson.LESSON;
     }
 
     @Override

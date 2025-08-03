@@ -24,98 +24,98 @@ public class SysRoleRecord extends UpdatableRecordImpl<SysRoleRecord> implements
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>lesson_prod.sys_role.id</code>. 主键ID
+     * Setter for <code>lesson.sys_role.id</code>. 主键ID
      */
     public void setId(Long value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_role.id</code>. 主键ID
+     * Getter for <code>lesson.sys_role.id</code>. 主键ID
      */
     public Long getId() {
         return (Long) get(0);
     }
 
     /**
-     * Setter for <code>lesson_prod.sys_role.role_name</code>. 角色名称
+     * Setter for <code>lesson.sys_role.role_name</code>. 角色名称
      */
     public void setRoleName(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_role.role_name</code>. 角色名称
+     * Getter for <code>lesson.sys_role.role_name</code>. 角色名称
      */
     public String getRoleName() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>lesson_prod.sys_role.description</code>. 角色描述
+     * Setter for <code>lesson.sys_role.description</code>. 角色描述
      */
     public void setDescription(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_role.description</code>. 角色描述
+     * Getter for <code>lesson.sys_role.description</code>. 角色描述
      */
     public String getDescription() {
         return (String) get(2);
     }
 
     /**
-     * Setter for <code>lesson_prod.sys_role.status</code>. 状态：0-禁用，1-启用
+     * Setter for <code>lesson.sys_role.status</code>. 状态：0-禁用，1-启用
      */
     public void setStatus(Integer value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_role.status</code>. 状态：0-禁用，1-启用
+     * Getter for <code>lesson.sys_role.status</code>. 状态：0-禁用，1-启用
      */
     public Integer getStatus() {
         return (Integer) get(3);
     }
 
     /**
-     * Setter for <code>lesson_prod.sys_role.created_time</code>. 创建时间
+     * Setter for <code>lesson.sys_role.created_time</code>. 创建时间
      */
     public void setCreatedTime(LocalDateTime value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_role.created_time</code>. 创建时间
+     * Getter for <code>lesson.sys_role.created_time</code>. 创建时间
      */
     public LocalDateTime getCreatedTime() {
         return (LocalDateTime) get(4);
     }
 
     /**
-     * Setter for <code>lesson_prod.sys_role.update_time</code>. 更新时间
+     * Setter for <code>lesson.sys_role.update_time</code>. 更新时间
      */
     public void setUpdateTime(LocalDateTime value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_role.update_time</code>. 更新时间
+     * Getter for <code>lesson.sys_role.update_time</code>. 更新时间
      */
     public LocalDateTime getUpdateTime() {
         return (LocalDateTime) get(5);
     }
 
     /**
-     * Setter for <code>lesson_prod.sys_role.deleted</code>. 是否删除：0-未删除，1-已删除
+     * Setter for <code>lesson.sys_role.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public void setDeleted(Integer value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_role.deleted</code>. 是否删除：0-未删除，1-已删除
+     * Getter for <code>lesson.sys_role.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public Integer getDeleted() {
         return (Integer) get(6);

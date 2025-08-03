@@ -43,6 +43,7 @@ import com.lesson.repository.tables.records.SysRolePermissionRecord;
 import com.lesson.repository.tables.records.SysRoleRecord;
 import com.lesson.repository.tables.records.SysUserRecord;
 
+import org.jooq.ForeignKey;
 import org.jooq.TableField;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
@@ -51,7 +52,7 @@ import org.jooq.impl.Internal;
 
 /**
  * A class modelling foreign key relationships and constraints of tables in 
- * lesson_prod.
+ * lesson.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Keys {
@@ -86,4 +87,10 @@ public class Keys {
     public static final UniqueKey<SysRolePermissionRecord> KEY_SYS_ROLE_PERMISSION_UK_ROLE_PERMISSION = Internal.createUniqueKey(SysRolePermission.SYS_ROLE_PERMISSION, DSL.name("KEY_sys_role_permission_uk_role_permission"), new TableField[] { SysRolePermission.SYS_ROLE_PERMISSION.ROLE_ID, SysRolePermission.SYS_ROLE_PERMISSION.PERMISSION }, true);
     public static final UniqueKey<SysUserRecord> KEY_SYS_USER_PRIMARY = Internal.createUniqueKey(SysUser.SYS_USER, DSL.name("KEY_sys_user_PRIMARY"), new TableField[] { SysUser.SYS_USER.ID }, true);
     public static final UniqueKey<SysUserRecord> KEY_SYS_USER_UK_PHONE = Internal.createUniqueKey(SysUser.SYS_USER, DSL.name("KEY_sys_user_uk_phone"), new TableField[] { SysUser.SYS_USER.PHONE }, true);
+
+    // -------------------------------------------------------------------------
+    // FOREIGN KEY definitions
+    // -------------------------------------------------------------------------
+
+    public static final ForeignKey<EduStudentCourseRecordRecord, SysConstantRecord> FK_ATTENDANCE_STATUS = Internal.createForeignKey(com.lesson.repository.tables.EduStudentCourseRecord.EDU_STUDENT_COURSE_RECORD, DSL.name("fk_attendance_status"), new TableField[] { com.lesson.repository.tables.EduStudentCourseRecord.EDU_STUDENT_COURSE_RECORD.STATUS_ID }, Keys.KEY_SYS_CONSTANT_PRIMARY, new TableField[] { SysConstant.SYS_CONSTANT.ID }, true);
 }

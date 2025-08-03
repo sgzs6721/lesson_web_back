@@ -6,7 +6,7 @@ package com.lesson.repository.tables;
 
 import com.lesson.repository.Indexes;
 import com.lesson.repository.Keys;
-import com.lesson.repository.LessonProd;
+import com.lesson.repository.Lesson;
 import com.lesson.repository.tables.records.SysInstitutionRecord;
 
 import java.time.LocalDateTime;
@@ -39,7 +39,7 @@ public class SysInstitution extends TableImpl<SysInstitutionRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>lesson_prod.sys_institution</code>
+     * The reference instance of <code>lesson.sys_institution</code>
      */
     public static final SysInstitution SYS_INSTITUTION = new SysInstitution();
 
@@ -52,52 +52,52 @@ public class SysInstitution extends TableImpl<SysInstitutionRecord> {
     }
 
     /**
-     * The column <code>lesson_prod.sys_institution.id</code>. 主键ID
+     * The column <code>lesson.sys_institution.id</code>. 主键ID
      */
     public final TableField<SysInstitutionRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "主键ID");
 
     /**
-     * The column <code>lesson_prod.sys_institution.name</code>. 机构名称
+     * The column <code>lesson.sys_institution.name</code>. 机构名称
      */
     public final TableField<SysInstitutionRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(100).nullable(false), this, "机构名称");
 
     /**
-     * The column <code>lesson_prod.sys_institution.type</code>. 机构类型：1-培训机构，2-学校，3-教育集团
+     * The column <code>lesson.sys_institution.type</code>. 机构类型：1-培训机构，2-学校，3-教育集团
      */
     public final TableField<SysInstitutionRecord, Integer> TYPE = createField(DSL.name("type"), SQLDataType.INTEGER.nullable(false), this, "机构类型：1-培训机构，2-学校，3-教育集团");
 
     /**
-     * The column <code>lesson_prod.sys_institution.description</code>. 机构简介
+     * The column <code>lesson.sys_institution.description</code>. 机构简介
      */
     public final TableField<SysInstitutionRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB, this, "机构简介");
 
     /**
-     * The column <code>lesson_prod.sys_institution.manager_name</code>. 负责人姓名
+     * The column <code>lesson.sys_institution.manager_name</code>. 负责人姓名
      */
     public final TableField<SysInstitutionRecord, String> MANAGER_NAME = createField(DSL.name("manager_name"), SQLDataType.VARCHAR(50).nullable(false), this, "负责人姓名");
 
     /**
-     * The column <code>lesson_prod.sys_institution.manager_phone</code>. 负责人电话
+     * The column <code>lesson.sys_institution.manager_phone</code>. 负责人电话
      */
     public final TableField<SysInstitutionRecord, String> MANAGER_PHONE = createField(DSL.name("manager_phone"), SQLDataType.VARCHAR(20).nullable(false), this, "负责人电话");
 
     /**
-     * The column <code>lesson_prod.sys_institution.status</code>. 状态：0-禁用，1-启用
+     * The column <code>lesson.sys_institution.status</code>. 状态：0-禁用，1-启用
      */
     public final TableField<SysInstitutionRecord, Integer> STATUS = createField(DSL.name("status"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.inline("1", SQLDataType.INTEGER)), this, "状态：0-禁用，1-启用");
 
     /**
-     * The column <code>lesson_prod.sys_institution.created_time</code>. 创建时间
+     * The column <code>lesson.sys_institution.created_time</code>. 创建时间
      */
     public final TableField<SysInstitutionRecord, LocalDateTime> CREATED_TIME = createField(DSL.name("created_time"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "创建时间");
 
     /**
-     * The column <code>lesson_prod.sys_institution.update_time</code>. 更新时间
+     * The column <code>lesson.sys_institution.update_time</code>. 更新时间
      */
     public final TableField<SysInstitutionRecord, LocalDateTime> UPDATE_TIME = createField(DSL.name("update_time"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "更新时间");
 
     /**
-     * The column <code>lesson_prod.sys_institution.deleted</code>. 是否删除：0-未删除，1-已删除
+     * The column <code>lesson.sys_institution.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public final TableField<SysInstitutionRecord, Integer> DELETED = createField(DSL.name("deleted"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.inline("0", SQLDataType.INTEGER)), this, "是否删除：0-未删除，1-已删除");
 
@@ -110,21 +110,21 @@ public class SysInstitution extends TableImpl<SysInstitutionRecord> {
     }
 
     /**
-     * Create an aliased <code>lesson_prod.sys_institution</code> table reference
+     * Create an aliased <code>lesson.sys_institution</code> table reference
      */
     public SysInstitution(String alias) {
         this(DSL.name(alias), SYS_INSTITUTION);
     }
 
     /**
-     * Create an aliased <code>lesson_prod.sys_institution</code> table reference
+     * Create an aliased <code>lesson.sys_institution</code> table reference
      */
     public SysInstitution(Name alias) {
         this(alias, SYS_INSTITUTION);
     }
 
     /**
-     * Create a <code>lesson_prod.sys_institution</code> table reference
+     * Create a <code>lesson.sys_institution</code> table reference
      */
     public SysInstitution() {
         this(DSL.name("sys_institution"), null);
@@ -136,7 +136,7 @@ public class SysInstitution extends TableImpl<SysInstitutionRecord> {
 
     @Override
     public Schema getSchema() {
-        return LessonProd.LESSON_PROD;
+        return Lesson.LESSON;
     }
 
     @Override

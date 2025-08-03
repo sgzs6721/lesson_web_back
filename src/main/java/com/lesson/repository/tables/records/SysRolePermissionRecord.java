@@ -24,84 +24,84 @@ public class SysRolePermissionRecord extends UpdatableRecordImpl<SysRolePermissi
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>lesson_prod.sys_role_permission.id</code>. 主键ID
+     * Setter for <code>lesson.sys_role_permission.id</code>. 主键ID
      */
     public void setId(Long value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_role_permission.id</code>. 主键ID
+     * Getter for <code>lesson.sys_role_permission.id</code>. 主键ID
      */
     public Long getId() {
         return (Long) get(0);
     }
 
     /**
-     * Setter for <code>lesson_prod.sys_role_permission.role_id</code>. 角色ID
+     * Setter for <code>lesson.sys_role_permission.role_id</code>. 角色ID
      */
     public void setRoleId(Long value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_role_permission.role_id</code>. 角色ID
+     * Getter for <code>lesson.sys_role_permission.role_id</code>. 角色ID
      */
     public Long getRoleId() {
         return (Long) get(1);
     }
 
     /**
-     * Setter for <code>lesson_prod.sys_role_permission.permission</code>. 权限标识
+     * Setter for <code>lesson.sys_role_permission.permission</code>. 权限标识
      */
     public void setPermission(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_role_permission.permission</code>. 权限标识
+     * Getter for <code>lesson.sys_role_permission.permission</code>. 权限标识
      */
     public String getPermission() {
         return (String) get(2);
     }
 
     /**
-     * Setter for <code>lesson_prod.sys_role_permission.created_time</code>. 创建时间
+     * Setter for <code>lesson.sys_role_permission.created_time</code>. 创建时间
      */
     public void setCreatedTime(LocalDateTime value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_role_permission.created_time</code>. 创建时间
+     * Getter for <code>lesson.sys_role_permission.created_time</code>. 创建时间
      */
     public LocalDateTime getCreatedTime() {
         return (LocalDateTime) get(3);
     }
 
     /**
-     * Setter for <code>lesson_prod.sys_role_permission.update_time</code>. 更新时间
+     * Setter for <code>lesson.sys_role_permission.update_time</code>. 更新时间
      */
     public void setUpdateTime(LocalDateTime value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_role_permission.update_time</code>. 更新时间
+     * Getter for <code>lesson.sys_role_permission.update_time</code>. 更新时间
      */
     public LocalDateTime getUpdateTime() {
         return (LocalDateTime) get(4);
     }
 
     /**
-     * Setter for <code>lesson_prod.sys_role_permission.deleted</code>. 是否删除：0-未删除，1-已删除
+     * Setter for <code>lesson.sys_role_permission.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public void setDeleted(Integer value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>lesson_prod.sys_role_permission.deleted</code>. 是否删除：0-未删除，1-已删除
+     * Getter for <code>lesson.sys_role_permission.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public Integer getDeleted() {
         return (Integer) get(5);
