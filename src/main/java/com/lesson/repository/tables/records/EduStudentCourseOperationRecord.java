@@ -25,308 +25,308 @@ public class EduStudentCourseOperationRecord extends UpdatableRecordImpl<EduStud
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>lesson.edu_student_course_operation.id</code>. 记录ID
+     * Setter for <code>lesson_prod.edu_student_course_operation.id</code>. 记录ID
      */
     public void setId(Long value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_course_operation.id</code>. 记录ID
+     * Getter for <code>lesson_prod.edu_student_course_operation.id</code>. 记录ID
      */
     public Long getId() {
         return (Long) get(0);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_course_operation.student_id</code>. 学员ID
+     * Setter for <code>lesson_prod.edu_student_course_operation.student_id</code>. 学员ID
      */
     public void setStudentId(Long value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_course_operation.student_id</code>. 学员ID
+     * Getter for <code>lesson_prod.edu_student_course_operation.student_id</code>. 学员ID
      */
     public Long getStudentId() {
         return (Long) get(1);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_course_operation.student_name</code>. 学员姓名
+     * Setter for <code>lesson_prod.edu_student_course_operation.student_name</code>. 学员姓名
      */
     public void setStudentName(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_course_operation.student_name</code>. 学员姓名
+     * Getter for <code>lesson_prod.edu_student_course_operation.student_name</code>. 学员姓名
      */
     public String getStudentName() {
         return (String) get(2);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_course_operation.course_id</code>. 课程ID
+     * Setter for <code>lesson_prod.edu_student_course_operation.course_id</code>. 课程ID
      */
     public void setCourseId(Long value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_course_operation.course_id</code>. 课程ID
+     * Getter for <code>lesson_prod.edu_student_course_operation.course_id</code>. 课程ID
      */
     public Long getCourseId() {
         return (Long) get(3);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_course_operation.operation_type</code>. 操作类型：TRANSFER_COURSE-转课，TRANSFER_CLASS-转班，REFUND-退费
+     * Setter for <code>lesson_prod.edu_student_course_operation.operation_type</code>. 操作类型：TRANSFER_COURSE-转课，TRANSFER_CLASS-转班，REFUND-退费
      */
     public void setOperationType(String value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_course_operation.operation_type</code>. 操作类型：TRANSFER_COURSE-转课，TRANSFER_CLASS-转班，REFUND-退费
+     * Getter for <code>lesson_prod.edu_student_course_operation.operation_type</code>. 操作类型：TRANSFER_COURSE-转课，TRANSFER_CLASS-转班，REFUND-退费
      */
     public String getOperationType() {
         return (String) get(4);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_course_operation.before_status</code>. 操作前状态
+     * Setter for <code>lesson_prod.edu_student_course_operation.before_status</code>. 操作前状态
      */
     public void setBeforeStatus(String value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_course_operation.before_status</code>. 操作前状态
+     * Getter for <code>lesson_prod.edu_student_course_operation.before_status</code>. 操作前状态
      */
     public String getBeforeStatus() {
         return (String) get(5);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_course_operation.after_status</code>. 操作后状态
+     * Setter for <code>lesson_prod.edu_student_course_operation.after_status</code>. 操作后状态
      */
     public void setAfterStatus(String value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_course_operation.after_status</code>. 操作后状态
+     * Getter for <code>lesson_prod.edu_student_course_operation.after_status</code>. 操作后状态
      */
     public String getAfterStatus() {
         return (String) get(6);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_course_operation.source_course_id</code>. 原课程ID
+     * Setter for <code>lesson_prod.edu_student_course_operation.source_course_id</code>. 原课程ID
      */
     public void setSourceCourseId(Long value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_course_operation.source_course_id</code>. 原课程ID
+     * Getter for <code>lesson_prod.edu_student_course_operation.source_course_id</code>. 原课程ID
      */
     public Long getSourceCourseId() {
         return (Long) get(7);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_course_operation.target_course_id</code>. 目标课程ID
+     * Setter for <code>lesson_prod.edu_student_course_operation.target_course_id</code>. 目标课程ID
      */
     public void setTargetCourseId(Long value) {
         set(8, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_course_operation.target_course_id</code>. 目标课程ID
+     * Getter for <code>lesson_prod.edu_student_course_operation.target_course_id</code>. 目标课程ID
      */
     public Long getTargetCourseId() {
         return (Long) get(8);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_course_operation.source_class_id</code>. 原班级ID
+     * Setter for <code>lesson_prod.edu_student_course_operation.source_class_id</code>. 原班级ID
      */
     public void setSourceClassId(Long value) {
         set(9, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_course_operation.source_class_id</code>. 原班级ID
+     * Getter for <code>lesson_prod.edu_student_course_operation.source_class_id</code>. 原班级ID
      */
     public Long getSourceClassId() {
         return (Long) get(9);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_course_operation.source_class_name</code>. 原班级名称
+     * Setter for <code>lesson_prod.edu_student_course_operation.source_class_name</code>. 原班级名称
      */
     public void setSourceClassName(String value) {
         set(10, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_course_operation.source_class_name</code>. 原班级名称
+     * Getter for <code>lesson_prod.edu_student_course_operation.source_class_name</code>. 原班级名称
      */
     public String getSourceClassName() {
         return (String) get(10);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_course_operation.target_class_id</code>. 目标班级ID
+     * Setter for <code>lesson_prod.edu_student_course_operation.target_class_id</code>. 目标班级ID
      */
     public void setTargetClassId(Long value) {
         set(11, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_course_operation.target_class_id</code>. 目标班级ID
+     * Getter for <code>lesson_prod.edu_student_course_operation.target_class_id</code>. 目标班级ID
      */
     public Long getTargetClassId() {
         return (Long) get(11);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_course_operation.target_class_name</code>. 目标班级名称
+     * Setter for <code>lesson_prod.edu_student_course_operation.target_class_name</code>. 目标班级名称
      */
     public void setTargetClassName(String value) {
         set(12, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_course_operation.target_class_name</code>. 目标班级名称
+     * Getter for <code>lesson_prod.edu_student_course_operation.target_class_name</code>. 目标班级名称
      */
     public String getTargetClassName() {
         return (String) get(12);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_course_operation.refund_amount</code>. 退费金额
+     * Setter for <code>lesson_prod.edu_student_course_operation.refund_amount</code>. 退费金额
      */
     public void setRefundAmount(BigDecimal value) {
         set(13, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_course_operation.refund_amount</code>. 退费金额
+     * Getter for <code>lesson_prod.edu_student_course_operation.refund_amount</code>. 退费金额
      */
     public BigDecimal getRefundAmount() {
         return (BigDecimal) get(13);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_course_operation.refund_method</code>. 退费方式：CASH-现金，BANK_TRANSFER-银行转账，WECHAT-微信，ALIPAY-支付宝
+     * Setter for <code>lesson_prod.edu_student_course_operation.refund_method</code>. 退费方式：CASH-现金，BANK_TRANSFER-银行转账，WECHAT-微信，ALIPAY-支付宝
      */
     public void setRefundMethod(String value) {
         set(14, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_course_operation.refund_method</code>. 退费方式：CASH-现金，BANK_TRANSFER-银行转账，WECHAT-微信，ALIPAY-支付宝
+     * Getter for <code>lesson_prod.edu_student_course_operation.refund_method</code>. 退费方式：CASH-现金，BANK_TRANSFER-银行转账，WECHAT-微信，ALIPAY-支付宝
      */
     public String getRefundMethod() {
         return (String) get(14);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_course_operation.operation_reason</code>. 操作原因
+     * Setter for <code>lesson_prod.edu_student_course_operation.operation_reason</code>. 操作原因
      */
     public void setOperationReason(String value) {
         set(15, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_course_operation.operation_reason</code>. 操作原因
+     * Getter for <code>lesson_prod.edu_student_course_operation.operation_reason</code>. 操作原因
      */
     public String getOperationReason() {
         return (String) get(15);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_course_operation.operator_id</code>. 操作人ID
+     * Setter for <code>lesson_prod.edu_student_course_operation.operator_id</code>. 操作人ID
      */
     public void setOperatorId(Long value) {
         set(16, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_course_operation.operator_id</code>. 操作人ID
+     * Getter for <code>lesson_prod.edu_student_course_operation.operator_id</code>. 操作人ID
      */
     public Long getOperatorId() {
         return (Long) get(16);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_course_operation.operator_name</code>. 操作人姓名
+     * Setter for <code>lesson_prod.edu_student_course_operation.operator_name</code>. 操作人姓名
      */
     public void setOperatorName(String value) {
         set(17, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_course_operation.operator_name</code>. 操作人姓名
+     * Getter for <code>lesson_prod.edu_student_course_operation.operator_name</code>. 操作人姓名
      */
     public String getOperatorName() {
         return (String) get(17);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_course_operation.operation_time</code>. 操作时间
+     * Setter for <code>lesson_prod.edu_student_course_operation.operation_time</code>. 操作时间
      */
     public void setOperationTime(LocalDateTime value) {
         set(18, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_course_operation.operation_time</code>. 操作时间
+     * Getter for <code>lesson_prod.edu_student_course_operation.operation_time</code>. 操作时间
      */
     public LocalDateTime getOperationTime() {
         return (LocalDateTime) get(18);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_course_operation.created_time</code>. 创建时间
+     * Setter for <code>lesson_prod.edu_student_course_operation.created_time</code>. 创建时间
      */
     public void setCreatedTime(LocalDateTime value) {
         set(19, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_course_operation.created_time</code>. 创建时间
+     * Getter for <code>lesson_prod.edu_student_course_operation.created_time</code>. 创建时间
      */
     public LocalDateTime getCreatedTime() {
         return (LocalDateTime) get(19);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_course_operation.update_time</code>. 更新时间
+     * Setter for <code>lesson_prod.edu_student_course_operation.update_time</code>. 更新时间
      */
     public void setUpdateTime(LocalDateTime value) {
         set(20, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_course_operation.update_time</code>. 更新时间
+     * Getter for <code>lesson_prod.edu_student_course_operation.update_time</code>. 更新时间
      */
     public LocalDateTime getUpdateTime() {
         return (LocalDateTime) get(20);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_course_operation.deleted</code>. 是否删除：0-未删除，1-已删除
+     * Setter for <code>lesson_prod.edu_student_course_operation.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public void setDeleted(Integer value) {
         set(21, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_course_operation.deleted</code>. 是否删除：0-未删除，1-已删除
+     * Getter for <code>lesson_prod.edu_student_course_operation.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public Integer getDeleted() {
         return (Integer) get(21);

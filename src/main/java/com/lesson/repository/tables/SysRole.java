@@ -6,7 +6,7 @@ package com.lesson.repository.tables;
 
 import com.lesson.repository.Indexes;
 import com.lesson.repository.Keys;
-import com.lesson.repository.Lesson;
+import com.lesson.repository.LessonProd;
 import com.lesson.repository.tables.records.SysRoleRecord;
 
 import java.time.LocalDateTime;
@@ -39,7 +39,7 @@ public class SysRole extends TableImpl<SysRoleRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>lesson.sys_role</code>
+     * The reference instance of <code>lesson_prod.sys_role</code>
      */
     public static final SysRole SYS_ROLE = new SysRole();
 
@@ -52,37 +52,37 @@ public class SysRole extends TableImpl<SysRoleRecord> {
     }
 
     /**
-     * The column <code>lesson.sys_role.id</code>. 主键ID
+     * The column <code>lesson_prod.sys_role.id</code>. 主键ID
      */
     public final TableField<SysRoleRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "主键ID");
 
     /**
-     * The column <code>lesson.sys_role.role_name</code>. 角色名称
+     * The column <code>lesson_prod.sys_role.role_name</code>. 角色名称
      */
     public final TableField<SysRoleRecord, String> ROLE_NAME = createField(DSL.name("role_name"), SQLDataType.VARCHAR(50).nullable(false), this, "角色名称");
 
     /**
-     * The column <code>lesson.sys_role.description</code>. 角色描述
+     * The column <code>lesson_prod.sys_role.description</code>. 角色描述
      */
     public final TableField<SysRoleRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.VARCHAR(200), this, "角色描述");
 
     /**
-     * The column <code>lesson.sys_role.status</code>. 状态：0-禁用，1-启用
+     * The column <code>lesson_prod.sys_role.status</code>. 状态：0-禁用，1-启用
      */
     public final TableField<SysRoleRecord, Integer> STATUS = createField(DSL.name("status"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.inline("1", SQLDataType.INTEGER)), this, "状态：0-禁用，1-启用");
 
     /**
-     * The column <code>lesson.sys_role.created_time</code>. 创建时间
+     * The column <code>lesson_prod.sys_role.created_time</code>. 创建时间
      */
     public final TableField<SysRoleRecord, LocalDateTime> CREATED_TIME = createField(DSL.name("created_time"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "创建时间");
 
     /**
-     * The column <code>lesson.sys_role.update_time</code>. 更新时间
+     * The column <code>lesson_prod.sys_role.update_time</code>. 更新时间
      */
     public final TableField<SysRoleRecord, LocalDateTime> UPDATE_TIME = createField(DSL.name("update_time"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "更新时间");
 
     /**
-     * The column <code>lesson.sys_role.deleted</code>. 是否删除：0-未删除，1-已删除
+     * The column <code>lesson_prod.sys_role.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public final TableField<SysRoleRecord, Integer> DELETED = createField(DSL.name("deleted"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.inline("0", SQLDataType.INTEGER)), this, "是否删除：0-未删除，1-已删除");
 
@@ -95,21 +95,21 @@ public class SysRole extends TableImpl<SysRoleRecord> {
     }
 
     /**
-     * Create an aliased <code>lesson.sys_role</code> table reference
+     * Create an aliased <code>lesson_prod.sys_role</code> table reference
      */
     public SysRole(String alias) {
         this(DSL.name(alias), SYS_ROLE);
     }
 
     /**
-     * Create an aliased <code>lesson.sys_role</code> table reference
+     * Create an aliased <code>lesson_prod.sys_role</code> table reference
      */
     public SysRole(Name alias) {
         this(alias, SYS_ROLE);
     }
 
     /**
-     * Create a <code>lesson.sys_role</code> table reference
+     * Create a <code>lesson_prod.sys_role</code> table reference
      */
     public SysRole() {
         this(DSL.name("sys_role"), null);
@@ -121,7 +121,7 @@ public class SysRole extends TableImpl<SysRoleRecord> {
 
     @Override
     public Schema getSchema() {
-        return Lesson.LESSON;
+        return LessonProd.LESSON_PROD;
     }
 
     @Override

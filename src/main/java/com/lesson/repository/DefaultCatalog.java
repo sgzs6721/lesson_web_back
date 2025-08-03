@@ -25,9 +25,9 @@ public class DefaultCatalog extends CatalogImpl {
     public static final DefaultCatalog DEFAULT_CATALOG = new DefaultCatalog();
 
     /**
-     * The schema <code>lesson</code>.
+     * The schema <code>lesson_prod</code>.
      */
-    public final Lesson LESSON = Lesson.LESSON;
+    public final LessonProd LESSON_PROD = LessonProd.LESSON_PROD;
 
     /**
      * No further instances allowed
@@ -39,6 +39,6 @@ public class DefaultCatalog extends CatalogImpl {
     @Override
     public final List<Schema> getSchemas() {
         return Arrays.<Schema>asList(
-            Lesson.LESSON);
+            LessonProd.LESSON_PROD);
     }
 }

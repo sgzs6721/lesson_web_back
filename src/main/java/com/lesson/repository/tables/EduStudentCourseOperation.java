@@ -6,7 +6,7 @@ package com.lesson.repository.tables;
 
 import com.lesson.repository.Indexes;
 import com.lesson.repository.Keys;
-import com.lesson.repository.Lesson;
+import com.lesson.repository.LessonProd;
 import com.lesson.repository.tables.records.EduStudentCourseOperationRecord;
 
 import java.math.BigDecimal;
@@ -40,7 +40,7 @@ public class EduStudentCourseOperation extends TableImpl<EduStudentCourseOperati
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>lesson.edu_student_course_operation</code>
+     * The reference instance of <code>lesson_prod.edu_student_course_operation</code>
      */
     public static final EduStudentCourseOperation EDU_STUDENT_COURSE_OPERATION = new EduStudentCourseOperation();
 
@@ -53,112 +53,112 @@ public class EduStudentCourseOperation extends TableImpl<EduStudentCourseOperati
     }
 
     /**
-     * The column <code>lesson.edu_student_course_operation.id</code>. 记录ID
+     * The column <code>lesson_prod.edu_student_course_operation.id</code>. 记录ID
      */
     public final TableField<EduStudentCourseOperationRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "记录ID");
 
     /**
-     * The column <code>lesson.edu_student_course_operation.student_id</code>. 学员ID
+     * The column <code>lesson_prod.edu_student_course_operation.student_id</code>. 学员ID
      */
     public final TableField<EduStudentCourseOperationRecord, Long> STUDENT_ID = createField(DSL.name("student_id"), SQLDataType.BIGINT.nullable(false), this, "学员ID");
 
     /**
-     * The column <code>lesson.edu_student_course_operation.student_name</code>. 学员姓名
+     * The column <code>lesson_prod.edu_student_course_operation.student_name</code>. 学员姓名
      */
     public final TableField<EduStudentCourseOperationRecord, String> STUDENT_NAME = createField(DSL.name("student_name"), SQLDataType.VARCHAR(50).nullable(false), this, "学员姓名");
 
     /**
-     * The column <code>lesson.edu_student_course_operation.course_id</code>. 课程ID
+     * The column <code>lesson_prod.edu_student_course_operation.course_id</code>. 课程ID
      */
     public final TableField<EduStudentCourseOperationRecord, Long> COURSE_ID = createField(DSL.name("course_id"), SQLDataType.BIGINT.nullable(false), this, "课程ID");
 
     /**
-     * The column <code>lesson.edu_student_course_operation.operation_type</code>. 操作类型：TRANSFER_COURSE-转课，TRANSFER_CLASS-转班，REFUND-退费
+     * The column <code>lesson_prod.edu_student_course_operation.operation_type</code>. 操作类型：TRANSFER_COURSE-转课，TRANSFER_CLASS-转班，REFUND-退费
      */
     public final TableField<EduStudentCourseOperationRecord, String> OPERATION_TYPE = createField(DSL.name("operation_type"), SQLDataType.VARCHAR(20).nullable(false), this, "操作类型：TRANSFER_COURSE-转课，TRANSFER_CLASS-转班，REFUND-退费");
 
     /**
-     * The column <code>lesson.edu_student_course_operation.before_status</code>. 操作前状态
+     * The column <code>lesson_prod.edu_student_course_operation.before_status</code>. 操作前状态
      */
     public final TableField<EduStudentCourseOperationRecord, String> BEFORE_STATUS = createField(DSL.name("before_status"), SQLDataType.VARCHAR(20).nullable(false), this, "操作前状态");
 
     /**
-     * The column <code>lesson.edu_student_course_operation.after_status</code>. 操作后状态
+     * The column <code>lesson_prod.edu_student_course_operation.after_status</code>. 操作后状态
      */
     public final TableField<EduStudentCourseOperationRecord, String> AFTER_STATUS = createField(DSL.name("after_status"), SQLDataType.VARCHAR(20).nullable(false), this, "操作后状态");
 
     /**
-     * The column <code>lesson.edu_student_course_operation.source_course_id</code>. 原课程ID
+     * The column <code>lesson_prod.edu_student_course_operation.source_course_id</code>. 原课程ID
      */
     public final TableField<EduStudentCourseOperationRecord, Long> SOURCE_COURSE_ID = createField(DSL.name("source_course_id"), SQLDataType.BIGINT, this, "原课程ID");
 
     /**
-     * The column <code>lesson.edu_student_course_operation.target_course_id</code>. 目标课程ID
+     * The column <code>lesson_prod.edu_student_course_operation.target_course_id</code>. 目标课程ID
      */
     public final TableField<EduStudentCourseOperationRecord, Long> TARGET_COURSE_ID = createField(DSL.name("target_course_id"), SQLDataType.BIGINT, this, "目标课程ID");
 
     /**
-     * The column <code>lesson.edu_student_course_operation.source_class_id</code>. 原班级ID
+     * The column <code>lesson_prod.edu_student_course_operation.source_class_id</code>. 原班级ID
      */
     public final TableField<EduStudentCourseOperationRecord, Long> SOURCE_CLASS_ID = createField(DSL.name("source_class_id"), SQLDataType.BIGINT, this, "原班级ID");
 
     /**
-     * The column <code>lesson.edu_student_course_operation.source_class_name</code>. 原班级名称
+     * The column <code>lesson_prod.edu_student_course_operation.source_class_name</code>. 原班级名称
      */
     public final TableField<EduStudentCourseOperationRecord, String> SOURCE_CLASS_NAME = createField(DSL.name("source_class_name"), SQLDataType.VARCHAR(100), this, "原班级名称");
 
     /**
-     * The column <code>lesson.edu_student_course_operation.target_class_id</code>. 目标班级ID
+     * The column <code>lesson_prod.edu_student_course_operation.target_class_id</code>. 目标班级ID
      */
     public final TableField<EduStudentCourseOperationRecord, Long> TARGET_CLASS_ID = createField(DSL.name("target_class_id"), SQLDataType.BIGINT, this, "目标班级ID");
 
     /**
-     * The column <code>lesson.edu_student_course_operation.target_class_name</code>. 目标班级名称
+     * The column <code>lesson_prod.edu_student_course_operation.target_class_name</code>. 目标班级名称
      */
     public final TableField<EduStudentCourseOperationRecord, String> TARGET_CLASS_NAME = createField(DSL.name("target_class_name"), SQLDataType.VARCHAR(100), this, "目标班级名称");
 
     /**
-     * The column <code>lesson.edu_student_course_operation.refund_amount</code>. 退费金额
+     * The column <code>lesson_prod.edu_student_course_operation.refund_amount</code>. 退费金额
      */
     public final TableField<EduStudentCourseOperationRecord, BigDecimal> REFUND_AMOUNT = createField(DSL.name("refund_amount"), SQLDataType.DECIMAL(10, 2), this, "退费金额");
 
     /**
-     * The column <code>lesson.edu_student_course_operation.refund_method</code>. 退费方式：CASH-现金，BANK_TRANSFER-银行转账，WECHAT-微信，ALIPAY-支付宝
+     * The column <code>lesson_prod.edu_student_course_operation.refund_method</code>. 退费方式：CASH-现金，BANK_TRANSFER-银行转账，WECHAT-微信，ALIPAY-支付宝
      */
     public final TableField<EduStudentCourseOperationRecord, String> REFUND_METHOD = createField(DSL.name("refund_method"), SQLDataType.VARCHAR(20), this, "退费方式：CASH-现金，BANK_TRANSFER-银行转账，WECHAT-微信，ALIPAY-支付宝");
 
     /**
-     * The column <code>lesson.edu_student_course_operation.operation_reason</code>. 操作原因
+     * The column <code>lesson_prod.edu_student_course_operation.operation_reason</code>. 操作原因
      */
     public final TableField<EduStudentCourseOperationRecord, String> OPERATION_REASON = createField(DSL.name("operation_reason"), SQLDataType.VARCHAR(500), this, "操作原因");
 
     /**
-     * The column <code>lesson.edu_student_course_operation.operator_id</code>. 操作人ID
+     * The column <code>lesson_prod.edu_student_course_operation.operator_id</code>. 操作人ID
      */
     public final TableField<EduStudentCourseOperationRecord, Long> OPERATOR_ID = createField(DSL.name("operator_id"), SQLDataType.BIGINT.nullable(false), this, "操作人ID");
 
     /**
-     * The column <code>lesson.edu_student_course_operation.operator_name</code>. 操作人姓名
+     * The column <code>lesson_prod.edu_student_course_operation.operator_name</code>. 操作人姓名
      */
     public final TableField<EduStudentCourseOperationRecord, String> OPERATOR_NAME = createField(DSL.name("operator_name"), SQLDataType.VARCHAR(50).nullable(false), this, "操作人姓名");
 
     /**
-     * The column <code>lesson.edu_student_course_operation.operation_time</code>. 操作时间
+     * The column <code>lesson_prod.edu_student_course_operation.operation_time</code>. 操作时间
      */
     public final TableField<EduStudentCourseOperationRecord, LocalDateTime> OPERATION_TIME = createField(DSL.name("operation_time"), SQLDataType.LOCALDATETIME(0).nullable(false), this, "操作时间");
 
     /**
-     * The column <code>lesson.edu_student_course_operation.created_time</code>. 创建时间
+     * The column <code>lesson_prod.edu_student_course_operation.created_time</code>. 创建时间
      */
     public final TableField<EduStudentCourseOperationRecord, LocalDateTime> CREATED_TIME = createField(DSL.name("created_time"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "创建时间");
 
     /**
-     * The column <code>lesson.edu_student_course_operation.update_time</code>. 更新时间
+     * The column <code>lesson_prod.edu_student_course_operation.update_time</code>. 更新时间
      */
     public final TableField<EduStudentCourseOperationRecord, LocalDateTime> UPDATE_TIME = createField(DSL.name("update_time"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "更新时间");
 
     /**
-     * The column <code>lesson.edu_student_course_operation.deleted</code>. 是否删除：0-未删除，1-已删除
+     * The column <code>lesson_prod.edu_student_course_operation.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public final TableField<EduStudentCourseOperationRecord, Integer> DELETED = createField(DSL.name("deleted"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.inline("0", SQLDataType.INTEGER)), this, "是否删除：0-未删除，1-已删除");
 
@@ -171,21 +171,21 @@ public class EduStudentCourseOperation extends TableImpl<EduStudentCourseOperati
     }
 
     /**
-     * Create an aliased <code>lesson.edu_student_course_operation</code> table reference
+     * Create an aliased <code>lesson_prod.edu_student_course_operation</code> table reference
      */
     public EduStudentCourseOperation(String alias) {
         this(DSL.name(alias), EDU_STUDENT_COURSE_OPERATION);
     }
 
     /**
-     * Create an aliased <code>lesson.edu_student_course_operation</code> table reference
+     * Create an aliased <code>lesson_prod.edu_student_course_operation</code> table reference
      */
     public EduStudentCourseOperation(Name alias) {
         this(alias, EDU_STUDENT_COURSE_OPERATION);
     }
 
     /**
-     * Create a <code>lesson.edu_student_course_operation</code> table reference
+     * Create a <code>lesson_prod.edu_student_course_operation</code> table reference
      */
     public EduStudentCourseOperation() {
         this(DSL.name("edu_student_course_operation"), null);
@@ -197,7 +197,7 @@ public class EduStudentCourseOperation extends TableImpl<EduStudentCourseOperati
 
     @Override
     public Schema getSchema() {
-        return Lesson.LESSON;
+        return LessonProd.LESSON_PROD;
     }
 
     @Override

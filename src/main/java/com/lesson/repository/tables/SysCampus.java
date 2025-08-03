@@ -6,7 +6,7 @@ package com.lesson.repository.tables;
 
 import com.lesson.repository.Indexes;
 import com.lesson.repository.Keys;
-import com.lesson.repository.Lesson;
+import com.lesson.repository.LessonProd;
 import com.lesson.repository.tables.records.SysCampusRecord;
 
 import java.math.BigDecimal;
@@ -40,7 +40,7 @@ public class SysCampus extends TableImpl<SysCampusRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>lesson.sys_campus</code>
+     * The reference instance of <code>lesson_prod.sys_campus</code>
      */
     public static final SysCampus SYS_CAMPUS = new SysCampus();
 
@@ -53,57 +53,57 @@ public class SysCampus extends TableImpl<SysCampusRecord> {
     }
 
     /**
-     * The column <code>lesson.sys_campus.id</code>. 主键ID
+     * The column <code>lesson_prod.sys_campus.id</code>. 主键ID
      */
     public final TableField<SysCampusRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "主键ID");
 
     /**
-     * The column <code>lesson.sys_campus.institution_id</code>. 机构ID
+     * The column <code>lesson_prod.sys_campus.institution_id</code>. 机构ID
      */
     public final TableField<SysCampusRecord, Long> INSTITUTION_ID = createField(DSL.name("institution_id"), SQLDataType.BIGINT.nullable(false).defaultValue(DSL.inline("1", SQLDataType.BIGINT)), this, "机构ID");
 
     /**
-     * The column <code>lesson.sys_campus.name</code>. 校区名称
+     * The column <code>lesson_prod.sys_campus.name</code>. 校区名称
      */
     public final TableField<SysCampusRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(100).nullable(false), this, "校区名称");
 
     /**
-     * The column <code>lesson.sys_campus.address</code>. 校区地址
+     * The column <code>lesson_prod.sys_campus.address</code>. 校区地址
      */
     public final TableField<SysCampusRecord, String> ADDRESS = createField(DSL.name("address"), SQLDataType.VARCHAR(255).nullable(false), this, "校区地址");
 
     /**
-     * The column <code>lesson.sys_campus.status</code>. 状态：0-已关闭，1-营业中
+     * The column <code>lesson_prod.sys_campus.status</code>. 状态：0-已关闭，1-营业中
      */
     public final TableField<SysCampusRecord, Integer> STATUS = createField(DSL.name("status"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.inline("1", SQLDataType.INTEGER)), this, "状态：0-已关闭，1-营业中");
 
     /**
-     * The column <code>lesson.sys_campus.monthly_rent</code>. 月租金
+     * The column <code>lesson_prod.sys_campus.monthly_rent</code>. 月租金
      */
     public final TableField<SysCampusRecord, BigDecimal> MONTHLY_RENT = createField(DSL.name("monthly_rent"), SQLDataType.DECIMAL(10, 2), this, "月租金");
 
     /**
-     * The column <code>lesson.sys_campus.property_fee</code>. 物业费
+     * The column <code>lesson_prod.sys_campus.property_fee</code>. 物业费
      */
     public final TableField<SysCampusRecord, BigDecimal> PROPERTY_FEE = createField(DSL.name("property_fee"), SQLDataType.DECIMAL(10, 2), this, "物业费");
 
     /**
-     * The column <code>lesson.sys_campus.utility_fee</code>. 固定水电费
+     * The column <code>lesson_prod.sys_campus.utility_fee</code>. 固定水电费
      */
     public final TableField<SysCampusRecord, BigDecimal> UTILITY_FEE = createField(DSL.name("utility_fee"), SQLDataType.DECIMAL(10, 2), this, "固定水电费");
 
     /**
-     * The column <code>lesson.sys_campus.created_time</code>. 创建时间
+     * The column <code>lesson_prod.sys_campus.created_time</code>. 创建时间
      */
     public final TableField<SysCampusRecord, LocalDateTime> CREATED_TIME = createField(DSL.name("created_time"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "创建时间");
 
     /**
-     * The column <code>lesson.sys_campus.update_time</code>. 更新时间
+     * The column <code>lesson_prod.sys_campus.update_time</code>. 更新时间
      */
     public final TableField<SysCampusRecord, LocalDateTime> UPDATE_TIME = createField(DSL.name("update_time"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "更新时间");
 
     /**
-     * The column <code>lesson.sys_campus.deleted</code>. 是否删除：0-未删除，1-已删除
+     * The column <code>lesson_prod.sys_campus.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public final TableField<SysCampusRecord, Integer> DELETED = createField(DSL.name("deleted"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.inline("0", SQLDataType.INTEGER)), this, "是否删除：0-未删除，1-已删除");
 
@@ -116,21 +116,21 @@ public class SysCampus extends TableImpl<SysCampusRecord> {
     }
 
     /**
-     * Create an aliased <code>lesson.sys_campus</code> table reference
+     * Create an aliased <code>lesson_prod.sys_campus</code> table reference
      */
     public SysCampus(String alias) {
         this(DSL.name(alias), SYS_CAMPUS);
     }
 
     /**
-     * Create an aliased <code>lesson.sys_campus</code> table reference
+     * Create an aliased <code>lesson_prod.sys_campus</code> table reference
      */
     public SysCampus(Name alias) {
         this(alias, SYS_CAMPUS);
     }
 
     /**
-     * Create a <code>lesson.sys_campus</code> table reference
+     * Create a <code>lesson_prod.sys_campus</code> table reference
      */
     public SysCampus() {
         this(DSL.name("sys_campus"), null);
@@ -142,7 +142,7 @@ public class SysCampus extends TableImpl<SysCampusRecord> {
 
     @Override
     public Schema getSchema() {
-        return Lesson.LESSON;
+        return LessonProd.LESSON_PROD;
     }
 
     @Override

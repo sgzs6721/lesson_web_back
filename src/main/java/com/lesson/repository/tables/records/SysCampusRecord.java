@@ -25,154 +25,154 @@ public class SysCampusRecord extends UpdatableRecordImpl<SysCampusRecord> implem
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>lesson.sys_campus.id</code>. 主键ID
+     * Setter for <code>lesson_prod.sys_campus.id</code>. 主键ID
      */
     public void setId(Long value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_campus.id</code>. 主键ID
+     * Getter for <code>lesson_prod.sys_campus.id</code>. 主键ID
      */
     public Long getId() {
         return (Long) get(0);
     }
 
     /**
-     * Setter for <code>lesson.sys_campus.institution_id</code>. 机构ID
+     * Setter for <code>lesson_prod.sys_campus.institution_id</code>. 机构ID
      */
     public void setInstitutionId(Long value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_campus.institution_id</code>. 机构ID
+     * Getter for <code>lesson_prod.sys_campus.institution_id</code>. 机构ID
      */
     public Long getInstitutionId() {
         return (Long) get(1);
     }
 
     /**
-     * Setter for <code>lesson.sys_campus.name</code>. 校区名称
+     * Setter for <code>lesson_prod.sys_campus.name</code>. 校区名称
      */
     public void setName(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_campus.name</code>. 校区名称
+     * Getter for <code>lesson_prod.sys_campus.name</code>. 校区名称
      */
     public String getName() {
         return (String) get(2);
     }
 
     /**
-     * Setter for <code>lesson.sys_campus.address</code>. 校区地址
+     * Setter for <code>lesson_prod.sys_campus.address</code>. 校区地址
      */
     public void setAddress(String value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_campus.address</code>. 校区地址
+     * Getter for <code>lesson_prod.sys_campus.address</code>. 校区地址
      */
     public String getAddress() {
         return (String) get(3);
     }
 
     /**
-     * Setter for <code>lesson.sys_campus.status</code>. 状态：0-已关闭，1-营业中
+     * Setter for <code>lesson_prod.sys_campus.status</code>. 状态：0-已关闭，1-营业中
      */
     public void setStatus(Integer value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_campus.status</code>. 状态：0-已关闭，1-营业中
+     * Getter for <code>lesson_prod.sys_campus.status</code>. 状态：0-已关闭，1-营业中
      */
     public Integer getStatus() {
         return (Integer) get(4);
     }
 
     /**
-     * Setter for <code>lesson.sys_campus.monthly_rent</code>. 月租金
+     * Setter for <code>lesson_prod.sys_campus.monthly_rent</code>. 月租金
      */
     public void setMonthlyRent(BigDecimal value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_campus.monthly_rent</code>. 月租金
+     * Getter for <code>lesson_prod.sys_campus.monthly_rent</code>. 月租金
      */
     public BigDecimal getMonthlyRent() {
         return (BigDecimal) get(5);
     }
 
     /**
-     * Setter for <code>lesson.sys_campus.property_fee</code>. 物业费
+     * Setter for <code>lesson_prod.sys_campus.property_fee</code>. 物业费
      */
     public void setPropertyFee(BigDecimal value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_campus.property_fee</code>. 物业费
+     * Getter for <code>lesson_prod.sys_campus.property_fee</code>. 物业费
      */
     public BigDecimal getPropertyFee() {
         return (BigDecimal) get(6);
     }
 
     /**
-     * Setter for <code>lesson.sys_campus.utility_fee</code>. 固定水电费
+     * Setter for <code>lesson_prod.sys_campus.utility_fee</code>. 固定水电费
      */
     public void setUtilityFee(BigDecimal value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_campus.utility_fee</code>. 固定水电费
+     * Getter for <code>lesson_prod.sys_campus.utility_fee</code>. 固定水电费
      */
     public BigDecimal getUtilityFee() {
         return (BigDecimal) get(7);
     }
 
     /**
-     * Setter for <code>lesson.sys_campus.created_time</code>. 创建时间
+     * Setter for <code>lesson_prod.sys_campus.created_time</code>. 创建时间
      */
     public void setCreatedTime(LocalDateTime value) {
         set(8, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_campus.created_time</code>. 创建时间
+     * Getter for <code>lesson_prod.sys_campus.created_time</code>. 创建时间
      */
     public LocalDateTime getCreatedTime() {
         return (LocalDateTime) get(8);
     }
 
     /**
-     * Setter for <code>lesson.sys_campus.update_time</code>. 更新时间
+     * Setter for <code>lesson_prod.sys_campus.update_time</code>. 更新时间
      */
     public void setUpdateTime(LocalDateTime value) {
         set(9, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_campus.update_time</code>. 更新时间
+     * Getter for <code>lesson_prod.sys_campus.update_time</code>. 更新时间
      */
     public LocalDateTime getUpdateTime() {
         return (LocalDateTime) get(9);
     }
 
     /**
-     * Setter for <code>lesson.sys_campus.deleted</code>. 是否删除：0-未删除，1-已删除
+     * Setter for <code>lesson_prod.sys_campus.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public void setDeleted(Integer value) {
         set(10, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_campus.deleted</code>. 是否删除：0-未删除，1-已删除
+     * Getter for <code>lesson_prod.sys_campus.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public Integer getDeleted() {
         return (Integer) get(10);

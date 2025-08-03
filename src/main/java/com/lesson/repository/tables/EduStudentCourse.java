@@ -6,7 +6,7 @@ package com.lesson.repository.tables;
 
 import com.lesson.repository.Indexes;
 import com.lesson.repository.Keys;
-import com.lesson.repository.Lesson;
+import com.lesson.repository.LessonProd;
 import com.lesson.repository.tables.records.EduStudentCourseRecord;
 
 import java.math.BigDecimal;
@@ -41,7 +41,7 @@ public class EduStudentCourse extends TableImpl<EduStudentCourseRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>lesson.edu_student_course</code>
+     * The reference instance of <code>lesson_prod.edu_student_course</code>
      */
     public static final EduStudentCourse EDU_STUDENT_COURSE = new EduStudentCourse();
 
@@ -54,72 +54,72 @@ public class EduStudentCourse extends TableImpl<EduStudentCourseRecord> {
     }
 
     /**
-     * The column <code>lesson.edu_student_course.id</code>. 记录ID
+     * The column <code>lesson_prod.edu_student_course.id</code>. 记录ID
      */
     public final TableField<EduStudentCourseRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "记录ID");
 
     /**
-     * The column <code>lesson.edu_student_course.student_id</code>. 学员ID
+     * The column <code>lesson_prod.edu_student_course.student_id</code>. 学员ID
      */
     public final TableField<EduStudentCourseRecord, Long> STUDENT_ID = createField(DSL.name("student_id"), SQLDataType.BIGINT.nullable(false), this, "学员ID");
 
     /**
-     * The column <code>lesson.edu_student_course.course_id</code>. 课程ID
+     * The column <code>lesson_prod.edu_student_course.course_id</code>. 课程ID
      */
     public final TableField<EduStudentCourseRecord, Long> COURSE_ID = createField(DSL.name("course_id"), SQLDataType.BIGINT.nullable(false), this, "课程ID");
 
     /**
-     * The column <code>lesson.edu_student_course.total_hours</code>. 总课时数
+     * The column <code>lesson_prod.edu_student_course.total_hours</code>. 总课时数
      */
     public final TableField<EduStudentCourseRecord, BigDecimal> TOTAL_HOURS = createField(DSL.name("total_hours"), SQLDataType.DECIMAL(10, 2).nullable(false), this, "总课时数");
 
     /**
-     * The column <code>lesson.edu_student_course.consumed_hours</code>. 已消耗课时数
+     * The column <code>lesson_prod.edu_student_course.consumed_hours</code>. 已消耗课时数
      */
     public final TableField<EduStudentCourseRecord, BigDecimal> CONSUMED_HOURS = createField(DSL.name("consumed_hours"), SQLDataType.DECIMAL(10, 2).nullable(false).defaultValue(DSL.inline("0.00", SQLDataType.DECIMAL)), this, "已消耗课时数");
 
     /**
-     * The column <code>lesson.edu_student_course.status</code>. 状态：STUDYING-在学，SUSPENDED-停课，GRADUATED-结业
+     * The column <code>lesson_prod.edu_student_course.status</code>. 状态：STUDYING-在学，SUSPENDED-停课，GRADUATED-结业
      */
     public final TableField<EduStudentCourseRecord, String> STATUS = createField(DSL.name("status"), SQLDataType.VARCHAR(20).nullable(false), this, "状态：STUDYING-在学，SUSPENDED-停课，GRADUATED-结业");
 
     /**
-     * The column <code>lesson.edu_student_course.start_date</code>. 报名日期
+     * The column <code>lesson_prod.edu_student_course.start_date</code>. 报名日期
      */
     public final TableField<EduStudentCourseRecord, LocalDate> START_DATE = createField(DSL.name("start_date"), SQLDataType.LOCALDATE.nullable(false), this, "报名日期");
 
     /**
-     * The column <code>lesson.edu_student_course.end_date</code>. 有效期至
+     * The column <code>lesson_prod.edu_student_course.end_date</code>. 有效期至
      */
     public final TableField<EduStudentCourseRecord, LocalDate> END_DATE = createField(DSL.name("end_date"), SQLDataType.LOCALDATE, this, "有效期至");
 
     /**
-     * The column <code>lesson.edu_student_course.fixed_schedule</code>. 固定排课时间，JSON格式
+     * The column <code>lesson_prod.edu_student_course.fixed_schedule</code>. 固定排课时间，JSON格式
      */
     public final TableField<EduStudentCourseRecord, String> FIXED_SCHEDULE = createField(DSL.name("fixed_schedule"), SQLDataType.CLOB, this, "固定排课时间，JSON格式");
 
     /**
-     * The column <code>lesson.edu_student_course.campus_id</code>. 校区ID
+     * The column <code>lesson_prod.edu_student_course.campus_id</code>. 校区ID
      */
     public final TableField<EduStudentCourseRecord, Long> CAMPUS_ID = createField(DSL.name("campus_id"), SQLDataType.BIGINT.nullable(false), this, "校区ID");
 
     /**
-     * The column <code>lesson.edu_student_course.institution_id</code>. 机构ID
+     * The column <code>lesson_prod.edu_student_course.institution_id</code>. 机构ID
      */
     public final TableField<EduStudentCourseRecord, Long> INSTITUTION_ID = createField(DSL.name("institution_id"), SQLDataType.BIGINT.nullable(false), this, "机构ID");
 
     /**
-     * The column <code>lesson.edu_student_course.created_time</code>. 创建时间
+     * The column <code>lesson_prod.edu_student_course.created_time</code>. 创建时间
      */
     public final TableField<EduStudentCourseRecord, LocalDateTime> CREATED_TIME = createField(DSL.name("created_time"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "创建时间");
 
     /**
-     * The column <code>lesson.edu_student_course.update_time</code>. 更新时间
+     * The column <code>lesson_prod.edu_student_course.update_time</code>. 更新时间
      */
     public final TableField<EduStudentCourseRecord, LocalDateTime> UPDATE_TIME = createField(DSL.name("update_time"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "更新时间");
 
     /**
-     * The column <code>lesson.edu_student_course.deleted</code>. 是否删除：0-未删除，1-已删除
+     * The column <code>lesson_prod.edu_student_course.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public final TableField<EduStudentCourseRecord, Integer> DELETED = createField(DSL.name("deleted"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.inline("0", SQLDataType.INTEGER)), this, "是否删除：0-未删除，1-已删除");
 
@@ -132,21 +132,21 @@ public class EduStudentCourse extends TableImpl<EduStudentCourseRecord> {
     }
 
     /**
-     * Create an aliased <code>lesson.edu_student_course</code> table reference
+     * Create an aliased <code>lesson_prod.edu_student_course</code> table reference
      */
     public EduStudentCourse(String alias) {
         this(DSL.name(alias), EDU_STUDENT_COURSE);
     }
 
     /**
-     * Create an aliased <code>lesson.edu_student_course</code> table reference
+     * Create an aliased <code>lesson_prod.edu_student_course</code> table reference
      */
     public EduStudentCourse(Name alias) {
         this(alias, EDU_STUDENT_COURSE);
     }
 
     /**
-     * Create a <code>lesson.edu_student_course</code> table reference
+     * Create a <code>lesson_prod.edu_student_course</code> table reference
      */
     public EduStudentCourse() {
         this(DSL.name("edu_student_course"), null);
@@ -158,7 +158,7 @@ public class EduStudentCourse extends TableImpl<EduStudentCourseRecord> {
 
     @Override
     public Schema getSchema() {
-        return Lesson.LESSON;
+        return LessonProd.LESSON_PROD;
     }
 
     @Override

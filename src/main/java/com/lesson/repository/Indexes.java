@@ -32,7 +32,7 @@ import org.jooq.impl.Internal;
 
 
 /**
- * A class modelling indexes of tables in lesson.
+ * A class modelling indexes of tables in lesson_prod.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Indexes {
@@ -92,7 +92,6 @@ public class Indexes {
     public static final Index SYS_COACH_IDX_PHONE = Internal.createIndex(DSL.name("idx_phone"), SysCoach.SYS_COACH, new OrderField[] { SysCoach.SYS_COACH.PHONE }, false);
     public static final Index SYS_USER_IDX_REAL_NAME = Internal.createIndex(DSL.name("idx_real_name"), SysUser.SYS_USER, new OrderField[] { SysUser.SYS_USER.REAL_NAME }, false);
     public static final Index SYS_USER_IDX_ROLE_ID = Internal.createIndex(DSL.name("idx_role_id"), SysUser.SYS_USER, new OrderField[] { SysUser.SYS_USER.ROLE_ID }, false);
-    public static final Index EDU_STUDENT_IDX_SOURCE_ID = Internal.createIndex(DSL.name("idx_source_id"), EduStudent.EDU_STUDENT, new OrderField[] { EduStudent.EDU_STUDENT.SOURCE_ID }, false);
     public static final Index EDU_COURSE_RECORD_IDX_START_TIME = Internal.createIndex(DSL.name("idx_start_time"), EduCourseRecord.EDU_COURSE_RECORD, new OrderField[] { EduCourseRecord.EDU_COURSE_RECORD.START_TIME }, false);
     public static final Index EDU_COURSE_IDX_STATUS = Internal.createIndex(DSL.name("idx_status"), EduCourse.EDU_COURSE, new OrderField[] { EduCourse.EDU_COURSE.STATUS }, false);
     public static final Index EDU_STUDENT_IDX_STATUS = Internal.createIndex(DSL.name("idx_status"), EduStudent.EDU_STUDENT, new OrderField[] { EduStudent.EDU_STUDENT.STATUS }, false);

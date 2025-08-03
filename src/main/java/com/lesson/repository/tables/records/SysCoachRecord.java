@@ -25,210 +25,210 @@ public class SysCoachRecord extends UpdatableRecordImpl<SysCoachRecord> implemen
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>lesson.sys_coach.id</code>. 教练ID
+     * Setter for <code>lesson_prod.sys_coach.id</code>. 教练ID
      */
     public void setId(Long value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_coach.id</code>. 教练ID
+     * Getter for <code>lesson_prod.sys_coach.id</code>. 教练ID
      */
     public Long getId() {
         return (Long) get(0);
     }
 
     /**
-     * Setter for <code>lesson.sys_coach.name</code>. 姓名
+     * Setter for <code>lesson_prod.sys_coach.name</code>. 姓名
      */
     public void setName(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_coach.name</code>. 姓名
+     * Getter for <code>lesson_prod.sys_coach.name</code>. 姓名
      */
     public String getName() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>lesson.sys_coach.gender</code>. 性别
+     * Setter for <code>lesson_prod.sys_coach.gender</code>. 性别
      */
     public void setGender(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_coach.gender</code>. 性别
+     * Getter for <code>lesson_prod.sys_coach.gender</code>. 性别
      */
     public String getGender() {
         return (String) get(2);
     }
 
     /**
-     * Setter for <code>lesson.sys_coach.age</code>. 年龄
+     * Setter for <code>lesson_prod.sys_coach.age</code>. 年龄
      */
     public void setAge(Integer value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_coach.age</code>. 年龄
+     * Getter for <code>lesson_prod.sys_coach.age</code>. 年龄
      */
     public Integer getAge() {
         return (Integer) get(3);
     }
 
     /**
-     * Setter for <code>lesson.sys_coach.phone</code>. 联系电话
+     * Setter for <code>lesson_prod.sys_coach.phone</code>. 联系电话
      */
     public void setPhone(String value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_coach.phone</code>. 联系电话
+     * Getter for <code>lesson_prod.sys_coach.phone</code>. 联系电话
      */
     public String getPhone() {
         return (String) get(4);
     }
 
     /**
-     * Setter for <code>lesson.sys_coach.avatar</code>. 头像URL
+     * Setter for <code>lesson_prod.sys_coach.avatar</code>. 头像URL
      */
     public void setAvatar(String value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_coach.avatar</code>. 头像URL
+     * Getter for <code>lesson_prod.sys_coach.avatar</code>. 头像URL
      */
     public String getAvatar() {
         return (String) get(5);
     }
 
     /**
-     * Setter for <code>lesson.sys_coach.job_title</code>. 职位
+     * Setter for <code>lesson_prod.sys_coach.job_title</code>. 职位
      */
     public void setJobTitle(String value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_coach.job_title</code>. 职位
+     * Getter for <code>lesson_prod.sys_coach.job_title</code>. 职位
      */
     public String getJobTitle() {
         return (String) get(6);
     }
 
     /**
-     * Setter for <code>lesson.sys_coach.hire_date</code>. 入职日期
+     * Setter for <code>lesson_prod.sys_coach.hire_date</code>. 入职日期
      */
     public void setHireDate(LocalDate value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_coach.hire_date</code>. 入职日期
+     * Getter for <code>lesson_prod.sys_coach.hire_date</code>. 入职日期
      */
     public LocalDate getHireDate() {
         return (LocalDate) get(7);
     }
 
     /**
-     * Setter for <code>lesson.sys_coach.experience</code>. 教龄(年)
+     * Setter for <code>lesson_prod.sys_coach.experience</code>. 教龄(年)
      */
     public void setExperience(Integer value) {
         set(8, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_coach.experience</code>. 教龄(年)
+     * Getter for <code>lesson_prod.sys_coach.experience</code>. 教龄(年)
      */
     public Integer getExperience() {
         return (Integer) get(8);
     }
 
     /**
-     * Setter for <code>lesson.sys_coach.status</code>. 状态：在职/休假中/离职
+     * Setter for <code>lesson_prod.sys_coach.status</code>. 状态：在职/休假中/离职
      */
     public void setStatus(String value) {
         set(9, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_coach.status</code>. 状态：在职/休假中/离职
+     * Getter for <code>lesson_prod.sys_coach.status</code>. 状态：在职/休假中/离职
      */
     public String getStatus() {
         return (String) get(9);
     }
 
     /**
-     * Setter for <code>lesson.sys_coach.campus_id</code>. 所属校区ID
+     * Setter for <code>lesson_prod.sys_coach.campus_id</code>. 所属校区ID
      */
     public void setCampusId(Long value) {
         set(10, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_coach.campus_id</code>. 所属校区ID
+     * Getter for <code>lesson_prod.sys_coach.campus_id</code>. 所属校区ID
      */
     public Long getCampusId() {
         return (Long) get(10);
     }
 
     /**
-     * Setter for <code>lesson.sys_coach.institution_id</code>. 所属机构ID
+     * Setter for <code>lesson_prod.sys_coach.institution_id</code>. 所属机构ID
      */
     public void setInstitutionId(Long value) {
         set(11, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_coach.institution_id</code>. 所属机构ID
+     * Getter for <code>lesson_prod.sys_coach.institution_id</code>. 所属机构ID
      */
     public Long getInstitutionId() {
         return (Long) get(11);
     }
 
     /**
-     * Setter for <code>lesson.sys_coach.created_time</code>. 创建时间
+     * Setter for <code>lesson_prod.sys_coach.created_time</code>. 创建时间
      */
     public void setCreatedTime(LocalDateTime value) {
         set(12, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_coach.created_time</code>. 创建时间
+     * Getter for <code>lesson_prod.sys_coach.created_time</code>. 创建时间
      */
     public LocalDateTime getCreatedTime() {
         return (LocalDateTime) get(12);
     }
 
     /**
-     * Setter for <code>lesson.sys_coach.update_time</code>. 更新时间
+     * Setter for <code>lesson_prod.sys_coach.update_time</code>. 更新时间
      */
     public void setUpdateTime(LocalDateTime value) {
         set(13, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_coach.update_time</code>. 更新时间
+     * Getter for <code>lesson_prod.sys_coach.update_time</code>. 更新时间
      */
     public LocalDateTime getUpdateTime() {
         return (LocalDateTime) get(13);
     }
 
     /**
-     * Setter for <code>lesson.sys_coach.deleted</code>. 是否删除：0-未删除，1-已删除
+     * Setter for <code>lesson_prod.sys_coach.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public void setDeleted(Integer value) {
         set(14, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_coach.deleted</code>. 是否删除：0-未删除，1-已删除
+     * Getter for <code>lesson_prod.sys_coach.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public Integer getDeleted() {
         return (Integer) get(14);

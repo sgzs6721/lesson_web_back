@@ -25,210 +25,210 @@ public class EduCourseRecord extends UpdatableRecordImpl<EduCourseRecord> implem
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>lesson.edu_course.id</code>. 课程ID
+     * Setter for <code>lesson_prod.edu_course.id</code>. 课程ID
      */
     public void setId(Long value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_course.id</code>. 课程ID
+     * Getter for <code>lesson_prod.edu_course.id</code>. 课程ID
      */
     public Long getId() {
         return (Long) get(0);
     }
 
     /**
-     * Setter for <code>lesson.edu_course.name</code>. 课程名称
+     * Setter for <code>lesson_prod.edu_course.name</code>. 课程名称
      */
     public void setName(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_course.name</code>. 课程名称
+     * Getter for <code>lesson_prod.edu_course.name</code>. 课程名称
      */
     public String getName() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>lesson.edu_course.type_id</code>. 课程类型(关联sys_constant表ID)
+     * Setter for <code>lesson_prod.edu_course.type_id</code>. 课程类型(关联sys_constant表ID)
      */
     public void setTypeId(Long value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_course.type_id</code>. 课程类型(关联sys_constant表ID)
+     * Getter for <code>lesson_prod.edu_course.type_id</code>. 课程类型(关联sys_constant表ID)
      */
     public Long getTypeId() {
         return (Long) get(2);
     }
 
     /**
-     * Setter for <code>lesson.edu_course.status</code>. 状态：DRAFT-草稿，PUBLISHED-已发布，SUSPENDED-已暂停，TERMINATED-已终止
+     * Setter for <code>lesson_prod.edu_course.status</code>. 状态：DRAFT-草稿，PUBLISHED-已发布，SUSPENDED-已暂停，TERMINATED-已终止
      */
     public void setStatus(String value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_course.status</code>. 状态：DRAFT-草稿，PUBLISHED-已发布，SUSPENDED-已暂停，TERMINATED-已终止
+     * Getter for <code>lesson_prod.edu_course.status</code>. 状态：DRAFT-草稿，PUBLISHED-已发布，SUSPENDED-已暂停，TERMINATED-已终止
      */
     public String getStatus() {
         return (String) get(3);
     }
 
     /**
-     * Setter for <code>lesson.edu_course.unit_hours</code>. 每次消耗课时数
+     * Setter for <code>lesson_prod.edu_course.unit_hours</code>. 每次消耗课时数
      */
     public void setUnitHours(BigDecimal value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_course.unit_hours</code>. 每次消耗课时数
+     * Getter for <code>lesson_prod.edu_course.unit_hours</code>. 每次消耗课时数
      */
     public BigDecimal getUnitHours() {
         return (BigDecimal) get(4);
     }
 
     /**
-     * Setter for <code>lesson.edu_course.total_hours</code>. 总课时数
+     * Setter for <code>lesson_prod.edu_course.total_hours</code>. 总课时数
      */
     public void setTotalHours(BigDecimal value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_course.total_hours</code>. 总课时数
+     * Getter for <code>lesson_prod.edu_course.total_hours</code>. 总课时数
      */
     public BigDecimal getTotalHours() {
         return (BigDecimal) get(5);
     }
 
     /**
-     * Setter for <code>lesson.edu_course.consumed_hours</code>. 已消耗课时数
+     * Setter for <code>lesson_prod.edu_course.consumed_hours</code>. 已消耗课时数
      */
     public void setConsumedHours(BigDecimal value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_course.consumed_hours</code>. 已消耗课时数
+     * Getter for <code>lesson_prod.edu_course.consumed_hours</code>. 已消耗课时数
      */
     public BigDecimal getConsumedHours() {
         return (BigDecimal) get(6);
     }
 
     /**
-     * Setter for <code>lesson.edu_course.price</code>. 课程单价(元)
+     * Setter for <code>lesson_prod.edu_course.price</code>. 课程单价(元)
      */
     public void setPrice(BigDecimal value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_course.price</code>. 课程单价(元)
+     * Getter for <code>lesson_prod.edu_course.price</code>. 课程单价(元)
      */
     public BigDecimal getPrice() {
         return (BigDecimal) get(7);
     }
 
     /**
-     * Setter for <code>lesson.edu_course.coach_fee</code>. 教练费用(元)
+     * Setter for <code>lesson_prod.edu_course.coach_fee</code>. 教练费用(元)
      */
     public void setCoachFee(BigDecimal value) {
         set(8, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_course.coach_fee</code>. 教练费用(元)
+     * Getter for <code>lesson_prod.edu_course.coach_fee</code>. 教练费用(元)
      */
     public BigDecimal getCoachFee() {
         return (BigDecimal) get(8);
     }
 
     /**
-     * Setter for <code>lesson.edu_course.description</code>. 课程描述
+     * Setter for <code>lesson_prod.edu_course.description</code>. 课程描述
      */
     public void setDescription(String value) {
         set(9, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_course.description</code>. 课程描述
+     * Getter for <code>lesson_prod.edu_course.description</code>. 课程描述
      */
     public String getDescription() {
         return (String) get(9);
     }
 
     /**
-     * Setter for <code>lesson.edu_course.campus_id</code>. 校区ID
+     * Setter for <code>lesson_prod.edu_course.campus_id</code>. 校区ID
      */
     public void setCampusId(Long value) {
         set(10, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_course.campus_id</code>. 校区ID
+     * Getter for <code>lesson_prod.edu_course.campus_id</code>. 校区ID
      */
     public Long getCampusId() {
         return (Long) get(10);
     }
 
     /**
-     * Setter for <code>lesson.edu_course.institution_id</code>. 机构ID
+     * Setter for <code>lesson_prod.edu_course.institution_id</code>. 机构ID
      */
     public void setInstitutionId(Long value) {
         set(11, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_course.institution_id</code>. 机构ID
+     * Getter for <code>lesson_prod.edu_course.institution_id</code>. 机构ID
      */
     public Long getInstitutionId() {
         return (Long) get(11);
     }
 
     /**
-     * Setter for <code>lesson.edu_course.created_time</code>. 创建时间
+     * Setter for <code>lesson_prod.edu_course.created_time</code>. 创建时间
      */
     public void setCreatedTime(LocalDateTime value) {
         set(12, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_course.created_time</code>. 创建时间
+     * Getter for <code>lesson_prod.edu_course.created_time</code>. 创建时间
      */
     public LocalDateTime getCreatedTime() {
         return (LocalDateTime) get(12);
     }
 
     /**
-     * Setter for <code>lesson.edu_course.update_time</code>. 更新时间
+     * Setter for <code>lesson_prod.edu_course.update_time</code>. 更新时间
      */
     public void setUpdateTime(LocalDateTime value) {
         set(13, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_course.update_time</code>. 更新时间
+     * Getter for <code>lesson_prod.edu_course.update_time</code>. 更新时间
      */
     public LocalDateTime getUpdateTime() {
         return (LocalDateTime) get(13);
     }
 
     /**
-     * Setter for <code>lesson.edu_course.deleted</code>. 是否删除：0-未删除，1-已删除
+     * Setter for <code>lesson_prod.edu_course.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public void setDeleted(Integer value) {
         set(14, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_course.deleted</code>. 是否删除：0-未删除，1-已删除
+     * Getter for <code>lesson_prod.edu_course.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public Integer getDeleted() {
         return (Integer) get(14);

@@ -6,7 +6,7 @@ package com.lesson.repository.tables;
 
 import com.lesson.repository.Indexes;
 import com.lesson.repository.Keys;
-import com.lesson.repository.Lesson;
+import com.lesson.repository.LessonProd;
 import com.lesson.repository.tables.records.SysCoachSalaryRecord;
 
 import java.math.BigDecimal;
@@ -41,7 +41,7 @@ public class SysCoachSalary extends TableImpl<SysCoachSalaryRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>lesson.sys_coach_salary</code>
+     * The reference instance of <code>lesson_prod.sys_coach_salary</code>
      */
     public static final SysCoachSalary SYS_COACH_SALARY = new SysCoachSalary();
 
@@ -54,62 +54,62 @@ public class SysCoachSalary extends TableImpl<SysCoachSalaryRecord> {
     }
 
     /**
-     * The column <code>lesson.sys_coach_salary.id</code>. 主键ID
+     * The column <code>lesson_prod.sys_coach_salary.id</code>. 主键ID
      */
     public final TableField<SysCoachSalaryRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "主键ID");
 
     /**
-     * The column <code>lesson.sys_coach_salary.coach_id</code>. 关联教练ID
+     * The column <code>lesson_prod.sys_coach_salary.coach_id</code>. 关联教练ID
      */
     public final TableField<SysCoachSalaryRecord, Long> COACH_ID = createField(DSL.name("coach_id"), SQLDataType.BIGINT.nullable(false), this, "关联教练ID");
 
     /**
-     * The column <code>lesson.sys_coach_salary.base_salary</code>. 基本工资
+     * The column <code>lesson_prod.sys_coach_salary.base_salary</code>. 基本工资
      */
     public final TableField<SysCoachSalaryRecord, BigDecimal> BASE_SALARY = createField(DSL.name("base_salary"), SQLDataType.DECIMAL(10, 2).nullable(false), this, "基本工资");
 
     /**
-     * The column <code>lesson.sys_coach_salary.social_insurance</code>. 社保费
+     * The column <code>lesson_prod.sys_coach_salary.social_insurance</code>. 社保费
      */
     public final TableField<SysCoachSalaryRecord, BigDecimal> SOCIAL_INSURANCE = createField(DSL.name("social_insurance"), SQLDataType.DECIMAL(10, 2).nullable(false), this, "社保费");
 
     /**
-     * The column <code>lesson.sys_coach_salary.class_fee</code>. 课时费
+     * The column <code>lesson_prod.sys_coach_salary.class_fee</code>. 课时费
      */
     public final TableField<SysCoachSalaryRecord, BigDecimal> CLASS_FEE = createField(DSL.name("class_fee"), SQLDataType.DECIMAL(10, 2).nullable(false), this, "课时费");
 
     /**
-     * The column <code>lesson.sys_coach_salary.performance_bonus</code>. 绩效奖金
+     * The column <code>lesson_prod.sys_coach_salary.performance_bonus</code>. 绩效奖金
      */
     public final TableField<SysCoachSalaryRecord, BigDecimal> PERFORMANCE_BONUS = createField(DSL.name("performance_bonus"), SQLDataType.DECIMAL(10, 2).defaultValue(DSL.inline("0.00", SQLDataType.DECIMAL)), this, "绩效奖金");
 
     /**
-     * The column <code>lesson.sys_coach_salary.commission</code>. 提成百分比
+     * The column <code>lesson_prod.sys_coach_salary.commission</code>. 提成百分比
      */
     public final TableField<SysCoachSalaryRecord, BigDecimal> COMMISSION = createField(DSL.name("commission"), SQLDataType.DECIMAL(5, 2).defaultValue(DSL.inline("0.00", SQLDataType.DECIMAL)), this, "提成百分比");
 
     /**
-     * The column <code>lesson.sys_coach_salary.dividend</code>. 分红
+     * The column <code>lesson_prod.sys_coach_salary.dividend</code>. 分红
      */
     public final TableField<SysCoachSalaryRecord, BigDecimal> DIVIDEND = createField(DSL.name("dividend"), SQLDataType.DECIMAL(10, 2).defaultValue(DSL.inline("0.00", SQLDataType.DECIMAL)), this, "分红");
 
     /**
-     * The column <code>lesson.sys_coach_salary.effective_date</code>. 生效日期
+     * The column <code>lesson_prod.sys_coach_salary.effective_date</code>. 生效日期
      */
     public final TableField<SysCoachSalaryRecord, LocalDate> EFFECTIVE_DATE = createField(DSL.name("effective_date"), SQLDataType.LOCALDATE.nullable(false), this, "生效日期");
 
     /**
-     * The column <code>lesson.sys_coach_salary.created_time</code>. 创建时间
+     * The column <code>lesson_prod.sys_coach_salary.created_time</code>. 创建时间
      */
     public final TableField<SysCoachSalaryRecord, LocalDateTime> CREATED_TIME = createField(DSL.name("created_time"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "创建时间");
 
     /**
-     * The column <code>lesson.sys_coach_salary.update_time</code>. 更新时间
+     * The column <code>lesson_prod.sys_coach_salary.update_time</code>. 更新时间
      */
     public final TableField<SysCoachSalaryRecord, LocalDateTime> UPDATE_TIME = createField(DSL.name("update_time"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "更新时间");
 
     /**
-     * The column <code>lesson.sys_coach_salary.deleted</code>. 是否删除：0-未删除，1-已删除
+     * The column <code>lesson_prod.sys_coach_salary.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public final TableField<SysCoachSalaryRecord, Integer> DELETED = createField(DSL.name("deleted"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.inline("0", SQLDataType.INTEGER)), this, "是否删除：0-未删除，1-已删除");
 
@@ -122,21 +122,21 @@ public class SysCoachSalary extends TableImpl<SysCoachSalaryRecord> {
     }
 
     /**
-     * Create an aliased <code>lesson.sys_coach_salary</code> table reference
+     * Create an aliased <code>lesson_prod.sys_coach_salary</code> table reference
      */
     public SysCoachSalary(String alias) {
         this(DSL.name(alias), SYS_COACH_SALARY);
     }
 
     /**
-     * Create an aliased <code>lesson.sys_coach_salary</code> table reference
+     * Create an aliased <code>lesson_prod.sys_coach_salary</code> table reference
      */
     public SysCoachSalary(Name alias) {
         this(alias, SYS_COACH_SALARY);
     }
 
     /**
-     * Create a <code>lesson.sys_coach_salary</code> table reference
+     * Create a <code>lesson_prod.sys_coach_salary</code> table reference
      */
     public SysCoachSalary() {
         this(DSL.name("sys_coach_salary"), null);
@@ -148,7 +148,7 @@ public class SysCoachSalary extends TableImpl<SysCoachSalaryRecord> {
 
     @Override
     public Schema getSchema() {
-        return Lesson.LESSON;
+        return LessonProd.LESSON_PROD;
     }
 
     @Override
