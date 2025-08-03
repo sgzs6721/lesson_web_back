@@ -38,10 +38,10 @@ jobs:
           source: ${{ github.workspace }}/target/lesson_web_back-prod.jar
           target: /root/lesson
           strip_components: ${{ secrets.STRIP_COMPONENTS }}
-      - name: Run Java Service Of lesson-web-back on HW Server
+      - name: Run Java Service Of lesson-web-back-prod on HW Server
         uses: fifsky/ssh-action@master
         with:
-          command: supervisorctl status lesson-web-back | awk '{print $2}' | while read line; do if [ $line == 'RUNNING' ]; then supervisorctl restart lesson-web-back;else supervisorctl start lesson-web-back; fi done
+          command: supervisorctl status lesson-web-back-prod | awk '{print $2}' | while read line; do if [ $line == 'RUNNING' ]; then supervisorctl restart lesson-web-back-prod;else supervisorctl start lesson-web-back-prod; fi done
           host: ${{ secrets.HW_TEST_SERVER }}
           user: ${{ secrets.HW_SERVER_USERNAME }}
           pass: ${{ secrets.HW_SERVER_PWD }}
