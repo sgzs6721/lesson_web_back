@@ -35,9 +35,6 @@
     <profiles>
         <profile>
             <id>dev</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
             <properties>
                 <db.url>jdbc:mysql://localhost:3306/lesson</db.url>
                 <db.user>lesson</db.user>
@@ -55,7 +52,7 @@
         <profile>
             <id>prod</id>
             <build>
-                <finalName>lesson_web_back-prod</finalName>
+                <finalName>lesson-web-back-prod-${project.version}</finalName>
             </build>
             <properties>
                 <db.url>jdbc:mysql://121.36.91.199:3306/lesson_prod</db.url>

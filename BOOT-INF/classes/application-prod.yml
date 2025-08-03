@@ -1,13 +1,15 @@
+
 server:
   servlet:
     context-path: /lesson
+  port: 8090
 
 spring:
   mvc:
     log-request-details: true
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://121.36.91.199:3306/lesson?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://121.36.91.199:3306/lesson_prod?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
     username: lesson
     password: Leilei@0217
     hikari:
@@ -21,7 +23,7 @@ spring:
   redis:
     host: 121.36.91.199
     port: 6379
-    database: 0
+    database: 1
     password: bg-league--redis-password-dont-change
     timeout: 10000
     lettuce:
