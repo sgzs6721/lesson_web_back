@@ -25,7 +25,7 @@ jobs:
         if: ${{ vars.FLYWAY_CLEAN == '1' }}
         run: mvn flyway:clean -P prod
       - name: Build application lesson_web_back
-        run: mvn flyway:repair -P prod && mvn flyway:migrate -P test && mvn jooq-codegen:generate -P prod && mvn clean compile -P prod && mvn install -P prod -Dmaven.test.skip=true
+        run: mvn flyway:repair -P prod && mvn flyway:migrate -P prod && mvn jooq-codegen:generate -P prod && mvn clean compile -P prod && mvn install -P prod -Dmaven.test.skip=true
       - name: Verify jar file exists
         run: ls -la target/lesson_web_back-prod.jar
       - name: Scp jar To HW Server
