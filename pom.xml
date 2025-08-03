@@ -54,6 +54,9 @@
         </profile>
         <profile>
             <id>prod</id>
+            <build>
+                <finalName>lesson-web-back-prod-${project.version}</finalName>
+            </build>
             <properties>
                 <db.url>jdbc:mysql://121.36.91.199:3306/lesson_prod</db.url>
                 <db.user>lesson</db.user>
