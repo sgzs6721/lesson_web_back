@@ -35,7 +35,7 @@ jobs:
           username: ${{ secrets.HW_SERVER_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
-          source: ${{ github.workspace }}/target/lesson-web-back-prod-1.0-SNAPSHOT.jar
+          source: ${{ github.workspace }}/target/lesson_web_back-prod.jar
           target: /root/lesson
           strip_components: ${{ secrets.STRIP_COMPONENTS }}
       - name: Run Java Service Of lesson-web-back on HW Server
