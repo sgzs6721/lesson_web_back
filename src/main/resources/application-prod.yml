@@ -1,6 +1,8 @@
+
 server:
   servlet:
     context-path: /lesson
+  port: 8090
 
 spring:
   mvc:
