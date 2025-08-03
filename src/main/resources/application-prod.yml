@@ -23,7 +23,7 @@ spring:
   redis:
     host: 121.36.91.199
     port: 6379
-    database: 0
+    database: 1
     password: bg-league--redis-password-dont-change
     timeout: 10000
     lettuce:

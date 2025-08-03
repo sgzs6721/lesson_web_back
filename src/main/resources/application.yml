@@ -5,31 +5,6 @@ server:
 spring:
   mvc:
     log-request-details: true
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://121.36.91.199:3306/lesson?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
-    username: lesson
-    password: Leilei@0217
-    hikari:
-      connection-timeout: 30000
-      maximum-pool-size: 10
-      minimum-idle: 5
-      idle-timeout: 600000
-      max-lifetime: 1800000
-      auto-commit: true
-      pool-name: LessonHikariCP
-  redis:
-    host: 121.36.91.199
-    port: 6379
-    database: 0
-    password: bg-league--redis-password-dont-change
-    timeout: 10000
-    lettuce:
-      pool:
-        max-active: 8
-        max-wait: -1
-        max-idle: 8
-        min-idle: 0
 
 logging:
   level:
