@@ -66,7 +66,7 @@ public class CourseServiceImpl implements CourseService {
             Long courseId = courseModel.createCourse(
                 request.getName(),
                 request.getTypeId(),
-                CourseStatus.PUBLISHED,
+                request.getStatus(), // 使用前端传入的状态
                 request.getUnitHours(),
                 BigDecimal.ZERO, // 总课时默认为0
                 request.getPrice(),

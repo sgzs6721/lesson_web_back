@@ -27,8 +27,11 @@ import java.util.stream.Collectors;
 
 import static com.lesson.repository.tables.EduStudent.EDU_STUDENT;
 import static com.lesson.repository.tables.EduCourse.EDU_COURSE;
+import static com.lesson.repository.tables.EduStudentCourse.EDU_STUDENT_COURSE;
 import static com.lesson.repository.tables.SysCoach.SYS_COACH;
 import static com.lesson.repository.tables.SysUser.SYS_USER;
+import static org.jooq.impl.DSL.sum;
+import java.math.BigDecimal;
 
 /**
  * 校区服务实现
@@ -184,16 +187,40 @@ public class CampusServiceImpl implements CampusService {
             }
         }
         
-        // 获取待上课时数量（暂时设为0，因为需要复杂的课时计算逻辑）
-        Integer lessonCount = campusStatsRedisService.getLessonCount(institutionId, id);
-        if (lessonCount == null) {
-            lessonCount = 0; // 暂时设为0，后续可以添加课时计算逻辑
-            campusStatsRedisService.setPendingLessonHours(institutionId, id, lessonCount);
+        // 获取已消耗课时数量（从学员课程关系中统计）
+        Integer consumedHours = campusStatsRedisService.getConsumedHours(institutionId, id);
+        if (consumedHours == null) {
+            // 从数据库查询已消耗课时数量
+            BigDecimal consumedHoursResult = dslContext.select(sum(EDU_STUDENT_COURSE.CONSUMED_HOURS))
+                    .from(EDU_STUDENT_COURSE)
+                    .where(EDU_STUDENT_COURSE.CAMPUS_ID.eq(id))
+                    .and(EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
+                    .and(EDU_STUDENT_COURSE.DELETED.eq(0))
+                    .fetchOneInto(BigDecimal.class);
+            consumedHours = consumedHoursResult != null ? consumedHoursResult.intValue() : 0;
+            // 缓存到Redis
+            campusStatsRedisService.setConsumedHours(institutionId, id, consumedHours);
+        }
+
+        // 获取总课时数量（从学员课程关系中统计）
+        Integer totalHours = campusStatsRedisService.getTotalHours(institutionId, id);
+        if (totalHours == null) {
+            // 从数据库查询总课时数量
+            BigDecimal totalHoursResult = dslContext.select(sum(EDU_STUDENT_COURSE.TOTAL_HOURS))
+                    .from(EDU_STUDENT_COURSE)
+                    .where(EDU_STUDENT_COURSE.CAMPUS_ID.eq(id))
+                    .and(EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
+                    .and(EDU_STUDENT_COURSE.DELETED.eq(0))
+                    .fetchOneInto(BigDecimal.class);
+            totalHours = totalHoursResult != null ? totalHoursResult.intValue() : 0;
+            // 缓存到Redis
+            campusStatsRedisService.setTotalHours(institutionId, id, totalHours);
         }
 
         campusVO.setCoachCount(coachCount != null ? coachCount : 0);
         campusVO.setStudentCount(studentCount != null ? studentCount : 0);
-        campusVO.setPendingLessonCount(lessonCount != null ? lessonCount : 0);
+        campusVO.setPendingLessonCount(consumedHours != null ? consumedHours : 0);
+        campusVO.setTotalLessonHours(totalHours != null ? totalHours : 0);
 
         return campusVO;
     }
@@ -339,16 +366,40 @@ public class CampusServiceImpl implements CampusService {
                 }
             }
             
-            // 获取待上课时数量（暂时设为0，因为需要复杂的课时计算逻辑）
-            Integer lessonCount = campusStatsRedisService.getLessonCount(finalInstitutionId, campusId);
-            if (lessonCount == null) {
-                lessonCount = 0; // 暂时设为0，后续可以添加课时计算逻辑
-                campusStatsRedisService.setPendingLessonHours(finalInstitutionId, campusId, lessonCount);
+            // 获取已消耗课时数量（从学员课程关系中统计）
+            Integer consumedHours = campusStatsRedisService.getConsumedHours(finalInstitutionId, campusId);
+            if (consumedHours == null) {
+                // 从数据库查询已消耗课时数量
+                BigDecimal consumedHoursResult = dslContext.select(sum(EDU_STUDENT_COURSE.CONSUMED_HOURS))
+                        .from(EDU_STUDENT_COURSE)
+                        .where(EDU_STUDENT_COURSE.CAMPUS_ID.eq(campusId))
+                        .and(EDU_STUDENT_COURSE.INSTITUTION_ID.eq(finalInstitutionId))
+                        .and(EDU_STUDENT_COURSE.DELETED.eq(0))
+                        .fetchOneInto(BigDecimal.class);
+                consumedHours = consumedHoursResult != null ? consumedHoursResult.intValue() : 0;
+                // 缓存到Redis
+                campusStatsRedisService.setConsumedHours(finalInstitutionId, campusId, consumedHours);
+            }
+
+            // 获取总课时数量（从学员课程关系中统计）
+            Integer totalHours = campusStatsRedisService.getTotalHours(finalInstitutionId, campusId);
+            if (totalHours == null) {
+                // 从数据库查询总课时数量
+                BigDecimal totalHoursResult = dslContext.select(sum(EDU_STUDENT_COURSE.TOTAL_HOURS))
+                        .from(EDU_STUDENT_COURSE)
+                        .where(EDU_STUDENT_COURSE.CAMPUS_ID.eq(campusId))
+                        .and(EDU_STUDENT_COURSE.INSTITUTION_ID.eq(finalInstitutionId))
+                        .and(EDU_STUDENT_COURSE.DELETED.eq(0))
+                        .fetchOneInto(BigDecimal.class);
+                totalHours = totalHoursResult != null ? totalHoursResult.intValue() : 0;
+                // 缓存到Redis
+                campusStatsRedisService.setTotalHours(finalInstitutionId, campusId, totalHours);
             }
 
             campusVO.setCoachCount(coachCount != null ? coachCount : 0);
             campusVO.setStudentCount(studentCount != null ? studentCount : 0);
-            campusVO.setPendingLessonCount(courseCount != null ? courseCount : 0);
+            campusVO.setPendingLessonCount(consumedHours != null ? consumedHours : 0);
+            campusVO.setTotalLessonHours(totalHours != null ? totalHours : 0);
             
             return campusVO;
         }).collect(Collectors.toList());

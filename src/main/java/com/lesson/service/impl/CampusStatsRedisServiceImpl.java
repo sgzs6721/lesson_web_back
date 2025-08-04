@@ -23,6 +23,8 @@ public class CampusStatsRedisServiceImpl implements CampusStatsRedisService {
     private static final String LESSON_COUNT_KEY = "campus:stats:lesson_count:%d:%d";
     private static final String COURSE_COUNT_KEY = "campus:stats:course_count:%d:%d";
     private static final String PENDING_LESSON_HOURS_KEY = "campus:stats:pending_lesson_hours:%d:%d";
+    private static final String CONSUMED_HOURS_KEY = "campus:stats:consumed_hours:%d:%d";
+    private static final String TOTAL_HOURS_KEY = "campus:stats:total_hours:%d:%d";
     private static final String INSTITUTION_STUDENT_COUNT_KEY = "institution:stats:student_count:%d";
     private static final String INSTITUTION_COURSE_COUNT_KEY = "institution:stats:course_count:%d";
     private static final long CACHE_EXPIRE_HOURS = 24;
@@ -289,18 +291,26 @@ public class CampusStatsRedisServiceImpl implements CampusStatsRedisService {
                     .fetchOneInto(Integer.class);
             setCourseCount(institutionId, campusId, courseCount);
             
-            // 4. 刷新待销课时数量
-            Integer pendingHours = dsl.select(field("SUM(total_hours - consumed_hours)", Integer.class))
+            // 4. 刷新已消耗课时数量
+            Integer consumedHours = dsl.select(field("SUM(consumed_hours)", Integer.class))
                     .from(table("edu_student_course"))
                     .where(field("campus_id").eq(campusId))
                     .and(field("institution_id").eq(institutionId))
                     .and(field("deleted").eq(0))
-                    .and(field("status").eq("STUDYING"))
                     .fetchOneInto(Integer.class);
-            setPendingLessonHours(institutionId, campusId, pendingHours != null ? pendingHours : 0);
+            setConsumedHours(institutionId, campusId, consumedHours != null ? consumedHours : 0);
             
-            log.info("校区统计数据刷新完成: institutionId={}, campusId={}, coachCount={}, studentCount={}, courseCount={}, pendingHours={}", 
-                    institutionId, campusId, coachCount, studentCount, courseCount, pendingHours);
+            // 5. 刷新总课时数量
+            Integer totalHours = dsl.select(field("SUM(total_hours)", Integer.class))
+                    .from(table("edu_student_course"))
+                    .where(field("campus_id").eq(campusId))
+                    .and(field("institution_id").eq(institutionId))
+                    .and(field("deleted").eq(0))
+                    .fetchOneInto(Integer.class);
+            setTotalHours(institutionId, campusId, totalHours != null ? totalHours : 0);
+            
+            log.info("校区统计数据刷新完成: institutionId={}, campusId={}, coachCount={}, studentCount={}, courseCount={}, consumedHours={}, totalHours={}", 
+                    institutionId, campusId, coachCount, studentCount, courseCount, consumedHours, totalHours);
                     
         } catch (Exception e) {
             log.error("刷新校区统计数据失败: institutionId={}, campusId={}", institutionId, campusId, e);
@@ -335,6 +345,74 @@ public class CampusStatsRedisServiceImpl implements CampusStatsRedisService {
                     
         } catch (Exception e) {
             log.error("刷新机构统计数据失败: institutionId={}", institutionId, e);
+        }
+    }
+
+    // ==================== 新增已消耗课时统计方法 ====================
+
+    @Override
+    public Integer getConsumedHours(Long institutionId, Long campusId) {
+        String key = String.format(CONSUMED_HOURS_KEY, institutionId, campusId);
+        Object value = redisUtil.get(key);
+        return value != null ? Integer.valueOf(value.toString()) : null;
+    }
+
+    @Override
+    public void setConsumedHours(Long institutionId, Long campusId, Integer hours) {
+        String key = String.format(CONSUMED_HOURS_KEY, institutionId, campusId);
+        redisUtil.set(key, hours, CACHE_EXPIRE_HOURS, TimeUnit.HOURS);
+    }
+
+    // ==================== 新增总课时统计方法 ====================
+
+    @Override
+    public Integer getTotalHours(Long institutionId, Long campusId) {
+        String key = String.format(TOTAL_HOURS_KEY, institutionId, campusId);
+        Object value = redisUtil.get(key);
+        return value != null ? Integer.valueOf(value.toString()) : null;
+    }
+
+    @Override
+    public void setTotalHours(Long institutionId, Long campusId, Integer hours) {
+        String key = String.format(TOTAL_HOURS_KEY, institutionId, campusId);
+        redisUtil.set(key, hours, CACHE_EXPIRE_HOURS, TimeUnit.HOURS);
+    }
+
+    @Override
+    public void incrementConsumedHours(Long institutionId, Long campusId, Integer hours) {
+        String key = String.format(CONSUMED_HOURS_KEY, institutionId, campusId);
+        redisUtil.increment(key, hours);
+        redisUtil.expire(key, CACHE_EXPIRE_HOURS, TimeUnit.HOURS);
+    }
+
+    @Override
+    public void decrementConsumedHours(Long institutionId, Long campusId, Integer hours) {
+        String key = String.format(CONSUMED_HOURS_KEY, institutionId, campusId);
+        Long currentValue = redisUtil.decrement(key, hours);
+        redisUtil.expire(key, CACHE_EXPIRE_HOURS, TimeUnit.HOURS);
+        
+        // 如果减到负数，设置为0
+        if (currentValue != null && currentValue < 0) {
+            redisUtil.set(key, 0, CACHE_EXPIRE_HOURS, TimeUnit.HOURS);
+        }
+    }
+
+    @Override
+    public void incrementTotalHours(Long institutionId, Long campusId, Integer hours) {
+        String key = String.format(TOTAL_HOURS_KEY, institutionId, campusId);
+        redisUtil.increment(key, hours);
+        redisUtil.expire(key, CACHE_EXPIRE_HOURS, TimeUnit.HOURS);
+    }
+
+    @Override
+    public void decrementTotalHours(Long institutionId, Long campusId, Integer hours) {
+        String key = String.format(TOTAL_HOURS_KEY, institutionId, campusId);
+        Long currentValue = redisUtil.decrement(key, hours);
+        redisUtil.expire(key, CACHE_EXPIRE_HOURS, TimeUnit.HOURS);
+        
+        // 如果减到负数，设置为0
+        if (currentValue != null && currentValue < 0) {
+            redisUtil.set(key, 0, CACHE_EXPIRE_HOURS, TimeUnit.HOURS);
         }
     }
 }

@@ -171,6 +171,82 @@ public interface CampusStatsRedisService {
      */
     Integer getPendingLessonHours(Long institutionId, Long campusId);
 
+    // ==================== 新增已消耗课时统计方法 ====================
+
+    /**
+     * 获取校区已消耗课时数量
+     *
+     * @param institutionId 机构ID
+     * @param campusId 校区ID
+     * @return 已消耗课时数量
+     */
+    Integer getConsumedHours(Long institutionId, Long campusId);
+
+    /**
+     * 设置校区已消耗课时数量
+     *
+     * @param institutionId 机构ID
+     * @param campusId 校区ID
+     * @param hours 课时数
+     */
+    void setConsumedHours(Long institutionId, Long campusId, Integer hours);
+
+    // ==================== 新增总课时统计方法 ====================
+
+    /**
+     * 获取校区总课时数量
+     *
+     * @param institutionId 机构ID
+     * @param campusId 校区ID
+     * @return 总课时数量
+     */
+    Integer getTotalHours(Long institutionId, Long campusId);
+
+    /**
+     * 设置校区总课时数量
+     *
+     * @param institutionId 机构ID
+     * @param campusId 校区ID
+     * @param hours 课时数
+     */
+    void setTotalHours(Long institutionId, Long campusId, Integer hours);
+
+    /**
+     * 增加校区已消耗课时数量
+     *
+     * @param institutionId 机构ID
+     * @param campusId 校区ID
+     * @param hours 课时数
+     */
+    void incrementConsumedHours(Long institutionId, Long campusId, Integer hours);
+
+    /**
+     * 减少校区已消耗课时数量
+     *
+     * @param institutionId 机构ID
+     * @param campusId 校区ID
+     * @param hours 课时数
+     */
+    void decrementConsumedHours(Long institutionId, Long campusId, Integer hours);
+
+    /**
+     * 增加校区总课时数量
+     *
+     * @param institutionId 机构ID
+     * @param campusId 校区ID
+     * @param hours 课时数
+     */
+    void incrementTotalHours(Long institutionId, Long campusId, Integer hours);
+
+    /**
+     * 减少校区总课时数量
+     *
+     * @param institutionId 机构ID
+     * @param campusId 校区ID
+     * @param hours 课时数
+     */
+    void decrementTotalHours(Long institutionId, Long campusId, Integer hours);
+
     // ==================== 新增全局统计方法 ====================
 
     /**

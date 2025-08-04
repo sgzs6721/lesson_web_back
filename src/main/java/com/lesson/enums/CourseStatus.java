@@ -23,6 +23,18 @@ public enum CourseStatus {
         throw new IllegalArgumentException("未知的课程状态: " + description);
     }
 
+    public static CourseStatus fromString(String status) {
+        if (status == null) {
+            return null;
+        }
+        for (CourseStatus courseStatus : values()) {
+            if (courseStatus.name().equals(status)) {
+                return courseStatus;
+            }
+        }
+        throw new IllegalArgumentException("未知的课程状态: " + status);
+    }
+
     public String getDescription() {
         return description;
     }

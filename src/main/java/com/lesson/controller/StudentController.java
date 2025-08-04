@@ -14,6 +14,8 @@ import com.lesson.vo.response.StudentWithCoursesVO;
 import com.lesson.vo.response.StudentRefundDetailVO;
 import com.lesson.vo.response.PaymentHoursInfoVO;
 import com.lesson.vo.response.StudentPaymentResponseVO;
+import com.lesson.vo.response.StudentCreateResponseVO;
+import com.lesson.vo.response.StudentStatusResponseVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -55,6 +57,25 @@ public class StudentController {
     public Result<Long> createWithCourse(@RequestBody @Valid StudentWithCourseCreateRequest request) {
         Long studentId = studentService.createStudentWithCourse(request);
         return Result.success(studentId);
+    }
+
+    /**
+     * 创建学员及课程（返回详细状态）
+     *
+     * @param request 创建学员及课程请求
+     * @return 学员创建详细状态
+     */
+    @PostMapping("/create-with-status")
+    @Operation(summary = "创建学员及课程（返回详细状态）",
+               description = "同时创建学员基本信息和报名课程信息，并返回详细的创建状态信息")
+    public Result<StudentCreateResponseVO> createWithCourseWithStatus(@RequestBody @Valid StudentWithCourseCreateRequest request) {
+        StudentCreateResponseVO response = studentService.createStudentWithCourseWithStatus(request);
+        
+        if ("SUCCESS".equals(response.getOperationStatus())) {
+            return Result.success(response);
+        } else {
+            return Result.error(response.getOperationMessage());
+        }
     }
 
     /**
@@ -152,6 +173,26 @@ public class StudentController {
             @RequestBody @Valid StudentCheckInRequest request) {
         studentService.checkIn(request);
         return Result.success();
+    }
+
+    /**
+     * 学员打卡（返回状态信息）
+     *
+     * @param request 打卡请求体 (包含 studentId, courseId 等)
+     * @return 学员状态响应
+     */
+    @PostMapping("/check-in-with-status")
+    @Operation(summary = "学员打卡（返回状态信息）",
+               description = "记录学员上课信息，自动扣除课时，并返回详细的状态信息")
+    public Result<StudentStatusResponseVO> checkInWithStatus(
+            @RequestBody @Valid StudentCheckInRequest request) {
+        StudentStatusResponseVO response = studentService.checkInWithStatus(request);
+        
+        if ("SUCCESS".equals(response.getOperationStatus())) {
+            return Result.success(response);
+        } else {
+            return Result.error(response.getOperationMessage());
+        }
     }
 
     /**

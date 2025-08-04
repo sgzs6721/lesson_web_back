@@ -97,8 +97,14 @@ public class CampusVO {
     /**
      * 待上课时数量
      */
-    @Schema(description = "待上课时数量", example = "100")
+    @Schema(description = "待上课时数量（已消耗的课时数）", example = "100")
     private Integer pendingLessonCount;
+
+    /**
+     * 总课时数
+     */
+    @Schema(description = "总课时数", example = "500")
+    private Integer totalLessonHours;
 
     /**
      * 是否可编辑

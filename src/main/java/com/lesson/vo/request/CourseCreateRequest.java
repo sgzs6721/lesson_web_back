@@ -25,7 +25,7 @@ public class CourseCreateRequest {
 
     @NotNull(message = "课程状态不能为空")
     @Schema(description = "课程状态")
-    private CourseStatus status = CourseStatus.PUBLISHED;
+    private CourseStatus status;
 
     @NotNull(message = "单次课时不能为空")
     @Positive(message = "单次课时必须大于0")

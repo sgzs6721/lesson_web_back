@@ -60,6 +60,11 @@ import com.lesson.vo.request.StudentWithinCourseTransferRequest;
 import com.lesson.service.CourseHoursRedisService;
 import com.lesson.service.CampusStatsRedisService;
 import com.lesson.vo.response.StudentPaymentResponseVO;
+import com.lesson.vo.response.StudentCreateResponseVO;
+import com.lesson.vo.response.StudentStatusResponseVO;
+import com.lesson.repository.tables.records.SysCampusRecord;
+import com.lesson.repository.tables.records.SysInstitutionRecord;
+import java.util.ArrayList;
 
 /**
  * 学员服务
@@ -179,6 +184,127 @@ public class StudentService {
     campusStatsRedisService.incrementStudentCount(institutionId, studentInfo.getCampusId());
 
     return studentId;
+  }
+
+  /**
+   * 创建学员及课程（返回详细状态）
+   *
+   * @param request 学员及课程创建请求
+   * @return 学员创建响应VO
+   */
+  @Transactional(rollbackFor = Exception.class)
+  public StudentCreateResponseVO createStudentWithCourseWithStatus(StudentWithCourseCreateRequest request) {
+    try {
+      // 从token中获取机构ID
+      Long institutionId = getInstitutionId();
+
+      // 1. 获取学员基本信息
+      StudentWithCourseCreateRequest.StudentInfo studentInfo = request.getStudentInfo();
+
+      // 2. 创建学员记录
+      EduStudentRecord studentRecord = new EduStudentRecord();
+      studentRecord.setName(studentInfo.getName());
+      studentRecord.setGender(studentInfo.getGender());
+      studentRecord.setAge(studentInfo.getAge());
+      studentRecord.setPhone(studentInfo.getPhone());
+      studentRecord.setCampusId(studentInfo.getCampusId());
+      studentRecord.setInstitutionId(institutionId);
+      studentRecord.setSourceId(studentInfo.getSourceId()); // 设置学员来源ID
+      studentRecord.setStatus("STUDYING"); // 学员状态默认为在学
+
+      // 3. 存储学员记录
+      Long studentId = studentModel.createStudent(studentRecord);
+
+      // 4. 获取校区和机构信息
+      SysCampusRecord campusRecord = dsl.selectFrom(Tables.SYS_CAMPUS)
+          .where(Tables.SYS_CAMPUS.ID.eq(studentInfo.getCampusId()))
+          .and(Tables.SYS_CAMPUS.DELETED.eq(0))
+          .fetchOne();
+
+      SysInstitutionRecord institutionRecord = dsl.selectFrom(Tables.SYS_INSTITUTION)
+          .where(Tables.SYS_INSTITUTION.ID.eq(institutionId))
+          .and(Tables.SYS_INSTITUTION.DELETED.eq(0))
+          .fetchOne();
+
+      // 5. 处理课程信息
+      List<StudentCreateResponseVO.CourseInfo> courseInfoList = new ArrayList<>();
+      for (StudentWithCourseCreateRequest.CourseInfo courseInfo : request.getCourseInfoList()) {
+        // 获取课程信息
+        EduCourseRecord courseRecord = dsl.selectFrom(Tables.EDU_COURSE)
+            .where(Tables.EDU_COURSE.ID.eq(courseInfo.getCourseId()))
+            .and(Tables.EDU_COURSE.DELETED.eq(0))
+            .fetchOne();
+
+        if (courseRecord == null) {
+          throw new IllegalArgumentException("课程不存在：" + courseInfo.getCourseId());
+        }
+
+        // 创建学员课程关系
+        EduStudentCourseRecord studentCourseRecord = new EduStudentCourseRecord();
+        studentCourseRecord.setStudentId(studentId);
+        studentCourseRecord.setCourseId(courseInfo.getCourseId());
+        studentCourseRecord.setConsumedHours(java.math.BigDecimal.ZERO);
+        studentCourseRecord.setStatus(StudentCourseStatus.WAITING_PAYMENT.getName());
+        studentCourseRecord.setStartDate(courseInfo.getEnrollDate());
+        studentCourseRecord.setCampusId(studentInfo.getCampusId());
+        studentCourseRecord.setInstitutionId(institutionId);
+        studentCourseRecord.setTotalHours(courseRecord.getTotalHours());
+
+        // 处理固定排课时间
+        try {
+          if (courseInfo.getFixedScheduleTimes() != null && !courseInfo.getFixedScheduleTimes().isEmpty()) {
+            String fixedScheduleJson = objectMapper.writeValueAsString(courseInfo.getFixedScheduleTimes());
+            studentCourseRecord.setFixedSchedule(fixedScheduleJson);
+          }
+        } catch (JsonProcessingException e) {
+          log.error("序列化固定排课时间失败", e);
+          throw new RuntimeException("序列化固定排课时间失败", e);
+        }
+
+        // 存储学员课程关系
+        studentCourseModel.createStudentCourse(studentCourseRecord);
+
+        // 构建课程信息响应
+        StudentCreateResponseVO.CourseInfo responseCourseInfo = new StudentCreateResponseVO.CourseInfo();
+        responseCourseInfo.setCourseId(courseRecord.getId());
+        responseCourseInfo.setCourseName(courseRecord.getName());
+        responseCourseInfo.setCourseStatus(studentCourseRecord.getStatus());
+        responseCourseInfo.setTotalHours(courseRecord.getTotalHours().intValue());
+        responseCourseInfo.setConsumedHours(0);
+        responseCourseInfo.setRemainingHours(courseRecord.getTotalHours().intValue());
+        responseCourseInfo.setEnrollDate(courseInfo.getEnrollDate().toString());
+        courseInfoList.add(responseCourseInfo);
+      }
+
+      // 6. 更新Redis统计数据
+      campusStatsRedisService.incrementStudentCount(institutionId, studentInfo.getCampusId());
+
+      // 7. 构建响应对象
+      StudentCreateResponseVO response = new StudentCreateResponseVO();
+      response.setStudentId(studentId);
+      response.setStudentName(studentRecord.getName());
+      response.setStudentStatus(studentRecord.getStatus());
+      response.setCampusId(studentInfo.getCampusId());
+      response.setCampusName(campusRecord != null ? campusRecord.getName() : "");
+      response.setInstitutionId(institutionId);
+      response.setInstitutionName(institutionRecord != null ? institutionRecord.getName() : "");
+      response.setCreatedTime(studentRecord.getCreatedTime());
+      response.setCourseInfoList(courseInfoList);
+      response.setOperationStatus("SUCCESS");
+      response.setOperationMessage("学员创建成功");
+
+      return response;
+
+    } catch (Exception e) {
+      log.error("创建学员失败", e);
+      
+      // 构建失败响应
+      StudentCreateResponseVO response = new StudentCreateResponseVO();
+      response.setOperationStatus("FAILED");
+      response.setOperationMessage("学员创建失败：" + e.getMessage());
+      
+      return response;
+    }
   }
 
   /**
@@ -872,6 +998,72 @@ public class StudentService {
   }
 
   /**
+   * 学员打卡（返回状态信息）
+   *
+   * @param request 打卡请求
+   * @return 学员状态响应
+   */
+  @Transactional(rollbackFor = Exception.class)
+  public StudentStatusResponseVO checkInWithStatus(StudentCheckInRequest request) {
+    try {
+      // 调用原有方法
+      checkIn(request);
+      
+      // 获取学员信息
+      EduStudentRecord student = dsl.selectFrom(Tables.EDU_STUDENT)
+          .where(Tables.EDU_STUDENT.ID.eq(request.getStudentId()))
+          .and(Tables.EDU_STUDENT.DELETED.eq(0))
+          .fetchOne();
+      
+      // 获取学员课程信息
+      EduStudentCourseRecord studentCourse = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
+          .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(request.getStudentId()))
+          .and(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(request.getCourseId()))
+          .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
+          .fetchOne();
+      
+      // 获取课程信息
+      EduCourseRecord course = dsl.selectFrom(Tables.EDU_COURSE)
+          .where(Tables.EDU_COURSE.ID.eq(request.getCourseId()))
+          .and(Tables.EDU_COURSE.DELETED.eq(0))
+          .fetchOne();
+      
+      // 构建状态变化信息
+      StudentStatusResponseVO.CourseStatusChange statusChange = new StudentStatusResponseVO.CourseStatusChange();
+      statusChange.setCourseId(request.getCourseId());
+      statusChange.setCourseName(course != null ? course.getName() : "");
+      statusChange.setAfterStatus(studentCourse != null ? studentCourse.getStatus() : "");
+      statusChange.setTotalHours(studentCourse != null ? studentCourse.getTotalHours().intValue() : 0);
+      statusChange.setConsumedHours(studentCourse != null ? studentCourse.getConsumedHours().intValue() : 0);
+      statusChange.setRemainingHours(studentCourse != null ? 
+          studentCourse.getTotalHours().subtract(studentCourse.getConsumedHours()).intValue() : 0);
+      
+      // 构建响应
+      StudentStatusResponseVO response = new StudentStatusResponseVO();
+      response.setStudentId(request.getStudentId());
+      response.setStudentName(student != null ? student.getName() : "");
+      response.setStudentStatus(student != null ? student.getStatus() : "");
+      response.setCourseStatusChanges(Arrays.asList(statusChange));
+      response.setOperationStatus("SUCCESS");
+      response.setOperationMessage("学员打卡成功");
+      response.setOperationTime(LocalDateTime.now());
+      
+      return response;
+      
+    } catch (Exception e) {
+      log.error("学员打卡失败", e);
+      
+      StudentStatusResponseVO response = new StudentStatusResponseVO();
+      response.setStudentId(request.getStudentId());
+      response.setOperationStatus("FAILED");
+      response.setOperationMessage("学员打卡失败：" + e.getMessage());
+      response.setOperationTime(LocalDateTime.now());
+      
+      return response;
+    }
+  }
+
+  /**
    * 学员请假（创建请假记录并更新课时）
    *
    * @param request 请假请求
@@ -959,6 +1151,72 @@ public class StudentService {
             .set(Tables.EDU_COURSE.UPDATE_TIME, LocalDateTime.now())
             .where(Tables.EDU_COURSE.ID.eq(request.getCourseId()))
             .execute();
+  }
+
+  /**
+   * 学员请假（返回状态信息）
+   *
+   * @param request 请假请求
+   * @return 学员状态响应
+   */
+  @Transactional(rollbackFor = Exception.class)
+  public StudentStatusResponseVO leaveWithStatus(StudentLeaveRequest request) {
+    try {
+      // 调用原有方法
+      leave(request);
+      
+      // 获取学员信息
+      EduStudentRecord student = dsl.selectFrom(Tables.EDU_STUDENT)
+          .where(Tables.EDU_STUDENT.ID.eq(request.getStudentId()))
+          .and(Tables.EDU_STUDENT.DELETED.eq(0))
+          .fetchOne();
+      
+      // 获取学员课程信息
+      EduStudentCourseRecord studentCourse = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
+          .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(request.getStudentId()))
+          .and(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(request.getCourseId()))
+          .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
+          .fetchOne();
+      
+      // 获取课程信息
+      EduCourseRecord course = dsl.selectFrom(Tables.EDU_COURSE)
+          .where(Tables.EDU_COURSE.ID.eq(request.getCourseId()))
+          .and(Tables.EDU_COURSE.DELETED.eq(0))
+          .fetchOne();
+      
+      // 构建状态变化信息
+      StudentStatusResponseVO.CourseStatusChange statusChange = new StudentStatusResponseVO.CourseStatusChange();
+      statusChange.setCourseId(request.getCourseId());
+      statusChange.setCourseName(course != null ? course.getName() : "");
+      statusChange.setAfterStatus(studentCourse != null ? studentCourse.getStatus() : "");
+      statusChange.setTotalHours(studentCourse != null ? studentCourse.getTotalHours().intValue() : 0);
+      statusChange.setConsumedHours(studentCourse != null ? studentCourse.getConsumedHours().intValue() : 0);
+      statusChange.setRemainingHours(studentCourse != null ? 
+          studentCourse.getTotalHours().subtract(studentCourse.getConsumedHours()).intValue() : 0);
+      
+      // 构建响应
+      StudentStatusResponseVO response = new StudentStatusResponseVO();
+      response.setStudentId(request.getStudentId());
+      response.setStudentName(student != null ? student.getName() : "");
+      response.setStudentStatus(student != null ? student.getStatus() : "");
+      response.setCourseStatusChanges(Arrays.asList(statusChange));
+      response.setOperationStatus("SUCCESS");
+      response.setOperationMessage("学员请假成功");
+      response.setOperationTime(LocalDateTime.now());
+      
+      return response;
+      
+    } catch (Exception e) {
+      log.error("学员请假失败", e);
+      
+      StudentStatusResponseVO response = new StudentStatusResponseVO();
+      response.setStudentId(request.getStudentId());
+      response.setOperationStatus("FAILED");
+      response.setOperationMessage("学员请假失败：" + e.getMessage());
+      response.setOperationTime(LocalDateTime.now());
+      
+      return response;
+    }
   }
 
   /**
@@ -1229,6 +1487,73 @@ public class StudentService {
     // ...
 
     return refundId;
+  }
+
+  /**
+   * 学员退费（返回状态信息）
+   *
+   * @param request 退费请求
+   * @return 学员状态响应
+   */
+  @Transactional(rollbackFor = Exception.class)
+  public StudentStatusResponseVO refundWithStatus(StudentRefundRequest request) {
+    try {
+      // 调用原有方法
+      Long refundId = processRefund(request);
+      
+      // 获取学员信息
+      EduStudentRecord student = dsl.selectFrom(Tables.EDU_STUDENT)
+          .where(Tables.EDU_STUDENT.ID.eq(request.getStudentId()))
+          .and(Tables.EDU_STUDENT.DELETED.eq(0))
+          .fetchOne();
+      
+      // 获取学员课程信息
+      EduStudentCourseRecord studentCourse = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
+          .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(request.getStudentId()))
+          .and(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(request.getCourseId()))
+          .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
+          .fetchOne();
+      
+      // 获取课程信息
+      EduCourseRecord course = dsl.selectFrom(Tables.EDU_COURSE)
+          .where(Tables.EDU_COURSE.ID.eq(request.getCourseId()))
+          .and(Tables.EDU_COURSE.DELETED.eq(0))
+          .fetchOne();
+      
+      // 构建状态变化信息
+      StudentStatusResponseVO.CourseStatusChange statusChange = new StudentStatusResponseVO.CourseStatusChange();
+      statusChange.setCourseId(request.getCourseId());
+      statusChange.setCourseName(course != null ? course.getName() : "");
+      statusChange.setAfterStatus(studentCourse != null ? studentCourse.getStatus() : "");
+      statusChange.setStatusDesc("已退费");
+      statusChange.setTotalHours(studentCourse != null ? studentCourse.getTotalHours().intValue() : 0);
+      statusChange.setConsumedHours(studentCourse != null ? studentCourse.getConsumedHours().intValue() : 0);
+      statusChange.setRemainingHours(studentCourse != null ? 
+          studentCourse.getTotalHours().subtract(studentCourse.getConsumedHours()).intValue() : 0);
+      
+      // 构建响应
+      StudentStatusResponseVO response = new StudentStatusResponseVO();
+      response.setStudentId(request.getStudentId());
+      response.setStudentName(student != null ? student.getName() : "");
+      response.setStudentStatus(student != null ? student.getStatus() : "");
+      response.setCourseStatusChanges(Arrays.asList(statusChange));
+      response.setOperationStatus("SUCCESS");
+      response.setOperationMessage("学员退费成功，退费记录ID：" + refundId);
+      response.setOperationTime(LocalDateTime.now());
+      
+      return response;
+      
+    } catch (Exception e) {
+      log.error("学员退费失败", e);
+      
+      StudentStatusResponseVO response = new StudentStatusResponseVO();
+      response.setStudentId(request.getStudentId());
+      response.setOperationStatus("FAILED");
+      response.setOperationMessage("学员退费失败：" + e.getMessage());
+      response.setOperationTime(LocalDateTime.now());
+      
+      return response;
+    }
   }
 
   /**
