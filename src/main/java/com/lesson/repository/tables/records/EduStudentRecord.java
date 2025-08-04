@@ -24,168 +24,168 @@ public class EduStudentRecord extends UpdatableRecordImpl<EduStudentRecord> impl
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>lesson.edu_student.id</code>. 记录ID
+     * Setter for <code>lesson_prod.edu_student.id</code>. 记录ID
      */
     public void setId(Long value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student.id</code>. 记录ID
+     * Getter for <code>lesson_prod.edu_student.id</code>. 记录ID
      */
     public Long getId() {
         return (Long) get(0);
     }
 
     /**
-     * Setter for <code>lesson.edu_student.name</code>. 学员姓名
+     * Setter for <code>lesson_prod.edu_student.name</code>. 学员姓名
      */
     public void setName(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student.name</code>. 学员姓名
+     * Getter for <code>lesson_prod.edu_student.name</code>. 学员姓名
      */
     public String getName() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>lesson.edu_student.gender</code>. 性别：MALE-男，FEMALE-女
+     * Setter for <code>lesson_prod.edu_student.gender</code>. 性别：MALE-男，FEMALE-女
      */
     public void setGender(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student.gender</code>. 性别：MALE-男，FEMALE-女
+     * Getter for <code>lesson_prod.edu_student.gender</code>. 性别：MALE-男，FEMALE-女
      */
     public String getGender() {
         return (String) get(2);
     }
 
     /**
-     * Setter for <code>lesson.edu_student.age</code>. 年龄
+     * Setter for <code>lesson_prod.edu_student.age</code>. 年龄
      */
     public void setAge(Integer value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student.age</code>. 年龄
+     * Getter for <code>lesson_prod.edu_student.age</code>. 年龄
      */
     public Integer getAge() {
         return (Integer) get(3);
     }
 
     /**
-     * Setter for <code>lesson.edu_student.phone</code>. 联系电话
+     * Setter for <code>lesson_prod.edu_student.phone</code>. 联系电话
      */
     public void setPhone(String value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student.phone</code>. 联系电话
+     * Getter for <code>lesson_prod.edu_student.phone</code>. 联系电话
      */
     public String getPhone() {
         return (String) get(4);
     }
 
     /**
-     * Setter for <code>lesson.edu_student.campus_id</code>. 校区ID
+     * Setter for <code>lesson_prod.edu_student.campus_id</code>. 校区ID
      */
     public void setCampusId(Long value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student.campus_id</code>. 校区ID
+     * Getter for <code>lesson_prod.edu_student.campus_id</code>. 校区ID
      */
     public Long getCampusId() {
         return (Long) get(5);
     }
 
     /**
-     * Setter for <code>lesson.edu_student.institution_id</code>. 机构ID
+     * Setter for <code>lesson_prod.edu_student.institution_id</code>. 机构ID
      */
     public void setInstitutionId(Long value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student.institution_id</code>. 机构ID
+     * Getter for <code>lesson_prod.edu_student.institution_id</code>. 机构ID
      */
     public Long getInstitutionId() {
         return (Long) get(6);
     }
 
     /**
-     * Setter for <code>lesson.edu_student.source_id</code>. 学员来源ID（关联sys_constant表）
+     * Setter for <code>lesson_prod.edu_student.source_id</code>. 学员来源ID（关联sys_constant表）
      */
     public void setSourceId(Long value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student.source_id</code>. 学员来源ID（关联sys_constant表）
+     * Getter for <code>lesson_prod.edu_student.source_id</code>. 学员来源ID（关联sys_constant表）
      */
     public Long getSourceId() {
         return (Long) get(7);
     }
 
     /**
-     * Setter for <code>lesson.edu_student.status</code>. 状态：STUDYING-在学，SUSPENDED-停课，GRADUATED-结业
+     * Setter for <code>lesson_prod.edu_student.status</code>. 状态：STUDYING-在学，SUSPENDED-停课，GRADUATED-结业
      */
     public void setStatus(String value) {
         set(8, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student.status</code>. 状态：STUDYING-在学，SUSPENDED-停课，GRADUATED-结业
+     * Getter for <code>lesson_prod.edu_student.status</code>. 状态：STUDYING-在学，SUSPENDED-停课，GRADUATED-结业
      */
     public String getStatus() {
         return (String) get(8);
     }
 
     /**
-     * Setter for <code>lesson.edu_student.created_time</code>. 创建时间
+     * Setter for <code>lesson_prod.edu_student.created_time</code>. 创建时间
      */
     public void setCreatedTime(LocalDateTime value) {
         set(9, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student.created_time</code>. 创建时间
+     * Getter for <code>lesson_prod.edu_student.created_time</code>. 创建时间
      */
     public LocalDateTime getCreatedTime() {
         return (LocalDateTime) get(9);
     }
 
     /**
-     * Setter for <code>lesson.edu_student.update_time</code>. 更新时间
+     * Setter for <code>lesson_prod.edu_student.update_time</code>. 更新时间
      */
     public void setUpdateTime(LocalDateTime value) {
         set(10, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student.update_time</code>. 更新时间
+     * Getter for <code>lesson_prod.edu_student.update_time</code>. 更新时间
      */
     public LocalDateTime getUpdateTime() {
         return (LocalDateTime) get(10);
     }
 
     /**
-     * Setter for <code>lesson.edu_student.deleted</code>. 是否删除：0-未删除，1-已删除
+     * Setter for <code>lesson_prod.edu_student.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public void setDeleted(Integer value) {
         set(11, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student.deleted</code>. 是否删除：0-未删除，1-已删除
+     * Getter for <code>lesson_prod.edu_student.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public Integer getDeleted() {
         return (Integer) get(11);

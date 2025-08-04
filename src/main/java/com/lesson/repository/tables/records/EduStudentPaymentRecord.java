@@ -26,224 +26,224 @@ public class EduStudentPaymentRecord extends UpdatableRecordImpl<EduStudentPayme
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>lesson.edu_student_payment.id</code>. 记录ID
+     * Setter for <code>lesson_prod.edu_student_payment.id</code>. 记录ID
      */
     public void setId(Long value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_payment.id</code>. 记录ID
+     * Getter for <code>lesson_prod.edu_student_payment.id</code>. 记录ID
      */
     public Long getId() {
         return (Long) get(0);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_payment.student_id</code>. 学员ID
+     * Setter for <code>lesson_prod.edu_student_payment.student_id</code>. 学员ID
      */
     public void setStudentId(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_payment.student_id</code>. 学员ID
+     * Getter for <code>lesson_prod.edu_student_payment.student_id</code>. 学员ID
      */
     public String getStudentId() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_payment.course_id</code>. 课程ID
+     * Setter for <code>lesson_prod.edu_student_payment.course_id</code>. 课程ID
      */
     public void setCourseId(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_payment.course_id</code>. 课程ID
+     * Getter for <code>lesson_prod.edu_student_payment.course_id</code>. 课程ID
      */
     public String getCourseId() {
         return (String) get(2);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_payment.payment_type</code>. 缴费类型：NEW-新报，RENEWAL-续报，TRANSFER-转课
+     * Setter for <code>lesson_prod.edu_student_payment.payment_type</code>. 缴费类型：NEW-新报，RENEWAL-续报，TRANSFER-转课
      */
     public void setPaymentType(String value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_payment.payment_type</code>. 缴费类型：NEW-新报，RENEWAL-续报，TRANSFER-转课
+     * Getter for <code>lesson_prod.edu_student_payment.payment_type</code>. 缴费类型：NEW-新报，RENEWAL-续报，TRANSFER-转课
      */
     public String getPaymentType() {
         return (String) get(3);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_payment.amount</code>. 缴费金额
+     * Setter for <code>lesson_prod.edu_student_payment.amount</code>. 缴费金额
      */
     public void setAmount(BigDecimal value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_payment.amount</code>. 缴费金额
+     * Getter for <code>lesson_prod.edu_student_payment.amount</code>. 缴费金额
      */
     public BigDecimal getAmount() {
         return (BigDecimal) get(4);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_payment.payment_method</code>. 支付方式：CASH-现金，CARD-刷卡，WECHAT-微信，ALIPAY-支付宝
+     * Setter for <code>lesson_prod.edu_student_payment.payment_method</code>. 支付方式：CASH-现金，CARD-刷卡，WECHAT-微信，ALIPAY-支付宝
      */
     public void setPaymentMethod(String value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_payment.payment_method</code>. 支付方式：CASH-现金，CARD-刷卡，WECHAT-微信，ALIPAY-支付宝
+     * Getter for <code>lesson_prod.edu_student_payment.payment_method</code>. 支付方式：CASH-现金，CARD-刷卡，WECHAT-微信，ALIPAY-支付宝
      */
     public String getPaymentMethod() {
         return (String) get(5);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_payment.course_hours</code>. 课时数
+     * Setter for <code>lesson_prod.edu_student_payment.course_hours</code>. 课时数
      */
     public void setCourseHours(BigDecimal value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_payment.course_hours</code>. 课时数
+     * Getter for <code>lesson_prod.edu_student_payment.course_hours</code>. 课时数
      */
     public BigDecimal getCourseHours() {
         return (BigDecimal) get(6);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_payment.gift_hours</code>. 赠送课时
+     * Setter for <code>lesson_prod.edu_student_payment.gift_hours</code>. 赠送课时
      */
     public void setGiftHours(BigDecimal value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_payment.gift_hours</code>. 赠送课时
+     * Getter for <code>lesson_prod.edu_student_payment.gift_hours</code>. 赠送课时
      */
     public BigDecimal getGiftHours() {
         return (BigDecimal) get(7);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_payment.valid_until</code>. 有效期至
+     * Setter for <code>lesson_prod.edu_student_payment.valid_until</code>. 有效期至
      */
     public void setValidUntil(LocalDate value) {
         set(8, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_payment.valid_until</code>. 有效期至
+     * Getter for <code>lesson_prod.edu_student_payment.valid_until</code>. 有效期至
      */
     public LocalDate getValidUntil() {
         return (LocalDate) get(8);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_payment.gift_items</code>. 赠品
+     * Setter for <code>lesson_prod.edu_student_payment.gift_items</code>. 赠品
      */
     public void setGiftItems(String value) {
         set(9, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_payment.gift_items</code>. 赠品
+     * Getter for <code>lesson_prod.edu_student_payment.gift_items</code>. 赠品
      */
     public String getGiftItems() {
         return (String) get(9);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_payment.notes</code>. 备注
+     * Setter for <code>lesson_prod.edu_student_payment.notes</code>. 备注
      */
     public void setNotes(String value) {
         set(10, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_payment.notes</code>. 备注
+     * Getter for <code>lesson_prod.edu_student_payment.notes</code>. 备注
      */
     public String getNotes() {
         return (String) get(10);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_payment.campus_id</code>. 校区ID
+     * Setter for <code>lesson_prod.edu_student_payment.campus_id</code>. 校区ID
      */
     public void setCampusId(Long value) {
         set(11, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_payment.campus_id</code>. 校区ID
+     * Getter for <code>lesson_prod.edu_student_payment.campus_id</code>. 校区ID
      */
     public Long getCampusId() {
         return (Long) get(11);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_payment.institution_id</code>. 机构ID
+     * Setter for <code>lesson_prod.edu_student_payment.institution_id</code>. 机构ID
      */
     public void setInstitutionId(Long value) {
         set(12, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_payment.institution_id</code>. 机构ID
+     * Getter for <code>lesson_prod.edu_student_payment.institution_id</code>. 机构ID
      */
     public Long getInstitutionId() {
         return (Long) get(12);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_payment.created_time</code>. 创建时间
+     * Setter for <code>lesson_prod.edu_student_payment.created_time</code>. 创建时间
      */
     public void setCreatedTime(LocalDateTime value) {
         set(13, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_payment.created_time</code>. 创建时间
+     * Getter for <code>lesson_prod.edu_student_payment.created_time</code>. 创建时间
      */
     public LocalDateTime getCreatedTime() {
         return (LocalDateTime) get(13);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_payment.update_time</code>. 更新时间
+     * Setter for <code>lesson_prod.edu_student_payment.update_time</code>. 更新时间
      */
     public void setUpdateTime(LocalDateTime value) {
         set(14, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_payment.update_time</code>. 更新时间
+     * Getter for <code>lesson_prod.edu_student_payment.update_time</code>. 更新时间
      */
     public LocalDateTime getUpdateTime() {
         return (LocalDateTime) get(14);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_payment.deleted</code>. 是否删除：0-未删除，1-已删除
+     * Setter for <code>lesson_prod.edu_student_payment.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public void setDeleted(Integer value) {
         set(15, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_payment.deleted</code>. 是否删除：0-未删除，1-已删除
+     * Getter for <code>lesson_prod.edu_student_payment.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public Integer getDeleted() {
         return (Integer) get(15);

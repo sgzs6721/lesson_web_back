@@ -39,6 +39,7 @@
                 <db.url>jdbc:mysql://localhost:3306/lesson</db.url>
                 <db.user>lesson</db.user>
                 <db.password>Leilei@0217</db.password>
+                <db.schema>lesson</db.schema>
             </properties>
         </profile>
         <profile>
@@ -47,6 +48,7 @@
                 <db.url>jdbc:mysql://121.36.91.199:3306/lesson</db.url>
                 <db.user>lesson</db.user>
                 <db.password>Leilei@0217</db.password>
+                <db.schema>lesson</db.schema>
             </properties>
         </profile>
         <profile>
@@ -58,6 +60,7 @@
                 <db.url>jdbc:mysql://121.36.91.199:3306/lesson_prod</db.url>
                 <db.user>lesson</db.user>
                 <db.password>Leilei@0217</db.password>
+                <db.schema>lesson_prod</db.schema>
             </properties>
         </profile>
     </profiles>
@@ -303,7 +306,7 @@
                             <excludes></excludes>
                             <schemata>
                                 <schema>
-                                    <inputSchema>lesson_prod</inputSchema>
+                                    <inputSchema>${db.schema}</inputSchema>
                                 </schema>
                             </schemata>
                         </database>

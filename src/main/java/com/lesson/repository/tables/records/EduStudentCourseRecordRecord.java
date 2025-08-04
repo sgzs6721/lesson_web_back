@@ -22,232 +22,232 @@ import org.jooq.impl.UpdatableRecordImpl;
  * 学员课程记录表
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class EduStudentCourseRecordRecord extends UpdatableRecordImpl<EduStudentCourseRecordRecord> implements Record16<Long, Long, Long, Long, LocalDate, LocalTime, LocalTime, BigDecimal, String, Long, Long, LocalDateTime, LocalDateTime, Integer, Long, String> {
+public class EduStudentCourseRecordRecord extends UpdatableRecordImpl<EduStudentCourseRecordRecord> implements Record16<Long, Long, Long, Long, LocalDate, LocalTime, LocalTime, BigDecimal, String, Long, Long, LocalDateTime, LocalDateTime, Integer, String, Long> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>lesson.edu_student_course_record.id</code>. 记录ID
+     * Setter for <code>lesson_prod.edu_student_course_record.id</code>. 记录ID
      */
     public void setId(Long value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_course_record.id</code>. 记录ID
+     * Getter for <code>lesson_prod.edu_student_course_record.id</code>. 记录ID
      */
     public Long getId() {
         return (Long) get(0);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_course_record.student_id</code>. 学员ID
+     * Setter for <code>lesson_prod.edu_student_course_record.student_id</code>. 学员ID
      */
     public void setStudentId(Long value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_course_record.student_id</code>. 学员ID
+     * Getter for <code>lesson_prod.edu_student_course_record.student_id</code>. 学员ID
      */
     public Long getStudentId() {
         return (Long) get(1);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_course_record.course_id</code>. 课程ID
+     * Setter for <code>lesson_prod.edu_student_course_record.course_id</code>. 课程ID
      */
     public void setCourseId(Long value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_course_record.course_id</code>. 课程ID
+     * Getter for <code>lesson_prod.edu_student_course_record.course_id</code>. 课程ID
      */
     public Long getCourseId() {
         return (Long) get(2);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_course_record.coach_id</code>. 教练ID
+     * Setter for <code>lesson_prod.edu_student_course_record.coach_id</code>. 教练ID
      */
     public void setCoachId(Long value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_course_record.coach_id</code>. 教练ID
+     * Getter for <code>lesson_prod.edu_student_course_record.coach_id</code>. 教练ID
      */
     public Long getCoachId() {
         return (Long) get(3);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_course_record.course_date</code>. 上课日期
+     * Setter for <code>lesson_prod.edu_student_course_record.course_date</code>. 上课日期
      */
     public void setCourseDate(LocalDate value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_course_record.course_date</code>. 上课日期
+     * Getter for <code>lesson_prod.edu_student_course_record.course_date</code>. 上课日期
      */
     public LocalDate getCourseDate() {
         return (LocalDate) get(4);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_course_record.start_time</code>. 开始时间
+     * Setter for <code>lesson_prod.edu_student_course_record.start_time</code>. 开始时间
      */
     public void setStartTime(LocalTime value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_course_record.start_time</code>. 开始时间
+     * Getter for <code>lesson_prod.edu_student_course_record.start_time</code>. 开始时间
      */
     public LocalTime getStartTime() {
         return (LocalTime) get(5);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_course_record.end_time</code>. 结束时间
+     * Setter for <code>lesson_prod.edu_student_course_record.end_time</code>. 结束时间
      */
     public void setEndTime(LocalTime value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_course_record.end_time</code>. 结束时间
+     * Getter for <code>lesson_prod.edu_student_course_record.end_time</code>. 结束时间
      */
     public LocalTime getEndTime() {
         return (LocalTime) get(6);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_course_record.hours</code>. 课时数
+     * Setter for <code>lesson_prod.edu_student_course_record.hours</code>. 课时数
      */
     public void setHours(BigDecimal value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_course_record.hours</code>. 课时数
+     * Getter for <code>lesson_prod.edu_student_course_record.hours</code>. 课时数
      */
     public BigDecimal getHours() {
         return (BigDecimal) get(7);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_course_record.notes</code>. 备注
+     * Setter for <code>lesson_prod.edu_student_course_record.notes</code>. 备注
      */
     public void setNotes(String value) {
         set(8, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_course_record.notes</code>. 备注
+     * Getter for <code>lesson_prod.edu_student_course_record.notes</code>. 备注
      */
     public String getNotes() {
         return (String) get(8);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_course_record.campus_id</code>. 校区ID
+     * Setter for <code>lesson_prod.edu_student_course_record.campus_id</code>. 校区ID
      */
     public void setCampusId(Long value) {
         set(9, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_course_record.campus_id</code>. 校区ID
+     * Getter for <code>lesson_prod.edu_student_course_record.campus_id</code>. 校区ID
      */
     public Long getCampusId() {
         return (Long) get(9);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_course_record.institution_id</code>. 机构ID
+     * Setter for <code>lesson_prod.edu_student_course_record.institution_id</code>. 机构ID
      */
     public void setInstitutionId(Long value) {
         set(10, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_course_record.institution_id</code>. 机构ID
+     * Getter for <code>lesson_prod.edu_student_course_record.institution_id</code>. 机构ID
      */
     public Long getInstitutionId() {
         return (Long) get(10);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_course_record.created_time</code>. 创建时间
+     * Setter for <code>lesson_prod.edu_student_course_record.created_time</code>. 创建时间
      */
     public void setCreatedTime(LocalDateTime value) {
         set(11, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_course_record.created_time</code>. 创建时间
+     * Getter for <code>lesson_prod.edu_student_course_record.created_time</code>. 创建时间
      */
     public LocalDateTime getCreatedTime() {
         return (LocalDateTime) get(11);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_course_record.update_time</code>. 更新时间
+     * Setter for <code>lesson_prod.edu_student_course_record.update_time</code>. 更新时间
      */
     public void setUpdateTime(LocalDateTime value) {
         set(12, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_course_record.update_time</code>. 更新时间
+     * Getter for <code>lesson_prod.edu_student_course_record.update_time</code>. 更新时间
      */
     public LocalDateTime getUpdateTime() {
         return (LocalDateTime) get(12);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_course_record.deleted</code>. 是否删除：0-未删除，1-已删除
+     * Setter for <code>lesson_prod.edu_student_course_record.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public void setDeleted(Integer value) {
         set(13, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_course_record.deleted</code>. 是否删除：0-未删除，1-已删除
+     * Getter for <code>lesson_prod.edu_student_course_record.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public Integer getDeleted() {
         return (Integer) get(13);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_course_record.status_id</code>. 状态ID：1-正常，2-异常
+     * Setter for <code>lesson_prod.edu_student_course_record.status</code>. 记录类型：CHECK_IN-打卡, LEAVE-请假
      */
-    public void setStatusId(Long value) {
+    public void setStatus(String value) {
         set(14, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_course_record.status_id</code>. 状态ID：1-正常，2-异常
+     * Getter for <code>lesson_prod.edu_student_course_record.status</code>. 记录类型：CHECK_IN-打卡, LEAVE-请假
      */
-    public Long getStatusId() {
-        return (Long) get(14);
+    public String getStatus() {
+        return (String) get(14);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_course_record.status</code>. 出勤状态（枚举值：NORMAL/LEAVE/ABSENT）
+     * Setter for <code>lesson_prod.edu_student_course_record.status_id</code>. 状态ID：1-正常，2-异常
      */
-    public void setStatus(String value) {
+    public void setStatusId(Long value) {
         set(15, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_course_record.status</code>. 出勤状态（枚举值：NORMAL/LEAVE/ABSENT）
+     * Getter for <code>lesson_prod.edu_student_course_record.status_id</code>. 状态ID：1-正常，2-异常
      */
-    public String getStatus() {
-        return (String) get(15);
+    public Long getStatusId() {
+        return (Long) get(15);
     }
 
     // -------------------------------------------------------------------------
@@ -264,12 +264,12 @@ public class EduStudentCourseRecordRecord extends UpdatableRecordImpl<EduStudent
     // -------------------------------------------------------------------------
 
     @Override
-    public Row16<Long, Long, Long, Long, LocalDate, LocalTime, LocalTime, BigDecimal, String, Long, Long, LocalDateTime, LocalDateTime, Integer, Long, String> fieldsRow() {
+    public Row16<Long, Long, Long, Long, LocalDate, LocalTime, LocalTime, BigDecimal, String, Long, Long, LocalDateTime, LocalDateTime, Integer, String, Long> fieldsRow() {
         return (Row16) super.fieldsRow();
     }
 
     @Override
-    public Row16<Long, Long, Long, Long, LocalDate, LocalTime, LocalTime, BigDecimal, String, Long, Long, LocalDateTime, LocalDateTime, Integer, Long, String> valuesRow() {
+    public Row16<Long, Long, Long, Long, LocalDate, LocalTime, LocalTime, BigDecimal, String, Long, Long, LocalDateTime, LocalDateTime, Integer, String, Long> valuesRow() {
         return (Row16) super.valuesRow();
     }
 
@@ -344,13 +344,13 @@ public class EduStudentCourseRecordRecord extends UpdatableRecordImpl<EduStudent
     }
 
     @Override
-    public Field<Long> field15() {
-        return EduStudentCourseRecord.EDU_STUDENT_COURSE_RECORD.STATUS_ID;
+    public Field<String> field15() {
+        return EduStudentCourseRecord.EDU_STUDENT_COURSE_RECORD.STATUS;
     }
 
     @Override
-    public Field<String> field16() {
-        return EduStudentCourseRecord.EDU_STUDENT_COURSE_RECORD.STATUS;
+    public Field<Long> field16() {
+        return EduStudentCourseRecord.EDU_STUDENT_COURSE_RECORD.STATUS_ID;
     }
 
     @Override
@@ -424,13 +424,13 @@ public class EduStudentCourseRecordRecord extends UpdatableRecordImpl<EduStudent
     }
 
     @Override
-    public Long component15() {
-        return getStatusId();
+    public String component15() {
+        return getStatus();
     }
 
     @Override
-    public String component16() {
-        return getStatus();
+    public Long component16() {
+        return getStatusId();
     }
 
     @Override
@@ -504,13 +504,13 @@ public class EduStudentCourseRecordRecord extends UpdatableRecordImpl<EduStudent
     }
 
     @Override
-    public Long value15() {
-        return getStatusId();
+    public String value15() {
+        return getStatus();
     }
 
     @Override
-    public String value16() {
-        return getStatus();
+    public Long value16() {
+        return getStatusId();
     }
 
     @Override
@@ -598,19 +598,19 @@ public class EduStudentCourseRecordRecord extends UpdatableRecordImpl<EduStudent
     }
 
     @Override
-    public EduStudentCourseRecordRecord value15(Long value) {
-        setStatusId(value);
-        return this;
-    }
-
-    @Override
-    public EduStudentCourseRecordRecord value16(String value) {
+    public EduStudentCourseRecordRecord value15(String value) {
         setStatus(value);
         return this;
     }
 
     @Override
-    public EduStudentCourseRecordRecord values(Long value1, Long value2, Long value3, Long value4, LocalDate value5, LocalTime value6, LocalTime value7, BigDecimal value8, String value9, Long value10, Long value11, LocalDateTime value12, LocalDateTime value13, Integer value14, Long value15, String value16) {
+    public EduStudentCourseRecordRecord value16(Long value) {
+        setStatusId(value);
+        return this;
+    }
+
+    @Override
+    public EduStudentCourseRecordRecord values(Long value1, Long value2, Long value3, Long value4, LocalDate value5, LocalTime value6, LocalTime value7, BigDecimal value8, String value9, Long value10, Long value11, LocalDateTime value12, LocalDateTime value13, Integer value14, String value15, Long value16) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -644,7 +644,7 @@ public class EduStudentCourseRecordRecord extends UpdatableRecordImpl<EduStudent
     /**
      * Create a detached, initialised EduStudentCourseRecordRecord
      */
-    public EduStudentCourseRecordRecord(Long id, Long studentId, Long courseId, Long coachId, LocalDate courseDate, LocalTime startTime, LocalTime endTime, BigDecimal hours, String notes, Long campusId, Long institutionId, LocalDateTime createdTime, LocalDateTime updateTime, Integer deleted, Long statusId, String status) {
+    public EduStudentCourseRecordRecord(Long id, Long studentId, Long courseId, Long coachId, LocalDate courseDate, LocalTime startTime, LocalTime endTime, BigDecimal hours, String notes, Long campusId, Long institutionId, LocalDateTime createdTime, LocalDateTime updateTime, Integer deleted, String status, Long statusId) {
         super(EduStudentCourseRecord.EDU_STUDENT_COURSE_RECORD);
 
         setId(id);
@@ -661,7 +661,7 @@ public class EduStudentCourseRecordRecord extends UpdatableRecordImpl<EduStudent
         setCreatedTime(createdTime);
         setUpdateTime(updateTime);
         setDeleted(deleted);
-        setStatusId(statusId);
         setStatus(status);
+        setStatusId(statusId);
     }
 }

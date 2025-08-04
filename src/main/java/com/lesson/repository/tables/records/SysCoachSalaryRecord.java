@@ -26,168 +26,168 @@ public class SysCoachSalaryRecord extends UpdatableRecordImpl<SysCoachSalaryReco
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>lesson.sys_coach_salary.id</code>. 主键ID
+     * Setter for <code>lesson_prod.sys_coach_salary.id</code>. 主键ID
      */
     public void setId(Long value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_coach_salary.id</code>. 主键ID
+     * Getter for <code>lesson_prod.sys_coach_salary.id</code>. 主键ID
      */
     public Long getId() {
         return (Long) get(0);
     }
 
     /**
-     * Setter for <code>lesson.sys_coach_salary.coach_id</code>. 关联教练ID
+     * Setter for <code>lesson_prod.sys_coach_salary.coach_id</code>. 关联教练ID
      */
     public void setCoachId(Long value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_coach_salary.coach_id</code>. 关联教练ID
+     * Getter for <code>lesson_prod.sys_coach_salary.coach_id</code>. 关联教练ID
      */
     public Long getCoachId() {
         return (Long) get(1);
     }
 
     /**
-     * Setter for <code>lesson.sys_coach_salary.base_salary</code>. 基本工资
+     * Setter for <code>lesson_prod.sys_coach_salary.base_salary</code>. 基本工资
      */
     public void setBaseSalary(BigDecimal value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_coach_salary.base_salary</code>. 基本工资
+     * Getter for <code>lesson_prod.sys_coach_salary.base_salary</code>. 基本工资
      */
     public BigDecimal getBaseSalary() {
         return (BigDecimal) get(2);
     }
 
     /**
-     * Setter for <code>lesson.sys_coach_salary.social_insurance</code>. 社保费
+     * Setter for <code>lesson_prod.sys_coach_salary.social_insurance</code>. 社保费
      */
     public void setSocialInsurance(BigDecimal value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_coach_salary.social_insurance</code>. 社保费
+     * Getter for <code>lesson_prod.sys_coach_salary.social_insurance</code>. 社保费
      */
     public BigDecimal getSocialInsurance() {
         return (BigDecimal) get(3);
     }
 
     /**
-     * Setter for <code>lesson.sys_coach_salary.class_fee</code>. 课时费
+     * Setter for <code>lesson_prod.sys_coach_salary.class_fee</code>. 课时费
      */
     public void setClassFee(BigDecimal value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_coach_salary.class_fee</code>. 课时费
+     * Getter for <code>lesson_prod.sys_coach_salary.class_fee</code>. 课时费
      */
     public BigDecimal getClassFee() {
         return (BigDecimal) get(4);
     }
 
     /**
-     * Setter for <code>lesson.sys_coach_salary.performance_bonus</code>. 绩效奖金
+     * Setter for <code>lesson_prod.sys_coach_salary.performance_bonus</code>. 绩效奖金
      */
     public void setPerformanceBonus(BigDecimal value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_coach_salary.performance_bonus</code>. 绩效奖金
+     * Getter for <code>lesson_prod.sys_coach_salary.performance_bonus</code>. 绩效奖金
      */
     public BigDecimal getPerformanceBonus() {
         return (BigDecimal) get(5);
     }
 
     /**
-     * Setter for <code>lesson.sys_coach_salary.commission</code>. 提成百分比
+     * Setter for <code>lesson_prod.sys_coach_salary.commission</code>. 提成百分比
      */
     public void setCommission(BigDecimal value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_coach_salary.commission</code>. 提成百分比
+     * Getter for <code>lesson_prod.sys_coach_salary.commission</code>. 提成百分比
      */
     public BigDecimal getCommission() {
         return (BigDecimal) get(6);
     }
 
     /**
-     * Setter for <code>lesson.sys_coach_salary.dividend</code>. 分红
+     * Setter for <code>lesson_prod.sys_coach_salary.dividend</code>. 分红
      */
     public void setDividend(BigDecimal value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_coach_salary.dividend</code>. 分红
+     * Getter for <code>lesson_prod.sys_coach_salary.dividend</code>. 分红
      */
     public BigDecimal getDividend() {
         return (BigDecimal) get(7);
     }
 
     /**
-     * Setter for <code>lesson.sys_coach_salary.effective_date</code>. 生效日期
+     * Setter for <code>lesson_prod.sys_coach_salary.effective_date</code>. 生效日期
      */
     public void setEffectiveDate(LocalDate value) {
         set(8, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_coach_salary.effective_date</code>. 生效日期
+     * Getter for <code>lesson_prod.sys_coach_salary.effective_date</code>. 生效日期
      */
     public LocalDate getEffectiveDate() {
         return (LocalDate) get(8);
     }
 
     /**
-     * Setter for <code>lesson.sys_coach_salary.created_time</code>. 创建时间
+     * Setter for <code>lesson_prod.sys_coach_salary.created_time</code>. 创建时间
      */
     public void setCreatedTime(LocalDateTime value) {
         set(9, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_coach_salary.created_time</code>. 创建时间
+     * Getter for <code>lesson_prod.sys_coach_salary.created_time</code>. 创建时间
      */
     public LocalDateTime getCreatedTime() {
         return (LocalDateTime) get(9);
     }
 
     /**
-     * Setter for <code>lesson.sys_coach_salary.update_time</code>. 更新时间
+     * Setter for <code>lesson_prod.sys_coach_salary.update_time</code>. 更新时间
      */
     public void setUpdateTime(LocalDateTime value) {
         set(10, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_coach_salary.update_time</code>. 更新时间
+     * Getter for <code>lesson_prod.sys_coach_salary.update_time</code>. 更新时间
      */
     public LocalDateTime getUpdateTime() {
         return (LocalDateTime) get(10);
     }
 
     /**
-     * Setter for <code>lesson.sys_coach_salary.deleted</code>. 是否删除：0-未删除，1-已删除
+     * Setter for <code>lesson_prod.sys_coach_salary.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public void setDeleted(Integer value) {
         set(11, value);
     }
 
     /**
-     * Getter for <code>lesson.sys_coach_salary.deleted</code>. 是否删除：0-未删除，1-已删除
+     * Getter for <code>lesson_prod.sys_coach_salary.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public Integer getDeleted() {
         return (Integer) get(11);

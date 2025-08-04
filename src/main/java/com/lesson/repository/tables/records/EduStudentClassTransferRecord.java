@@ -24,154 +24,154 @@ public class EduStudentClassTransferRecord extends UpdatableRecordImpl<EduStuden
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>lesson.edu_student_class_transfer.id</code>. 记录ID
+     * Setter for <code>lesson_prod.edu_student_class_transfer.id</code>. 记录ID
      */
     public void setId(Long value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_class_transfer.id</code>. 记录ID
+     * Getter for <code>lesson_prod.edu_student_class_transfer.id</code>. 记录ID
      */
     public Long getId() {
         return (Long) get(0);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_class_transfer.student_id</code>. 学员ID
+     * Setter for <code>lesson_prod.edu_student_class_transfer.student_id</code>. 学员ID
      */
     public void setStudentId(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_class_transfer.student_id</code>. 学员ID
+     * Getter for <code>lesson_prod.edu_student_class_transfer.student_id</code>. 学员ID
      */
     public String getStudentId() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_class_transfer.course_id</code>. 课程ID
+     * Setter for <code>lesson_prod.edu_student_class_transfer.course_id</code>. 课程ID
      */
     public void setCourseId(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_class_transfer.course_id</code>. 课程ID
+     * Getter for <code>lesson_prod.edu_student_class_transfer.course_id</code>. 课程ID
      */
     public String getCourseId() {
         return (String) get(2);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_class_transfer.original_schedule</code>. 原上课时间
+     * Setter for <code>lesson_prod.edu_student_class_transfer.original_schedule</code>. 原上课时间
      */
     public void setOriginalSchedule(String value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_class_transfer.original_schedule</code>. 原上课时间
+     * Getter for <code>lesson_prod.edu_student_class_transfer.original_schedule</code>. 原上课时间
      */
     public String getOriginalSchedule() {
         return (String) get(3);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_class_transfer.new_schedule</code>. 新上课时间
+     * Setter for <code>lesson_prod.edu_student_class_transfer.new_schedule</code>. 新上课时间
      */
     public void setNewSchedule(String value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_class_transfer.new_schedule</code>. 新上课时间
+     * Getter for <code>lesson_prod.edu_student_class_transfer.new_schedule</code>. 新上课时间
      */
     public String getNewSchedule() {
         return (String) get(4);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_class_transfer.reason</code>. 转班原因
+     * Setter for <code>lesson_prod.edu_student_class_transfer.reason</code>. 转班原因
      */
     public void setReason(String value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_class_transfer.reason</code>. 转班原因
+     * Getter for <code>lesson_prod.edu_student_class_transfer.reason</code>. 转班原因
      */
     public String getReason() {
         return (String) get(5);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_class_transfer.campus_id</code>. 校区ID
+     * Setter for <code>lesson_prod.edu_student_class_transfer.campus_id</code>. 校区ID
      */
     public void setCampusId(Long value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_class_transfer.campus_id</code>. 校区ID
+     * Getter for <code>lesson_prod.edu_student_class_transfer.campus_id</code>. 校区ID
      */
     public Long getCampusId() {
         return (Long) get(6);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_class_transfer.institution_id</code>. 机构ID
+     * Setter for <code>lesson_prod.edu_student_class_transfer.institution_id</code>. 机构ID
      */
     public void setInstitutionId(Long value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_class_transfer.institution_id</code>. 机构ID
+     * Getter for <code>lesson_prod.edu_student_class_transfer.institution_id</code>. 机构ID
      */
     public Long getInstitutionId() {
         return (Long) get(7);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_class_transfer.created_time</code>. 创建时间
+     * Setter for <code>lesson_prod.edu_student_class_transfer.created_time</code>. 创建时间
      */
     public void setCreatedTime(LocalDateTime value) {
         set(8, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_class_transfer.created_time</code>. 创建时间
+     * Getter for <code>lesson_prod.edu_student_class_transfer.created_time</code>. 创建时间
      */
     public LocalDateTime getCreatedTime() {
         return (LocalDateTime) get(8);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_class_transfer.update_time</code>. 更新时间
+     * Setter for <code>lesson_prod.edu_student_class_transfer.update_time</code>. 更新时间
      */
     public void setUpdateTime(LocalDateTime value) {
         set(9, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_class_transfer.update_time</code>. 更新时间
+     * Getter for <code>lesson_prod.edu_student_class_transfer.update_time</code>. 更新时间
      */
     public LocalDateTime getUpdateTime() {
         return (LocalDateTime) get(9);
     }
 
     /**
-     * Setter for <code>lesson.edu_student_class_transfer.deleted</code>. 是否删除：0-未删除，1-已删除
+     * Setter for <code>lesson_prod.edu_student_class_transfer.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public void setDeleted(Integer value) {
         set(10, value);
     }
 
     /**
-     * Getter for <code>lesson.edu_student_class_transfer.deleted</code>. 是否删除：0-未删除，1-已删除
+     * Getter for <code>lesson_prod.edu_student_class_transfer.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public Integer getDeleted() {
         return (Integer) get(10);
