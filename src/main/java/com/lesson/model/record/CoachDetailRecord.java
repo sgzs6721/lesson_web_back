@@ -35,9 +35,19 @@ public class CoachDetailRecord {
     private Integer age;
     
     /**
+     * 工作类型
+     */
+    private String workType;
+    
+    /**
      * 联系电话
      */
     private String phone;
+    
+    /**
+     * 身份证号
+     */
+    private String idNumber;
     
     /**
      * 头像URL
@@ -53,6 +63,11 @@ public class CoachDetailRecord {
      * 入职日期
      */
     private LocalDate hireDate;
+    
+    /**
+     * 执教日期
+     */
+    private LocalDate coachingDate;
     
     /**
      * 教龄(年)

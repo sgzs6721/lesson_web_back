@@ -2,6 +2,7 @@ package com.lesson.request.coach;
 
 import com.lesson.common.enums.CoachStatus;
 import com.lesson.common.enums.Gender;
+import com.lesson.common.enums.WorkType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -28,14 +29,19 @@ public class CoachUpdateRequest {
     @Schema(description = "性别", example = "MALE")
     private Gender gender;
     
-    @Min(value = 18, message = "年龄不能小于18岁")
-    @Max(value = 80, message = "年龄不能大于80岁")
-    @Schema(description = "年龄", example = "28")
+    @Schema(description = "工作类型", example = "FULL_TIME")
+    private WorkType workType;
+    
+    @Schema(description = "年龄（根据身份证号自动计算）", example = "28", hidden = true)
     private Integer age;
     
     @Pattern(regexp = "^1[3-9]\\d{9}$", message = "手机号格式不正确")
     @Schema(description = "联系电话", example = "13800138000")
     private String phone;
+    
+    @Pattern(regexp = "^[1-9]\\d{5}(18|19|20)\\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\\d{3}[0-9Xx]$", message = "身份证号格式不正确")
+    @Schema(description = "身份证号", example = "110101199001011234")
+    private String idNumber;
     
     @Schema(description = "头像URL", example = "https://example.com/avatar.jpg")
     private String avatar;
@@ -47,8 +53,10 @@ public class CoachUpdateRequest {
     @Schema(description = "入职日期", example = "2023-01-01")
     private LocalDate hireDate;
     
-    @Min(value = 0, message = "教龄不能为负数")
-    @Schema(description = "教龄(年)", example = "5")
+    @Schema(description = "执教日期", example = "2023-01-01")
+    private LocalDate coachingDate;
+    
+    @Schema(description = "教龄(年)（根据执教日期自动计算）", example = "5", hidden = true)
     private Integer experience;
     
     @Schema(description = "证书列表", example = "[\"健身教练证\", \"急救证\"]")
@@ -64,6 +72,10 @@ public class CoachUpdateRequest {
     @DecimalMin(value = "0", message = "基本工资不能为负数")
     @Schema(description = "基本工资", example = "5000")
     private BigDecimal baseSalary;
+    
+    @Min(value = 0, message = "保底课时不能为负数")
+    @Schema(description = "保底课时", example = "160")
+    private Integer guaranteedHours;
     
     @DecimalMin(value = "0", message = "社保费不能为负数")
     @Schema(description = "社保费", example = "1000")

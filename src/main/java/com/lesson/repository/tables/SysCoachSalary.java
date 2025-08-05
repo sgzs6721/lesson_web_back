@@ -69,6 +69,11 @@ public class SysCoachSalary extends TableImpl<SysCoachSalaryRecord> {
     public final TableField<SysCoachSalaryRecord, BigDecimal> BASE_SALARY = createField(DSL.name("base_salary"), SQLDataType.DECIMAL(10, 2).nullable(false), this, "基本工资");
 
     /**
+     * The column <code>lesson_prod.sys_coach_salary.guaranteed_hours</code>. 保底课时
+     */
+    public final TableField<SysCoachSalaryRecord, Integer> GUARANTEED_HOURS = createField(DSL.name("guaranteed_hours"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.inline("0", SQLDataType.INTEGER)), this, "保底课时");
+
+    /**
      * The column <code>lesson_prod.sys_coach_salary.social_insurance</code>. 社保费
      */
     public final TableField<SysCoachSalaryRecord, BigDecimal> SOCIAL_INSURANCE = createField(DSL.name("social_insurance"), SQLDataType.DECIMAL(10, 2).nullable(false), this, "社保费");

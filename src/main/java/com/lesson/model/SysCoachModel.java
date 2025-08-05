@@ -3,6 +3,7 @@ package com.lesson.model;
 import com.lesson.common.exception.BusinessException;
 import com.lesson.common.enums.CoachStatus;
 import com.lesson.common.enums.Gender;
+import com.lesson.common.enums.WorkType;
 import com.lesson.model.record.CoachDetailRecord;
 import com.lesson.repository.tables.records.SysCoachRecord;
 import com.lesson.repository.tables.records.SysCoachCertificationRecord;
@@ -45,7 +46,8 @@ public class SysCoachModel {
      */
     public Long createCoach(String name, CoachStatus status, Integer age, String phone,
                              String avatar, String jobTitle, LocalDate hireDate,
-                             Integer experience, Gender gender, Long campusId, Long institutionId) {
+                             Integer experience, Gender gender, WorkType workType, 
+                             String idNumber, LocalDate coachingDate, Long campusId, Long institutionId) {
         // 参数验证
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("姓名不能为空");
@@ -71,6 +73,9 @@ public class SysCoachModel {
         if (gender == null) {
             throw new IllegalArgumentException("性别不能为空");
         }
+        if (workType == null) {
+            throw new IllegalArgumentException("工作类型不能为空");
+        }
         if (campusId == null) {
             throw new IllegalArgumentException("校区ID不能为空");
         }
@@ -90,6 +95,9 @@ public class SysCoachModel {
                     .set(SYS_COACH.HIRE_DATE, hireDate)
                     .set(SYS_COACH.EXPERIENCE, experience)
                     .set(SYS_COACH.GENDER, gender.getCode())
+                    .set(SYS_COACH.WORK_TYPE, workType.getCode())
+                    .set(SYS_COACH.ID_NUMBER, idNumber)
+                    .set(SYS_COACH.COACHING_DATE, coachingDate)
                     .set(SYS_COACH.CAMPUS_ID, campusId)
                     .set(SYS_COACH.INSTITUTION_ID, institutionId)
                     .set(SYS_COACH.DELETED, 0)
@@ -197,10 +205,13 @@ public class SysCoachModel {
                     SYS_COACH.NAME,
                     SYS_COACH.STATUS,
                     SYS_COACH.AGE,
+                    SYS_COACH.WORK_TYPE,
                     SYS_COACH.PHONE,
+                    SYS_COACH.ID_NUMBER,
                     SYS_COACH.AVATAR,
                     SYS_COACH.JOB_TITLE,
                     SYS_COACH.HIRE_DATE,
+                    SYS_COACH.COACHING_DATE,
                     SYS_COACH.EXPERIENCE,
                     SYS_COACH.GENDER,
                     SYS_COACH.CAMPUS_ID,
@@ -227,10 +238,13 @@ public class SysCoachModel {
         result.setName(record.get(SYS_COACH.NAME));
         result.setStatus(CoachStatus.fromCode(record.get(SYS_COACH.STATUS)));
         result.setAge(record.get(SYS_COACH.AGE));
+        result.setWorkType(record.get(SYS_COACH.WORK_TYPE));
         result.setPhone(record.get(SYS_COACH.PHONE));
+        result.setIdNumber(record.get(SYS_COACH.ID_NUMBER));
         result.setAvatar(record.get(SYS_COACH.AVATAR));
         result.setJobTitle(record.get(SYS_COACH.JOB_TITLE));
         result.setHireDate(record.get(SYS_COACH.HIRE_DATE));
+        result.setCoachingDate(record.get(SYS_COACH.COACHING_DATE));
         result.setExperience(record.get(SYS_COACH.EXPERIENCE));
         result.setGender(Gender.fromCode(record.get(SYS_COACH.GENDER)));
         result.setCampusId(record.get(SYS_COACH.CAMPUS_ID));
@@ -308,12 +322,13 @@ public class SysCoachModel {
     /**
      * 添加教练薪资
      */
-    public void addSalary(Long coachId, BigDecimal baseSalary, BigDecimal socialInsurance,
+    public void addSalary(Long coachId, BigDecimal baseSalary, Integer guaranteedHours, BigDecimal socialInsurance,
                          BigDecimal classFee, BigDecimal performanceBonus, BigDecimal commission,
                          BigDecimal dividend, LocalDate effectiveDate) {
         dsl.insertInto(SYS_COACH_SALARY)
            .set(SYS_COACH_SALARY.COACH_ID, coachId)
            .set(SYS_COACH_SALARY.BASE_SALARY, baseSalary)
+           .set(SYS_COACH_SALARY.GUARANTEED_HOURS, guaranteedHours)
            .set(SYS_COACH_SALARY.SOCIAL_INSURANCE, socialInsurance)
            .set(SYS_COACH_SALARY.CLASS_FEE, classFee)
            .set(SYS_COACH_SALARY.PERFORMANCE_BONUS, performanceBonus)

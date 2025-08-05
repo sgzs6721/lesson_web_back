@@ -3,6 +3,7 @@ package com.lesson.service.impl;
 import com.lesson.common.exception.BusinessException;
 import com.lesson.common.enums.CoachStatus;
 import com.lesson.common.enums.Gender;
+import com.lesson.utils.CoachUtils;
 import com.lesson.model.SysCoachModel;
 import com.lesson.model.record.CoachDetailRecord;
 import com.lesson.repository.tables.records.SysCoachCertificationRecord;
@@ -106,17 +107,32 @@ public class CoachServiceImpl implements CoachService {
                 throw new BusinessException("机构ID不能为空");
             }
 
+            // 根据身份证号计算年龄
+            Integer calculatedAge = CoachUtils.calculateAgeFromIdNumber(request.getIdNumber());
+            if (calculatedAge == null) {
+                throw new BusinessException("无法从身份证号计算年龄，请检查身份证号格式");
+            }
+            if (calculatedAge < 18 || calculatedAge > 80) {
+                throw new BusinessException("年龄必须在18-80岁之间");
+            }
+
+            // 根据执教日期计算教龄
+            Integer calculatedExperience = CoachUtils.calculateExperienceFromCoachingDate(request.getCoachingDate());
+
             // 创建教练记录
             Long coachId = coachModel.createCoach(
                 request.getName(),
                 request.getStatus(),
-                request.getAge(),
+                calculatedAge,  // 使用计算出的年龄
                 request.getPhone(),
                 request.getAvatar(),
                 request.getJobTitle(),
                 request.getHireDate(),
-                request.getExperience(),
+                calculatedExperience,  // 使用计算出的教龄
                 request.getGender(),
+                request.getWorkType(),
+                request.getIdNumber(),
+                request.getCoachingDate(),
                 request.getCampusId(),
                 institutionId
             );
@@ -125,6 +141,7 @@ public class CoachServiceImpl implements CoachService {
             coachModel.addSalary(
                 coachId,
                 request.getBaseSalary(),
+                request.getGuaranteedHours(),
                 request.getSocialInsurance(),
                 request.getClassFee(),
                 request.getPerformanceBonus(),
@@ -173,17 +190,37 @@ public class CoachServiceImpl implements CoachService {
                 throw new BusinessException("无权操作其他机构的教练信息");
             }
 
+            // 计算年龄和教龄
+            Integer calculatedAge = coach.getAge();
+            Integer calculatedExperience = coach.getExperience();
+
+            // 如果身份证号有更新，重新计算年龄
+            if (request.getIdNumber() != null && !request.getIdNumber().equals(coach.getIdNumber())) {
+                calculatedAge = CoachUtils.calculateAgeFromIdNumber(request.getIdNumber());
+                if (calculatedAge == null) {
+                    throw new BusinessException("无法从身份证号计算年龄，请检查身份证号格式");
+                }
+                if (calculatedAge < 18 || calculatedAge > 80) {
+                    throw new BusinessException("年龄必须在18-80岁之间");
+                }
+            }
+
+            // 如果执教日期有更新，重新计算教龄
+            if (request.getCoachingDate() != null && !request.getCoachingDate().equals(coach.getCoachingDate())) {
+                calculatedExperience = CoachUtils.calculateExperienceFromCoachingDate(request.getCoachingDate());
+            }
+
             // 更新教练基本信息
             coachModel.updateCoach(
                     request.getId(),
                     request.getName() != null ? request.getName() : coach.getName(),
                     request.getStatus(),
-                    request.getAge() != null ? request.getAge() : coach.getAge(),
+                    calculatedAge,  // 使用计算出的年龄
                     request.getPhone() != null ? request.getPhone() : coach.getPhone(),
                     request.getAvatar() != null ? request.getAvatar() : coach.getAvatar(),
                     request.getJobTitle() != null ? request.getJobTitle() : coach.getJobTitle(),
                     request.getHireDate() != null ? request.getHireDate() : coach.getHireDate(),
-                    request.getExperience() != null ? request.getExperience() : coach.getExperience(),
+                    calculatedExperience,  // 使用计算出的教龄
                     request.getGender(),
                     request.getCampusId() != null ? request.getCampusId() : coach.getCampusId(),
                     institutionId
@@ -195,13 +232,15 @@ public class CoachServiceImpl implements CoachService {
             }
 
             // 更新薪资信息（如果有提供薪资相关字段）
-            if (request.getBaseSalary() != null || request.getSocialInsurance() != null ||
-                request.getClassFee() != null || request.getPerformanceBonus() != null ||
-                request.getCommission() != null || request.getDividend() != null) {
+            if (request.getBaseSalary() != null || request.getGuaranteedHours() != null || 
+                request.getSocialInsurance() != null || request.getClassFee() != null || 
+                request.getPerformanceBonus() != null || request.getCommission() != null || 
+                request.getDividend() != null) {
                 
                 coachModel.addSalary(
                     request.getId(),
                     request.getBaseSalary(),
+                    request.getGuaranteedHours(),
                     request.getSocialInsurance(),
                     request.getClassFee(),
                     request.getPerformanceBonus(),

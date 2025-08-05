@@ -68,6 +68,11 @@ public class SysCoach extends TableImpl<SysCoachRecord> {
     public final TableField<SysCoachRecord, String> GENDER = createField(DSL.name("gender"), SQLDataType.VARCHAR(20).nullable(false), this, "性别");
 
     /**
+     * The column <code>lesson_prod.sys_coach.work_type</code>. 工作类型：FULL_TIME-全职，PART_TIME-兼职
+     */
+    public final TableField<SysCoachRecord, String> WORK_TYPE = createField(DSL.name("work_type"), SQLDataType.VARCHAR(20).nullable(false).defaultValue(DSL.inline("FULL_TIME", SQLDataType.VARCHAR)), this, "工作类型：FULL_TIME-全职，PART_TIME-兼职");
+
+    /**
      * The column <code>lesson_prod.sys_coach.age</code>. 年龄
      */
     public final TableField<SysCoachRecord, Integer> AGE = createField(DSL.name("age"), SQLDataType.INTEGER.nullable(false), this, "年龄");
@@ -76,6 +81,11 @@ public class SysCoach extends TableImpl<SysCoachRecord> {
      * The column <code>lesson_prod.sys_coach.phone</code>. 联系电话
      */
     public final TableField<SysCoachRecord, String> PHONE = createField(DSL.name("phone"), SQLDataType.VARCHAR(20).nullable(false), this, "联系电话");
+
+    /**
+     * The column <code>lesson_prod.sys_coach.id_number</code>. 身份证号
+     */
+    public final TableField<SysCoachRecord, String> ID_NUMBER = createField(DSL.name("id_number"), SQLDataType.VARCHAR(18), this, "身份证号");
 
     /**
      * The column <code>lesson_prod.sys_coach.avatar</code>. 头像URL
@@ -91,6 +101,11 @@ public class SysCoach extends TableImpl<SysCoachRecord> {
      * The column <code>lesson_prod.sys_coach.hire_date</code>. 入职日期
      */
     public final TableField<SysCoachRecord, LocalDate> HIRE_DATE = createField(DSL.name("hire_date"), SQLDataType.LOCALDATE.nullable(false), this, "入职日期");
+
+    /**
+     * The column <code>lesson_prod.sys_coach.coaching_date</code>. 执教日期
+     */
+    public final TableField<SysCoachRecord, LocalDate> COACHING_DATE = createField(DSL.name("coaching_date"), SQLDataType.LOCALDATE, this, "执教日期");
 
     /**
      * The column <code>lesson_prod.sys_coach.experience</code>. 教龄(年)

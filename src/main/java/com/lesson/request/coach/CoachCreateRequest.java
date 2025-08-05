@@ -2,6 +2,7 @@ package com.lesson.request.coach;
 
 import com.lesson.common.enums.CoachStatus;
 import com.lesson.common.enums.Gender;
+import com.lesson.common.enums.WorkType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -33,12 +34,16 @@ public class CoachCreateRequest {
     private Gender gender;
     
     /**
-     * 年龄
+     * 工作类型
      */
-    @NotNull(message = "年龄不能为空")
-    @Min(value = 18, message = "年龄不能小于18岁")
-    @Max(value = 80, message = "年龄不能大于80岁")
-    @Schema(description = "年龄", required = true, example = "28")
+    @NotNull(message = "工作类型不能为空")
+    @Schema(description = "工作类型", required = true, example = "FULL_TIME")
+    private WorkType workType;
+    
+    /**
+     * 年龄（根据身份证号自动计算，无需手动输入）
+     */
+    @Schema(description = "年龄（根据身份证号自动计算）", example = "28", hidden = true)
     private Integer age;
     
     /**
@@ -48,6 +53,14 @@ public class CoachCreateRequest {
     @Pattern(regexp = "^1[3-9]\\d{9}$", message = "手机号格式不正确")
     @Schema(description = "联系电话", required = true, example = "13800138000")
     private String phone;
+    
+    /**
+     * 身份证号
+     */
+    @NotBlank(message = "身份证号不能为空")
+    @Pattern(regexp = "^[1-9]\\d{5}(18|19|20)\\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\\d{3}[0-9Xx]$", message = "身份证号格式不正确")
+    @Schema(description = "身份证号", required = true, example = "110101199001011234")
+    private String idNumber;
     
     /**
      * 头像URL
@@ -71,11 +84,16 @@ public class CoachCreateRequest {
     private LocalDate hireDate;
     
     /**
-     * 教龄(年)
+     * 执教日期
      */
-    @NotNull(message = "教龄不能为空")
-    @Min(value = 0, message = "教龄不能为负数")
-    @Schema(description = "教龄(年)", required = true, example = "5")
+    @NotNull(message = "执教日期不能为空")
+    @Schema(description = "执教日期", required = true, example = "2023-01-01")
+    private LocalDate coachingDate;
+    
+    /**
+     * 教龄(年)（根据执教日期自动计算，无需手动输入）
+     */
+    @Schema(description = "教龄(年)（根据执教日期自动计算）", example = "5", hidden = true)
     private Integer experience;
     
     /**
@@ -106,6 +124,14 @@ public class CoachCreateRequest {
     @DecimalMin(value = "0", message = "基本工资不能为负数")
     @Schema(description = "基本工资", required = true, example = "5000")
     private BigDecimal baseSalary;
+    
+    /**
+     * 保底课时
+     */
+    @NotNull(message = "保底课时不能为空")
+    @Min(value = 0, message = "保底课时不能为负数")
+    @Schema(description = "保底课时", required = true, example = "160")
+    private Integer guaranteedHours;
     
     /**
      * 社保费
