@@ -1,0 +1,30 @@
+### 教练详情接口测试 - 验证字段完整性
+
+# 1. 先登录获取token
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "123456"
+}
+
+###
+
+# 2. 获取教练详情 - 验证所有字段是否正确返回
+GET http://localhost:8080/api/coach/detail?id=1&campusId=1
+Authorization: Bearer {{auth_token}}
+
+###
+
+# 3. 获取教练详情 - 另一个教练
+GET http://localhost:8080/api/coach/detail?id=2&campusId=1
+Authorization: Bearer {{auth_token}}
+
+###
+
+# 4. 对比教练列表和详情接口的字段
+GET http://localhost:8080/api/coach/list?campusId=1&page=1&size=5
+Authorization: Bearer {{auth_token}}
+
+### 

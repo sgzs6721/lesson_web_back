@@ -1,0 +1,36 @@
+### 教练列表接口测试 - 验证字段完整性
+
+# 1. 先登录获取token
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "123456"
+}
+
+###
+
+# 2. 查询教练列表 - 验证所有字段是否正确返回
+GET http://localhost:8080/api/coach/list?campusId=1&page=1&size=10
+Authorization: Bearer {{auth_token}}
+
+###
+
+# 3. 查询教练列表 - 带关键词搜索
+GET http://localhost:8080/api/coach/list?campusId=1&keyword=张&page=1&size=10
+Authorization: Bearer {{auth_token}}
+
+###
+
+# 4. 查询教练列表 - 按工作类型筛选
+GET http://localhost:8080/api/coach/list?campusId=1&page=1&size=10
+Authorization: Bearer {{auth_token}}
+
+###
+
+# 5. 获取教练详情 - 对比列表和详情的字段
+GET http://localhost:8080/api/coach/detail?id=1&campusId=1
+Authorization: Bearer {{auth_token}}
+
+### 

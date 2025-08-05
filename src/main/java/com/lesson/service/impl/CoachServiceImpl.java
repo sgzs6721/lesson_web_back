@@ -80,14 +80,19 @@ public class CoachServiceImpl implements CoachService {
         vo.setName(record.getName());
         vo.setStatus(record.getStatus());
         vo.setAge(record.getAge());
+        vo.setWorkType(record.getWorkType());
         vo.setPhone(record.getPhone());
+        vo.setIdNumber(record.getIdNumber());
         vo.setAvatar(record.getAvatar());
         vo.setJobTitle(record.getJobTitle());
         vo.setHireDate(record.getHireDate());
+        vo.setCoachingDate(record.getCoachingDate());
         vo.setExperience(record.getExperience());
         vo.setGender(record.getGender());
         vo.setCampusId(record.getCampusId());
+        vo.setCampusName(record.getCampusName());
         vo.setInstitutionId(record.getInstitutionId());
+        vo.setInstitutionName(record.getInstitutionName());
 
         // 设置薪资信息
         CoachDetailVO.SalaryInfo salaryInfo = new CoachDetailVO.SalaryInfo();

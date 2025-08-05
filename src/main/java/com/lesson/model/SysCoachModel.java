@@ -14,9 +14,11 @@ import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Component;
 
+import com.lesson.utils.CoachUtils;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -212,15 +214,31 @@ public class SysCoachModel {
         result.setId(record.get("id", Long.class));
         result.setName(record.get("name", String.class));
         result.setStatus(CoachStatus.fromCode(record.get("status", String.class)));
-        result.setAge(record.get("age", Integer.class));
+        
+        // 实时计算年龄
+        String idNumber = record.get("id_number", String.class);
+        Integer calculatedAge = null;
+        if (idNumber != null) {
+            calculatedAge = CoachUtils.calculateAgeFromIdNumber(idNumber);
+        }
+        result.setAge(calculatedAge);
+        
         result.setWorkType(record.get("work_type", String.class));
         result.setPhone(record.get("phone", String.class));
-        result.setIdNumber(record.get("id_number", String.class));
+        result.setIdNumber(idNumber);
         result.setAvatar(record.get("avatar", String.class));
         result.setJobTitle(record.get("job_title", String.class));
         result.setHireDate(record.get("hire_date", LocalDate.class));
         result.setCoachingDate(record.get("coaching_date", LocalDate.class));
-        result.setExperience(record.get("experience", Integer.class));
+        
+        // 实时计算教龄
+        LocalDate coachingDate = record.get("coaching_date", LocalDate.class);
+        Integer calculatedExperience = null;
+        if (coachingDate != null) {
+            calculatedExperience = CoachUtils.calculateExperienceFromCoachingDate(coachingDate);
+        }
+        result.setExperience(calculatedExperience);
+        
         result.setGender(Gender.fromCode(record.get("gender", String.class)));
         result.setCampusId(record.get("campus_id", Long.class));
         result.setCampusName(record.get("campus_name", String.class));
@@ -348,21 +366,26 @@ public class SysCoachModel {
     public List<CoachDetailRecord> listCoaches(String keyword, String status, String jobTitle,
                                              Long campusId, Long institutionId, String sortField,
                                              String sortOrder, Integer page, Integer size) {
+        // 检查是否需要内存排序（按年龄或教龄排序）
+        boolean needMemorySort = "age".equalsIgnoreCase(sortField) || "experience".equalsIgnoreCase(sortField);
+        
         // 构建基础查询
         SelectConditionStep<?> query = createBaseQuery(keyword, status, jobTitle, campusId, institutionId);
 
-        // 计算分页参数
-        int offset = (page - 1) * size;
-
-        // 构建排序
-        SortField<?> orderByField = buildSortField(sortField, sortOrder);
-        
-        // 执行查询
-        Result<?> records = query
-                .orderBy(orderByField)
-                .limit(size)
-                .offset(offset)
-                .fetch();
+        Result<?> records;
+        if (needMemorySort) {
+            // 如果需要内存排序，先获取所有数据
+            records = query.fetch();
+        } else {
+            // 否则使用数据库排序和分页
+            SortField<?> orderByField = buildSortField(sortField, sortOrder);
+            int offset = (page - 1) * size;
+            records = query
+                    .orderBy(orderByField)
+                    .limit(size)
+                    .offset(offset)
+                    .fetch();
+        }
 
         // 获取所有教练ID
         List<Long> coachIds = records.map(r -> r.get(SYS_COACH.ID));
@@ -385,22 +408,38 @@ public class SysCoachModel {
             }
         }
 
-        // 转换结果
-        return records.stream()
+        // 转换结果并实时计算年龄和教龄
+        List<CoachDetailRecord> result = records.stream()
                 .map(record -> {
                     CoachDetailRecord detailRecord = new CoachDetailRecord();
                     detailRecord.setId(record.get(SYS_COACH.ID));
                     detailRecord.setName(record.get(SYS_COACH.NAME));
                     detailRecord.setStatus(CoachStatus.fromCode(record.get(SYS_COACH.STATUS)));
-                    detailRecord.setAge(record.get(SYS_COACH.AGE));
+                    
+                    // 实时计算年龄
+                    String idNumber = record.get(SYS_COACH.ID_NUMBER);
+                    Integer calculatedAge = null;
+                    if (idNumber != null) {
+                        calculatedAge = CoachUtils.calculateAgeFromIdNumber(idNumber);
+                    }
+                    detailRecord.setAge(calculatedAge);
+                    
                     detailRecord.setWorkType(record.get(SYS_COACH.WORK_TYPE));
                     detailRecord.setPhone(record.get(SYS_COACH.PHONE));
-                    detailRecord.setIdNumber(record.get(SYS_COACH.ID_NUMBER));
+                    detailRecord.setIdNumber(idNumber);
                     detailRecord.setAvatar(record.get(SYS_COACH.AVATAR));
                     detailRecord.setJobTitle(record.get(SYS_COACH.JOB_TITLE));
                     detailRecord.setHireDate(record.get(SYS_COACH.HIRE_DATE));
                     detailRecord.setCoachingDate(record.get(SYS_COACH.COACHING_DATE));
-                    detailRecord.setExperience(record.get(SYS_COACH.EXPERIENCE));
+                    
+                    // 实时计算教龄
+                    LocalDate coachingDate = record.get(SYS_COACH.COACHING_DATE);
+                    Integer calculatedExperience = null;
+                    if (coachingDate != null) {
+                        calculatedExperience = CoachUtils.calculateExperienceFromCoachingDate(coachingDate);
+                    }
+                    detailRecord.setExperience(calculatedExperience);
+                    
                     detailRecord.setGender(Gender.fromCode(record.get(SYS_COACH.GENDER)));
                     detailRecord.setCampusId(record.get(SYS_COACH.CAMPUS_ID));
                     detailRecord.setCampusName(record.get("campus_name", String.class));
@@ -413,6 +452,24 @@ public class SysCoachModel {
                     return detailRecord;
                 })
                 .collect(Collectors.toList());
+
+        // 如果需要内存排序，进行排序和分页
+        if (needMemorySort) {
+            // 内存排序
+            Comparator<CoachDetailRecord> comparator = buildMemoryComparator(sortField, sortOrder);
+            result.sort(comparator);
+            
+            // 内存分页
+            int startIndex = (page - 1) * size;
+            int endIndex = Math.min(startIndex + size, result.size());
+            if (startIndex < result.size()) {
+                result = result.subList(startIndex, endIndex);
+            } else {
+                result = new ArrayList<>();
+            }
+        }
+
+        return result;
     }
 
     /**
@@ -586,6 +643,37 @@ public class SysCoachModel {
                 return SYS_COACH.UPDATE_TIME.sort(order);
             default:
                 return defaultSort;
+        }
+    }
+
+    /**
+     * 构建内存排序比较器
+     */
+    private Comparator<CoachDetailRecord> buildMemoryComparator(String sortField, String sortOrder) {
+        boolean isDesc = "desc".equalsIgnoreCase(sortOrder);
+        
+        switch (sortField.toLowerCase()) {
+            case "age":
+                return isDesc ? 
+                    Comparator.comparing(CoachDetailRecord::getAge, Comparator.nullsLast(Comparator.reverseOrder())) :
+                    Comparator.comparing(CoachDetailRecord::getAge, Comparator.nullsLast(Comparator.naturalOrder()));
+            case "experience":
+                return isDesc ? 
+                    Comparator.comparing(CoachDetailRecord::getExperience, Comparator.nullsLast(Comparator.reverseOrder())) :
+                    Comparator.comparing(CoachDetailRecord::getExperience, Comparator.nullsLast(Comparator.naturalOrder()));
+            case "name":
+                return isDesc ? 
+                    Comparator.comparing(CoachDetailRecord::getName, Comparator.nullsLast(Comparator.reverseOrder())) :
+                    Comparator.comparing(CoachDetailRecord::getName, Comparator.nullsLast(Comparator.naturalOrder()));
+            case "hiredate":
+            case "hire_date":
+                return isDesc ? 
+                    Comparator.comparing(CoachDetailRecord::getHireDate, Comparator.nullsLast(Comparator.reverseOrder())) :
+                    Comparator.comparing(CoachDetailRecord::getHireDate, Comparator.nullsLast(Comparator.naturalOrder()));
+            default:
+                return isDesc ? 
+                    Comparator.comparing(CoachDetailRecord::getId, Comparator.reverseOrder()) :
+                    Comparator.comparing(CoachDetailRecord::getId);
         }
     }
 }

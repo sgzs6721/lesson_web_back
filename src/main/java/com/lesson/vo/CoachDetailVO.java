@@ -42,10 +42,22 @@ public class CoachDetailVO {
     private Integer age;
     
     /**
+     * 工作类型
+     */
+    @Schema(description = "工作类型：FULLTIME-全职，PARTTIME-兼职", example = "FULLTIME")
+    private String workType;
+    
+    /**
      * 联系电话
      */
     @Schema(description = "联系电话", example = "13800138000")
     private String phone;
+    
+    /**
+     * 身份证号
+     */
+    @Schema(description = "身份证号", example = "110101199001011234")
+    private String idNumber;
     
     /**
      * 头像URL
@@ -65,6 +77,13 @@ public class CoachDetailVO {
     @Schema(description = "入职日期", example = "2023-01-01")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate hireDate;
+    
+    /**
+     * 执教日期
+     */
+    @Schema(description = "执教日期", example = "2020-01-01")
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate coachingDate;
     
     /**
      * 教龄(年)
@@ -91,10 +110,22 @@ public class CoachDetailVO {
     private Long campusId;
     
     /**
+     * 所属校区名称
+     */
+    @Schema(description = "所属校区名称", example = "北京中关村校区")
+    private String campusName;
+    
+    /**
      * 所属机构ID
      */
     @Schema(description = "所属机构ID", example = "1")
     private Long institutionId;
+    
+    /**
+     * 所属机构名称
+     */
+    @Schema(description = "所属机构名称", example = "ABC健身")
+    private String institutionName;
     
     /**
      * 薪资信息
