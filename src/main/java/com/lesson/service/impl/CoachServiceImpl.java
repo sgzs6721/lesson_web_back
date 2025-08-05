@@ -3,6 +3,7 @@ package com.lesson.service.impl;
 import com.lesson.common.exception.BusinessException;
 import com.lesson.common.enums.CoachStatus;
 import com.lesson.common.enums.Gender;
+import com.lesson.common.enums.WorkType;
 import com.lesson.utils.CoachUtils;
 import com.lesson.model.SysCoachModel;
 import com.lesson.model.record.CoachDetailRecord;
@@ -56,6 +57,9 @@ public class CoachServiceImpl implements CoachService {
         vo.setJobTitle(record.getJobTitle());
         vo.setHireDate(record.getHireDate());
         vo.setExperience(record.getExperience());
+        vo.setWorkType(WorkType.fromCode(record.getWorkType()));
+        vo.setIdNumber(record.getIdNumber());
+        vo.setCoachingDate(record.getCoachingDate());
         vo.setStatus(record.getStatus());
         vo.setCampusId(record.getCampusId());
         vo.setCampusName(record.getCampusName());

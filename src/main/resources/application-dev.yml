@@ -7,7 +7,7 @@ spring:
     log-request-details: true
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://121.36.91.199:3306/lesson_dev?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://121.36.91.199:3306/lesson?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
     username: lesson
     password: Leilei@0217
     hikari:
@@ -39,4 +39,4 @@ logging:
     org.springframework.security: DEBUG
     org.springframework.web.servlet.DispatcherServlet: DEBUG
     org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: TRACE
-    org.jooq: DEBUG 
+    org.jooq: DEBUG

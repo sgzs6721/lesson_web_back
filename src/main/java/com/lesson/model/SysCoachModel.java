@@ -84,24 +84,10 @@ public class SysCoachModel {
         }
 
         try {
-            // 创建教练记录
-            dsl.insertInto(SYS_COACH)
-                    .set(SYS_COACH.NAME, name)
-                    .set(SYS_COACH.STATUS, status.getCode())
-                    .set(SYS_COACH.AGE, age)
-                    .set(SYS_COACH.PHONE, phone)
-                    .set(SYS_COACH.AVATAR, avatar)
-                    .set(SYS_COACH.JOB_TITLE, jobTitle)
-                    .set(SYS_COACH.HIRE_DATE, hireDate)
-                    .set(SYS_COACH.EXPERIENCE, experience)
-                    .set(SYS_COACH.GENDER, gender.getCode())
-                    .set(SYS_COACH.WORK_TYPE, workType.getCode())
-                    .set(SYS_COACH.ID_NUMBER, idNumber)
-                    .set(SYS_COACH.COACHING_DATE, coachingDate)
-                    .set(SYS_COACH.CAMPUS_ID, campusId)
-                    .set(SYS_COACH.INSTITUTION_ID, institutionId)
-                    .set(SYS_COACH.DELETED, 0)
-                    .execute();
+            // 创建教练记录 - 使用原生SQL避免JOOQ类型问题
+            String sql = "INSERT INTO sys_coach (name, status, age, phone, avatar, job_title, hire_date, experience, gender, work_type, id_number, coaching_date, campus_id, institution_id, deleted) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)";
+            
+            dsl.execute(sql, name, status.getCode(), age, phone, avatar, jobTitle, hireDate, experience, gender.getCode(), workType.getCode(), idNumber, coachingDate, campusId, institutionId);
 
             // 获取最后插入的ID
             Long id = dsl.select(DSL.field("LAST_INSERT_ID()")).fetchOne(0, Long.class);
@@ -199,34 +185,19 @@ public class SysCoachModel {
      * 根据ID、校区ID和机构ID查询教练
      */
     public CoachDetailRecord getCoach(Long id, Long campusId, Long institutionId) {
-        // 1. 查询基本信息
-        Record record = dsl.select(
-                    SYS_COACH.ID,
-                    SYS_COACH.NAME,
-                    SYS_COACH.STATUS,
-                    SYS_COACH.AGE,
-                    SYS_COACH.WORK_TYPE,
-                    SYS_COACH.PHONE,
-                    SYS_COACH.ID_NUMBER,
-                    SYS_COACH.AVATAR,
-                    SYS_COACH.JOB_TITLE,
-                    SYS_COACH.HIRE_DATE,
-                    SYS_COACH.COACHING_DATE,
-                    SYS_COACH.EXPERIENCE,
-                    SYS_COACH.GENDER,
-                    SYS_COACH.CAMPUS_ID,
-                    SYS_COACH.INSTITUTION_ID,
-                    SYS_CAMPUS.NAME.as("campus_name"),
-                    SYS_INSTITUTION.NAME.as("institution_name")
-                )
-                .from(SYS_COACH)
-                .leftJoin(SYS_CAMPUS).on(SYS_COACH.CAMPUS_ID.eq(SYS_CAMPUS.ID))
-                .leftJoin(SYS_INSTITUTION).on(SYS_COACH.INSTITUTION_ID.eq(SYS_INSTITUTION.ID))
-                .where(SYS_COACH.ID.eq(id))
-                .and(SYS_COACH.CAMPUS_ID.eq(campusId))
-                .and(SYS_COACH.INSTITUTION_ID.eq(institutionId))
-                .and(SYS_COACH.DELETED.eq(0))
-                .fetchOne();
+        // 1. 查询基本信息 - 使用原生SQL避免JOOQ类型问题
+        String sql = "SELECT " +
+            "c.id, c.name, c.status, c.age, c.work_type, c.phone, c.id_number, " +
+            "c.avatar, c.job_title, c.hire_date, c.coaching_date, c.experience, " +
+            "c.gender, c.campus_id, c.institution_id, " +
+            "campus.name as campus_name, " +
+            "inst.name as institution_name " +
+            "FROM sys_coach c " +
+            "LEFT JOIN sys_campus campus ON c.campus_id = campus.id " +
+            "LEFT JOIN sys_institution inst ON c.institution_id = inst.id " +
+            "WHERE c.id = ? AND c.campus_id = ? AND c.institution_id = ? AND c.deleted = 0";
+        
+        Record record = dsl.fetchOne(sql, id, campusId, institutionId);
 
         if (record == null) {
             return null;
@@ -234,22 +205,22 @@ public class SysCoachModel {
 
         // 2. 构建基本信息
         CoachDetailRecord result = new CoachDetailRecord();
-        result.setId(record.get(SYS_COACH.ID));
-        result.setName(record.get(SYS_COACH.NAME));
-        result.setStatus(CoachStatus.fromCode(record.get(SYS_COACH.STATUS)));
-        result.setAge(record.get(SYS_COACH.AGE));
-        result.setWorkType(record.get(SYS_COACH.WORK_TYPE));
-        result.setPhone(record.get(SYS_COACH.PHONE));
-        result.setIdNumber(record.get(SYS_COACH.ID_NUMBER));
-        result.setAvatar(record.get(SYS_COACH.AVATAR));
-        result.setJobTitle(record.get(SYS_COACH.JOB_TITLE));
-        result.setHireDate(record.get(SYS_COACH.HIRE_DATE));
-        result.setCoachingDate(record.get(SYS_COACH.COACHING_DATE));
-        result.setExperience(record.get(SYS_COACH.EXPERIENCE));
-        result.setGender(Gender.fromCode(record.get(SYS_COACH.GENDER)));
-        result.setCampusId(record.get(SYS_COACH.CAMPUS_ID));
+        result.setId(record.get("id", Long.class));
+        result.setName(record.get("name", String.class));
+        result.setStatus(CoachStatus.fromCode(record.get("status", String.class)));
+        result.setAge(record.get("age", Integer.class));
+        result.setWorkType(record.get("work_type", String.class));
+        result.setPhone(record.get("phone", String.class));
+        result.setIdNumber(record.get("id_number", String.class));
+        result.setAvatar(record.get("avatar", String.class));
+        result.setJobTitle(record.get("job_title", String.class));
+        result.setHireDate(record.get("hire_date", LocalDate.class));
+        result.setCoachingDate(record.get("coaching_date", LocalDate.class));
+        result.setExperience(record.get("experience", Integer.class));
+        result.setGender(Gender.fromCode(record.get("gender", String.class)));
+        result.setCampusId(record.get("campus_id", Long.class));
         result.setCampusName(record.get("campus_name", String.class));
-        result.setInstitutionId(record.get(SYS_COACH.INSTITUTION_ID));
+        result.setInstitutionId(record.get("institution_id", Long.class));
         result.setInstitutionName(record.get("institution_name", String.class));
 
         // 3. 查询最新薪资信息
@@ -325,18 +296,10 @@ public class SysCoachModel {
     public void addSalary(Long coachId, BigDecimal baseSalary, Integer guaranteedHours, BigDecimal socialInsurance,
                          BigDecimal classFee, BigDecimal performanceBonus, BigDecimal commission,
                          BigDecimal dividend, LocalDate effectiveDate) {
-        dsl.insertInto(SYS_COACH_SALARY)
-           .set(SYS_COACH_SALARY.COACH_ID, coachId)
-           .set(SYS_COACH_SALARY.BASE_SALARY, baseSalary)
-           .set(SYS_COACH_SALARY.GUARANTEED_HOURS, guaranteedHours)
-           .set(SYS_COACH_SALARY.SOCIAL_INSURANCE, socialInsurance)
-           .set(SYS_COACH_SALARY.CLASS_FEE, classFee)
-           .set(SYS_COACH_SALARY.PERFORMANCE_BONUS, performanceBonus)
-           .set(SYS_COACH_SALARY.COMMISSION, commission)
-           .set(SYS_COACH_SALARY.DIVIDEND, dividend)
-           .set(SYS_COACH_SALARY.EFFECTIVE_DATE, effectiveDate)
-           .set(SYS_COACH_SALARY.DELETED,  0)
-           .execute();
+        // 使用原生SQL避免JOOQ类型问题
+        String sql = "INSERT INTO sys_coach_salary (coach_id, base_salary, guaranteed_hours, social_insurance, class_fee, performance_bonus, commission, dividend, effective_date, deleted) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0)";
+        
+        dsl.execute(sql, coachId, baseSalary, guaranteedHours, socialInsurance, classFee, performanceBonus, commission, dividend, effectiveDate);
     }
 
     /**
@@ -387,9 +350,12 @@ public class SysCoachModel {
         // 计算分页参数
         int offset = (page - 1) * size;
 
+        // 构建排序
+        SortField<?> orderByField = buildSortField(sortField, sortOrder);
+        
         // 执行查询
         Result<?> records = query
-                .orderBy(SYS_COACH.CREATED_TIME.desc())
+                .orderBy(orderByField)
                 .limit(size)
                 .offset(offset)
                 .fetch();
@@ -575,6 +541,44 @@ public class SysCoachModel {
             .where(SYS_COACH_COURSE.COURSE_ID.eq(courseId))
             .and(SYS_COACH_COURSE.DELETED.eq(0))
             .and(SYS_COACH.DELETED.eq(0))
-            .fetchInto(CoachDetailRecord.class);
+                        .fetchInto(CoachDetailRecord.class);
+    }
+
+    /**
+     * 构建排序字段
+     */
+    private SortField<?> buildSortField(String sortField, String sortOrder) {
+        // 默认排序：按ID升序
+        SortField<?> defaultSort = SYS_COACH.ID.asc();
+        
+        if (sortField == null || sortField.isEmpty()) {
+            return defaultSort;
+        }
+        
+        // 确定排序方向
+        SortOrder order = "desc".equalsIgnoreCase(sortOrder) ? SortOrder.DESC : SortOrder.ASC;
+        
+        // 根据字段名确定排序字段
+        switch (sortField.toLowerCase()) {
+            case "id":
+                return SYS_COACH.ID.sort(order);
+            case "age":
+                return SYS_COACH.AGE.sort(order);
+            case "experience":
+                return SYS_COACH.EXPERIENCE.sort(order);
+            case "hiredate":
+            case "hire_date":
+                return SYS_COACH.HIRE_DATE.sort(order);
+            case "name":
+                return SYS_COACH.NAME.sort(order);
+            case "createdtime":
+            case "created_time":
+                return SYS_COACH.CREATED_TIME.sort(order);
+            case "updatedtime":
+            case "updated_time":
+                return SYS_COACH.UPDATE_TIME.sort(order);
+            default:
+                return defaultSort;
+        }
     }
 }

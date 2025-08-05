@@ -29,7 +29,7 @@ public class CoachUpdateRequest {
     @Schema(description = "性别", example = "MALE")
     private Gender gender;
     
-    @Schema(description = "工作类型", example = "FULL_TIME")
+            @Schema(description = "工作类型", example = "FULLTIME")
     private WorkType workType;
     
     @Schema(description = "年龄（根据身份证号自动计算）", example = "28", hidden = true)

@@ -10,12 +10,12 @@ public enum WorkType {
     /**
      * 全职
      */
-    FULL_TIME("FULL_TIME", "全职", "全职工作"),
+    FULLTIME("FULLTIME", "全职", "全职工作"),
 
     /**
      * 兼职
      */
-    PART_TIME("PART_TIME", "兼职", "兼职工作");
+    PARTTIME("PARTTIME", "兼职", "兼职工作");
 
     private final String code;
     private final String name;

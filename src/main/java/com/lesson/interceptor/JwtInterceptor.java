@@ -30,6 +30,11 @@ public class JwtInterceptor implements HandlerInterceptor {
             throw new AuthException("未登录或token已过期");
         }
 
+        // 处理Bearer前缀
+        if (token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+
         try {
             // 验证token
             jwtUtil.parseToken(token);

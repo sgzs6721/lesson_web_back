@@ -2,6 +2,7 @@ package com.lesson.vo;
 
 import com.lesson.common.enums.CoachStatus;
 import com.lesson.common.enums.Gender;
+import com.lesson.common.enums.WorkType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -70,6 +71,25 @@ public class CoachVO {
      */
     @Schema(description = "教龄(年)", example = "5")
     private Integer experience;
+    
+    /**
+     * 工作类型
+     */
+    @Schema(description = "工作类型：FULLTIME-全职，PARTTIME-兼职", example = "FULLTIME")
+    private WorkType workType;
+    
+    /**
+     * 身份证号
+     */
+    @Schema(description = "身份证号", example = "110101199001011234")
+    private String idNumber;
+    
+    /**
+     * 执教日期
+     */
+    @Schema(description = "执教日期", example = "2020-01-01")
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate coachingDate;
     
     /**
      * 证书列表

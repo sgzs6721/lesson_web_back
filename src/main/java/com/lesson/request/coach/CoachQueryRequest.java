@@ -43,7 +43,7 @@ public class CoachQueryRequest extends PageRequest {
     /**
      * 排序字段
      */
-    @Schema(description = "排序字段：experience-按教龄排序，hireDate-按入职日期排序", example = "experience")
+    @Schema(description = "排序字段：id-按ID排序，age-按年龄排序，experience-按教龄排序，hiredate-按入职日期排序，name-按姓名排序，createdtime-按创建时间排序", example = "id")
     private String sortField;
     
     /**

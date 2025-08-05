@@ -1,0 +1,125 @@
+### 教练管理接口测试
+
+### 1. 创建教练接口测试
+POST http://localhost:8080/api/coach/create
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "张教练",
+  "gender": "MALE",
+  "workType": "FULL_TIME",
+  "phone": "13800138000",
+  "idNumber": "110101199001011234",
+  "avatar": "https://example.com/avatar.jpg",
+  "jobTitle": "高级教练",
+  "hireDate": "2023-01-01",
+  "coachingDate": "2020-03-01",
+  "campusId": 1,
+  "status": "ACTIVE",
+  "baseSalary": 5000,
+  "guaranteedHours": 160,
+  "socialInsurance": 1000,
+  "classFee": 200,
+  "performanceBonus": 1000,
+  "commission": 5,
+  "dividend": 2000,
+  "certifications": ["健身教练证", "急救证"]
+}
+
+### 2. 创建兼职教练接口测试
+POST http://localhost:8080/api/coach/create
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "李教练",
+  "gender": "FEMALE",
+  "workType": "PART_TIME",
+  "phone": "13800138001",
+  "idNumber": "110101199505151234",
+  "avatar": "https://example.com/avatar2.jpg",
+  "jobTitle": "兼职教练",
+  "hireDate": "2023-06-01",
+  "coachingDate": "2021-09-01",
+  "campusId": 1,
+  "status": "ACTIVE",
+  "baseSalary": 3000,
+  "guaranteedHours": 80,
+  "socialInsurance": 500,
+  "classFee": 150,
+  "performanceBonus": 500,
+  "commission": 3,
+  "dividend": 1000,
+  "certifications": ["瑜伽教练证"]
+}
+
+### 3. 查询教练列表接口测试
+GET http://localhost:8080/api/coach/list?page=1&size=10&keyword=&status=&jobTitle=&campusId=1
+Authorization: Bearer {{token}}
+
+### 4. 查询教练详情接口测试
+GET http://localhost:8080/api/coach/detail?id=1&campusId=1
+Authorization: Bearer {{token}}
+
+### 5. 更新教练接口测试
+POST http://localhost:8080/api/coach/update
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "id": 1,
+  "name": "张教练（已更新）",
+  "gender": "MALE",
+  "workType": "FULL_TIME",
+  "phone": "13800138000",
+  "idNumber": "110101199001011234",
+  "avatar": "https://example.com/avatar_updated.jpg",
+  "jobTitle": "资深教练",
+  "hireDate": "2023-01-01",
+  "coachingDate": "2019-03-01",
+  "campusId": 1,
+  "status": "ACTIVE",
+  "baseSalary": 6000,
+  "guaranteedHours": 180,
+  "socialInsurance": 1200,
+  "classFee": 250,
+  "performanceBonus": 1200,
+  "commission": 6,
+  "dividend": 2500,
+  "certifications": ["健身教练证", "急救证", "营养师证"]
+}
+
+### 6. 更新教练身份证号（测试年龄重新计算）
+POST http://localhost:8080/api/coach/update
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "id": 1,
+  "idNumber": "110101198505151234",
+  "coachingDate": "2018-03-01"
+}
+
+### 7. 查询简单教练列表接口测试
+GET http://localhost:8080/api/coach/simple?campusId=1
+Authorization: Bearer {{token}}
+
+### 8. 更新教练状态接口测试
+POST http://localhost:8080/api/coach/status
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "id": 1,
+  "status": "VACATION"
+}
+
+### 9. 删除教练接口测试
+POST http://localhost:8080/api/coach/delete
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "id": 1
+} 

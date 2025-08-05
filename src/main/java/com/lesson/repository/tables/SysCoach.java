@@ -68,9 +68,9 @@ public class SysCoach extends TableImpl<SysCoachRecord> {
     public final TableField<SysCoachRecord, String> GENDER = createField(DSL.name("gender"), SQLDataType.VARCHAR(20).nullable(false), this, "性别");
 
     /**
-     * The column <code>lesson_prod.sys_coach.work_type</code>. 工作类型：FULL_TIME-全职，PART_TIME-兼职
+     * The column <code>lesson_prod.sys_coach.work_type</code>. 工作类型：FULLTIME-全职，PARTTIME-兼职
      */
-    public final TableField<SysCoachRecord, String> WORK_TYPE = createField(DSL.name("work_type"), SQLDataType.VARCHAR(20).nullable(false).defaultValue(DSL.inline("FULL_TIME", SQLDataType.VARCHAR)), this, "工作类型：FULL_TIME-全职，PART_TIME-兼职");
+    public final TableField<SysCoachRecord, String> WORK_TYPE = createField(DSL.name("work_type"), SQLDataType.VARCHAR(20).nullable(false).defaultValue(DSL.inline("FULLTIME", SQLDataType.VARCHAR)), this, "工作类型：FULLTIME-全职，PARTTIME-兼职");
 
     /**
      * The column <code>lesson_prod.sys_coach.age</code>. 年龄

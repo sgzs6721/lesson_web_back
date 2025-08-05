@@ -1,6 +1,6 @@
 -- 为教练表添加新字段
 ALTER TABLE `sys_coach` 
-ADD COLUMN `work_type` varchar(20) NOT NULL DEFAULT 'FULL_TIME' COMMENT '工作类型：FULL_TIME-全职，PART_TIME-兼职' AFTER `gender`,
+ADD COLUMN `work_type` varchar(20) NOT NULL DEFAULT 'FULLTIME' COMMENT '工作类型：FULLTIME-全职，PARTTIME-兼职' AFTER `gender`,
 ADD COLUMN `id_number` varchar(18) DEFAULT NULL COMMENT '身份证号' AFTER `phone`,
 ADD COLUMN `coaching_date` date DEFAULT NULL COMMENT '执教日期' AFTER `hire_date`;
 

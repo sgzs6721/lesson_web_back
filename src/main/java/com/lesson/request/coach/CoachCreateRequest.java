@@ -37,7 +37,7 @@ public class CoachCreateRequest {
      * 工作类型
      */
     @NotNull(message = "工作类型不能为空")
-    @Schema(description = "工作类型", required = true, example = "FULL_TIME")
+            @Schema(description = "工作类型", required = true, example = "FULLTIME")
     private WorkType workType;
     
     /**
