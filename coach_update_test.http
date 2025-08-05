@@ -1,0 +1,66 @@
+### 教练更新接口测试 - 验证新添加字段
+
+# 1. 先登录获取token
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "123456"
+}
+
+###
+
+# 2. 更新教练信息 - 包含新添加的字段
+POST http://localhost:8080/api/coach/update
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "id": 1,
+  "name": "张教练",
+  "gender": "MALE",
+  "workType": "PARTTIME",
+  "phone": "13800138001",
+  "idNumber": "110101199001011234",
+  "avatar": "https://example.com/avatar.jpg",
+  "jobTitle": "高级教练",
+  "hireDate": "2023-01-01",
+  "coachingDate": "2020-01-01",
+  "certifications": ["健身教练证", "急救证"],
+  "status": "ACTIVE",
+  "campusId": 1,
+  "baseSalary": 6000,
+  "guaranteedHours": 160,
+  "socialInsurance": 1200,
+  "classFee": 250,
+  "performanceBonus": 1500,
+  "commission": 8,
+  "dividend": 2500
+}
+
+###
+
+# 3. 获取教练详情 - 验证字段是否正确更新
+GET http://localhost:8080/api/coach/detail?id=1&campusId=1
+Authorization: Bearer {{auth_token}}
+
+###
+
+# 4. 更新教练信息 - 只更新工作类型
+POST http://localhost:8080/api/coach/update
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "id": 1,
+  "workType": "FULLTIME"
+}
+
+###
+
+# 5. 再次获取教练详情 - 验证工作类型是否正确更新
+GET http://localhost:8080/api/coach/detail?id=1&campusId=1
+Authorization: Bearer {{auth_token}}
+
+### 

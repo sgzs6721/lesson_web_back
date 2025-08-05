@@ -221,11 +221,14 @@ public class CoachServiceImpl implements CoachService {
                     request.getStatus(),
                     calculatedAge,  // 使用计算出的年龄
                     request.getPhone() != null ? request.getPhone() : coach.getPhone(),
+                    request.getIdNumber() != null ? request.getIdNumber() : coach.getIdNumber(),
                     request.getAvatar() != null ? request.getAvatar() : coach.getAvatar(),
                     request.getJobTitle() != null ? request.getJobTitle() : coach.getJobTitle(),
                     request.getHireDate() != null ? request.getHireDate() : coach.getHireDate(),
                     calculatedExperience,  // 使用计算出的教龄
                     request.getGender(),
+                    request.getWorkType() != null ? request.getWorkType() : WorkType.fromCode(coach.getWorkType()),
+                    request.getCoachingDate() != null ? request.getCoachingDate() : coach.getCoachingDate(),
                     request.getCampusId() != null ? request.getCampusId() : coach.getCampusId(),
                     institutionId
             );

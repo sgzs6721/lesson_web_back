@@ -105,8 +105,9 @@ public class SysCoachModel {
      * 更新教练
      */
     public void updateCoach(Long id, String name, CoachStatus status, Integer age,
-                            String phone, String avatar, String jobTitle, LocalDate hireDate,
-                            Integer experience, Gender gender, Long campusId, Long institutionId) {
+                            String phone, String idNumber, String avatar, String jobTitle, LocalDate hireDate,
+                            Integer experience, Gender gender, WorkType workType, LocalDate coachingDate, 
+                            Long campusId, Long institutionId) {
         // 获取原来的校区和机构ID
         Record oldRecord = dsl.select(SYS_COACH.CAMPUS_ID, SYS_COACH.INSTITUTION_ID)
                             .from(SYS_COACH)
@@ -132,11 +133,14 @@ public class SysCoachModel {
                 .set(SYS_COACH.STATUS, status.getCode())
                 .set(SYS_COACH.AGE, age)
                 .set(SYS_COACH.PHONE, phone)
+                .set(SYS_COACH.ID_NUMBER, idNumber)
                 .set(SYS_COACH.AVATAR, avatar)
                 .set(SYS_COACH.JOB_TITLE, jobTitle)
                 .set(SYS_COACH.HIRE_DATE, hireDate)
                 .set(SYS_COACH.EXPERIENCE, experience)
                 .set(SYS_COACH.GENDER, gender.getCode())
+                .set(SYS_COACH.WORK_TYPE, workType != null ? workType.getCode() : null)
+                .set(SYS_COACH.COACHING_DATE, coachingDate)
                 .set(SYS_COACH.CAMPUS_ID, campusId)
                 .set(SYS_COACH.INSTITUTION_ID, institutionId)
                 .where(SYS_COACH.ID.eq(id))
