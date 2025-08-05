@@ -393,10 +393,13 @@ public class SysCoachModel {
                     detailRecord.setName(record.get(SYS_COACH.NAME));
                     detailRecord.setStatus(CoachStatus.fromCode(record.get(SYS_COACH.STATUS)));
                     detailRecord.setAge(record.get(SYS_COACH.AGE));
+                    detailRecord.setWorkType(record.get(SYS_COACH.WORK_TYPE));
                     detailRecord.setPhone(record.get(SYS_COACH.PHONE));
+                    detailRecord.setIdNumber(record.get(SYS_COACH.ID_NUMBER));
                     detailRecord.setAvatar(record.get(SYS_COACH.AVATAR));
                     detailRecord.setJobTitle(record.get(SYS_COACH.JOB_TITLE));
                     detailRecord.setHireDate(record.get(SYS_COACH.HIRE_DATE));
+                    detailRecord.setCoachingDate(record.get(SYS_COACH.COACHING_DATE));
                     detailRecord.setExperience(record.get(SYS_COACH.EXPERIENCE));
                     detailRecord.setGender(Gender.fromCode(record.get(SYS_COACH.GENDER)));
                     detailRecord.setCampusId(record.get(SYS_COACH.CAMPUS_ID));
