@@ -312,18 +312,48 @@ public class EduCourseModel {
 
   private SortField<?> getSortField(String field, String order) {
     Field<?> sortField;
-    switch (field) {
+    switch (field.toLowerCase()) {
+      case "id":
+        sortField = EDU_COURSE.ID;
+        break;
       case "name":
         sortField = EDU_COURSE.NAME;
         break;
       case "type":
+      case "typeid":
         sortField = EDU_COURSE.TYPE_ID;
         break;
       case "status":
         sortField = EDU_COURSE.STATUS;
         break;
-      case "createTime":
+      case "price":
+        sortField = EDU_COURSE.PRICE;
+        break;
+      case "totalhours":
+      case "total_hours":
+        sortField = EDU_COURSE.TOTAL_HOURS;
+        break;
+      case "consumedhours":
+      case "consumed_hours":
+        sortField = EDU_COURSE.CONSUMED_HOURS;
+        break;
+      case "unithours":
+      case "unit_hours":
+        sortField = EDU_COURSE.UNIT_HOURS;
+        break;
+      case "coachfee":
+      case "coach_fee":
+        sortField = EDU_COURSE.COACH_FEE;
+        break;
+      case "createtime":
+      case "createdtime":
+      case "created_time":
         sortField = EDU_COURSE.CREATED_TIME;
+        break;
+      case "updatetime":
+      case "updatedtime":
+      case "updated_time":
+        sortField = EDU_COURSE.UPDATE_TIME;
         break;
       default:
         sortField = EDU_COURSE.ID;

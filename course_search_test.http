@@ -21,7 +21,40 @@ GET http://localhost:8080/api/courses/list?pageNum=1&pageSize=10&campusId=1
 Authorization: Bearer {{token}}
 
 ### 6. 测试排序功能
+# 按创建时间排序
 GET http://localhost:8080/api/courses/list?pageNum=1&pageSize=10&sortField=createdTime&sortOrder=desc
+Authorization: Bearer {{token}}
+
+### 6.1 按ID排序（升序）
+GET http://localhost:8080/api/courses/list?pageNum=1&pageSize=10&sortField=id&sortOrder=asc
+Authorization: Bearer {{token}}
+
+### 6.2 按课程单价排序（降序）
+GET http://localhost:8080/api/courses/list?pageNum=1&pageSize=10&sortField=price&sortOrder=desc
+Authorization: Bearer {{token}}
+
+### 6.3 按总课时排序（升序）
+GET http://localhost:8080/api/courses/list?pageNum=1&pageSize=10&sortField=totalHours&sortOrder=asc
+Authorization: Bearer {{token}}
+
+### 6.4 按已销课时排序（降序）
+GET http://localhost:8080/api/courses/list?pageNum=1&pageSize=10&sortField=consumedHours&sortOrder=desc
+Authorization: Bearer {{token}}
+
+### 6.5 按单次课时排序（升序）
+GET http://localhost:8080/api/courses/list?pageNum=1&pageSize=10&sortField=unitHours&sortOrder=asc
+Authorization: Bearer {{token}}
+
+### 6.6 按教练费用排序（降序）
+GET http://localhost:8080/api/courses/list?pageNum=1&pageSize=10&sortField=coachFee&sortOrder=desc
+Authorization: Bearer {{token}}
+
+### 6.7 按课程名称排序（升序）
+GET http://localhost:8080/api/courses/list?pageNum=1&pageSize=10&sortField=name&sortOrder=asc
+Authorization: Bearer {{token}}
+
+### 6.8 按更新时间排序（降序）
+GET http://localhost:8080/api/courses/list?pageNum=1&pageSize=10&sortField=updatedTime&sortOrder=desc
 Authorization: Bearer {{token}}
 
 ### 7. 测试组合筛选（课程名称 + 多课程类型 + 多教练）

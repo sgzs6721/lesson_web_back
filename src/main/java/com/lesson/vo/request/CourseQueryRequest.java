@@ -26,7 +26,7 @@ public class CourseQueryRequest {
     @Schema(description = "机构ID")
     private Long institutionId;
 
-    @Schema(description = "排序字段")
+    @Schema(description = "排序字段：id-按ID排序，name-按课程名称排序，price-按课程单价排序，totalHours-按总课时排序，consumedHours-按已销课时排序，unitHours-按单次课时排序，coachFee-按教练费用排序，createdTime-按创建时间排序，updatedTime-按更新时间排序", example = "createdTime")
     private String sortField;
 
     @Schema(description = "排序方向：asc-升序，desc-降序")
