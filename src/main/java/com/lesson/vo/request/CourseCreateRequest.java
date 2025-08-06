@@ -42,6 +42,9 @@ public class CourseCreateRequest {
     @Schema(description = "教练费用")
     private BigDecimal coachFee;
 
+    @Schema(description = "是否多教师教学：true-是，false-否", example = "false")
+    private Boolean isMultiTeacher;
+
     @NotNull(message = "教练列表不能为空")
     @Schema(description = "教练ID列表")
     private List<Long> coachIds;

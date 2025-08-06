@@ -57,6 +57,12 @@ public class CourseVO {
     private BigDecimal coachFee;
 
     /**
+     * 是否多教师教学
+     */
+    @Schema(description = "是否多教师教学：true-是，false-否", example = "false")
+    private Boolean isMultiTeacher;
+
+    /**
      * 校区ID
      */
     private Long campusId;

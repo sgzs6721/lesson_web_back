@@ -3,6 +3,7 @@ package com.lesson.vo.request;
 import com.lesson.enums.CourseStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import java.util.List;
 
 @Data
 @Schema(description = "课程查询请求")
@@ -16,8 +17,8 @@ public class CourseQueryRequest {
     @Schema(description = "课程状态")
     private CourseStatus status;
 
-    @Schema(description = "教练ID")
-    private Long coachId;
+    @Schema(description = "教练ID列表")
+    private List<Long> coachIds;
 
     @Schema(description = "校区ID")
     private Long campusId;

@@ -21,7 +21,7 @@ public class EduCourseModel {
 
   public Long createCourse(String name, Long typeId, CourseStatus status,
                            BigDecimal unitHours, BigDecimal totalHours, BigDecimal price, BigDecimal coachFee,
-                           Long campusId, Long institutionId, String description) {
+                           Boolean isMultiTeacher, Long campusId, Long institutionId, String description) {
     dsl.insertInto(EDU_COURSE)
         .set(EDU_COURSE.NAME, name)
         .set(EDU_COURSE.TYPE_ID, typeId)
@@ -30,6 +30,7 @@ public class EduCourseModel {
         .set(EDU_COURSE.TOTAL_HOURS, totalHours)
         .set(EDU_COURSE.PRICE, price)
         .set(EDU_COURSE.COACH_FEE, coachFee)
+        .set(EDU_COURSE.IS_MULTI_TEACHER, isMultiTeacher != null ? (isMultiTeacher ? 1 : 0) : 0)
         .set(EDU_COURSE.CAMPUS_ID, campusId)
         .set(EDU_COURSE.INSTITUTION_ID, institutionId)
         .set(EDU_COURSE.DESCRIPTION, description)
@@ -90,7 +91,7 @@ public class EduCourseModel {
 
   public void updateCourse(Long id, String name, Long typeId, CourseStatus status,
                            BigDecimal unitHours, BigDecimal totalHours, BigDecimal price, BigDecimal coachFee,
-                           Long campusId, String description) {
+                           Boolean isMultiTeacher, Long campusId, String description) {
     // 获取当前课程信息
     CourseDetailRecord existingCourse = getCourseById(id);
     if (existingCourse == null) {
@@ -108,6 +109,7 @@ public class EduCourseModel {
           .set(EDU_COURSE.TOTAL_HOURS, totalHours)
           .set(EDU_COURSE.PRICE, price)
           .set(EDU_COURSE.COACH_FEE, coachFee)
+          .set(EDU_COURSE.IS_MULTI_TEACHER, isMultiTeacher != null ? (isMultiTeacher ? 1 : 0) : 0)
           .set(EDU_COURSE.DESCRIPTION, description)
           .where(EDU_COURSE.ID.eq(id))
           .execute();
@@ -121,6 +123,7 @@ public class EduCourseModel {
           .set(EDU_COURSE.TOTAL_HOURS, totalHours)
           .set(EDU_COURSE.PRICE, price)
           .set(EDU_COURSE.COACH_FEE, coachFee)
+          .set(EDU_COURSE.IS_MULTI_TEACHER, isMultiTeacher != null ? (isMultiTeacher ? 1 : 0) : 0)
           .set(EDU_COURSE.CAMPUS_ID, campusId)
           .set(EDU_COURSE.DESCRIPTION, description)
           .where(EDU_COURSE.ID.eq(id))
@@ -193,7 +196,7 @@ public class EduCourseModel {
   }
 
   public List<CourseDetailRecord> listCourses(String keyword, Long typeId, CourseStatus status,
-                                              Long campusId, Long institutionId,
+                                              List<Long> coachIds, Long campusId, Long institutionId,
                                               String sortField, String sortOrder,
                                               int pageNum, int pageSize) {
     SelectConditionStep<Record> query = dsl.select()
@@ -208,6 +211,15 @@ public class EduCourseModel {
     }
     if (status != null) {
       query.and(EDU_COURSE.STATUS.eq(status.name()));
+    }
+    if (coachIds != null && !coachIds.isEmpty()) {
+      // 通过教练-课程关联表筛选多个教练
+      query.and(EDU_COURSE.ID.in(
+          dsl.select(SYS_COACH_COURSE.COURSE_ID)
+              .from(SYS_COACH_COURSE)
+              .where(SYS_COACH_COURSE.COACH_ID.in(coachIds))
+              .and(SYS_COACH_COURSE.DELETED.eq(0))
+      ));
     }
     if (campusId != null) {
       query.and(EDU_COURSE.CAMPUS_ID.eq(campusId));
@@ -226,7 +238,7 @@ public class EduCourseModel {
   }
 
   public long countCourses(String keyword, Long typeId, CourseStatus status,
-                           Long coachId, Long campusId, Long institutionId) {
+                           List<Long> coachIds, Long campusId, Long institutionId) {
     SelectConditionStep<Record1<Integer>> query = dsl.selectCount()
         .from(EDU_COURSE)
         .where(EDU_COURSE.DELETED.eq(0));
@@ -239,6 +251,15 @@ public class EduCourseModel {
     }
     if (status != null) {
       query.and(EDU_COURSE.STATUS.eq(status.name()));
+    }
+    if (coachIds != null && !coachIds.isEmpty()) {
+      // 通过教练-课程关联表筛选多个教练
+      query.and(EDU_COURSE.ID.in(
+          dsl.select(SYS_COACH_COURSE.COURSE_ID)
+              .from(SYS_COACH_COURSE)
+              .where(SYS_COACH_COURSE.COACH_ID.in(coachIds))
+              .and(SYS_COACH_COURSE.DELETED.eq(0))
+      ));
     }
     if (campusId != null) {
       query.and(EDU_COURSE.CAMPUS_ID.eq(campusId));

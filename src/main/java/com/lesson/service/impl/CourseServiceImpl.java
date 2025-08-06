@@ -71,6 +71,7 @@ public class CourseServiceImpl implements CourseService {
                 BigDecimal.ZERO, // 总课时默认为0
                 request.getPrice(),
                 request.getCoachFee(),
+                request.getIsMultiTeacher(),
                 request.getCampusId(),
                 institutionId,
                 request.getDescription()
@@ -128,6 +129,7 @@ public class CourseServiceImpl implements CourseService {
                 existingCourse.getTotalHours(), // 保留原有的总课时值
                 request.getPrice(),
                 request.getCoachFee(),
+                request.getIsMultiTeacher(),
                 request.getCampusId(),
                 request.getDescription()
             );
@@ -270,6 +272,7 @@ public class CourseServiceImpl implements CourseService {
             request.getKeyword(),
             request.getTypeId(),
             request.getStatus(),
+            request.getCoachIds(),
             request.getCampusId(),
             request.getInstitutionId(),
             request.getSortField(),
@@ -343,7 +346,7 @@ public class CourseServiceImpl implements CourseService {
             request.getKeyword(),
             request.getTypeId(),
             request.getStatus(),
-            request.getCoachId(),
+            request.getCoachIds(),
             request.getCampusId(),
             request.getInstitutionId()
         );
@@ -352,6 +355,8 @@ public class CourseServiceImpl implements CourseService {
     private CourseVO convertToVO(CourseDetailRecord record) {
         CourseVO vo = new CourseVO();
         BeanUtils.copyProperties(record, vo);
+        // 设置是否多教师教学字段
+        vo.setIsMultiTeacher(record.getIsMultiTeacher());
         return vo;
     }
 

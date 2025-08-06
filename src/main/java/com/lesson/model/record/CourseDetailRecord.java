@@ -19,6 +19,7 @@ public class CourseDetailRecord {
     private BigDecimal consumedHours;
     private BigDecimal price;
     private BigDecimal coachFee;
+    private Boolean isMultiTeacher;
     private Long campusId;
     private String campusName;
     private Long institutionId;
