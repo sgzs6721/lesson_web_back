@@ -195,7 +195,7 @@ public class EduCourseModel {
         .fetchOneInto(CourseDetailRecord.class);
   }
 
-  public List<CourseDetailRecord> listCourses(String keyword, Long typeId, CourseStatus status,
+  public List<CourseDetailRecord> listCourses(String keyword, List<Long> typeIds, CourseStatus status,
                                               List<Long> coachIds, Long campusId, Long institutionId,
                                               String sortField, String sortOrder,
                                               int pageNum, int pageSize) {
@@ -206,8 +206,8 @@ public class EduCourseModel {
     if (StringUtils.hasText(keyword)) {
       query.and(EDU_COURSE.NAME.like("%" + keyword + "%"));
     }
-    if (typeId != null) {
-      query.and(EDU_COURSE.TYPE_ID.eq(typeId));
+    if (typeIds != null && !typeIds.isEmpty()) {
+      query.and(EDU_COURSE.TYPE_ID.in(typeIds));
     }
     if (status != null) {
       query.and(EDU_COURSE.STATUS.eq(status.name()));
@@ -237,7 +237,7 @@ public class EduCourseModel {
     return query.fetchInto(CourseDetailRecord.class);
   }
 
-  public long countCourses(String keyword, Long typeId, CourseStatus status,
+  public long countCourses(String keyword, List<Long> typeIds, CourseStatus status,
                            List<Long> coachIds, Long campusId, Long institutionId) {
     SelectConditionStep<Record1<Integer>> query = dsl.selectCount()
         .from(EDU_COURSE)
@@ -246,8 +246,8 @@ public class EduCourseModel {
     if (StringUtils.hasText(keyword)) {
       query.and(EDU_COURSE.NAME.like("%" + keyword + "%"));
     }
-    if (typeId != null) {
-      query.and(EDU_COURSE.TYPE_ID.eq(typeId));
+    if (typeIds != null && !typeIds.isEmpty()) {
+      query.and(EDU_COURSE.TYPE_ID.in(typeIds));
     }
     if (status != null) {
       query.and(EDU_COURSE.STATUS.eq(status.name()));

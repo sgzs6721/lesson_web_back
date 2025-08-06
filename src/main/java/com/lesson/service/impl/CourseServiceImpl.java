@@ -270,7 +270,7 @@ public class CourseServiceImpl implements CourseService {
         // 获取课程基本信息列表
         List<CourseDetailRecord> records = courseModel.listCourses(
             request.getKeyword(),
-            request.getTypeId(),
+            request.getTypeIds(),
             request.getStatus(),
             request.getCoachIds(),
             request.getCampusId(),
@@ -344,7 +344,7 @@ public class CourseServiceImpl implements CourseService {
     public long countCourses(CourseQueryRequest request) {
         return courseModel.countCourses(
             request.getKeyword(),
-            request.getTypeId(),
+            request.getTypeIds(),
             request.getStatus(),
             request.getCoachIds(),
             request.getCampusId(),

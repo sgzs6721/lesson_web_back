@@ -11,8 +11,8 @@ public class CourseQueryRequest {
     @Schema(description = "关键词（课程名称或描述）")
     private String keyword;
 
-    @Schema(description = "课程类型ID（系统常量ID）")
-    private Long typeId;
+    @Schema(description = "课程类型ID列表（系统常量ID）")
+    private List<Long> typeIds;
 
     @Schema(description = "课程状态")
     private CourseStatus status;

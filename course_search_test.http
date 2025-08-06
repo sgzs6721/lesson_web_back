@@ -1,0 +1,37 @@
+### 课程搜索功能测试
+
+### 1. 测试课程名称搜索
+GET http://localhost:8080/api/courses/list?pageNum=1&pageSize=10&keyword=瑜伽
+Authorization: Bearer {{token}}
+
+### 2. 测试多课程类型筛选
+GET http://localhost:8080/api/courses/list?pageNum=1&pageSize=10&typeIds=11&typeIds=12
+Authorization: Bearer {{token}}
+
+### 3. 测试多教练筛选
+GET http://localhost:8080/api/courses/list?pageNum=1&pageSize=10&coachIds=1&coachIds=2
+Authorization: Bearer {{token}}
+
+### 4. 测试课程状态筛选
+GET http://localhost:8080/api/courses/list?pageNum=1&pageSize=10&status=ACTIVE
+Authorization: Bearer {{token}}
+
+### 5. 测试校区筛选
+GET http://localhost:8080/api/courses/list?pageNum=1&pageSize=10&campusId=1
+Authorization: Bearer {{token}}
+
+### 6. 测试排序功能
+GET http://localhost:8080/api/courses/list?pageNum=1&pageSize=10&sortField=createdTime&sortOrder=desc
+Authorization: Bearer {{token}}
+
+### 7. 测试组合筛选（课程名称 + 多课程类型 + 多教练）
+GET http://localhost:8080/api/courses/list?pageNum=1&pageSize=10&keyword=瑜伽&typeIds=11&typeIds=12&coachIds=1&coachIds=2&status=ACTIVE&campusId=1&sortField=createdTime&sortOrder=desc
+Authorization: Bearer {{token}}
+
+### 8. 测试您提供的URL格式
+GET http://localhost:8080/api/courses/list?page=1&pageSize=10&typeIds=11&typeIds=12&sortField=createdTime&sortOrder=desc&campusId=1
+Authorization: Bearer {{token}}
+
+### 9. 测试分页功能
+GET http://localhost:8080/api/courses/list?pageNum=2&pageSize=5
+Authorization: Bearer {{token}} 
