@@ -423,6 +423,15 @@ public class CoachServiceImpl implements CoachService {
                         CoachSimpleVO vo = new CoachSimpleVO();
                         vo.setId(record.getId());
                         vo.setName(record.getName());
+                        
+                        // 获取教练薪资信息
+                        SysCoachSalaryRecord salaryRecord = coachModel.getLatestSalary(record.getId());
+                        if (salaryRecord != null) {
+                            vo.setClassFee(salaryRecord.getClassFee());
+                            vo.setBaseSalary(salaryRecord.getBaseSalary());
+                            vo.setPerformanceBonus(salaryRecord.getPerformanceBonus());
+                        }
+                        
                         return vo;
                     })
                     .collect(Collectors.toList());
