@@ -1,0 +1,135 @@
+### 课程多教师课时费功能测试
+
+### 1. 创建支持多教师教学的课程（每个教练不同课时费）
+POST http://localhost:8080/api/courses/create
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "多教师大课测试-不同课时费",
+  "typeId": 3,
+  "status": "ACTIVE",
+  "unitHours": 2.0,
+  "price": 200.00,
+  "coachFee": 50.00,
+  "isMultiTeacher": true,
+  "coachFees": [
+    {
+      "coachId": 1,
+      "coachFee": 90.00
+    },
+    {
+      "coachId": 2,
+      "coachFee": 95.00
+    },
+    {
+      "coachId": 3,
+      "coachFee": 95.00
+    }
+  ],
+  "campusId": 1,
+  "description": "这是一个支持多教师教学的大课，每个教练课时费不同"
+}
+
+### 2. 创建单教师课程（使用默认课时费）
+POST http://localhost:8080/api/courses/create
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "单教师一对一课程-默认课时费",
+  "typeId": 2,
+  "status": "ACTIVE",
+  "unitHours": 1.0,
+  "price": 300.00,
+  "coachFee": 100.00,
+  "isMultiTeacher": false,
+  "coachFees": [
+    {
+      "coachId": 1,
+      "coachFee": 100.00
+    }
+  ],
+  "campusId": 1,
+  "description": "这是一个单教师的一对一课程，使用默认课时费"
+}
+
+### 3. 查询课程列表（验证多教师教学字段和教练课时费）
+GET http://localhost:8080/api/courses/list?pageNum=1&pageSize=10
+Authorization: Bearer {{token}}
+
+### 4. 获取课程详情（验证多教师教学字段和教练课时费）
+GET http://localhost:8080/api/courses/detail?id=1
+Authorization: Bearer {{token}}
+
+### 5. 更新课程为多教师教学（修改教练课时费）
+POST http://localhost:8080/api/courses/update
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "id": 1,
+  "name": "更新后的多教师课程-新课时费",
+  "typeId": 3,
+  "status": "ACTIVE",
+  "unitHours": 2.0,
+  "price": 250.00,
+  "coachFee": 60.00,
+  "isMultiTeacher": true,
+  "coachFees": [
+    {
+      "coachId": 1,
+      "coachFee": 85.00
+    },
+    {
+      "coachId": 2,
+      "coachFee": 90.00
+    },
+    {
+      "coachId": 3,
+      "coachFee": 92.00
+    }
+  ],
+  "campusId": 1,
+  "description": "更新后的多教师课程，调整了教练课时费"
+}
+
+### 6. 更新课程为单教师教学（移除多教师设置）
+POST http://localhost:8080/api/courses/update
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "id": 2,
+  "name": "更新后的单教师课程",
+  "typeId": 2,
+  "status": "ACTIVE",
+  "unitHours": 1.0,
+  "price": 350.00,
+  "coachFee": 120.00,
+  "isMultiTeacher": false,
+  "coachIds": [1],
+  "campusId": 1,
+  "description": "更新后的单教师课程描述"
+}
+
+### 7. 再次获取课程详情（验证更新后的教练课时费）
+GET http://localhost:8080/api/courses/detail?id=1
+Authorization: Bearer {{token}}
+
+### 8. 测试边界情况：多教师教学但没有提供教练课时费列表
+POST http://localhost:8080/api/courses/create
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "多教师课程-无课时费列表",
+  "typeId": 3,
+  "status": "ACTIVE",
+  "unitHours": 2.0,
+  "price": 200.00,
+  "coachFee": 50.00,
+  "isMultiTeacher": true,
+  "campusId": 1,
+  "description": "多教师教学但没有提供教练课时费列表，应该使用默认课时费"
+} 

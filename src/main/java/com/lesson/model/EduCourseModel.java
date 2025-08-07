@@ -44,7 +44,7 @@ public class EduCourseModel {
     return id;
   }
 
-  public void createCourseCoachRelation(Long courseId, Long coachId) {
+  public void createCourseCoachRelation(Long courseId, Long coachId, BigDecimal coachFee) {
     try {
       // 首先检查是否存在已删除的记录
       int deletedCount = dsl.selectCount()
@@ -55,9 +55,10 @@ public class EduCourseModel {
           .fetchOne(0, int.class);
 
       if (deletedCount > 0) {
-        // 如果存在已删除的记录，则将其标记为未删除
+        // 如果存在已删除的记录，则将其标记为未删除并更新课时费
         dsl.update(SYS_COACH_COURSE)
             .set(SYS_COACH_COURSE.DELETED, 0)
+            .set(SYS_COACH_COURSE.COACH_FEE, coachFee)
             .where(SYS_COACH_COURSE.COACH_ID.eq(coachId))
             .and(SYS_COACH_COURSE.COURSE_ID.eq(courseId))
             .and(SYS_COACH_COURSE.DELETED.eq(1))
@@ -74,7 +75,13 @@ public class EduCourseModel {
           .fetchOne(0, int.class);
 
       if (activeCount > 0) {
-        // 如果已经存在未删除的记录，则不需要做任何操作
+        // 如果已经存在未删除的记录，则更新课时费
+        dsl.update(SYS_COACH_COURSE)
+            .set(SYS_COACH_COURSE.COACH_FEE, coachFee)
+            .where(SYS_COACH_COURSE.COACH_ID.eq(coachId))
+            .and(SYS_COACH_COURSE.COURSE_ID.eq(courseId))
+            .and(SYS_COACH_COURSE.DELETED.eq(0))
+            .execute();
         return;
       }
 
@@ -82,6 +89,7 @@ public class EduCourseModel {
       dsl.insertInto(SYS_COACH_COURSE)
           .set(SYS_COACH_COURSE.COACH_ID, coachId)
           .set(SYS_COACH_COURSE.COURSE_ID, courseId)
+          .set(SYS_COACH_COURSE.COACH_FEE, coachFee)
           .set(SYS_COACH_COURSE.DELETED, 0)
           .execute();
     } catch (Exception e) {

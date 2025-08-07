@@ -9,6 +9,7 @@ import com.lesson.repository.Keys;
 import com.lesson.repository.LessonProd;
 import com.lesson.repository.tables.records.SysCoachCourseRecord;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -19,7 +20,7 @@ import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row6;
+import org.jooq.Row7;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -65,6 +66,11 @@ public class SysCoachCourse extends TableImpl<SysCoachCourseRecord> {
      * The column <code>lesson_prod.sys_coach_course.course_id</code>. 关联课程ID
      */
     public final TableField<SysCoachCourseRecord, Long> COURSE_ID = createField(DSL.name("course_id"), SQLDataType.BIGINT.nullable(false), this, "关联课程ID");
+
+    /**
+     * The column <code>lesson_prod.sys_coach_course.coach_fee</code>. 该教练在此课程中的课时费(元)
+     */
+    public final TableField<SysCoachCourseRecord, BigDecimal> COACH_FEE = createField(DSL.name("coach_fee"), SQLDataType.DECIMAL(10, 2).nullable(false).defaultValue(DSL.inline("0.00", SQLDataType.DECIMAL)), this, "该教练在此课程中的课时费(元)");
 
     /**
      * The column <code>lesson_prod.sys_coach_course.created_time</code>. 创建时间
@@ -149,28 +155,18 @@ public class SysCoachCourse extends TableImpl<SysCoachCourseRecord> {
         return new SysCoachCourse(alias, this);
     }
 
-    /**
-     * Rename this table
-     */
     @Override
     public SysCoachCourse rename(String name) {
         return new SysCoachCourse(DSL.name(name), null);
     }
 
-    /**
-     * Rename this table
-     */
     @Override
     public SysCoachCourse rename(Name name) {
         return new SysCoachCourse(name, null);
     }
 
-    // -------------------------------------------------------------------------
-    // Row6 type methods
-    // -------------------------------------------------------------------------
-
     @Override
-    public Row6<Long, Long, Long, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
-        return (Row6) super.fieldsRow();
+    public Row7<Long, Long, Long, BigDecimal, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
+        return (Row7<Long, Long, Long, BigDecimal, LocalDateTime, LocalDateTime, Integer>) super.fieldsRow();
     }
-}
+} 

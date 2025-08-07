@@ -135,6 +135,11 @@ public class CoachDetailRecord {
     private BigDecimal dividend;
     
     /**
+     * 该教练在此课程中的课时费
+     */
+    private BigDecimal coachFee;
+    
+    /**
      * 生效日期
      */
     private LocalDate effectiveDate;

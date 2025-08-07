@@ -18,6 +18,7 @@ import com.lesson.vo.CourseVO;
 import com.lesson.vo.request.CourseCreateRequest;
 import com.lesson.vo.request.CourseQueryRequest;
 import com.lesson.vo.request.CourseUpdateRequest;
+import com.lesson.vo.request.CoachFeeRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -53,13 +54,24 @@ public class CourseServiceImpl implements CourseService {
             }
 
             // 验证教练列表
-            if (CollectionUtils.isEmpty(request.getCoachIds())) {
-                throw new BusinessException("至少需要选择一个教练");
-            }
-
-            // 验证教练是否存在且属于当前机构
-            for (Long coachId : request.getCoachIds()) {
-                sysCoachModel.validateCoach(coachId, request.getCampusId(), institutionId);
+            if (Boolean.TRUE.equals(request.getIsMultiTeacher())) {
+                // 多教师教学模式
+                if (CollectionUtils.isEmpty(request.getCoachFees())) {
+                    throw new BusinessException("多教师教学模式下，至少需要选择一个教练");
+                }
+                
+                // 验证教练是否存在且属于当前机构
+                for (CoachFeeRequest coachFee : request.getCoachFees()) {
+                    sysCoachModel.validateCoach(coachFee.getCoachId(), request.getCampusId(), institutionId);
+                }
+            } else {
+                // 单教师教学模式
+                if (CollectionUtils.isEmpty(request.getCoachFees()) || request.getCoachFees().size() != 1) {
+                    throw new BusinessException("单教师教学模式下，只能选择一个教练");
+                }
+                
+                // 验证教练是否存在且属于当前机构
+                sysCoachModel.validateCoach(request.getCoachFees().get(0).getCoachId(), request.getCampusId(), institutionId);
             }
 
             // 创建课程基本信息
@@ -78,12 +90,15 @@ public class CourseServiceImpl implements CourseService {
             );
 
             // 创建课程-教练关联关系
-            for (Long coachId : request.getCoachIds()) {
-                courseModel.createCourseCoachRelation(courseId, coachId);
+            for (CoachFeeRequest coachFee : request.getCoachFees()) {
+                courseModel.createCourseCoachRelation(courseId, coachFee.getCoachId(), coachFee.getCoachFee());
             }
 
+            List<Long> coachIds = request.getCoachFees().stream()
+                .map(CoachFeeRequest::getCoachId)
+                .collect(Collectors.toList());
             log.info("课程创建成功: courseId={}, name={}, coachIds={}",
-                     courseId, request.getName(), request.getCoachIds());
+                     courseId, request.getName(), coachIds);
 
             // 更新Redis统计数据
             campusStatsRedisService.incrementCourseCount(institutionId, request.getCampusId());
@@ -109,14 +124,25 @@ public class CourseServiceImpl implements CourseService {
             }
 
             // 验证教练列表
-            if (CollectionUtils.isEmpty(request.getCoachIds())) {
-                throw new BusinessException("至少需要选择一个教练");
-            }
-
-            // 验证教练是否存在且属于当前机构
             Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
-            for (Long coachId : request.getCoachIds()) {
-                sysCoachModel.validateCoach(coachId, request.getCampusId(), institutionId);
+            if (Boolean.TRUE.equals(request.getIsMultiTeacher())) {
+                // 多教师教学模式
+                if (CollectionUtils.isEmpty(request.getCoachFees())) {
+                    throw new BusinessException("多教师教学模式下，至少需要选择一个教练");
+                }
+                
+                // 验证教练是否存在且属于当前机构
+                for (CoachFeeRequest coachFee : request.getCoachFees()) {
+                    sysCoachModel.validateCoach(coachFee.getCoachId(), request.getCampusId(), institutionId);
+                }
+            } else {
+                // 单教师教学模式
+                if (CollectionUtils.isEmpty(request.getCoachFees()) || request.getCoachFees().size() != 1) {
+                    throw new BusinessException("单教师教学模式下，只能选择一个教练");
+                }
+                
+                // 验证教练是否存在且属于当前机构
+                sysCoachModel.validateCoach(request.getCoachFees().get(0).getCoachId(), request.getCampusId(), institutionId);
             }
 
             // 更新课程基本信息
@@ -140,12 +166,12 @@ public class CourseServiceImpl implements CourseService {
                 courseModel.deleteCourseCoachRelations(request.getId());
 
                 // 然后添加新的关联关系
-                for (Long coachId : request.getCoachIds()) {
+                for (CoachFeeRequest coachFee : request.getCoachFees()) {
                     try {
-                        courseModel.createCourseCoachRelation(request.getId(), coachId);
+                        courseModel.createCourseCoachRelation(request.getId(), coachFee.getCoachId(), coachFee.getCoachFee());
                     } catch (Exception e) {
                         log.error("创建课程-教练关联失败: courseId={}, coachId={}, error={}",
-                                 request.getId(), coachId, e.getMessage());
+                                 request.getId(), coachFee.getCoachId(), e.getMessage());
                         // 继续处理其他教练关联，而不是直接失败
                     }
                 }
@@ -155,8 +181,11 @@ public class CourseServiceImpl implements CourseService {
                 // 只记录错误，不抛出异常
             }
 
+            List<Long> coachIds = request.getCoachFees().stream()
+                .map(CoachFeeRequest::getCoachId)
+                .collect(Collectors.toList());
             log.info("课程更新成功: courseId={}, name={}, coachIds={}",
-                     request.getId(), request.getName(), request.getCoachIds());
+                     request.getId(), request.getName(), coachIds);
 
             // 如果校区发生变化，更新Redis统计数据
             if (!existingCourse.getCampusId().equals(request.getCampusId())) {
@@ -254,6 +283,7 @@ public class CourseServiceImpl implements CourseService {
                     CourseVO.CoachInfo coachInfo = new CourseVO.CoachInfo();
                     coachInfo.setId(coach.getId());
                     coachInfo.setName(coach.getName());
+                    coachInfo.setCoachFee(coach.getCoachFee());
                     return coachInfo;
                 })
                 .collect(Collectors.toList());
@@ -327,6 +357,7 @@ public class CourseServiceImpl implements CourseService {
                             CourseVO.CoachInfo coachInfo = new CourseVO.CoachInfo();
                             coachInfo.setId(coach.getId());
                             coachInfo.setName(coach.getName());
+                            coachInfo.setCoachFee(coach.getCoachFee());
                             return coachInfo;
                         })
                         .collect(Collectors.toList());

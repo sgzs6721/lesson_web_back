@@ -103,5 +103,8 @@ public class CourseVO {
         
         @Schema(description = "教练姓名")
         private String name;
+        
+        @Schema(description = "该教练在此课程中的课时费")
+        private BigDecimal coachFee;
     }
 }

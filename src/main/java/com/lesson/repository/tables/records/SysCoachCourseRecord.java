@@ -6,12 +6,13 @@ package com.lesson.repository.tables.records;
 
 import com.lesson.repository.tables.SysCoachCourse;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record6;
-import org.jooq.Row6;
+import org.jooq.Record7;
+import org.jooq.Row7;
 import org.jooq.impl.UpdatableRecordImpl;
 
 
@@ -19,7 +20,7 @@ import org.jooq.impl.UpdatableRecordImpl;
  * 教练课程关联表
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class SysCoachCourseRecord extends UpdatableRecordImpl<SysCoachCourseRecord> implements Record6<Long, Long, Long, LocalDateTime, LocalDateTime, Integer> {
+public class SysCoachCourseRecord extends UpdatableRecordImpl<SysCoachCourseRecord> implements Record7<Long, Long, Long, BigDecimal, LocalDateTime, LocalDateTime, Integer> {
 
     private static final long serialVersionUID = 1L;
 
@@ -66,45 +67,59 @@ public class SysCoachCourseRecord extends UpdatableRecordImpl<SysCoachCourseReco
     }
 
     /**
+     * Setter for <code>lesson_prod.sys_coach_course.coach_fee</code>. 该教练在此课程中的课时费(元)
+     */
+    public void setCoachFee(BigDecimal value) {
+        set(3, value);
+    }
+
+    /**
+     * Getter for <code>lesson_prod.sys_coach_course.coach_fee</code>. 该教练在此课程中的课时费(元)
+     */
+    public BigDecimal getCoachFee() {
+        return (BigDecimal) get(3);
+    }
+
+    /**
      * Setter for <code>lesson_prod.sys_coach_course.created_time</code>. 创建时间
      */
     public void setCreatedTime(LocalDateTime value) {
-        set(3, value);
+        set(4, value);
     }
 
     /**
      * Getter for <code>lesson_prod.sys_coach_course.created_time</code>. 创建时间
      */
     public LocalDateTime getCreatedTime() {
-        return (LocalDateTime) get(3);
+        return (LocalDateTime) get(4);
     }
 
     /**
      * Setter for <code>lesson_prod.sys_coach_course.update_time</code>. 更新时间
      */
     public void setUpdateTime(LocalDateTime value) {
-        set(4, value);
+        set(5, value);
     }
 
     /**
      * Getter for <code>lesson_prod.sys_coach_course.update_time</code>. 更新时间
      */
     public LocalDateTime getUpdateTime() {
-        return (LocalDateTime) get(4);
+        return (LocalDateTime) get(5);
     }
 
     /**
      * Setter for <code>lesson_prod.sys_coach_course.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public void setDeleted(Integer value) {
-        set(5, value);
+        set(6, value);
     }
 
     /**
      * Getter for <code>lesson_prod.sys_coach_course.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public Integer getDeleted() {
-        return (Integer) get(5);
+        return (Integer) get(6);
     }
 
     // -------------------------------------------------------------------------
@@ -117,17 +132,17 @@ public class SysCoachCourseRecord extends UpdatableRecordImpl<SysCoachCourseReco
     }
 
     // -------------------------------------------------------------------------
-    // Record6 type implementation
+    // Record7 type implementation
     // -------------------------------------------------------------------------
 
     @Override
-    public Row6<Long, Long, Long, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
-        return (Row6) super.fieldsRow();
+    public Row7<Long, Long, Long, BigDecimal, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
+        return (Row7<Long, Long, Long, BigDecimal, LocalDateTime, LocalDateTime, Integer>) super.fieldsRow();
     }
 
     @Override
-    public Row6<Long, Long, Long, LocalDateTime, LocalDateTime, Integer> valuesRow() {
-        return (Row6) super.valuesRow();
+    public Row7<Long, Long, Long, BigDecimal, LocalDateTime, LocalDateTime, Integer> valuesRow() {
+        return (Row7<Long, Long, Long, BigDecimal, LocalDateTime, LocalDateTime, Integer>) super.valuesRow();
     }
 
     @Override
@@ -146,17 +161,22 @@ public class SysCoachCourseRecord extends UpdatableRecordImpl<SysCoachCourseReco
     }
 
     @Override
-    public Field<LocalDateTime> field4() {
-        return SysCoachCourse.SYS_COACH_COURSE.CREATED_TIME;
+    public Field<BigDecimal> field4() {
+        return SysCoachCourse.SYS_COACH_COURSE.COACH_FEE;
     }
 
     @Override
     public Field<LocalDateTime> field5() {
+        return SysCoachCourse.SYS_COACH_COURSE.CREATED_TIME;
+    }
+
+    @Override
+    public Field<LocalDateTime> field6() {
         return SysCoachCourse.SYS_COACH_COURSE.UPDATE_TIME;
     }
 
     @Override
-    public Field<Integer> field6() {
+    public Field<Integer> field7() {
         return SysCoachCourse.SYS_COACH_COURSE.DELETED;
     }
 
@@ -176,17 +196,22 @@ public class SysCoachCourseRecord extends UpdatableRecordImpl<SysCoachCourseReco
     }
 
     @Override
-    public LocalDateTime component4() {
-        return getCreatedTime();
+    public BigDecimal component4() {
+        return getCoachFee();
     }
 
     @Override
     public LocalDateTime component5() {
+        return getCreatedTime();
+    }
+
+    @Override
+    public LocalDateTime component6() {
         return getUpdateTime();
     }
 
     @Override
-    public Integer component6() {
+    public Integer component7() {
         return getDeleted();
     }
 
@@ -206,17 +231,22 @@ public class SysCoachCourseRecord extends UpdatableRecordImpl<SysCoachCourseReco
     }
 
     @Override
-    public LocalDateTime value4() {
-        return getCreatedTime();
+    public BigDecimal value4() {
+        return getCoachFee();
     }
 
     @Override
     public LocalDateTime value5() {
+        return getCreatedTime();
+    }
+
+    @Override
+    public LocalDateTime value6() {
         return getUpdateTime();
     }
 
     @Override
-    public Integer value6() {
+    public Integer value7() {
         return getDeleted();
     }
 
@@ -239,31 +269,38 @@ public class SysCoachCourseRecord extends UpdatableRecordImpl<SysCoachCourseReco
     }
 
     @Override
-    public SysCoachCourseRecord value4(LocalDateTime value) {
-        setCreatedTime(value);
+    public SysCoachCourseRecord value4(BigDecimal value) {
+        setCoachFee(value);
         return this;
     }
 
     @Override
     public SysCoachCourseRecord value5(LocalDateTime value) {
+        setCreatedTime(value);
+        return this;
+    }
+
+    @Override
+    public SysCoachCourseRecord value6(LocalDateTime value) {
         setUpdateTime(value);
         return this;
     }
 
     @Override
-    public SysCoachCourseRecord value6(Integer value) {
+    public SysCoachCourseRecord value7(Integer value) {
         setDeleted(value);
         return this;
     }
 
     @Override
-    public SysCoachCourseRecord values(Long value1, Long value2, Long value3, LocalDateTime value4, LocalDateTime value5, Integer value6) {
+    public SysCoachCourseRecord values(Long value1, Long value2, Long value3, BigDecimal value4, LocalDateTime value5, LocalDateTime value6, Integer value7) {
         value1(value1);
         value2(value2);
         value3(value3);
         value4(value4);
         value5(value5);
         value6(value6);
+        value7(value7);
         return this;
     }
 
@@ -281,14 +318,15 @@ public class SysCoachCourseRecord extends UpdatableRecordImpl<SysCoachCourseReco
     /**
      * Create a detached, initialised SysCoachCourseRecord
      */
-    public SysCoachCourseRecord(Long id, Long coachId, Long courseId, LocalDateTime createdTime, LocalDateTime updateTime, Integer deleted) {
+    public SysCoachCourseRecord(Long id, Long coachId, Long courseId, BigDecimal coachFee, LocalDateTime createdTime, LocalDateTime updateTime, Integer deleted) {
         super(SysCoachCourse.SYS_COACH_COURSE);
 
         setId(id);
         setCoachId(coachId);
         setCourseId(courseId);
+        setCoachFee(coachFee);
         setCreatedTime(createdTime);
         setUpdateTime(updateTime);
         setDeleted(deleted);
     }
-}
+} 

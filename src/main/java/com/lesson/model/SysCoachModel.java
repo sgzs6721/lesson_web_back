@@ -597,7 +597,8 @@ public class SysCoachModel {
                 SYS_COACH.EXPERIENCE,
                 SYS_COACH.GENDER,
                 SYS_COACH.CAMPUS_ID,
-                SYS_COACH.INSTITUTION_ID
+                SYS_COACH.INSTITUTION_ID,
+                SYS_COACH_COURSE.COACH_FEE
             )
             .from(SYS_COACH)
             .innerJoin(SYS_COACH_COURSE)
@@ -605,7 +606,7 @@ public class SysCoachModel {
             .where(SYS_COACH_COURSE.COURSE_ID.eq(courseId))
             .and(SYS_COACH_COURSE.DELETED.eq(0))
             .and(SYS_COACH.DELETED.eq(0))
-                        .fetchInto(CoachDetailRecord.class);
+            .fetchInto(CoachDetailRecord.class);
     }
 
     /**

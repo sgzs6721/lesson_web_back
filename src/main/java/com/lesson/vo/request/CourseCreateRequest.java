@@ -1,6 +1,7 @@
 package com.lesson.vo.request;
 
 import com.lesson.enums.CourseStatus;
+import com.lesson.vo.request.CoachFeeRequest;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -45,9 +46,8 @@ public class CourseCreateRequest {
     @Schema(description = "是否多教师教学：true-是，false-否", example = "false")
     private Boolean isMultiTeacher;
 
-    @NotNull(message = "教练列表不能为空")
-    @Schema(description = "教练ID列表")
-    private List<Long> coachIds;
+    @Schema(description = "教练课时费列表（多教师教学时使用）")
+    private List<CoachFeeRequest> coachFees;
 
     @NotNull(message = "校区ID不能为空")
     @Schema(description = "校区ID")
