@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 用户列表VO
@@ -31,10 +32,10 @@ public class UserListVO {
     private String phone;
 
     /**
-     * 角色信息
+     * 角色信息列表
      */
-    @Schema(description = "角色信息")
-    private RoleInfo role;
+    @Schema(description = "角色信息列表")
+    private List<RoleInfo> roles;
 
     /**
      * 校区信息

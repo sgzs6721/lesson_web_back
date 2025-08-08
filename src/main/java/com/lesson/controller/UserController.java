@@ -8,6 +8,7 @@ import com.lesson.service.RoleService;
 import com.lesson.service.UserService;
 import com.lesson.vo.PageResult;
 import com.lesson.vo.user.UserListVO;
+import com.lesson.vo.response.UserStatusResponseVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -59,6 +60,26 @@ public class UserController {
     }
 
     /**
+     * 创建用户（返回状态信息）
+     * 
+     * @param request 创建用户请求参数
+     * @return 用户状态响应
+     */
+    @PostMapping("/create-with-status")
+    @Operation(summary = "创建用户（返回状态信息）", 
+               description = "创建新用户，需要指定用户角色和所属机构/校区，并返回详细的状态信息")
+    @RequirePermission("user:create")
+    public Result<UserStatusResponseVO> createWithStatus(@RequestBody @Validated UserCreateRequest request) {
+        UserStatusResponseVO response = userService.createUserWithStatus(request);
+        
+        if ("SUCCESS".equals(response.getOperationStatus())) {
+            return Result.success(response);
+        } else {
+            return Result.error(response.getOperationMessage());
+        }
+    }
+
+    /**
      * 更新用户
      * 
      * @param request 更新用户请求参数
@@ -71,6 +92,26 @@ public class UserController {
     public Result<Void> update(@RequestBody @Validated UserUpdateRequest request) {
         userService.updateUser(request);
         return Result.success(null);
+    }
+
+    /**
+     * 更新用户（返回状态信息）
+     * 
+     * @param request 更新用户请求参数
+     * @return 用户状态响应
+     */
+    @PostMapping("/update-with-status")
+    @Operation(summary = "更新用户（返回状态信息）", 
+               description = "更新用户信息，包括姓名、手机号、角色等，并返回详细的状态信息")
+    @RequirePermission("user:update")
+    public Result<UserStatusResponseVO> updateWithStatus(@RequestBody @Validated UserUpdateRequest request) {
+        UserStatusResponseVO response = userService.updateUserWithStatus(request);
+        
+        if ("SUCCESS".equals(response.getOperationStatus())) {
+            return Result.success(response);
+        } else {
+            return Result.error(response.getOperationMessage());
+        }
     }
 
     /**

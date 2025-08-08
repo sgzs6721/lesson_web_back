@@ -13,6 +13,8 @@ import com.lesson.model.SysUserRoleModel;
 import com.lesson.repository.tables.records.SysInstitutionRecord;
 import com.lesson.repository.tables.records.SysRoleRecord;
 import com.lesson.repository.tables.records.SysUserRecord;
+import com.lesson.repository.tables.records.SysCampusRecord;
+import com.lesson.repository.Tables;
 import com.lesson.request.user.*;
 import com.lesson.service.UserService;
 import com.lesson.utils.JwtUtil;
@@ -21,7 +23,9 @@ import com.lesson.vo.role.RoleVO;
 import com.lesson.vo.user.UserListVO;
 import com.lesson.vo.user.UserLoginVO;
 import com.lesson.vo.user.UserRegisterVO;
+import com.lesson.vo.response.UserStatusResponseVO;
 import lombok.RequiredArgsConstructor;
+import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Record3;
 import org.jooq.Result;
@@ -31,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.time.LocalDateTime;
 import io.jsonwebtoken.Claims;
 
 /**
@@ -48,6 +53,7 @@ public class UserServiceImpl implements UserService {
   private final PasswordEncoder passwordEncoder;
   private final JwtUtil jwtUtil;
   private final HttpServletRequest httpServletRequest;  // 添加 HttpServletRequest
+  private final DSLContext dsl;
 
   @Override
   public Long createUser(String phone, String password, String realName, Long institutionId, Long roleId, UserStatus status) {
@@ -216,6 +222,26 @@ public class UserServiceImpl implements UserService {
           }
       }
 
+      // 查询用户的所有角色信息
+      Map<Long, List<UserListVO.RoleInfo>> userRolesMap = new HashMap<>();
+      if (!userIds.isEmpty()) {
+          for (Long userId : userIds) {
+              List<Long> userRoleIds = userRoleModel.getUserRoleIds(userId);
+              List<UserListVO.RoleInfo> roleInfos = new ArrayList<>();
+              
+              for (Long roleId : userRoleIds) {
+                  SysRoleRecord role = roleModel.getById(roleId);
+                  if (role != null) {
+                      UserListVO.RoleInfo roleInfo = new UserListVO.RoleInfo();
+                      roleInfo.setId(role.getId());
+                      roleInfo.setName(role.getRoleName());
+                      roleInfos.add(roleInfo);
+                  }
+              }
+              userRolesMap.put(userId, roleInfos);
+          }
+      }
+
       // 转换为VO
       List<UserListVO> users = userRecords.stream()
           .map(record -> {
@@ -223,6 +249,8 @@ public class UserServiceImpl implements UserService {
               // 设置校区信息
               vo.setCampus(userCampusMap.getOrDefault(vo.getId(),
                   new UserListVO.CampusInfo())); // 使用内部类
+              // 设置角色信息列表
+              vo.setRoles(userRolesMap.getOrDefault(vo.getId(), new ArrayList<>()));
               return vo;
           })
           .collect(Collectors.toList());
@@ -239,19 +267,13 @@ public class UserServiceImpl implements UserService {
   }
 
   /**
-   * 将数据库记录转换为基本的UserListVO（不包含校区信息）
+   * 将数据库记录转换为基本的UserListVO（不包含校区信息和角色信息）
    */
   private UserListVO convertToBasicUserVO(Record record) {
     UserListVO vo = new UserListVO();
     vo.setId(record.get("id", Long.class));
     vo.setRealName(record.get("real_name", String.class));
     vo.setPhone(record.get("phone", String.class));
-
-    // 设置角色信息
-    UserListVO.RoleInfo roleInfo = new UserListVO.RoleInfo();
-    roleInfo.setId(record.get("role_id", Long.class));
-    roleInfo.setName(record.get("role_name", String.class));
-    vo.setRole(roleInfo);
 
     // 设置状态
     Integer status = record.get("status", Integer.class);
@@ -326,6 +348,151 @@ public class UserServiceImpl implements UserService {
       throw e;
     } catch (Exception e) {
       throw new BusinessException("创建用户失败: " + e.getMessage());
+    }
+  }
+
+  @Override
+  @Transactional(rollbackFor = Exception.class)
+  public UserStatusResponseVO createUserWithStatus(UserCreateRequest request) {
+    try {
+      // 调用原有方法创建用户
+      Long userId = createUser(request);
+      
+      // 获取用户信息
+      SysUserRecord user = userModel.getById(userId);
+      
+      // 获取机构信息
+      SysInstitutionRecord institution = institutionModel.getById(user.getInstitutionId());
+      
+      // 获取校区信息
+      String campusName = "";
+      if (user.getCampusId() != null && user.getCampusId() > 0) {
+        try {
+          SysCampusRecord campusRecord = dsl.selectFrom(Tables.SYS_CAMPUS)
+              .where(Tables.SYS_CAMPUS.ID.eq(user.getCampusId()))
+              .and(Tables.SYS_CAMPUS.DELETED.eq(0))
+              .fetchOne();
+          campusName = campusRecord != null ? campusRecord.getName() : "未知校区";
+        } catch (Exception e) {
+          campusName = "未知校区";
+        }
+      }
+      
+      // 获取角色信息
+      List<UserStatusResponseVO.RoleInfo> roleInfos = new ArrayList<>();
+      for (Long roleId : request.getRoleIds()) {
+        SysRoleRecord role = roleModel.getById(roleId);
+        if (role != null) {
+          UserStatusResponseVO.RoleInfo roleInfo = new UserStatusResponseVO.RoleInfo();
+          roleInfo.setRoleId(role.getId());
+          roleInfo.setRoleName(role.getRoleName());
+          roleInfo.setRoleDesc(role.getDescription());
+          
+          // 获取角色权限
+          List<String> permissions = roleModel.getRolePermissions(roleId);
+          roleInfo.setPermissions(permissions);
+          
+          roleInfos.add(roleInfo);
+        }
+      }
+      
+      // 构建响应
+      UserStatusResponseVO response = new UserStatusResponseVO();
+      response.setUserId(userId);
+      response.setRealName(user.getRealName());
+      response.setPhone(user.getPhone());
+      response.setStatus(user.getStatus() == 1 ? "ENABLED" : "DISABLED");
+      response.setInstitutionId(user.getInstitutionId());
+      response.setInstitutionName(institution != null ? institution.getName() : "");
+      response.setCampusId(user.getCampusId());
+      response.setCampusName(campusName);
+      response.setRoles(roleInfos);
+      response.setOperationStatus("SUCCESS");
+      response.setOperationMessage("用户创建成功");
+      response.setOperationTime(LocalDateTime.now());
+      
+      return response;
+      
+    } catch (Exception e) {
+      UserStatusResponseVO response = new UserStatusResponseVO();
+      response.setOperationStatus("FAILED");
+      response.setOperationMessage("用户创建失败：" + e.getMessage());
+      response.setOperationTime(LocalDateTime.now());
+      
+      return response;
+    }
+  }
+
+  @Override
+  @Transactional(rollbackFor = Exception.class)
+  public UserStatusResponseVO updateUserWithStatus(UserUpdateRequest request) {
+    try {
+      // 调用原有方法更新用户
+      updateUser(request);
+      
+      // 获取用户信息
+      SysUserRecord user = userModel.getById(request.getId());
+      
+      // 获取机构信息
+      SysInstitutionRecord institution = institutionModel.getById(user.getInstitutionId());
+      
+      // 获取校区信息
+      String campusName = "";
+      if (user.getCampusId() != null && user.getCampusId() > 0) {
+        try {
+          SysCampusRecord campusRecord = dsl.selectFrom(Tables.SYS_CAMPUS)
+              .where(Tables.SYS_CAMPUS.ID.eq(user.getCampusId()))
+              .and(Tables.SYS_CAMPUS.DELETED.eq(0))
+              .fetchOne();
+          campusName = campusRecord != null ? campusRecord.getName() : "未知校区";
+        } catch (Exception e) {
+          campusName = "未知校区";
+        }
+      }
+      
+      // 获取角色信息
+      List<UserStatusResponseVO.RoleInfo> roleInfos = new ArrayList<>();
+      for (Long roleId : request.getRoleIds()) {
+        SysRoleRecord role = roleModel.getById(roleId);
+        if (role != null) {
+          UserStatusResponseVO.RoleInfo roleInfo = new UserStatusResponseVO.RoleInfo();
+          roleInfo.setRoleId(role.getId());
+          roleInfo.setRoleName(role.getRoleName());
+          roleInfo.setRoleDesc(role.getDescription());
+          
+          // 获取角色权限
+          List<String> permissions = roleModel.getRolePermissions(roleId);
+          roleInfo.setPermissions(permissions);
+          
+          roleInfos.add(roleInfo);
+        }
+      }
+      
+      // 构建响应
+      UserStatusResponseVO response = new UserStatusResponseVO();
+      response.setUserId(request.getId());
+      response.setRealName(user.getRealName());
+      response.setPhone(user.getPhone());
+      response.setStatus(user.getStatus() == 1 ? "ENABLED" : "DISABLED");
+      response.setInstitutionId(user.getInstitutionId());
+      response.setInstitutionName(institution != null ? institution.getName() : "");
+      response.setCampusId(user.getCampusId());
+      response.setCampusName(campusName);
+      response.setRoles(roleInfos);
+      response.setOperationStatus("SUCCESS");
+      response.setOperationMessage("用户更新成功");
+      response.setOperationTime(LocalDateTime.now());
+      
+      return response;
+      
+    } catch (Exception e) {
+      UserStatusResponseVO response = new UserStatusResponseVO();
+      response.setUserId(request.getId());
+      response.setOperationStatus("FAILED");
+      response.setOperationMessage("用户更新失败：" + e.getMessage());
+      response.setOperationTime(LocalDateTime.now());
+      
+      return response;
     }
   }
 

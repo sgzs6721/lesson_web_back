@@ -262,12 +262,13 @@ public class CampusStatsRedisServiceImpl implements CampusStatsRedisService {
         log.info("开始刷新校区统计数据: institutionId={}, campusId={}", institutionId, campusId);
         
         try {
-            // 1. 刷新教练数量
+            // 1. 刷新教练数量（只统计在职教练）
             Integer coachCount = dsl.selectCount()
                     .from(table("sys_coach"))
                     .where(field("campus_id").eq(campusId))
                     .and(field("institution_id").eq(institutionId))
                     .and(field("deleted").eq(0))
+                    .and(field("status").eq("active")) // 只统计在职教练
                     .fetchOneInto(Integer.class);
             setTeacherCount(institutionId, campusId, coachCount.longValue());
             

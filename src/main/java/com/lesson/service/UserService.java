@@ -8,6 +8,7 @@ import com.lesson.vo.user.UserListVO;
 import com.lesson.vo.user.UserLoginVO;
 import com.lesson.vo.user.UserRegisterVO;
 import com.lesson.vo.user.UserVO;
+import com.lesson.vo.response.UserStatusResponseVO;
 
 import java.util.List;
 
@@ -46,9 +47,19 @@ public interface UserService {
     Long createUser(UserCreateRequest request);
 
     /**
+     * 创建用户（返回状态信息）
+     */
+    UserStatusResponseVO createUserWithStatus(UserCreateRequest request);
+
+    /**
      * 更新用户
      */
     void updateUser(UserUpdateRequest request);
+
+    /**
+     * 更新用户（返回状态信息）
+     */
+    UserStatusResponseVO updateUserWithStatus(UserUpdateRequest request);
 
     /**
      * 删除用户

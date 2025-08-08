@@ -546,12 +546,13 @@ public class StatisticsController {
             // 校区管理员：只统计自己校区的数据
             log.info("校区管理员统计 - 机构ID: {}, 校区ID: {}", institutionId, userCampusId);
             
-            // 统计学员数量
+            // 统计学员数量（只统计在学学员）
             totalStudents = dslContext.selectCount()
                     .from(EduStudent.EDU_STUDENT)
                     .where(EduStudent.EDU_STUDENT.DELETED.eq(0))
                     .and(EduStudent.EDU_STUDENT.INSTITUTION_ID.eq(institutionId))
                     .and(EduStudent.EDU_STUDENT.CAMPUS_ID.eq(userCampusId))
+                    .and(EduStudent.EDU_STUDENT.STATUS.eq("STUDYING")) // 只统计在学学员
                     .fetchOneInto(Integer.class);
             log.info("从数据库查询学员数量: {}", totalStudents);
             
@@ -606,6 +607,7 @@ public class StatisticsController {
                         .from(EduStudent.EDU_STUDENT)
                         .where(EduStudent.EDU_STUDENT.DELETED.eq(0))
                         .and(EduStudent.EDU_STUDENT.INSTITUTION_ID.eq(institutionId))
+                        .and(EduStudent.EDU_STUDENT.STATUS.eq("STUDYING")) // 只统计在学学员
                         .fetchOneInto(Integer.class);
                 campusStatsRedisService.setInstitutionStudentCount(institutionId, totalStudents);
             }
@@ -695,12 +697,13 @@ public class StatisticsController {
             // 校区管理员：只统计自己校区的数据
             log.info("校区管理员详细统计 - 机构ID: {}, 校区ID: {}", institutionId, userCampusId);
             
-            // 统计学员数量
+            // 统计学员数量（只统计在学学员）
             totalStudents = dslContext.selectCount()
                     .from(EduStudent.EDU_STUDENT)
                     .where(EduStudent.EDU_STUDENT.DELETED.eq(0))
                     .and(EduStudent.EDU_STUDENT.INSTITUTION_ID.eq(institutionId))
                     .and(EduStudent.EDU_STUDENT.CAMPUS_ID.eq(userCampusId))
+                    .and(EduStudent.EDU_STUDENT.STATUS.eq("STUDYING")) // 只统计在学学员
                     .fetchOneInto(Integer.class);
             
             // 统计课程数量
@@ -731,6 +734,7 @@ public class StatisticsController {
                         .from(EduStudent.EDU_STUDENT)
                         .where(EduStudent.EDU_STUDENT.DELETED.eq(0))
                         .and(EduStudent.EDU_STUDENT.INSTITUTION_ID.eq(institutionId))
+                        .and(EduStudent.EDU_STUDENT.STATUS.eq("STUDYING")) // 只统计在学学员
                         .fetchOneInto(Integer.class);
                 campusStatsRedisService.setInstitutionStudentCount(institutionId, totalStudents);
             }
