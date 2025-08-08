@@ -25,12 +25,29 @@ public class SysUserRoleModel {
      * @return 关联记录ID
      */
     public Long assignRoleToUser(Long userId, Long roleId) {
-        return dsl.insertInto(SYS_USER_ROLE)
-                .set(SYS_USER_ROLE.USER_ID, userId)
-                .set(SYS_USER_ROLE.ROLE_ID, roleId)
-                .returning(SYS_USER_ROLE.ID)
-                .fetchOne()
-                .getId();
+        // 先检查是否已存在该用户角色关联（包括已删除的）
+        Long existingId = dsl.select(SYS_USER_ROLE.ID)
+                .from(SYS_USER_ROLE)
+                .where(SYS_USER_ROLE.USER_ID.eq(userId))
+                .and(SYS_USER_ROLE.ROLE_ID.eq(roleId))
+                .fetchOneInto(Long.class);
+        
+        if (existingId != null) {
+            // 如果存在，则恢复该记录（设置deleted=0）
+            dsl.update(SYS_USER_ROLE)
+                    .set(SYS_USER_ROLE.DELETED, 0)
+                    .where(SYS_USER_ROLE.ID.eq(existingId))
+                    .execute();
+            return existingId;
+        } else {
+            // 如果不存在，则插入新记录
+            return dsl.insertInto(SYS_USER_ROLE)
+                    .set(SYS_USER_ROLE.USER_ID, userId)
+                    .set(SYS_USER_ROLE.ROLE_ID, roleId)
+                    .returning(SYS_USER_ROLE.ID)
+                    .fetchOne()
+                    .getId();
+        }
     }
 
     /**

@@ -240,14 +240,16 @@ public class UserServiceImpl implements UserService {
                       RoleEnum roleEnum = roleModel.getRoleEnumById(roleId);
                       roleInfo.setRoleEnum(roleEnum);
                       
-                      // 如果是校区管理员角色，需要包含校区ID
+                      // 如果是校区管理员角色，需要包含校区ID和校区名称
                       if ("校区管理员".equals(role.getRoleName())) {
-                          // 获取用户的校区ID
+                          // 获取用户的校区信息
                           UserListVO.CampusInfo campusInfo = userCampusMap.get(userId);
                           if (campusInfo != null && campusInfo.getId() != null) {
                               roleInfo.setCampusId(campusInfo.getId());
+                              roleInfo.setCampusName(campusInfo.getName());
                           }
                       }
+                      // 其他角色（超级管理员、协同管理员）的campusId和campusName保持为null
                       
                       roleInfos.add(roleInfo);
                   }

@@ -87,6 +87,13 @@ public class UserListVO {
         @Schema(description = "校区ID（校区管理员角色时使用）")
         @JsonInclude(JsonInclude.Include.NON_NULL)
         private Long campusId;
+
+        /**
+         * 校区名称（校区管理员角色时使用）
+         */
+        @Schema(description = "校区名称（校区管理员角色时使用）")
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        private String campusName;
     }
 
     /**
