@@ -319,13 +319,55 @@ public class UserServiceImpl implements UserService {
         throw new BusinessException("手机号已存在");
       }
 
+      // 处理角色信息
+      List<Long> roleIds = request.getRoleIds();
+      Long campusIdFromRoles = null;
+      
+      // 如果前端传递了roles字段，则从roles中提取角色ID和校区ID
+      if ((roleIds == null || roleIds.isEmpty()) && request.getRoles() != null && !request.getRoles().isEmpty()) {
+          roleIds = new ArrayList<>();
+          for (UserCreateRequest.RoleInfo roleInfo : request.getRoles()) {
+              // 根据角色名称获取角色ID（支持英文和中文角色名称）
+              Long roleId = null;
+              String roleName = roleInfo.getName();
+              
+              // 先尝试直接查询
+              roleId = roleModel.getRoleIdByCode(roleName);
+              
+              // 如果没找到，尝试英文到中文的映射
+              if (roleId == null) {
+                  String chineseRoleName = null;
+                  if ("SUPER_ADMIN".equals(roleName)) {
+                      chineseRoleName = "超级管理员";
+                  } else if ("COLLABORATOR".equals(roleName)) {
+                      chineseRoleName = "协同管理员";
+                  } else if ("CAMPUS_ADMIN".equals(roleName)) {
+                      chineseRoleName = "校区管理员";
+                  }
+                  
+                  if (chineseRoleName != null) {
+                      roleId = roleModel.getRoleIdByCode(chineseRoleName);
+                  }
+              }
+              
+              if (roleId != null) {
+                  roleIds.add(roleId);
+                  
+                  // 如果是校区管理员角色，提取校区ID
+                  if (("校区管理员".equals(roleName) || "CAMPUS_ADMIN".equals(roleName)) && roleInfo.getCampusId() != null) {
+                      campusIdFromRoles = roleInfo.getCampusId();
+                  }
+              }
+          }
+      }
+      
       // 验证角色ID列表
-      if (request.getRoleIds() == null || request.getRoleIds().isEmpty()) {
+      if (roleIds == null || roleIds.isEmpty()) {
         throw new BusinessException("角色不能为空");
       }
 
       // 检查是否包含超级管理员角色（不允许创建）
-      for (Long roleId : request.getRoleIds()) {
+      for (Long roleId : roleIds) {
         RoleEnum roleEnum = roleModel.getRoleEnumById(roleId);
         if (roleEnum == RoleEnum.SUPER_ADMIN) {
           throw new BusinessException("不允许创建超级管理员角色");
@@ -333,19 +375,22 @@ public class UserServiceImpl implements UserService {
       }
 
       // 检查是否包含校区管理员角色，如果包含则必须指定校区ID
-      boolean hasCampusAdminRole = request.getRoleIds().stream()
+      boolean hasCampusAdminRole = roleIds.stream()
           .anyMatch(roleId -> {
             RoleEnum roleEnum = roleModel.getRoleEnumById(roleId);
             return roleEnum == RoleEnum.CAMPUS_ADMIN;
           });
 
-      if (hasCampusAdminRole && (request.getCampusId() == null || request.getCampusId() <= 0)) {
+      // 优先使用从roles中提取的校区ID，其次使用请求中的校区ID
+      Long campusId = campusIdFromRoles != null ? campusIdFromRoles : request.getCampusId();
+      
+      if (hasCampusAdminRole && (campusId == null || campusId <= 0)) {
         throw new BusinessException("校区管理员必须指定所属校区");
       }
 
       // 创建用户（使用第一个角色ID作为主角色，保持向后兼容）
-      Long primaryRoleId = request.getRoleIds().get(0);
-      Long campusId = hasCampusAdminRole ? request.getCampusId() : -1L;
+      Long primaryRoleId = roleIds.get(0);
+      Long finalCampusId = hasCampusAdminRole ? campusId : -1L;
 
       Long userId = userModel.createUser(
           request.getPhone(),
@@ -353,13 +398,13 @@ public class UserServiceImpl implements UserService {
           request.getRealName(),
           institutionId,
           primaryRoleId,
-          campusId,
+          finalCampusId,
           passwordEncoder,
           request.getStatus()
       );
 
       // 为用户分配所有角色
-      userRoleModel.assignRolesToUser(userId, request.getRoleIds());
+      userRoleModel.assignRolesToUser(userId, roleIds);
 
       return userId;
     } catch (BusinessException e) {
