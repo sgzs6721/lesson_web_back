@@ -1,6 +1,8 @@
 package com.lesson.vo.user;
 
+import com.lesson.common.enums.RoleEnum;
 import com.lesson.common.enums.UserStatus;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -36,12 +38,6 @@ public class UserListVO {
      */
     @Schema(description = "角色信息列表")
     private List<RoleInfo> roles;
-
-    /**
-     * 校区信息
-     */
-    @Schema(description = "校区信息")
-    private CampusInfo campus;
 
     /**
      * 状态：0-禁用，1-启用
@@ -80,9 +76,16 @@ public class UserListVO {
         private String name;
 
         /**
+         * 角色枚举
+         */
+        @Schema(description = "角色枚举")
+        private RoleEnum roleEnum;
+
+        /**
          * 校区ID（校区管理员角色时使用）
          */
         @Schema(description = "校区ID（校区管理员角色时使用）")
+        @JsonInclude(JsonInclude.Include.NON_NULL)
         private Long campusId;
     }
 
@@ -104,4 +107,4 @@ public class UserListVO {
         @Schema(description = "校区名称")
         private String name;
     }
-} 
+}

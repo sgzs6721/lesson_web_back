@@ -236,6 +236,10 @@ public class UserServiceImpl implements UserService {
                       roleInfo.setId(role.getId());
                       roleInfo.setName(role.getRoleName());
                       
+                      // 设置角色枚举
+                      RoleEnum roleEnum = roleModel.getRoleEnumById(roleId);
+                      roleInfo.setRoleEnum(roleEnum);
+                      
                       // 如果是校区管理员角色，需要包含校区ID
                       if ("校区管理员".equals(role.getRoleName())) {
                           // 获取用户的校区ID
@@ -256,11 +260,13 @@ public class UserServiceImpl implements UserService {
       List<UserListVO> users = userRecords.stream()
           .map(record -> {
               UserListVO vo = convertToBasicUserVO(record);
-              // 设置校区信息
-              vo.setCampus(userCampusMap.getOrDefault(vo.getId(),
-                  new UserListVO.CampusInfo())); // 使用内部类
-              // 设置角色信息列表
-              vo.setRoles(userRolesMap.getOrDefault(vo.getId(), new ArrayList<>()));
+              
+              // 获取用户角色信息
+              List<UserListVO.RoleInfo> userRoles = userRolesMap.getOrDefault(vo.getId(), new ArrayList<>());
+              vo.setRoles(userRoles);
+              
+              // 校区信息现在通过roles中的campusId字段提供，不需要单独的campus字段
+              
               return vo;
           })
           .collect(Collectors.toList());
@@ -530,13 +536,34 @@ public class UserServiceImpl implements UserService {
       if ((roleIds == null || roleIds.isEmpty()) && request.getRoles() != null && !request.getRoles().isEmpty()) {
           roleIds = new ArrayList<>();
           for (UserUpdateRequest.RoleInfo roleInfo : request.getRoles()) {
-              // 根据角色名称获取角色ID
-              Long roleId = roleModel.getRoleIdByCode(roleInfo.getName());
+              // 根据角色名称获取角色ID（支持英文和中文角色名称）
+              Long roleId = null;
+              String roleName = roleInfo.getName();
+              
+              // 先尝试直接查询
+              roleId = roleModel.getRoleIdByCode(roleName);
+              
+              // 如果没找到，尝试英文到中文的映射
+              if (roleId == null) {
+                  String chineseRoleName = null;
+                  if ("SUPER_ADMIN".equals(roleName)) {
+                      chineseRoleName = "超级管理员";
+                  } else if ("COLLABORATOR".equals(roleName)) {
+                      chineseRoleName = "协同管理员";
+                  } else if ("CAMPUS_ADMIN".equals(roleName)) {
+                      chineseRoleName = "校区管理员";
+                  }
+                  
+                  if (chineseRoleName != null) {
+                      roleId = roleModel.getRoleIdByCode(chineseRoleName);
+                  }
+              }
+              
               if (roleId != null) {
                   roleIds.add(roleId);
                   
                   // 如果是校区管理员角色，提取校区ID
-                  if ("校区管理员".equals(roleInfo.getName()) && roleInfo.getCampusId() != null) {
+                  if (("校区管理员".equals(roleName) || "CAMPUS_ADMIN".equals(roleName)) && roleInfo.getCampusId() != null) {
                       campusIdFromRoles = roleInfo.getCampusId();
                   }
               }
