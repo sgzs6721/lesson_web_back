@@ -78,6 +78,12 @@ public class UserListVO {
          */
         @Schema(description = "角色名称")
         private String name;
+
+        /**
+         * 校区ID（校区管理员角色时使用）
+         */
+        @Schema(description = "校区ID（校区管理员角色时使用）")
+        private Long campusId;
     }
 
     /**

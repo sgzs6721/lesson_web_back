@@ -46,9 +46,14 @@ public class UserUpdateRequest {
     /**
      * 角色ID列表
      */
-    @NotNull(message = "角色不能为空")
-    @Schema(description = "角色ID列表（支持多个角色：2-协同管理员，3-校区管理员）", required = true, example = "[2, 3]")
+    @Schema(description = "角色ID列表（支持多个角色：2-协同管理员，3-校区管理员）", example = "[2, 3]")
     private List<Long> roleIds;
+
+    /**
+     * 角色对象列表（前端传递的格式）
+     */
+    @Schema(description = "角色对象列表", hidden = true)
+    private List<RoleInfo> roles;
 
     /**
      * 校区ID，系统管理员可为空
@@ -62,4 +67,29 @@ public class UserUpdateRequest {
     @NotNull(message = "状态不能为空")
     @Schema(description = "用户状态（DISABLED-禁用，ENABLED-启用）", required = true, example = "ENABLED")
     private UserStatus status;
+
+    /**
+     * 角色信息内部类
+     */
+    @Data
+    @Schema(description = "角色信息")
+    public static class RoleInfo {
+        /**
+         * 角色名称
+         */
+        @Schema(description = "角色名称")
+        private String name;
+
+        /**
+         * 校区ID
+         */
+        @Schema(description = "校区ID")
+        private Long campusId;
+
+        /**
+         * 状态
+         */
+        @Schema(description = "状态")
+        private String status;
+    }
 } 
