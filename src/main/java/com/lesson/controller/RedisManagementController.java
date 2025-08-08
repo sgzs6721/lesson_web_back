@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import io.swagger.v3.oas.annotations.Operation;
+import com.lesson.service.CampusStatsRedisService;
 
 /**
  * Redis管理控制器
@@ -26,6 +28,8 @@ public class RedisManagementController {
 
     @Autowired
     private RedisManagementUtil redisManagementUtil;
+
+    private final CampusStatsRedisService campusStatsRedisService;
 
     @GetMapping("/stats")
     @ApiOperation("获取所有环境的Redis统计信息")
@@ -160,6 +164,54 @@ public class RedisManagementController {
         } catch (Exception e) {
             log.error("获取Redis信息失败", e);
             return Result.error("获取Redis信息失败: " + e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/clear-campus-stats/{institutionId}")
+    @Operation(summary = "清理机构校区统计数据缓存", description = "清理指定机构的所有校区统计数据缓存")
+    public Result<String> clearCampusStatsCache(@PathVariable Long institutionId) {
+        try {
+            campusStatsRedisService.clearCampusStatsCache(institutionId);
+            return Result.success("校区统计数据缓存清理成功");
+        } catch (Exception e) {
+            log.error("清理校区统计数据缓存失败: institutionId={}", institutionId, e);
+            return Result.error("清理校区统计数据缓存失败: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/refresh-campus-stats/{institutionId}")
+    @Operation(summary = "刷新机构校区统计数据", description = "刷新指定机构的所有校区统计数据")
+    public Result<String> refreshCampusStats(@PathVariable Long institutionId) {
+        try {
+            campusStatsRedisService.refreshAllCampusStats(institutionId);
+            return Result.success("校区统计数据刷新成功");
+        } catch (Exception e) {
+            log.error("刷新校区统计数据失败: institutionId={}", institutionId, e);
+            return Result.error("刷新校区统计数据失败: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/clear-and-refresh-campus-stats/{institutionId}")
+    @Operation(summary = "清理并刷新机构校区统计数据", description = "先清理缓存，再刷新指定机构的所有校区统计数据")
+    public Result<String> clearAndRefreshCampusStats(@PathVariable Long institutionId) {
+        try {
+            campusStatsRedisService.clearAndRefreshAllCampusStats(institutionId);
+            return Result.success("校区统计数据清理并刷新成功");
+        } catch (Exception e) {
+            log.error("清理并刷新校区统计数据失败: institutionId={}", institutionId, e);
+            return Result.error("清理并刷新校区统计数据失败: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/refresh-single-campus-stats/{institutionId}/{campusId}")
+    @Operation(summary = "刷新单个校区统计数据", description = "刷新指定校区的统计数据")
+    public Result<String> refreshSingleCampusStats(@PathVariable Long institutionId, @PathVariable Long campusId) {
+        try {
+            campusStatsRedisService.refreshCampusStats(institutionId, campusId);
+            return Result.success("单个校区统计数据刷新成功");
+        } catch (Exception e) {
+            log.error("刷新单个校区统计数据失败: institutionId={}, campusId={}", institutionId, campusId, e);
+            return Result.error("刷新单个校区统计数据失败: " + e.getMessage());
         }
     }
 } 

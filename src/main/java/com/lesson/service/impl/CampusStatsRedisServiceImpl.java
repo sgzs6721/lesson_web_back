@@ -8,6 +8,7 @@ import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static org.jooq.impl.DSL.field;
@@ -415,5 +416,124 @@ public class CampusStatsRedisServiceImpl implements CampusStatsRedisService {
         if (currentValue != null && currentValue < 0) {
             redisUtil.set(key, 0, CACHE_EXPIRE_HOURS, TimeUnit.HOURS);
         }
+    }
+
+    // ==================== 新增缓存清理和批量刷新方法 ====================
+
+    /**
+     * 清理指定机构的所有校区统计数据缓存
+     */
+    public void clearCampusStatsCache(Long institutionId) {
+        log.info("开始清理机构校区统计数据缓存: institutionId={}", institutionId);
+        
+        try {
+            // 获取该机构的所有校区ID
+            List<Long> campusIds = dsl.select(field("id", Long.class))
+                    .from(table("sys_campus"))
+                    .where(field("institution_id").eq(institutionId))
+                    .and(field("deleted").eq(0))
+                    .fetchInto(Long.class);
+            
+            // 清理每个校区的缓存
+            for (Long campusId : campusIds) {
+                clearSingleCampusStatsCache(institutionId, campusId);
+            }
+            
+            // 清理机构级缓存
+            clearInstitutionStatsCache(institutionId);
+            
+            log.info("机构校区统计数据缓存清理完成: institutionId={}, 校区数量={}", institutionId, campusIds.size());
+        } catch (Exception e) {
+            log.error("清理机构校区统计数据缓存失败: institutionId={}", institutionId, e);
+        }
+    }
+
+    /**
+     * 清理单个校区的统计数据缓存
+     */
+    public void clearSingleCampusStatsCache(Long institutionId, Long campusId) {
+        log.info("清理单个校区统计数据缓存: institutionId={}, campusId={}", institutionId, campusId);
+        
+        try {
+            // 删除各种统计数据的缓存
+            deleteTeacherCount(institutionId, campusId);
+            deleteStudentCount(institutionId, campusId);
+            deleteCourseCount(institutionId, campusId);
+            
+            // 删除课时相关缓存
+            String pendingHoursKey = String.format(PENDING_LESSON_HOURS_KEY, institutionId, campusId);
+            String consumedHoursKey = String.format(CONSUMED_HOURS_KEY, institutionId, campusId);
+            String totalHoursKey = String.format(TOTAL_HOURS_KEY, institutionId, campusId);
+            
+            redisUtil.delete(pendingHoursKey);
+            redisUtil.delete(consumedHoursKey);
+            redisUtil.delete(totalHoursKey);
+            
+            log.info("单个校区统计数据缓存清理完成: institutionId={}, campusId={}", institutionId, campusId);
+        } catch (Exception e) {
+            log.error("清理单个校区统计数据缓存失败: institutionId={}, campusId={}", institutionId, campusId, e);
+        }
+    }
+
+    /**
+     * 清理机构级统计数据缓存
+     */
+    public void clearInstitutionStatsCache(Long institutionId) {
+        log.info("清理机构级统计数据缓存: institutionId={}", institutionId);
+        
+        try {
+            String studentCountKey = String.format(INSTITUTION_STUDENT_COUNT_KEY, institutionId);
+            String courseCountKey = String.format(INSTITUTION_COURSE_COUNT_KEY, institutionId);
+            
+            redisUtil.delete(studentCountKey);
+            redisUtil.delete(courseCountKey);
+            
+            log.info("机构级统计数据缓存清理完成: institutionId={}", institutionId);
+        } catch (Exception e) {
+            log.error("清理机构级统计数据缓存失败: institutionId={}", institutionId, e);
+        }
+    }
+
+    /**
+     * 刷新指定机构的所有校区统计数据
+     */
+    public void refreshAllCampusStats(Long institutionId) {
+        log.info("开始刷新机构所有校区统计数据: institutionId={}", institutionId);
+        
+        try {
+            // 获取该机构的所有校区ID
+            List<Long> campusIds = dsl.select(field("id", Long.class))
+                    .from(table("sys_campus"))
+                    .where(field("institution_id").eq(institutionId))
+                    .and(field("deleted").eq(0))
+                    .fetchInto(Long.class);
+            
+            // 刷新每个校区的统计数据
+            for (Long campusId : campusIds) {
+                refreshCampusStats(institutionId, campusId);
+            }
+            
+            // 刷新机构级统计数据
+            refreshInstitutionStats(institutionId);
+            
+            log.info("机构所有校区统计数据刷新完成: institutionId={}, 校区数量={}", institutionId, campusIds.size());
+        } catch (Exception e) {
+            log.error("刷新机构所有校区统计数据失败: institutionId={}", institutionId, e);
+        }
+    }
+
+    /**
+     * 清理并刷新指定机构的所有校区统计数据
+     */
+    public void clearAndRefreshAllCampusStats(Long institutionId) {
+        log.info("开始清理并刷新机构所有校区统计数据: institutionId={}", institutionId);
+        
+        // 先清理缓存
+        clearCampusStatsCache(institutionId);
+        
+        // 再刷新统计数据
+        refreshAllCampusStats(institutionId);
+        
+        log.info("机构所有校区统计数据清理并刷新完成: institutionId={}", institutionId);
     }
 }

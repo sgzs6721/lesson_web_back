@@ -295,4 +295,42 @@ public interface CampusStatsRedisService {
      * @param institutionId 机构ID
      */
     void refreshInstitutionStats(Long institutionId);
+
+    // ==================== 新增缓存清理和批量刷新方法 ====================
+
+    /**
+     * 清理指定机构的所有校区统计数据缓存
+     *
+     * @param institutionId 机构ID
+     */
+    void clearCampusStatsCache(Long institutionId);
+
+    /**
+     * 清理单个校区的统计数据缓存
+     *
+     * @param institutionId 机构ID
+     * @param campusId 校区ID
+     */
+    void clearSingleCampusStatsCache(Long institutionId, Long campusId);
+
+    /**
+     * 清理机构级统计数据缓存
+     *
+     * @param institutionId 机构ID
+     */
+    void clearInstitutionStatsCache(Long institutionId);
+
+    /**
+     * 刷新指定机构的所有校区统计数据
+     *
+     * @param institutionId 机构ID
+     */
+    void refreshAllCampusStats(Long institutionId);
+
+    /**
+     * 清理并刷新指定机构的所有校区统计数据
+     *
+     * @param institutionId 机构ID
+     */
+    void clearAndRefreshAllCampusStats(Long institutionId);
 } 
