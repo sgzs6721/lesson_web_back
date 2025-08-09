@@ -59,24 +59,6 @@ public class StudentController {
         return Result.success(studentId);
     }
 
-    /**
-     * 创建学员及课程（返回详细状态）
-     *
-     * @param request 创建学员及课程请求
-     * @return 学员创建详细状态
-     */
-    @PostMapping("/create-with-status")
-    @Operation(summary = "创建学员及课程（返回详细状态）",
-               description = "同时创建学员基本信息和报名课程信息，并返回详细的创建状态信息")
-    public Result<StudentCreateResponseVO> createWithCourseWithStatus(@RequestBody @Valid StudentWithCourseCreateRequest request) {
-        StudentCreateResponseVO response = studentService.createStudentWithCourseWithStatus(request);
-        
-        if ("SUCCESS".equals(response.getOperationStatus())) {
-            return Result.success(response);
-        } else {
-            return Result.error(response.getOperationMessage());
-        }
-    }
 
     /**
      * 更新学员及课程
@@ -86,10 +68,10 @@ public class StudentController {
      */
     @PostMapping("/update")
     @Operation(summary = "更新学员及课程",
-               description = "同时更新学员基本信息和课程信息")
-    public Result<Void> updateWithCourse(@RequestBody @Valid StudentWithCourseUpdateRequest request) {
-        studentService.updateStudentWithCourse(request);
-        return Result.success();
+               description = "同时更新学员基本信息和课程信息，并返回当前状态快照")
+    public Result<StudentStatusResponseVO> updateWithCourse(@RequestBody @Valid StudentWithCourseUpdateRequest request) {
+        StudentStatusResponseVO vo = studentService.updateStudentWithCourseReturnStatus(request);
+        return Result.success(vo);
     }
 
     /**
@@ -108,12 +90,12 @@ public class StudentController {
             .where(com.lesson.repository.tables.EduStudent.EDU_STUDENT.ID.eq(id))
             .and(com.lesson.repository.tables.EduStudent.EDU_STUDENT.DELETED.eq(0))
             .fetchOne();
-        
+
         if (student != null) {
             // 更新Redis统计数据
             campusStatsRedisService.decrementStudentCount(student.getInstitutionId(), student.getCampusId());
         }
-        
+
         studentModel.deleteStudent(id);
         return Result.success();
     }
@@ -187,7 +169,7 @@ public class StudentController {
     public Result<StudentStatusResponseVO> checkInWithStatus(
             @RequestBody @Valid StudentCheckInRequest request) {
         StudentStatusResponseVO response = studentService.checkInWithStatus(request);
-        
+
         if ("SUCCESS".equals(response.getOperationStatus())) {
             return Result.success(response);
         } else {
@@ -305,25 +287,25 @@ public class StudentController {
     public Result<PaymentHoursInfoVO> getPaymentHours(
             @Parameter(description = "学员ID", required = true) @RequestParam Long studentId,
             @Parameter(description = "课程ID", required = true) @RequestParam Long courseId) {
-        
+
         // 获取机构ID和校区ID
         Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
         Long campusId = studentService.getStudentCampusId(studentId);
-        
-        CourseHoursRedisService.PaymentHoursInfo hoursInfo = 
+
+        CourseHoursRedisService.PaymentHoursInfo hoursInfo =
             courseHoursRedisService.getPaymentHours(institutionId, campusId, courseId, studentId);
-        
+
         if (hoursInfo == null) {
             return Result.success(null);
         }
-        
+
         PaymentHoursInfoVO vo = new PaymentHoursInfoVO();
         vo.setRegularHours(hoursInfo.getRegularHours());
         vo.setGiftHours(hoursInfo.getGiftHours());
         vo.setTotalHours(hoursInfo.getTotalHours());
         vo.setPaymentId(hoursInfo.getPaymentId());
         vo.setTimestamp(hoursInfo.getTimestamp());
-        
+
         return Result.success(vo);
     }
 
@@ -340,13 +322,13 @@ public class StudentController {
     public Result<Void> clearPaymentHours(
             @Parameter(description = "学员ID", required = true) @RequestParam Long studentId,
             @Parameter(description = "课程ID", required = true) @RequestParam Long courseId) {
-        
+
         // 获取机构ID和校区ID
         Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
         Long campusId = studentService.getStudentCampusId(studentId);
-        
+
         courseHoursRedisService.deletePaymentHours(institutionId, campusId, courseId, studentId);
-        
+
         return Result.success();
     }
 }

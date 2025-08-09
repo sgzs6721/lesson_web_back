@@ -8,7 +8,6 @@ import lombok.Data;
 
 import javax.validation.Valid;
 import javax.validation.constraints.*;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -130,10 +129,11 @@ public class StudentWithCourseUpdateRequest {
         private List<ScheduleTime> fixedScheduleTimes;
 
         /**
-         * 课程状态
+         * 课程状态（可选，不传则不修改）
          */
-        @ApiModelProperty("课程状态：STUDYING-在学，EXPIRED-过期，GRADUATED-结业")
-        private StudentCourseStatus status = StudentCourseStatus.STUDYING; // 默认为在学状态
+        @ApiModelProperty("课程状态：STUDYING-在学，EXPIRED-过期，GRADUATED-结业；不传表示不修改")
+        private StudentCourseStatus status;
+
     }
 
     /**

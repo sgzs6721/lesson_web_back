@@ -14,14 +14,12 @@ import com.lesson.vo.response.FinanceAnalysisVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import com.lesson.repository.tables.EduStudent;
@@ -540,7 +538,7 @@ public class StatisticsController {
         log.info("目标校区ID: 传入={}, 用户权限={}, 最终使用={}", campusId, userCampusId, targetCampusId);
 
         Integer totalStudents;
-        Integer totalCourses; // 课程总数
+        Integer totalCourses; // 课程总数（学员学习中的课程，按课程ID去重）
         Integer totalStudentCourses; // 学员报名的课程总数
         
         // 按状态分组的学员数量
@@ -563,15 +561,18 @@ public class StatisticsController {
                     .fetchOneInto(Integer.class);
             log.info("从数据库查询学员数量: {}", totalStudents);
             
-            // 统计课程总数
+            // 统计课程总数：学员学习中的课程，按课程ID去重
             totalCourses = dslContext.selectCount()
-                    .from(EduCourse.EDU_COURSE)
-                    .where(EduCourse.EDU_COURSE.DELETED.eq(0))
-                    .and(EduCourse.EDU_COURSE.INSTITUTION_ID.eq(institutionId))
-                    .and(EduCourse.EDU_COURSE.CAMPUS_ID.eq(targetCampusId))
-                    .and(EduCourse.EDU_COURSE.STATUS.eq("PUBLISHED"))
+                    .from(
+                        dslContext.selectDistinct(EduStudentCourse.EDU_STUDENT_COURSE.COURSE_ID)
+                            .from(EduStudentCourse.EDU_STUDENT_COURSE)
+                            .where(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
+                            .and(EduStudentCourse.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
+                            .and(EduStudentCourse.EDU_STUDENT_COURSE.CAMPUS_ID.eq(targetCampusId))
+                            .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq(com.lesson.enums.StudentCourseStatus.STUDYING.getName()))
+                    )
                     .fetchOneInto(Integer.class);
-            log.info("从数据库查询课程总数: {}", totalCourses);
+            log.info("从数据库查询学习中课程总数（去重）: {}", totalCourses);
             
             // 统计学员报名的课程总数
             totalStudentCourses = dslContext.selectCount()
@@ -588,7 +589,7 @@ public class StatisticsController {
                     .where(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
                     .and(EduStudentCourse.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
                     .and(EduStudentCourse.EDU_STUDENT_COURSE.CAMPUS_ID.eq(targetCampusId))
-                    .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq("STUDYING"))
+                    .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq(com.lesson.enums.StudentCourseStatus.STUDYING.getName()))
                     .fetchOneInto(Integer.class);
                     
             graduatedStudents = dslContext.selectCount()
@@ -596,7 +597,7 @@ public class StatisticsController {
                     .where(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
                     .and(EduStudentCourse.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
                     .and(EduStudentCourse.EDU_STUDENT_COURSE.CAMPUS_ID.eq(targetCampusId))
-                    .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq("GRADUATED"))
+                    .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq(com.lesson.enums.StudentCourseStatus.GRADUATED.getName()))
                     .fetchOneInto(Integer.class);
                     
             expiredStudents = dslContext.selectCount()
@@ -604,7 +605,7 @@ public class StatisticsController {
                     .where(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
                     .and(EduStudentCourse.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
                     .and(EduStudentCourse.EDU_STUDENT_COURSE.CAMPUS_ID.eq(targetCampusId))
-                    .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq("EXPIRED"))
+                    .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq(com.lesson.enums.StudentCourseStatus.EXPIRED.getName()))
                     .fetchOneInto(Integer.class);
                     
             refundedStudents = dslContext.selectCount()
@@ -612,7 +613,7 @@ public class StatisticsController {
                     .where(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
                     .and(EduStudentCourse.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
                     .and(EduStudentCourse.EDU_STUDENT_COURSE.CAMPUS_ID.eq(targetCampusId))
-                    .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq("REFUNDED"))
+                    .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq(com.lesson.enums.StudentCourseStatus.REFUNDED.getName()))
                     .fetchOneInto(Integer.class);
         } else {
             // 超级管理员：统计整个机构的数据
@@ -629,18 +630,17 @@ public class StatisticsController {
                 campusStatsRedisService.setInstitutionStudentCount(institutionId, totalStudents);
             }
 
-            // 统计课程总数
-            totalCourses = campusStatsRedisService.getInstitutionCourseCount(institutionId);
-            if (totalCourses == null) {
-                totalCourses = dslContext.selectCount()
-                        .from(EduCourse.EDU_COURSE)
-                        .where(EduCourse.EDU_COURSE.DELETED.eq(0))
-                        .and(EduCourse.EDU_COURSE.INSTITUTION_ID.eq(institutionId))
-                        .and(EduCourse.EDU_COURSE.STATUS.eq("PUBLISHED"))
-                        .fetchOneInto(Integer.class);
-                campusStatsRedisService.setInstitutionCourseCount(institutionId, totalCourses);
-            }
-            log.info("从数据库查询课程总数: {}", totalCourses);
+            // 统计课程总数：学员学习中的课程，按课程ID去重（机构维度）
+            totalCourses = dslContext.selectCount()
+                    .from(
+                        dslContext.selectDistinct(EduStudentCourse.EDU_STUDENT_COURSE.COURSE_ID)
+                            .from(EduStudentCourse.EDU_STUDENT_COURSE)
+                            .where(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
+                            .and(EduStudentCourse.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
+                            .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq(com.lesson.enums.StudentCourseStatus.STUDYING.getName()))
+                    )
+                    .fetchOneInto(Integer.class);
+            log.info("从数据库查询学习中课程总数（机构维度，去重）: {}", totalCourses);
             
             // 统计学员报名的课程总数（不重复的课程ID）
             totalStudentCourses = dslContext.selectCount()
@@ -656,28 +656,28 @@ public class StatisticsController {
                     .from(EduStudentCourse.EDU_STUDENT_COURSE)
                     .where(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
                     .and(EduStudentCourse.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
-                    .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq("STUDYING"))
+                    .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq(com.lesson.enums.StudentCourseStatus.STUDYING.getName()))
                     .fetchOneInto(Integer.class);
                     
             graduatedStudents = dslContext.selectCount()
                     .from(EduStudentCourse.EDU_STUDENT_COURSE)
                     .where(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
                     .and(EduStudentCourse.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
-                    .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq("GRADUATED"))
+                    .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq(com.lesson.enums.StudentCourseStatus.GRADUATED.getName()))
                     .fetchOneInto(Integer.class);
                     
             expiredStudents = dslContext.selectCount()
                     .from(EduStudentCourse.EDU_STUDENT_COURSE)
                     .where(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
                     .and(EduStudentCourse.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
-                    .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq("EXPIRED"))
+                    .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq(com.lesson.enums.StudentCourseStatus.EXPIRED.getName()))
                     .fetchOneInto(Integer.class);
                     
             refundedStudents = dslContext.selectCount()
                     .from(EduStudentCourse.EDU_STUDENT_COURSE)
                     .where(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
                     .and(EduStudentCourse.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
-                    .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq("REFUNDED"))
+                    .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq(com.lesson.enums.StudentCourseStatus.REFUNDED.getName()))
                     .fetchOneInto(Integer.class);
         }
 

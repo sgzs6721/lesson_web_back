@@ -13,7 +13,6 @@ import com.lesson.repository.Tables;
 import com.lesson.repository.tables.records.EduCourseRecord;
 import com.lesson.repository.tables.records.EduStudentCourseRecord;
 import com.lesson.repository.tables.records.EduStudentRecord;
-import com.lesson.repository.tables.records.EduStudentCourseRecordRecord;
 import com.lesson.repository.tables.records.SysConstantRecord;
 import com.lesson.vo.PageResult;
 import com.lesson.vo.request.StudentQueryRequest;
@@ -45,7 +44,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.Duration;
@@ -57,8 +55,7 @@ import com.lesson.vo.request.StudentRefundRequest;
 import com.lesson.vo.response.StudentRefundDetailVO;
 import com.lesson.vo.response.StudentCourseOperationRecordVO;
 import com.lesson.vo.request.StudentWithinCourseTransferRequest;
-import com.lesson.service.CourseHoursRedisService;
-import com.lesson.service.CampusStatsRedisService;
+// imports cleaned
 import com.lesson.vo.response.StudentPaymentResponseVO;
 import com.lesson.vo.response.StudentCreateResponseVO;
 import com.lesson.vo.response.StudentStatusResponseVO;
@@ -334,6 +331,8 @@ public class StudentService {
     studentRecord.setGender(studentInfo.getGender());
     studentRecord.setAge(studentInfo.getAge());
     studentRecord.setPhone(studentInfo.getPhone());
+    // 记录更新前的校区ID，用于统计修正
+    Long oldCampusIdBeforeUpdate = studentRecord.getCampusId();
     studentRecord.setCampusId(studentInfo.getCampusId());
     studentRecord.setInstitutionId(institutionId);
     studentRecord.setUpdateTime(LocalDateTime.now());
@@ -342,19 +341,14 @@ public class StudentService {
     studentModel.updateStudent(studentRecord);
 
     // 4. 更新Redis统计数据（如果校区发生变化）
-    Long oldCampusId = studentRecord.getCampusId();
-    if (!oldCampusId.equals(studentInfo.getCampusId())) {
-      campusStatsRedisService.decrementStudentCount(institutionId, oldCampusId);
+    if (!java.util.Objects.equals(oldCampusIdBeforeUpdate, studentInfo.getCampusId())) {
+      campusStatsRedisService.decrementStudentCount(institutionId, oldCampusIdBeforeUpdate);
       campusStatsRedisService.incrementStudentCount(institutionId, studentInfo.getCampusId());
     }
 
-    // 5. 先将该学员所有课程逻辑删除
-    dsl.update(Tables.EDU_STUDENT_COURSE)
-        .set(Tables.EDU_STUDENT_COURSE.DELETED, 1)
-        .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(request.getStudentId()))
-        .execute();
+    // 5. 不再全量逻辑删除课程关系，防止状态被意外重置。
 
-    // 6. 处理课程信息
+    // 6. 处理课程信息（按传入逐项更新/新增；未传课程不动）
     for (StudentWithCourseUpdateRequest.CourseInfo courseInfo : request.getCourseInfoList()) {
       // 获取课程信息
       EduCourseRecord courseRecord = dsl.selectFrom(Tables.EDU_COURSE)
@@ -366,37 +360,38 @@ public class StudentService {
         throw new IllegalArgumentException("课程不存在：" + courseInfo.getCourseId());
       }
 
-      // 6. 获取或创建学员课程关系
-      EduStudentCourseRecord studentCourseRecord;
+      // 6.1 获取或创建学员课程关系
+      EduStudentCourseRecord studentCourseRecord = null;
       if (courseInfo.getStudentCourseId() != null) {
-        // 如果有ID，则获取现有记录
         studentCourseRecord = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
             .where(Tables.EDU_STUDENT_COURSE.ID.eq(courseInfo.getStudentCourseId()))
             .fetchOne();
-
         if (studentCourseRecord == null) {
           throw new IllegalArgumentException("学员课程关系不存在：" + courseInfo.getStudentCourseId());
         }
-        
-        // 更新现有记录的状态
-        if (courseInfo.getStatus() != null) {
-          studentCourseRecord.setStatus(courseInfo.getStatus().getName());
-        }
       } else {
-        // 如果没有ID，则创建新记录
-        studentCourseRecord = new EduStudentCourseRecord();
-        studentCourseRecord.setStudentId(request.getStudentId());
-        studentCourseRecord.setCourseId(courseInfo.getCourseId());
-        studentCourseRecord.setConsumedHours(java.math.BigDecimal.ZERO);
-        // 使用课程信息中的状态，如果为空则默认为 STUDYING
-        StudentCourseStatus status = courseInfo.getStatus() != null ? courseInfo.getStatus() : StudentCourseStatus.STUDYING;
-        studentCourseRecord.setStatus(status.getName());
-        studentCourseRecord.setStartDate(courseInfo.getEnrollDate());
-        studentCourseRecord.setCampusId(studentInfo.getCampusId());
-        studentCourseRecord.setInstitutionId(institutionId);
-        // 使用课程表中的标准课时，而不是前端传入的值
-        studentCourseRecord.setTotalHours(courseRecord.getTotalHours());
+        // 根据 studentId+courseId 尝试匹配已有关系（包含已被标记删除的）
+        studentCourseRecord = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
+            .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(request.getStudentId()))
+            .and(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(courseInfo.getCourseId()))
+            .orderBy(Tables.EDU_STUDENT_COURSE.ID.desc())
+            .limit(1)
+            .fetchOne();
+        if (studentCourseRecord == null) {
+          // 不存在则创建新记录，默认待缴费
+          studentCourseRecord = new EduStudentCourseRecord();
+          studentCourseRecord.setStudentId(request.getStudentId());
+          studentCourseRecord.setCourseId(courseInfo.getCourseId());
+          studentCourseRecord.setConsumedHours(java.math.BigDecimal.ZERO);
+          studentCourseRecord.setStatus(StudentCourseStatus.WAITING_PAYMENT.getName());
+          studentCourseRecord.setStartDate(courseInfo.getEnrollDate());
+          studentCourseRecord.setCampusId(studentInfo.getCampusId());
+          studentCourseRecord.setInstitutionId(institutionId);
+          studentCourseRecord.setTotalHours(courseRecord.getTotalHours());
+        }
       }
+
+      // 6.2 不修改课程状态（除非是新建关系时设置默认值）
 
       // 7. 处理固定排课时间
       try {
@@ -409,16 +404,68 @@ public class StudentService {
         throw new RuntimeException("序列化固定排课时间失败", e);
       }
 
-      // 8. 恢复课程为未删除
+      // 8. 确保记录为未删除
       studentCourseRecord.setDeleted(0);
 
-      // 9. 存储学员课程关系
-      if (courseInfo.getStudentCourseId() != null) {
+      // 9. 按存在与否选择更新或创建
+      if (studentCourseRecord.getId() != null) {
         studentCourseModel.updateStudentCourse(studentCourseRecord);
       } else {
         studentCourseModel.createStudentCourse(studentCourseRecord);
       }
     }
+  }
+
+  /**
+   * 更新学员及课程信息，并返回当前状态快照
+   */
+  @Transactional(rollbackFor = Exception.class)
+  public StudentStatusResponseVO updateStudentWithCourseReturnStatus(StudentWithCourseUpdateRequest request) {
+    updateStudentWithCourse(request);
+
+    // 组装状态返回
+    StudentStatusResponseVO vo = new StudentStatusResponseVO();
+    vo.setOperationStatus("SUCCESS");
+    vo.setOperationMessage("更新成功");
+    vo.setOperationTime(LocalDateTime.now());
+    vo.setStudentId(request.getStudentId());
+
+    // 学员基本状态
+    EduStudentRecord sr = dsl.selectFrom(Tables.EDU_STUDENT)
+        .where(Tables.EDU_STUDENT.ID.eq(request.getStudentId()))
+        .fetchOne();
+    if (sr != null) {
+      vo.setStudentName(sr.getName());
+      vo.setStudentStatus(sr.getStatus());
+    }
+
+    // 课程状态
+    java.util.List<StudentStatusResponseVO.CourseStatusChange> statusList = new java.util.ArrayList<>();
+    java.util.List<EduStudentCourseRecord> records = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
+        .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(request.getStudentId()))
+        .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
+        .fetch();
+    for (EduStudentCourseRecord r : records) {
+      StudentStatusResponseVO.CourseStatusChange c = new StudentStatusResponseVO.CourseStatusChange();
+      c.setCourseId(r.getCourseId());
+      String courseName = dsl.select(Tables.EDU_COURSE.NAME)
+          .from(Tables.EDU_COURSE)
+          .where(Tables.EDU_COURSE.ID.eq(r.getCourseId()))
+          .fetchOneInto(String.class);
+      c.setCourseName(courseName);
+      c.setBeforeStatus(null);
+      c.setAfterStatus(r.getStatus());
+      if (r.getTotalHours() != null) c.setTotalHours(r.getTotalHours().intValue());
+      if (r.getConsumedHours() != null) c.setConsumedHours(r.getConsumedHours().intValue());
+      if (r.getTotalHours() != null && r.getConsumedHours() != null) {
+        java.math.BigDecimal remain = r.getTotalHours().subtract(r.getConsumedHours());
+        c.setRemainingHours(remain.intValue());
+      }
+      statusList.add(c);
+    }
+    vo.setCourseStatusChanges(statusList);
+
+    return vo;
   }
 
   /**
