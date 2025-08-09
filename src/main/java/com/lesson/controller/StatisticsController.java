@@ -538,8 +538,7 @@ public class StatisticsController {
         log.info("目标校区ID: 传入={}, 用户权限={}, 最终使用={}", campusId, userCampusId, targetCampusId);
 
         Integer totalStudents;
-        Integer totalCourses; // 课程总数（学员学习中的课程，按课程ID去重）
-        Integer totalStudentCourses; // 学员报名的课程总数
+        Integer totalStudentCourses; // 学员课程总数（学习中，按课程ID去重）
         
         // 按状态分组的学员数量
         Integer studyingStudents = 0;    // 在学学员
@@ -561,8 +560,8 @@ public class StatisticsController {
                     .fetchOneInto(Integer.class);
             log.info("从数据库查询学员数量: {}", totalStudents);
             
-            // 统计课程总数：学员学习中的课程，按课程ID去重
-            totalCourses = dslContext.selectCount()
+            // 统计学员课程总数（学习中，按课程ID去重）
+            totalStudentCourses = dslContext.selectCount()
                     .from(
                         dslContext.selectDistinct(EduStudentCourse.EDU_STUDENT_COURSE.COURSE_ID)
                             .from(EduStudentCourse.EDU_STUDENT_COURSE)
@@ -572,18 +571,11 @@ public class StatisticsController {
                             .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq(com.lesson.enums.StudentCourseStatus.STUDYING.getName()))
                     )
                     .fetchOneInto(Integer.class);
-            log.info("从数据库查询学习中课程总数（去重）: {}", totalCourses);
+            log.info("从数据库查询学员课程总数（学习中，按课程ID去重）: {}", totalStudentCourses);
             
-            // 统计学员报名的课程总数
-            totalStudentCourses = dslContext.selectCount()
-                    .from(EduStudentCourse.EDU_STUDENT_COURSE)
-                    .where(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
-                    .and(EduStudentCourse.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
-                    .and(EduStudentCourse.EDU_STUDENT_COURSE.CAMPUS_ID.eq(targetCampusId))
-                    .fetchOneInto(Integer.class);
-            log.info("从数据库查询学员报名课程数量: {}", totalStudentCourses);
+            // 已按学习中去重统计，无需再次覆盖
             
-            // 按状态统计学员数量
+            // 按状态统计学员数量（课程维度）
             studyingStudents = dslContext.selectCount()
                     .from(EduStudentCourse.EDU_STUDENT_COURSE)
                     .where(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
@@ -630,8 +622,8 @@ public class StatisticsController {
                 campusStatsRedisService.setInstitutionStudentCount(institutionId, totalStudents);
             }
 
-            // 统计课程总数：学员学习中的课程，按课程ID去重（机构维度）
-            totalCourses = dslContext.selectCount()
+            // 统计学员课程总数（机构维度：学习中，按课程ID去重）
+            totalStudentCourses = dslContext.selectCount()
                     .from(
                         dslContext.selectDistinct(EduStudentCourse.EDU_STUDENT_COURSE.COURSE_ID)
                             .from(EduStudentCourse.EDU_STUDENT_COURSE)
@@ -640,16 +632,9 @@ public class StatisticsController {
                             .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq(com.lesson.enums.StudentCourseStatus.STUDYING.getName()))
                     )
                     .fetchOneInto(Integer.class);
-            log.info("从数据库查询学习中课程总数（机构维度，去重）: {}", totalCourses);
+            log.info("从数据库查询学员课程总数（机构维度：学习中，按课程ID去重）: {}", totalStudentCourses);
             
-            // 统计学员报名的课程总数（不重复的课程ID）
-            totalStudentCourses = dslContext.selectCount()
-                    .from(dslContext.selectDistinct(EduStudentCourse.EDU_STUDENT_COURSE.COURSE_ID)
-                            .from(EduStudentCourse.EDU_STUDENT_COURSE)
-                            .where(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
-                            .and(EduStudentCourse.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId)))
-                    .fetchOneInto(Integer.class);
-            log.info("从数据库查询学员报名课程数量（不重复）: {}", totalStudentCourses);
+            // 已按学习中去重统计，无需再次覆盖
             
             // 按状态统计学员数量
             studyingStudents = dslContext.selectCount()
@@ -683,8 +668,7 @@ public class StatisticsController {
 
         Map<String, Object> result = new HashMap<>();
         result.put("totalStudents", totalStudents != null ? totalStudents : 0);
-        result.put("totalCourses", totalCourses != null ? totalCourses : 0); // 课程总数
-        result.put("totalStudentCourses", totalStudentCourses != null ? totalStudentCourses : 0); // 学员报名课程总数
+        result.put("totalStudentCourses", totalStudentCourses != null ? totalStudentCourses : 0); // 学员课程总数（学习中，去重）
         
         // 按状态分组的学员数量
         result.put("studyingStudents", studyingStudents != null ? studyingStudents : 0);    // 在学学员
