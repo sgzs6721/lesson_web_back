@@ -74,6 +74,15 @@ public class CourseServiceImpl implements CourseService {
                 sysCoachModel.validateCoach(request.getCoachFees().get(0).getCoachId(), request.getCampusId(), institutionId);
             }
 
+            // 计算课程层面的教练费用（仅用于课程表的冗余字段）
+            BigDecimal courseLevelCoachFee = BigDecimal.ZERO;
+            if (!Boolean.TRUE.equals(request.getIsMultiTeacher())) {
+                if (request.getCoachFees() != null && request.getCoachFees().size() == 1
+                        && request.getCoachFees().get(0).getCoachFee() != null) {
+                    courseLevelCoachFee = request.getCoachFees().get(0).getCoachFee();
+                }
+            }
+
             // 创建课程基本信息
             Long courseId = courseModel.createCourse(
                 request.getName(),
@@ -82,7 +91,7 @@ public class CourseServiceImpl implements CourseService {
                 request.getUnitHours(),
                 BigDecimal.ZERO, // 总课时默认为0
                 request.getPrice(),
-                request.getCoachFee(),
+                courseLevelCoachFee,
                 request.getIsMultiTeacher(),
                 request.getCampusId(),
                 institutionId,
@@ -145,6 +154,15 @@ public class CourseServiceImpl implements CourseService {
                 sysCoachModel.validateCoach(request.getCoachFees().get(0).getCoachId(), request.getCampusId(), institutionId);
             }
 
+            // 计算课程层面的教练费用（仅用于课程表的冗余字段）
+            BigDecimal updateCourseLevelCoachFee = BigDecimal.ZERO;
+            if (!Boolean.TRUE.equals(request.getIsMultiTeacher())) {
+                if (request.getCoachFees() != null && request.getCoachFees().size() == 1
+                        && request.getCoachFees().get(0).getCoachFee() != null) {
+                    updateCourseLevelCoachFee = request.getCoachFees().get(0).getCoachFee();
+                }
+            }
+
             // 更新课程基本信息
             courseModel.updateCourse(
                 request.getId(),
@@ -154,7 +172,7 @@ public class CourseServiceImpl implements CourseService {
                 request.getUnitHours(),
                 existingCourse.getTotalHours(), // 保留原有的总课时值
                 request.getPrice(),
-                request.getCoachFee(),
+                updateCourseLevelCoachFee,
                 request.getIsMultiTeacher(),
                 request.getCampusId(),
                 request.getDescription()

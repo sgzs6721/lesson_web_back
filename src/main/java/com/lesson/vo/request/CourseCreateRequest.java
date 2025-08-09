@@ -38,15 +38,10 @@ public class CourseCreateRequest {
     @Schema(description = "课程单价")
     private BigDecimal price;
 
-    @NotNull(message = "教练费用不能为空")
-    @PositiveOrZero(message = "教练费用必须大于等于0")
-    @Schema(description = "教练费用")
-    private BigDecimal coachFee;
-
     @Schema(description = "是否多教师教学：true-是，false-否", example = "false")
     private Boolean isMultiTeacher;
 
-    @Schema(description = "教练课时费列表（多教师教学时使用）")
+    @Schema(description = "教练课时费列表（多教师/单教师均通过该列表传递教练与课时费；课程层coachFee字段已移除）")
     private List<CoachFeeRequest> coachFees;
 
     @NotNull(message = "校区ID不能为空")
