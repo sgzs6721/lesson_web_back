@@ -538,7 +538,7 @@ public class StatisticsController {
         log.info("目标校区ID: 传入={}, 用户权限={}, 最终使用={}", campusId, userCampusId, targetCampusId);
 
         Integer totalStudents;
-        Integer totalStudentCourses; // 学员课程总数（学习中，按课程ID去重）
+        Integer totalStudentCourses; // 学员课程总数（所有状态，按课程ID去重）
         
         // 按状态分组的学员数量
         Integer studyingStudents = 0;    // 在学学员
@@ -560,7 +560,7 @@ public class StatisticsController {
                     .fetchOneInto(Integer.class);
             log.info("从数据库查询学员数量: {}", totalStudents);
             
-            // 统计学员课程总数（学习中，按课程ID去重）
+            // 统计学员课程总数（所有状态，按课程ID去重）
             totalStudentCourses = dslContext.selectCount()
                     .from(
                         dslContext.selectDistinct(EduStudentCourse.EDU_STUDENT_COURSE.COURSE_ID)
@@ -568,10 +568,19 @@ public class StatisticsController {
                             .where(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
                             .and(EduStudentCourse.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
                             .and(EduStudentCourse.EDU_STUDENT_COURSE.CAMPUS_ID.eq(targetCampusId))
-                            .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq(com.lesson.enums.StudentCourseStatus.STUDYING.getName()))
                     )
                     .fetchOneInto(Integer.class);
-            log.info("从数据库查询学员课程总数（学习中，按课程ID去重）: {}", totalStudentCourses);
+            log.info("校区统计 - 从数据库查询学员课程总数（所有状态，按课程ID去重）: {}", totalStudentCourses);
+            
+            // 调试：查询各种状态的数量
+            Integer studyingCount = dslContext.selectCount()
+                    .from(EduStudentCourse.EDU_STUDENT_COURSE)
+                    .where(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
+                    .and(EduStudentCourse.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
+                    .and(EduStudentCourse.EDU_STUDENT_COURSE.CAMPUS_ID.eq(targetCampusId))
+                    .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq(com.lesson.enums.StudentCourseStatus.STUDYING.getName()))
+                    .fetchOneInto(Integer.class);
+            log.info("校区统计 - 学习中状态的总记录数: {}", studyingCount);
             
             // 已按学习中去重统计，无需再次覆盖
             
@@ -622,17 +631,25 @@ public class StatisticsController {
                 campusStatsRedisService.setInstitutionStudentCount(institutionId, totalStudents);
             }
 
-            // 统计学员课程总数（机构维度：学习中，按课程ID去重）
+            // 统计学员课程总数（机构维度：所有状态，按课程ID去重）
             totalStudentCourses = dslContext.selectCount()
                     .from(
                         dslContext.selectDistinct(EduStudentCourse.EDU_STUDENT_COURSE.COURSE_ID)
                             .from(EduStudentCourse.EDU_STUDENT_COURSE)
                             .where(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
                             .and(EduStudentCourse.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
-                            .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq(com.lesson.enums.StudentCourseStatus.STUDYING.getName()))
                     )
                     .fetchOneInto(Integer.class);
-            log.info("从数据库查询学员课程总数（机构维度：学习中，按课程ID去重）: {}", totalStudentCourses);
+            log.info("机构统计 - 从数据库查询学员课程总数（所有状态，按课程ID去重）: {}", totalStudentCourses);
+            
+            // 调试：查询各种状态的数量
+            Integer studyingCount = dslContext.selectCount()
+                    .from(EduStudentCourse.EDU_STUDENT_COURSE)
+                    .where(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
+                    .and(EduStudentCourse.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
+                    .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq(com.lesson.enums.StudentCourseStatus.STUDYING.getName()))
+                    .fetchOneInto(Integer.class);
+            log.info("机构统计 - 学习中状态的总记录数: {}", studyingCount);
             
             // 已按学习中去重统计，无需再次覆盖
             
@@ -668,7 +685,7 @@ public class StatisticsController {
 
         Map<String, Object> result = new HashMap<>();
         result.put("totalStudents", totalStudents != null ? totalStudents : 0);
-        result.put("totalStudentCourses", totalStudentCourses != null ? totalStudentCourses : 0); // 学员课程总数（学习中，去重）
+        result.put("totalStudentCourses", totalStudentCourses != null ? totalStudentCourses : 0); // 学员课程总数（所有状态，去重）
         
         // 按状态分组的学员数量
         result.put("studyingStudents", studyingStudents != null ? studyingStudents : 0);    // 在学学员
