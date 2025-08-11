@@ -94,6 +94,14 @@ public class StudentController {
         if (student != null) {
             // 更新Redis统计数据
             campusStatsRedisService.decrementStudentCount(student.getInstitutionId(), student.getCampusId());
+            
+            // 同时删除学员课程关系记录（逻辑删除）
+            dsl.update(com.lesson.repository.tables.EduStudentCourse.EDU_STUDENT_COURSE)
+                .set(com.lesson.repository.tables.EduStudentCourse.EDU_STUDENT_COURSE.DELETED, 1)
+                .set(com.lesson.repository.tables.EduStudentCourse.EDU_STUDENT_COURSE.UPDATE_TIME, java.time.LocalDateTime.now())
+                .where(com.lesson.repository.tables.EduStudentCourse.EDU_STUDENT_COURSE.STUDENT_ID.eq(id))
+                .and(com.lesson.repository.tables.EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
+                .execute();
         }
 
         studentModel.deleteStudent(id);
