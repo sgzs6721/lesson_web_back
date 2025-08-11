@@ -538,13 +538,16 @@ public class StatisticsController {
         log.info("目标校区ID: 传入={}, 用户权限={}, 最终使用={}", campusId, userCampusId, targetCampusId);
 
         Integer totalStudents;
-        Integer totalStudentCourses; // 学员课程总数（所有状态，按课程ID去重）
+        Integer totalStudentCourses; // 学员课程总数（只统计学习中状态，按课程ID去重）
         
         // 按状态分组的学员数量
         Integer studyingStudents = 0;    // 在学学员
         Integer graduatedStudents = 0;   // 结业学员
         Integer expiredStudents = 0;     // 过期学员
         Integer refundedStudents = 0;    // 退费学员
+        Integer waitingRenewalStudents = 0; // 待续费学员
+        Integer waitingPaymentStudents = 0; // 待缴费学员
+        Integer waitingClassStudents = 0;   // 待上课学员
 
         if (targetCampusId != null && targetCampusId > 0) {
             // 校区统计：统计指定校区的数据
@@ -560,7 +563,7 @@ public class StatisticsController {
                     .fetchOneInto(Integer.class);
             log.info("从数据库查询学员数量: {}", totalStudents);
             
-            // 统计学员课程总数（所有状态，按课程ID去重）
+            // 统计学员课程总数（只统计学习中状态，按课程ID去重）
             totalStudentCourses = dslContext.selectCount()
                     .from(
                         dslContext.selectDistinct(EduStudentCourse.EDU_STUDENT_COURSE.COURSE_ID)
@@ -568,9 +571,10 @@ public class StatisticsController {
                             .where(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
                             .and(EduStudentCourse.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
                             .and(EduStudentCourse.EDU_STUDENT_COURSE.CAMPUS_ID.eq(targetCampusId))
+                            .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq(com.lesson.enums.StudentCourseStatus.STUDYING.getName()))
                     )
                     .fetchOneInto(Integer.class);
-            log.info("校区统计 - 从数据库查询学员课程总数（所有状态，按课程ID去重）: {}", totalStudentCourses);
+            log.info("校区统计 - 从数据库查询学员课程总数（学习中状态，按课程ID去重）: {}", totalStudentCourses);
             
             // 调试：查询各种状态的数量
             Integer studyingCount = dslContext.selectCount()
@@ -616,6 +620,30 @@ public class StatisticsController {
                     .and(EduStudentCourse.EDU_STUDENT_COURSE.CAMPUS_ID.eq(targetCampusId))
                     .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq(com.lesson.enums.StudentCourseStatus.REFUNDED.getName()))
                     .fetchOneInto(Integer.class);
+                    
+            waitingRenewalStudents = dslContext.selectCount()
+                    .from(EduStudentCourse.EDU_STUDENT_COURSE)
+                    .where(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
+                    .and(EduStudentCourse.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
+                    .and(EduStudentCourse.EDU_STUDENT_COURSE.CAMPUS_ID.eq(targetCampusId))
+                    .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq(com.lesson.enums.StudentCourseStatus.WAITING_RENEWAL.getName()))
+                    .fetchOneInto(Integer.class);
+                    
+            waitingPaymentStudents = dslContext.selectCount()
+                    .from(EduStudentCourse.EDU_STUDENT_COURSE)
+                    .where(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
+                    .and(EduStudentCourse.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
+                    .and(EduStudentCourse.EDU_STUDENT_COURSE.CAMPUS_ID.eq(targetCampusId))
+                    .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq(com.lesson.enums.StudentCourseStatus.WAITING_PAYMENT.getName()))
+                    .fetchOneInto(Integer.class);
+                    
+            waitingClassStudents = dslContext.selectCount()
+                    .from(EduStudentCourse.EDU_STUDENT_COURSE)
+                    .where(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
+                    .and(EduStudentCourse.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
+                    .and(EduStudentCourse.EDU_STUDENT_COURSE.CAMPUS_ID.eq(targetCampusId))
+                    .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq(com.lesson.enums.StudentCourseStatus.WAITING_CLASS.getName()))
+                    .fetchOneInto(Integer.class);
         } else {
             // 超级管理员：统计整个机构的数据
             totalStudents = campusStatsRedisService.getInstitutionStudentCount(institutionId);
@@ -631,16 +659,17 @@ public class StatisticsController {
                 campusStatsRedisService.setInstitutionStudentCount(institutionId, totalStudents);
             }
 
-            // 统计学员课程总数（机构维度：所有状态，按课程ID去重）
+            // 统计学员课程总数（机构维度：只统计学习中状态，按课程ID去重）
             totalStudentCourses = dslContext.selectCount()
                     .from(
                         dslContext.selectDistinct(EduStudentCourse.EDU_STUDENT_COURSE.COURSE_ID)
                             .from(EduStudentCourse.EDU_STUDENT_COURSE)
                             .where(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
                             .and(EduStudentCourse.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
+                            .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq(com.lesson.enums.StudentCourseStatus.STUDYING.getName()))
                     )
                     .fetchOneInto(Integer.class);
-            log.info("机构统计 - 从数据库查询学员课程总数（所有状态，按课程ID去重）: {}", totalStudentCourses);
+            log.info("机构统计 - 从数据库查询学员课程总数（学习中状态，按课程ID去重）: {}", totalStudentCourses);
             
             // 调试：查询各种状态的数量
             Integer studyingCount = dslContext.selectCount()
@@ -681,17 +710,41 @@ public class StatisticsController {
                     .and(EduStudentCourse.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
                     .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq(com.lesson.enums.StudentCourseStatus.REFUNDED.getName()))
                     .fetchOneInto(Integer.class);
+                    
+            waitingRenewalStudents = dslContext.selectCount()
+                    .from(EduStudentCourse.EDU_STUDENT_COURSE)
+                    .where(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
+                    .and(EduStudentCourse.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
+                    .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq(com.lesson.enums.StudentCourseStatus.WAITING_RENEWAL.getName()))
+                    .fetchOneInto(Integer.class);
+                    
+            waitingPaymentStudents = dslContext.selectCount()
+                    .from(EduStudentCourse.EDU_STUDENT_COURSE)
+                    .where(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
+                    .and(EduStudentCourse.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
+                    .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq(com.lesson.enums.StudentCourseStatus.WAITING_PAYMENT.getName()))
+                    .fetchOneInto(Integer.class);
+                    
+            waitingClassStudents = dslContext.selectCount()
+                    .from(EduStudentCourse.EDU_STUDENT_COURSE)
+                    .where(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
+                    .and(EduStudentCourse.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
+                    .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq(com.lesson.enums.StudentCourseStatus.WAITING_CLASS.getName()))
+                    .fetchOneInto(Integer.class);
         }
 
         Map<String, Object> result = new HashMap<>();
         result.put("totalStudents", totalStudents != null ? totalStudents : 0);
-        result.put("totalStudentCourses", totalStudentCourses != null ? totalStudentCourses : 0); // 学员课程总数（所有状态，去重）
+        result.put("totalStudentCourses", totalStudentCourses != null ? totalStudentCourses : 0); // 学员课程总数（只统计学习中状态，去重）
         
         // 按状态分组的学员数量
         result.put("studyingStudents", studyingStudents != null ? studyingStudents : 0);    // 在学学员
         result.put("graduatedStudents", graduatedStudents != null ? graduatedStudents : 0); // 结业学员
         result.put("expiredStudents", expiredStudents != null ? expiredStudents : 0);       // 过期学员
         result.put("refundedStudents", refundedStudents != null ? refundedStudents : 0);    // 退费学员
+        result.put("waitingRenewalStudents", waitingRenewalStudents != null ? waitingRenewalStudents : 0); // 待续费学员
+        result.put("waitingPaymentStudents", waitingPaymentStudents != null ? waitingPaymentStudents : 0); // 待缴费学员
+        result.put("waitingClassStudents", waitingClassStudents != null ? waitingClassStudents : 0);   // 待上课学员
 
         return Result.success(result);
     }
@@ -746,14 +799,15 @@ public class StatisticsController {
                     .and(EduCourse.EDU_COURSE.CAMPUS_ID.eq(userCampusId))
                     .fetchOneInto(Integer.class);
             
-            // 统计学员报名的课程总数（不重复的课程ID）
+            // 统计学员报名的课程总数（只统计学习中状态，不重复的课程ID）
             totalStudentCourses = dslContext.selectCount()
                     .from(dslContext.selectDistinct(EduStudentCourse.EDU_STUDENT_COURSE.COURSE_ID)
                             .from(EduStudentCourse.EDU_STUDENT_COURSE)
                             .where(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
-                            .and(EduStudentCourse.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId)))
+                            .and(EduStudentCourse.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
+                            .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq(com.lesson.enums.StudentCourseStatus.STUDYING.getName())))
                     .fetchOneInto(Integer.class);
-            log.info("从数据库查询学员报名课程数量（不重复）: {}", totalStudentCourses);
+            log.info("从数据库查询学员报名课程数量（学习中状态，不重复）: {}", totalStudentCourses);
             
             log.info("校区管理员统计结果 - 学员: {}, 课程: {}, 报名课程: {}", totalStudents, totalCourses, totalStudentCourses);
         } else {
@@ -782,11 +836,15 @@ public class StatisticsController {
                 campusStatsRedisService.setInstitutionCourseCount(institutionId, totalCourses);
             }
 
-            // 统计学员报名的课程总数
+            // 统计学员报名的课程总数（只统计学习中状态，按课程ID去重）
             totalStudentCourses = dslContext.selectCount()
-                    .from(EduStudentCourse.EDU_STUDENT_COURSE)
-                    .where(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
-                    .and(EduStudentCourse.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
+                    .from(
+                        dslContext.selectDistinct(EduStudentCourse.EDU_STUDENT_COURSE.COURSE_ID)
+                            .from(EduStudentCourse.EDU_STUDENT_COURSE)
+                            .where(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
+                            .and(EduStudentCourse.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
+                            .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq(com.lesson.enums.StudentCourseStatus.STUDYING.getName()))
+                    )
                     .fetchOneInto(Integer.class);
             
             log.info("超级管理员统计结果 - 学员: {}, 课程: {}, 报名课程: {}", totalStudents, totalCourses, totalStudentCourses);
