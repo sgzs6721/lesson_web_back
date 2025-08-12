@@ -103,7 +103,7 @@ public class StudentController {
             @Parameter(description = "学员ID", required = true) @RequestParam Long id) {
         // 创建一个查询请求，只查询指定学员
         StudentQueryRequest request = new StudentQueryRequest();
-        request.setStudentId(id);
+        request.setId(id);
 
         // 使用学员课程列表查询方法获取详情
         PageResult<StudentWithCoursesVO> pageResult = studentService.listStudentsWithCourses(request);

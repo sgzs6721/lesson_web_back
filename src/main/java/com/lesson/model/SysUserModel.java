@@ -18,6 +18,7 @@ import java.util.List;
 import static com.lesson.repository.Tables.SYS_USER;
 import static com.lesson.repository.Tables.SYS_ROLE;
 import static com.lesson.repository.Tables.SYS_CAMPUS;
+import static com.lesson.repository.tables.SysUserRole.SYS_USER_ROLE;
 
 /**
  * 系统用户表数据库操作
@@ -408,10 +409,13 @@ public class SysUserModel {
                 SYS_USER.CAMPUS_ID
             )
             .from(SYS_USER)
-            .join(SYS_ROLE).on(SYS_USER.ROLE_ID.eq(SYS_ROLE.ID))
+            .join(SYS_USER_ROLE).on(SYS_USER.ID.eq(SYS_USER_ROLE.USER_ID))
+            .join(SYS_ROLE).on(SYS_USER_ROLE.ROLE_ID.eq(SYS_ROLE.ID))
             .where(SYS_USER.CAMPUS_ID.in(campusIds))
             .and(SYS_USER.INSTITUTION_ID.eq(institutionId))
             .and(SYS_USER.DELETED.eq(0))
+            .and(SYS_USER_ROLE.DELETED.eq(0))
+            .and(SYS_ROLE.DELETED.eq(0))
             .and(SYS_ROLE.ROLE_NAME.eq(RoleConstant.ROLE_CAMPUS_ADMIN))
             .fetchInto(UserVO.class);
     }

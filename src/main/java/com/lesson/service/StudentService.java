@@ -601,10 +601,10 @@ public class StudentService {
     List<EduStudentRecord> students;
     long total;
 
-    if (request.getStudentId() != null) {
+    if (request.getId() != null) {
       // 如果指定了学员ID，只查询该学员
       EduStudentRecord student = dsl.selectFrom(Tables.EDU_STUDENT)
-          .where(Tables.EDU_STUDENT.ID.eq(request.getStudentId()))
+          .where(Tables.EDU_STUDENT.ID.eq(request.getId()))
           .and(Tables.EDU_STUDENT.DELETED.eq(0))
           .fetchOne();
 
@@ -612,7 +612,7 @@ public class StudentService {
         // 权限检查：校区管理员只能查看自己校区的学员
         if (currentUserCampusId != null && !currentUserCampusId.equals(student.getCampusId())) {
           log.warn("校区管理员尝试访问其他校区的学员，学员ID: {}, 当前用户校区: {}, 学员校区: {}", 
-                   request.getStudentId(), currentUserCampusId, student.getCampusId());
+                   request.getId(), currentUserCampusId, student.getCampusId());
           return PageResult.of(Collections.emptyList(), 0, request.getPageNum(), request.getPageSize());
         }
         students = Collections.singletonList(student);
@@ -820,10 +820,10 @@ public class StudentService {
     List<EduStudentRecord> students;
     long total;
 
-    if (request.getStudentId() != null) {
+    if (request.getId() != null) {
       // 如果指定了学员ID，只查询该学员
       EduStudentRecord student = dsl.selectFrom(Tables.EDU_STUDENT)
-          .where(Tables.EDU_STUDENT.ID.eq(request.getStudentId()))
+          .where(Tables.EDU_STUDENT.ID.eq(request.getId()))
           .and(Tables.EDU_STUDENT.DELETED.eq(0))
           .fetchOne();
 
