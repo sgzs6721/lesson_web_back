@@ -643,6 +643,30 @@ public class StudentService {
         query.and(Tables.EDU_STUDENT.NAME.like("%" + request.getKeyword() + "%"));
       }
 
+      // 如果指定了课程ID，需要先查询报名了该课程的学员ID列表
+      List<Long> studentIdsWithCourse = null;
+      if (request.getCourseId() != null) {
+        log.info("按课程ID过滤，课程ID: {}", request.getCourseId());
+        studentIdsWithCourse = dsl.selectDistinct(Tables.EDU_STUDENT_COURSE.STUDENT_ID)
+            .from(Tables.EDU_STUDENT_COURSE)
+            .where(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(request.getCourseId()))
+            .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
+            .and(institutionId != null ? Tables.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId) : DSL.noCondition())
+            .and(currentUserCampusId != null ? Tables.EDU_STUDENT_COURSE.CAMPUS_ID.eq(currentUserCampusId) : 
+                 (request.getCampusId() != null ? Tables.EDU_STUDENT_COURSE.CAMPUS_ID.eq(request.getCampusId()) : DSL.noCondition()))
+            .fetchInto(Long.class);
+        log.info("找到报名课程 {} 的学员ID列表: {}", request.getCourseId(), studentIdsWithCourse);
+        
+        if (studentIdsWithCourse.isEmpty()) {
+          // 如果没有学员报名该课程，直接返回空结果
+          log.info("没有学员报名课程 {}，返回空结果", request.getCourseId());
+          return PageResult.of(Collections.emptyList(), 0, request.getPageNum(), request.getPageSize());
+        }
+        
+        // 添加学员ID过滤条件
+        query.and(Tables.EDU_STUDENT.ID.in(studentIdsWithCourse));
+      }
+
       // 先查询总数
       total = dsl.selectCount()
           .from(Tables.EDU_STUDENT)
@@ -652,6 +676,8 @@ public class StudentService {
                (request.getCampusId() != null ? Tables.EDU_STUDENT.CAMPUS_ID.eq(request.getCampusId()) : DSL.noCondition()))
           .and(request.getKeyword() != null && !request.getKeyword().isEmpty() ?
                Tables.EDU_STUDENT.NAME.like("%" + request.getKeyword() + "%") : DSL.noCondition())
+          .and(request.getCourseId() != null && studentIdsWithCourse != null && !studentIdsWithCourse.isEmpty() ?
+               Tables.EDU_STUDENT.ID.in(studentIdsWithCourse) : DSL.noCondition())
           .fetchOne(0, Long.class);
 
       // 分页查询
@@ -1754,5 +1780,110 @@ public class StudentService {
     // 你可以根据需要补充更多字段，比如操作人、学员姓名、课程名称等
 
     return vo;
+  }
+
+  /**
+   * 删除学员及其相关课程关系记录
+   *
+   * @param studentId 学员ID
+   */
+  @Transactional(rollbackFor = Exception.class)
+  public void deleteStudentWithCourses(Long studentId) {
+    log.info("开始删除学员及其课程关系记录，学员ID: {}", studentId);
+    
+    // 获取学员信息用于更新统计
+    EduStudentRecord student = dsl.selectFrom(Tables.EDU_STUDENT)
+        .where(Tables.EDU_STUDENT.ID.eq(studentId))
+        .and(Tables.EDU_STUDENT.DELETED.eq(0))
+        .fetchOne();
+
+    if (student != null) {
+      log.info("找到学员记录: ID={}, 姓名={}, 机构ID={}, 校区ID={}", 
+               studentId, student.getName(), student.getInstitutionId(), student.getCampusId());
+      
+      // 先查询该学员有多少条课程关系记录
+      Integer courseCount = dsl.selectCount()
+          .from(Tables.EDU_STUDENT_COURSE)
+          .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(studentId))
+          .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
+          .fetchOneInto(Integer.class);
+      log.info("学员 {} 有 {} 条课程关系记录需要删除", studentId, courseCount);
+      
+      // 更新Redis统计数据
+      campusStatsRedisService.decrementStudentCount(student.getInstitutionId(), student.getCampusId());
+      log.info("已更新Redis统计数据，减少学员数量");
+      
+      // 同时删除学员课程关系记录（逻辑删除）
+      log.info("准备执行UPDATE语句，学员ID: {}", studentId);
+      
+      // 先查看要更新的记录
+      List<Record> recordsToUpdate = dsl.select()
+          .from(Tables.EDU_STUDENT_COURSE)
+          .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(studentId))
+          .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
+          .fetch();
+      log.info("找到 {} 条需要更新的记录", recordsToUpdate.size());
+      
+      for (Record record : recordsToUpdate) {
+          Long recordId = record.get(Tables.EDU_STUDENT_COURSE.ID);
+          Long courseId = record.get(Tables.EDU_STUDENT_COURSE.COURSE_ID);
+          String status = record.get(Tables.EDU_STUDENT_COURSE.STATUS);
+          log.info("记录ID: {}, 课程ID: {}, 状态: {}", recordId, courseId, status);
+      }
+      
+      int updatedRows = dsl.update(Tables.EDU_STUDENT_COURSE)
+          .set(Tables.EDU_STUDENT_COURSE.DELETED, 1)
+          .set(Tables.EDU_STUDENT_COURSE.UPDATE_TIME, LocalDateTime.now())
+          .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(studentId))
+          .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
+          .execute();
+      
+      log.info("已删除学员 {} 的课程关系记录，更新了 {} 行", studentId, updatedRows);
+      
+      // 验证删除结果
+      Integer remainingCount = dsl.selectCount()
+          .from(Tables.EDU_STUDENT_COURSE)
+          .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(studentId))
+          .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
+          .fetchOneInto(Integer.class);
+      log.info("删除后，学员 {} 还有 {} 条未删除的课程关系记录", studentId, remainingCount);
+      
+      // 如果还有未删除的记录，尝试强制删除
+      if (remainingCount > 0) {
+          log.warn("还有 {} 条记录未删除，尝试强制删除", remainingCount);
+          
+          // 再次尝试删除，这次不检查deleted状态
+          int forceUpdatedRows = dsl.update(Tables.EDU_STUDENT_COURSE)
+              .set(Tables.EDU_STUDENT_COURSE.DELETED, 1)
+              .set(Tables.EDU_STUDENT_COURSE.UPDATE_TIME, LocalDateTime.now())
+              .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(studentId))
+              .execute();
+          
+          log.info("强制删除后，更新了 {} 行", forceUpdatedRows);
+          
+          // 再次验证
+          Integer finalRemainingCount = dsl.selectCount()
+              .from(Tables.EDU_STUDENT_COURSE)
+              .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(studentId))
+              .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
+              .fetchOneInto(Integer.class);
+          log.info("强制删除后，学员 {} 还有 {} 条未删除的课程关系记录", studentId, finalRemainingCount);
+      }
+      
+    } else {
+      log.warn("未找到学员记录，学员ID: {}", studentId);
+    }
+
+    // 删除学员记录
+    studentModel.deleteStudent(studentId);
+    log.info("已删除学员记录，学员ID: {}", studentId);
+    
+    // 最终验证
+    Integer finalStudentCount = dsl.selectCount()
+        .from(Tables.EDU_STUDENT)
+        .where(Tables.EDU_STUDENT.ID.eq(studentId))
+        .and(Tables.EDU_STUDENT.DELETED.eq(0))
+        .fetchOneInto(Integer.class);
+    log.info("删除完成后，学员 {} 在学员表中的状态: deleted={}", studentId, finalStudentCount == 0 ? "已删除" : "未删除");
   }
 }

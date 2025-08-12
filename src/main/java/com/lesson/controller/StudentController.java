@@ -85,26 +85,7 @@ public class StudentController {
                description = "根据学员ID删除学员（逻辑删除）")
     public Result<Void> delete(
             @Parameter(description = "学员ID", required = true) @RequestParam Long id) {
-        // 获取学员信息用于更新统计
-        com.lesson.repository.tables.records.EduStudentRecord student = dsl.selectFrom(com.lesson.repository.tables.EduStudent.EDU_STUDENT)
-            .where(com.lesson.repository.tables.EduStudent.EDU_STUDENT.ID.eq(id))
-            .and(com.lesson.repository.tables.EduStudent.EDU_STUDENT.DELETED.eq(0))
-            .fetchOne();
-
-        if (student != null) {
-            // 更新Redis统计数据
-            campusStatsRedisService.decrementStudentCount(student.getInstitutionId(), student.getCampusId());
-            
-            // 同时删除学员课程关系记录（逻辑删除）
-            dsl.update(com.lesson.repository.tables.EduStudentCourse.EDU_STUDENT_COURSE)
-                .set(com.lesson.repository.tables.EduStudentCourse.EDU_STUDENT_COURSE.DELETED, 1)
-                .set(com.lesson.repository.tables.EduStudentCourse.EDU_STUDENT_COURSE.UPDATE_TIME, java.time.LocalDateTime.now())
-                .where(com.lesson.repository.tables.EduStudentCourse.EDU_STUDENT_COURSE.STUDENT_ID.eq(id))
-                .and(com.lesson.repository.tables.EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
-                .execute();
-        }
-
-        studentModel.deleteStudent(id);
+        studentService.deleteStudentWithCourses(id);
         return Result.success();
     }
 

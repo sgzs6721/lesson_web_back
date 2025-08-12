@@ -21,6 +21,7 @@ import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 import com.lesson.repository.tables.EduStudent;
 import com.lesson.repository.tables.EduCourse;
@@ -576,6 +577,16 @@ public class StatisticsController {
                     .fetchOneInto(Integer.class);
             log.info("校区统计 - 从数据库查询学员课程总数（学习中状态，按课程ID去重）: {}", totalStudentCourses);
             
+            // 调试：查询具体的课程ID列表
+            List<Long> courseIds = dslContext.selectDistinct(EduStudentCourse.EDU_STUDENT_COURSE.COURSE_ID)
+                    .from(EduStudentCourse.EDU_STUDENT_COURSE)
+                    .where(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
+                    .and(EduStudentCourse.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
+                    .and(EduStudentCourse.EDU_STUDENT_COURSE.CAMPUS_ID.eq(targetCampusId))
+                    .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq(com.lesson.enums.StudentCourseStatus.STUDYING.getName()))
+                    .fetchInto(Long.class);
+            log.info("校区统计 - 学习中状态的课程ID列表: {}", courseIds);
+            
             // 调试：查询各种状态的数量
             Integer studyingCount = dslContext.selectCount()
                     .from(EduStudentCourse.EDU_STUDENT_COURSE)
@@ -585,6 +596,24 @@ public class StatisticsController {
                     .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq(com.lesson.enums.StudentCourseStatus.STUDYING.getName()))
                     .fetchOneInto(Integer.class);
             log.info("校区统计 - 学习中状态的总记录数: {}", studyingCount);
+            
+            // 调试：查询所有状态的记录数量（未删除）
+            Integer totalActiveRecords = dslContext.selectCount()
+                    .from(EduStudentCourse.EDU_STUDENT_COURSE)
+                    .where(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
+                    .and(EduStudentCourse.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
+                    .and(EduStudentCourse.EDU_STUDENT_COURSE.CAMPUS_ID.eq(targetCampusId))
+                    .fetchOneInto(Integer.class);
+            log.info("校区统计 - 所有状态的活跃记录总数: {}", totalActiveRecords);
+            
+            // 调试：查询已删除的记录数量
+            Integer totalDeletedRecords = dslContext.selectCount()
+                    .from(EduStudentCourse.EDU_STUDENT_COURSE)
+                    .where(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(1))
+                    .and(EduStudentCourse.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
+                    .and(EduStudentCourse.EDU_STUDENT_COURSE.CAMPUS_ID.eq(targetCampusId))
+                    .fetchOneInto(Integer.class);
+            log.info("校区统计 - 已删除的记录总数: {}", totalDeletedRecords);
             
             // 已按学习中去重统计，无需再次覆盖
             
@@ -671,6 +700,15 @@ public class StatisticsController {
                     .fetchOneInto(Integer.class);
             log.info("机构统计 - 从数据库查询学员课程总数（学习中状态，按课程ID去重）: {}", totalStudentCourses);
             
+            // 调试：查询具体的课程ID列表
+            List<Long> courseIds = dslContext.selectDistinct(EduStudentCourse.EDU_STUDENT_COURSE.COURSE_ID)
+                    .from(EduStudentCourse.EDU_STUDENT_COURSE)
+                    .where(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
+                    .and(EduStudentCourse.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
+                    .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq(com.lesson.enums.StudentCourseStatus.STUDYING.getName()))
+                    .fetchInto(Long.class);
+            log.info("机构统计 - 学习中状态的课程ID列表: {}", courseIds);
+            
             // 调试：查询各种状态的数量
             Integer studyingCount = dslContext.selectCount()
                     .from(EduStudentCourse.EDU_STUDENT_COURSE)
@@ -679,6 +717,22 @@ public class StatisticsController {
                     .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq(com.lesson.enums.StudentCourseStatus.STUDYING.getName()))
                     .fetchOneInto(Integer.class);
             log.info("机构统计 - 学习中状态的总记录数: {}", studyingCount);
+            
+            // 调试：查询所有状态的记录数量（未删除）
+            Integer totalActiveRecords = dslContext.selectCount()
+                    .from(EduStudentCourse.EDU_STUDENT_COURSE)
+                    .where(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
+                    .and(EduStudentCourse.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
+                    .fetchOneInto(Integer.class);
+            log.info("机构统计 - 所有状态的活跃记录总数: {}", totalActiveRecords);
+            
+            // 调试：查询已删除的记录数量
+            Integer totalDeletedRecords = dslContext.selectCount()
+                    .from(EduStudentCourse.EDU_STUDENT_COURSE)
+                    .where(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(1))
+                    .and(EduStudentCourse.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
+                    .fetchOneInto(Integer.class);
+            log.info("机构统计 - 已删除的记录总数: {}", totalDeletedRecords);
             
             // 已按学习中去重统计，无需再次覆盖
             
