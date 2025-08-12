@@ -682,7 +682,7 @@ public class StudentService {
 
       // 分页查询
       students = query
-          .orderBy(Tables.EDU_STUDENT.CREATED_TIME.desc())
+          .orderBy(buildSortField(request.getSortField(), request.getSortOrder()))
           .limit(request.getPageSize())
           .offset((request.getPageNum() - 1) * request.getPageSize())
           .fetchInto(EduStudentRecord.class);
@@ -864,7 +864,7 @@ public class StudentService {
 
       // 分页查询
       students = query
-          .orderBy(Tables.EDU_STUDENT.CREATED_TIME.desc())
+          .orderBy(buildSortField(request.getSortField(), request.getSortOrder()))
           .limit(request.getPageSize())
           .offset((request.getPageNum() - 1) * request.getPageSize())
           .fetchInto(EduStudentRecord.class);
@@ -1780,6 +1780,45 @@ public class StudentService {
     // 你可以根据需要补充更多字段，比如操作人、学员姓名、课程名称等
 
     return vo;
+  }
+
+  /**
+   * 构建排序字段
+   *
+   * @param sortField 排序字段
+   * @param sortOrder 排序方向
+   * @return 排序字段
+   */
+  private org.jooq.SortField<?> buildSortField(String sortField, String sortOrder) {
+    // 默认排序：按ID降序
+    org.jooq.SortField<?> defaultSort = Tables.EDU_STUDENT.ID.desc();
+    
+    if (sortField == null || sortField.isEmpty()) {
+      return defaultSort;
+    }
+    
+    // 确定排序方向
+    org.jooq.SortOrder order = "desc".equalsIgnoreCase(sortOrder) ? org.jooq.SortOrder.DESC : org.jooq.SortOrder.ASC;
+    
+    // 根据字段名确定排序字段
+    switch (sortField.toLowerCase()) {
+      case "id":
+        return Tables.EDU_STUDENT.ID.sort(order);
+      case "name":
+        return Tables.EDU_STUDENT.NAME.sort(order);
+      case "age":
+        return Tables.EDU_STUDENT.AGE.sort(order);
+      case "phone":
+        return Tables.EDU_STUDENT.PHONE.sort(order);
+      case "createdtime":
+      case "created_time":
+        return Tables.EDU_STUDENT.CREATED_TIME.sort(order);
+      case "updatetime":
+      case "updated_time":
+        return Tables.EDU_STUDENT.UPDATE_TIME.sort(order);
+      default:
+        return defaultSort;
+    }
   }
 
   /**

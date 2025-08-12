@@ -151,7 +151,7 @@ public class EduStudentCourseModel {
 
         SelectSeekStepN<?> query = select
                 .where(conditions)
-                .orderBy(getOrderByFields(request.getSortBy())); // 应用排序
+                .orderBy(getOrderByFields(request.getSortField(), request.getSortOrder())); // 应用排序
 
         Result<?> result = query
                 .limit(request.getLimit() != null ? request.getLimit() : 10)
@@ -295,49 +295,58 @@ public class EduStudentCourseModel {
     /**
      * 根据 sortBy 字符串解析排序字段
      */
-    private List<SortField<?>> getOrderByFields(String sortBy) {
-        if (!StringUtils.hasText(sortBy)) {
+    private List<SortField<?>> getOrderByFields(String sortField, String sortOrder) {
+        if (!StringUtils.hasText(sortField)) {
             // 默认按创建时间降序，然后按报名日期降序
             return Arrays.asList(EDU_STUDENT_COURSE.CREATED_TIME.desc(), EDU_STUDENT_COURSE.START_DATE.desc());
         }
 
         List<SortField<?>> sortFields = new ArrayList<>();
-        String[] sortParams = sortBy.split("_");
-        if (sortParams.length == 2) {
-            String fieldName = sortParams[0];
-            String direction = sortParams[1];
-            SortOrder sortOrder = "asc".equalsIgnoreCase(direction) ? SortOrder.ASC : SortOrder.DESC;
+        
+        // 确定排序方向
+        SortOrder order = "desc".equalsIgnoreCase(sortOrder) ? SortOrder.DESC : SortOrder.ASC;
 
-            Field<?> sortField = null;
-            switch (fieldName) {
-                case "studentId":
-                    sortField = EDU_STUDENT.ID;
-                    break;
-                case "studentAge":
-                    sortField = EDU_STUDENT.AGE;
-                    break;
-                case "remainingHours":
-                    // 按计算出的剩余课时排序
-                    sortField = EDU_STUDENT_COURSE.TOTAL_HOURS.minus(EDU_STUDENT_COURSE.CONSUMED_HOURS);
-                    break;
-                case "lastClassTime":
-                    // sortField = LAST_CLASS_TIME_FIELD; // 需要定义最近上课时间字段
-                    break;
-                case "enrollmentDate":
-                    sortField = EDU_STUDENT_COURSE.START_DATE;
-                    break;
-                case "status":
-                     sortField = EDU_STUDENT_COURSE.STATUS;
-                     break;
-                case "createdTime":
-                     sortField = EDU_STUDENT_COURSE.CREATED_TIME;
-                     break;
-                // 可以添加更多排序字段
-            }
+        Field<?> field = null;
+        switch (sortField.toLowerCase()) {
+            case "id":
+            case "studentid":
+                field = EDU_STUDENT.ID;
+                break;
+            case "name":
+            case "studentname":
+                field = EDU_STUDENT.NAME;
+                break;
+            case "age":
+            case "studentage":
+                field = EDU_STUDENT.AGE;
+                break;
+            case "phone":
+            case "studentphone":
+                field = EDU_STUDENT.PHONE;
+                break;
+            case "remaininghours":
+                // 按计算出的剩余课时排序
+                field = EDU_STUDENT_COURSE.TOTAL_HOURS.minus(EDU_STUDENT_COURSE.CONSUMED_HOURS);
+                break;
+            case "enrollmentdate":
+                field = EDU_STUDENT_COURSE.START_DATE;
+                break;
+            case "status":
+                field = EDU_STUDENT_COURSE.STATUS;
+                break;
+            case "createdtime":
+            case "created_time":
+                field = EDU_STUDENT_COURSE.CREATED_TIME;
+                break;
+            case "updatetime":
+            case "updated_time":
+                field = EDU_STUDENT_COURSE.UPDATE_TIME;
+                break;
+            // 可以添加更多排序字段
+        }
 
-            if (sortField != null) {
-                 sortFields.add(sortField.sort(sortOrder));
-            }
+        if (field != null) {
+            sortFields.add(field.sort(order));
         }
 
         // 如果解析失败或未指定有效字段，则使用默认排序

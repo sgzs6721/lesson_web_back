@@ -47,10 +47,16 @@ public class StudentQueryRequest {
     private YearMonth enrollmentYearMonth;
 
     /**
-     * 排序方式
+     * 排序字段
      */
-    @ApiModelProperty(value = "排序方式", example = "enrollmentDate_desc")
-    private String sortBy;
+    @ApiModelProperty(value = "排序字段：id-按ID排序，name-按姓名排序，age-按年龄排序，phone-按电话排序，createdtime-按创建时间排序，updatetime-按更新时间排序", example = "id")
+    private String sortField;
+
+    /**
+     * 排序方向
+     */
+    @ApiModelProperty(value = "排序方向：asc-升序，desc-降序", example = "desc")
+    private String sortOrder;
 
     /**
      * 校区ID
