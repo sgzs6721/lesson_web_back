@@ -283,12 +283,22 @@ public class CampusServiceImpl implements CampusService {
         if (!campusIds.isEmpty()) {
             // 查询这些校区的管理员信息
             List<UserVO> managers = userModel.findManagersByCampusIds(campusIds, institutionId);
+            log.info("查询到 {} 个校区管理员: {}", managers.size(), managers);
+            
             // 构建校区ID到管理员信息的映射，只取每个校区的第一个管理员
             managers.forEach(manager -> {
                 if (!campusManagerMap.containsKey(manager.getCampusId())) {
                     campusManagerMap.put(manager.getCampusId(), manager);
+                    log.info("校区 {} 的管理员: {} ({})", manager.getCampusId(), manager.getRealName(), manager.getPhone());
+                } else {
+                    log.warn("校区 {} 已有管理员 {}，跳过重复管理员: {} ({})", 
+                            manager.getCampusId(), 
+                            campusManagerMap.get(manager.getCampusId()).getRealName(),
+                            manager.getRealName(), manager.getPhone());
                 }
             });
+            
+            log.info("校区管理员映射: {}", campusManagerMap);
         }
 
         // 3. 组装最终结果
@@ -308,6 +318,9 @@ public class CampusServiceImpl implements CampusService {
             if (manager != null) {
                 campusVO.setManagerName(manager.getRealName());
                 campusVO.setManagerPhone(manager.getPhone());
+                log.info("校区 {} 设置管理员信息: {} ({})", record.getId(), manager.getRealName(), manager.getPhone());
+            } else {
+                log.warn("校区 {} 没有找到管理员信息", record.getId());
             }
 
             // 从Redis获取统计数据，如果缓存没有数据则从数据库查询

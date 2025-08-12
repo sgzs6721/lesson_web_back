@@ -1783,6 +1783,35 @@ public class StudentService {
   }
 
   /**
+   * 验证校区管理员唯一性
+   *
+   * @param campusId 校区ID
+   * @param institutionId 机构ID
+   * @param excludeUserId 排除的用户ID（更新时使用）
+   * @throws BusinessException 如果校区已有管理员
+   */
+  private void validateCampusAdminUniqueness(Long campusId, Long institutionId, Long excludeUserId) {
+    if (campusId == null || campusId <= 0) {
+      return; // 不是校区管理员，无需验证
+    }
+    
+    // 查询该校区是否已有其他管理员
+    Integer existingAdminCount = dsl.selectCount()
+        .from(Tables.SYS_USER)
+        .join(Tables.SYS_ROLE).on(Tables.SYS_USER.ROLE_ID.eq(Tables.SYS_ROLE.ID))
+        .where(Tables.SYS_USER.CAMPUS_ID.eq(campusId))
+        .and(Tables.SYS_USER.INSTITUTION_ID.eq(institutionId))
+        .and(Tables.SYS_USER.DELETED.eq(0))
+        .and(Tables.SYS_ROLE.ROLE_NAME.eq("校区管理员"))
+        .and(excludeUserId != null ? Tables.SYS_USER.ID.ne(excludeUserId) : DSL.noCondition())
+        .fetchOneInto(Integer.class);
+    
+    if (existingAdminCount > 0) {
+      throw new BusinessException("校区ID " + campusId + " 已有管理员，一个校区只能有一个管理员");
+    }
+  }
+
+  /**
    * 删除学员及其相关课程关系记录
    *
    * @param studentId 学员ID

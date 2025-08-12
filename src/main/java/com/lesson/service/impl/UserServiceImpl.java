@@ -388,6 +388,11 @@ public class UserServiceImpl implements UserService {
         throw new BusinessException("校区管理员必须指定所属校区");
       }
 
+      // 验证校区管理员唯一性
+      if (hasCampusAdminRole) {
+        validateCampusAdminUniqueness(campusId, institutionId, null);
+      }
+
       // 创建用户（使用第一个角色ID作为主角色，保持向后兼容）
       Long primaryRoleId = roleIds.get(0);
       Long finalCampusId = hasCampusAdminRole ? campusId : -1L;
@@ -661,6 +666,11 @@ public class UserServiceImpl implements UserService {
           campusId = -1L;
       }
 
+      // 验证校区管理员唯一性
+      if (hasCampusAdminRole) {
+          validateCampusAdminUniqueness(campusId, institutionId, request.getId());
+      }
+
       // 使用第一个角色ID作为主角色，保持向后兼容
       Long primaryRoleId = roleIds.get(0);
 
@@ -708,6 +718,35 @@ public class UserServiceImpl implements UserService {
       throw e;
     } catch (Exception e) {
       throw new BusinessException("删除用户失败: " + e.getMessage());
+    }
+  }
+
+  /**
+   * 验证校区管理员唯一性
+   *
+   * @param campusId 校区ID
+   * @param institutionId 机构ID
+   * @param excludeUserId 排除的用户ID（更新时使用）
+   * @throws BusinessException 如果校区已有管理员
+   */
+  private void validateCampusAdminUniqueness(Long campusId, Long institutionId, Long excludeUserId) {
+    if (campusId == null || campusId <= 0) {
+      return; // 不是校区管理员，无需验证
+    }
+    
+    // 查询该校区是否已有其他管理员
+    Integer existingAdminCount = dsl.selectCount()
+        .from(Tables.SYS_USER)
+        .join(Tables.SYS_ROLE).on(Tables.SYS_USER.ROLE_ID.eq(Tables.SYS_ROLE.ID))
+        .where(Tables.SYS_USER.CAMPUS_ID.eq(campusId))
+        .and(Tables.SYS_USER.INSTITUTION_ID.eq(institutionId))
+        .and(Tables.SYS_USER.DELETED.eq(0))
+        .and(Tables.SYS_ROLE.ROLE_NAME.eq("校区管理员"))
+        .and(excludeUserId != null ? Tables.SYS_USER.ID.ne(excludeUserId) : org.jooq.impl.DSL.noCondition())
+        .fetchOneInto(Integer.class);
+    
+    if (existingAdminCount > 0) {
+      throw new BusinessException("校区ID " + campusId + " 已有管理员，一个校区只能有一个管理员");
     }
   }
 
