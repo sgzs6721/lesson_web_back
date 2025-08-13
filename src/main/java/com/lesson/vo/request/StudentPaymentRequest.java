@@ -59,10 +59,9 @@ public class StudentPaymentRequest {
     @ApiModelProperty(value = "赠送的课时", example = "2")
     private BigDecimal giftHours = BigDecimal.ZERO; // 默认为0
 
-    @NotNull(message = "有效期至不能为空")
-    @ApiModelProperty(value = "课程有效期至", required = true, example = "2025-10-23")
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate validUntil;
+    @NotNull(message = "有效期不能为空")
+    @ApiModelProperty(value = "课程有效期（月数）", required = true, example = "12")
+    private Integer validityPeriod;
 
     @ApiModelProperty(value = "赠品常量ID列表", example = "[1, 2, 3]")
     private List<Long> giftItems;

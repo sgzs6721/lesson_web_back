@@ -734,13 +734,16 @@ public class UserServiceImpl implements UserService {
       return; // 不是校区管理员，无需验证
     }
     
-    // 查询该校区是否已有其他管理员
+    // 查询该校区是否已有其他管理员（使用多角色关联表）
     Integer existingAdminCount = dsl.selectCount()
         .from(Tables.SYS_USER)
-        .join(Tables.SYS_ROLE).on(Tables.SYS_USER.ROLE_ID.eq(Tables.SYS_ROLE.ID))
+        .join(org.jooq.impl.DSL.table("sys_user_role")).on(Tables.SYS_USER.ID.eq(org.jooq.impl.DSL.field("sys_user_role.user_id", Long.class)))
+        .join(Tables.SYS_ROLE).on(org.jooq.impl.DSL.field("sys_user_role.role_id", Long.class).eq(Tables.SYS_ROLE.ID))
         .where(Tables.SYS_USER.CAMPUS_ID.eq(campusId))
         .and(Tables.SYS_USER.INSTITUTION_ID.eq(institutionId))
         .and(Tables.SYS_USER.DELETED.eq(0))
+        .and(org.jooq.impl.DSL.field("sys_user_role.deleted", Integer.class).eq(0))
+        .and(Tables.SYS_ROLE.DELETED.eq(0))
         .and(Tables.SYS_ROLE.ROLE_NAME.eq("校区管理员"))
         .and(excludeUserId != null ? Tables.SYS_USER.ID.ne(excludeUserId) : org.jooq.impl.DSL.noCondition())
         .fetchOneInto(Integer.class);

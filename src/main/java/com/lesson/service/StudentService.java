@@ -1397,7 +1397,9 @@ public class StudentService {
     paymentRecord.setPaymentMethod(request.getPaymentMethod().name());
     paymentRecord.setCourseHours(request.getCourseHours());
     paymentRecord.setGiftHours(request.getGiftHours());
-    paymentRecord.setValidUntil(request.getValidUntil());
+    // 计算有效期结束日期：当前日期 + 有效期月数
+    LocalDate validUntil = LocalDate.now().plusMonths(request.getValidityPeriod());
+    paymentRecord.setValidUntil(validUntil);
     paymentRecord.setGiftItems(giftItemsDbString); // 存储转换后的字符串
     paymentRecord.setNotes(request.getNotes());
     paymentRecord.setCampusId(campusId);
@@ -1412,10 +1414,10 @@ public class StudentService {
     // - 如果是续费且原状态是GRADUATED/EXPIRED等，可能需要重置为STUDYING
     BigDecimal addedTotalHours = request.getCourseHours().add(request.getGiftHours());
     studentCourse.setTotalHours(studentCourse.getTotalHours().add(addedTotalHours));
-    studentCourse.setEndDate(request.getValidUntil()); // 直接使用新的有效期覆盖
+    studentCourse.setEndDate(validUntil); // 使用计算后的有效期
     
-    log.info("设置学员课程有效期: studentId={}, courseId={}, validUntil={}, endDate={}", 
-            request.getStudentId(), request.getCourseId(), request.getValidUntil(), studentCourse.getEndDate());
+    log.info("设置学员课程有效期: studentId={}, courseId={}, validityPeriod={}个月, endDate={}", 
+            request.getStudentId(), request.getCourseId(), request.getValidityPeriod(), studentCourse.getEndDate());
 
     // 更新课程状态为学习中（缴费后直接进入学习状态）
     studentCourse.setStatus(StudentCourseStatus.STUDYING.getName());
@@ -1457,6 +1459,7 @@ public class StudentService {
     
     // 设置总课时和有效期
     response.setTotalHours(studentCourse.getTotalHours().toString());
+    response.setValidityPeriod(request.getValidityPeriod());
     response.setValidUntil(studentCourse.getEndDate() != null ? studentCourse.getEndDate().toString() : null);
 
     return response;
