@@ -21,7 +21,7 @@ import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row16;
+import org.jooq.Row17;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -133,6 +133,11 @@ public class EduStudentPayment extends TableImpl<EduStudentPaymentRecord> {
      */
     public final TableField<EduStudentPaymentRecord, Integer> DELETED = createField(DSL.name("deleted"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.inline("0", SQLDataType.INTEGER)), this, "是否删除：0-未删除，1-已删除");
 
+    /**
+     * The column <code>lesson_prod.edu_student_payment.transaction_date</code>. 缴费日期（实际缴费发生的日期）
+     */
+    public final TableField<EduStudentPaymentRecord, LocalDate> TRANSACTION_DATE = createField(DSL.name("transaction_date"), SQLDataType.LOCALDATE.nullable(false).defaultValue(DSL.inline("curdate()", SQLDataType.LOCALDATE)), this, "缴费日期（实际缴费发生的日期）");
+
     private EduStudentPayment(Name alias, Table<EduStudentPaymentRecord> aliased) {
         this(alias, aliased, null);
     }
@@ -218,11 +223,11 @@ public class EduStudentPayment extends TableImpl<EduStudentPaymentRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row16 type methods
+    // Row17 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row16<Long, String, String, String, BigDecimal, String, BigDecimal, BigDecimal, LocalDate, String, String, Long, Long, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
-        return (Row16) super.fieldsRow();
+    public Row17<Long, String, String, String, BigDecimal, String, BigDecimal, BigDecimal, LocalDate, String, String, Long, Long, LocalDateTime, LocalDateTime, Integer, LocalDate> fieldsRow() {
+        return (Row17) super.fieldsRow();
     }
 }

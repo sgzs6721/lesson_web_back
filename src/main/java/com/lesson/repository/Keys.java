@@ -22,6 +22,7 @@ import com.lesson.repository.tables.SysInstitution;
 import com.lesson.repository.tables.SysRole;
 import com.lesson.repository.tables.SysRolePermission;
 import com.lesson.repository.tables.SysUser;
+import com.lesson.repository.tables.SysUserRole;
 import com.lesson.repository.tables.records.EduCourseRecord;
 import com.lesson.repository.tables.records.EduCourseRecordRecord;
 import com.lesson.repository.tables.records.EduStudentClassTransferRecord;
@@ -42,6 +43,7 @@ import com.lesson.repository.tables.records.SysInstitutionRecord;
 import com.lesson.repository.tables.records.SysRolePermissionRecord;
 import com.lesson.repository.tables.records.SysRoleRecord;
 import com.lesson.repository.tables.records.SysUserRecord;
+import com.lesson.repository.tables.records.SysUserRoleRecord;
 
 import org.jooq.TableField;
 import org.jooq.UniqueKey;
@@ -73,6 +75,7 @@ public class Keys {
     public static final UniqueKey<EduStudentRefundRecord> KEY_EDU_STUDENT_REFUND_PRIMARY = Internal.createUniqueKey(EduStudentRefund.EDU_STUDENT_REFUND, DSL.name("KEY_edu_student_refund_PRIMARY"), new TableField[] { EduStudentRefund.EDU_STUDENT_REFUND.ID }, true);
     public static final UniqueKey<SysCampusRecord> KEY_SYS_CAMPUS_PRIMARY = Internal.createUniqueKey(SysCampus.SYS_CAMPUS, DSL.name("KEY_sys_campus_PRIMARY"), new TableField[] { SysCampus.SYS_CAMPUS.ID }, true);
     public static final UniqueKey<SysCoachRecord> KEY_SYS_COACH_PRIMARY = Internal.createUniqueKey(SysCoach.SYS_COACH, DSL.name("KEY_sys_coach_PRIMARY"), new TableField[] { SysCoach.SYS_COACH.ID }, true);
+    public static final UniqueKey<SysCoachRecord> KEY_SYS_COACH_UK_ID_NUMBER_DELETED = Internal.createUniqueKey(SysCoach.SYS_COACH, DSL.name("KEY_sys_coach_uk_id_number_deleted"), new TableField[] { SysCoach.SYS_COACH.ID_NUMBER, SysCoach.SYS_COACH.DELETED }, true);
     public static final UniqueKey<SysCoachCertificationRecord> KEY_SYS_COACH_CERTIFICATION_PRIMARY = Internal.createUniqueKey(SysCoachCertification.SYS_COACH_CERTIFICATION, DSL.name("KEY_sys_coach_certification_PRIMARY"), new TableField[] { SysCoachCertification.SYS_COACH_CERTIFICATION.ID }, true);
     public static final UniqueKey<SysCoachCourseRecord> KEY_SYS_COACH_COURSE_PRIMARY = Internal.createUniqueKey(SysCoachCourse.SYS_COACH_COURSE, DSL.name("KEY_sys_coach_course_PRIMARY"), new TableField[] { SysCoachCourse.SYS_COACH_COURSE.ID }, true);
     public static final UniqueKey<SysCoachCourseRecord> KEY_SYS_COACH_COURSE_UK_COACH_COURSE = Internal.createUniqueKey(SysCoachCourse.SYS_COACH_COURSE, DSL.name("KEY_sys_coach_course_uk_coach_course"), new TableField[] { SysCoachCourse.SYS_COACH_COURSE.COACH_ID, SysCoachCourse.SYS_COACH_COURSE.COURSE_ID, SysCoachCourse.SYS_COACH_COURSE.DELETED }, true);
@@ -86,4 +89,6 @@ public class Keys {
     public static final UniqueKey<SysRolePermissionRecord> KEY_SYS_ROLE_PERMISSION_UK_ROLE_PERMISSION = Internal.createUniqueKey(SysRolePermission.SYS_ROLE_PERMISSION, DSL.name("KEY_sys_role_permission_uk_role_permission"), new TableField[] { SysRolePermission.SYS_ROLE_PERMISSION.ROLE_ID, SysRolePermission.SYS_ROLE_PERMISSION.PERMISSION }, true);
     public static final UniqueKey<SysUserRecord> KEY_SYS_USER_PRIMARY = Internal.createUniqueKey(SysUser.SYS_USER, DSL.name("KEY_sys_user_PRIMARY"), new TableField[] { SysUser.SYS_USER.ID }, true);
     public static final UniqueKey<SysUserRecord> KEY_SYS_USER_UK_PHONE = Internal.createUniqueKey(SysUser.SYS_USER, DSL.name("KEY_sys_user_uk_phone"), new TableField[] { SysUser.SYS_USER.PHONE }, true);
+    public static final UniqueKey<SysUserRoleRecord> KEY_SYS_USER_ROLE_PRIMARY = Internal.createUniqueKey(SysUserRole.SYS_USER_ROLE, DSL.name("KEY_sys_user_role_PRIMARY"), new TableField[] { SysUserRole.SYS_USER_ROLE.ID }, true);
+    public static final UniqueKey<SysUserRoleRecord> KEY_SYS_USER_ROLE_UK_USER_ROLE = Internal.createUniqueKey(SysUserRole.SYS_USER_ROLE, DSL.name("KEY_sys_user_role_uk_user_role"), new TableField[] { SysUserRole.SYS_USER_ROLE.USER_ID, SysUserRole.SYS_USER_ROLE.ROLE_ID }, true);
 }

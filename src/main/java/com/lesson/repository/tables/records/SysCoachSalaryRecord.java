@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
 
 import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record12;
-import org.jooq.Row12;
+import org.jooq.Record13;
+import org.jooq.Row13;
 import org.jooq.impl.UpdatableRecordImpl;
 
 
@@ -21,7 +21,7 @@ import org.jooq.impl.UpdatableRecordImpl;
  * 教练薪资表
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class SysCoachSalaryRecord extends UpdatableRecordImpl<SysCoachSalaryRecord> implements Record12<Long, Long, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, LocalDate, LocalDateTime, LocalDateTime, Integer> {
+public class SysCoachSalaryRecord extends UpdatableRecordImpl<SysCoachSalaryRecord> implements Record13<Long, Long, BigDecimal, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, LocalDate, LocalDateTime, LocalDateTime, Integer> {
 
     private static final long serialVersionUID = 1L;
 
@@ -68,129 +68,143 @@ public class SysCoachSalaryRecord extends UpdatableRecordImpl<SysCoachSalaryReco
     }
 
     /**
+     * Setter for <code>lesson_prod.sys_coach_salary.guaranteed_hours</code>. 保底课时
+     */
+    public void setGuaranteedHours(Integer value) {
+        set(3, value);
+    }
+
+    /**
+     * Getter for <code>lesson_prod.sys_coach_salary.guaranteed_hours</code>. 保底课时
+     */
+    public Integer getGuaranteedHours() {
+        return (Integer) get(3);
+    }
+
+    /**
      * Setter for <code>lesson_prod.sys_coach_salary.social_insurance</code>. 社保费
      */
     public void setSocialInsurance(BigDecimal value) {
-        set(3, value);
+        set(4, value);
     }
 
     /**
      * Getter for <code>lesson_prod.sys_coach_salary.social_insurance</code>. 社保费
      */
     public BigDecimal getSocialInsurance() {
-        return (BigDecimal) get(3);
+        return (BigDecimal) get(4);
     }
 
     /**
      * Setter for <code>lesson_prod.sys_coach_salary.class_fee</code>. 课时费
      */
     public void setClassFee(BigDecimal value) {
-        set(4, value);
+        set(5, value);
     }
 
     /**
      * Getter for <code>lesson_prod.sys_coach_salary.class_fee</code>. 课时费
      */
     public BigDecimal getClassFee() {
-        return (BigDecimal) get(4);
+        return (BigDecimal) get(5);
     }
 
     /**
      * Setter for <code>lesson_prod.sys_coach_salary.performance_bonus</code>. 绩效奖金
      */
     public void setPerformanceBonus(BigDecimal value) {
-        set(5, value);
+        set(6, value);
     }
 
     /**
      * Getter for <code>lesson_prod.sys_coach_salary.performance_bonus</code>. 绩效奖金
      */
     public BigDecimal getPerformanceBonus() {
-        return (BigDecimal) get(5);
+        return (BigDecimal) get(6);
     }
 
     /**
      * Setter for <code>lesson_prod.sys_coach_salary.commission</code>. 提成百分比
      */
     public void setCommission(BigDecimal value) {
-        set(6, value);
+        set(7, value);
     }
 
     /**
      * Getter for <code>lesson_prod.sys_coach_salary.commission</code>. 提成百分比
      */
     public BigDecimal getCommission() {
-        return (BigDecimal) get(6);
+        return (BigDecimal) get(7);
     }
 
     /**
      * Setter for <code>lesson_prod.sys_coach_salary.dividend</code>. 分红
      */
     public void setDividend(BigDecimal value) {
-        set(7, value);
+        set(8, value);
     }
 
     /**
      * Getter for <code>lesson_prod.sys_coach_salary.dividend</code>. 分红
      */
     public BigDecimal getDividend() {
-        return (BigDecimal) get(7);
+        return (BigDecimal) get(8);
     }
 
     /**
      * Setter for <code>lesson_prod.sys_coach_salary.effective_date</code>. 生效日期
      */
     public void setEffectiveDate(LocalDate value) {
-        set(8, value);
+        set(9, value);
     }
 
     /**
      * Getter for <code>lesson_prod.sys_coach_salary.effective_date</code>. 生效日期
      */
     public LocalDate getEffectiveDate() {
-        return (LocalDate) get(8);
+        return (LocalDate) get(9);
     }
 
     /**
      * Setter for <code>lesson_prod.sys_coach_salary.created_time</code>. 创建时间
      */
     public void setCreatedTime(LocalDateTime value) {
-        set(9, value);
+        set(10, value);
     }
 
     /**
      * Getter for <code>lesson_prod.sys_coach_salary.created_time</code>. 创建时间
      */
     public LocalDateTime getCreatedTime() {
-        return (LocalDateTime) get(9);
+        return (LocalDateTime) get(10);
     }
 
     /**
      * Setter for <code>lesson_prod.sys_coach_salary.update_time</code>. 更新时间
      */
     public void setUpdateTime(LocalDateTime value) {
-        set(10, value);
+        set(11, value);
     }
 
     /**
      * Getter for <code>lesson_prod.sys_coach_salary.update_time</code>. 更新时间
      */
     public LocalDateTime getUpdateTime() {
-        return (LocalDateTime) get(10);
+        return (LocalDateTime) get(11);
     }
 
     /**
      * Setter for <code>lesson_prod.sys_coach_salary.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public void setDeleted(Integer value) {
-        set(11, value);
+        set(12, value);
     }
 
     /**
      * Getter for <code>lesson_prod.sys_coach_salary.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public Integer getDeleted() {
-        return (Integer) get(11);
+        return (Integer) get(12);
     }
 
     // -------------------------------------------------------------------------
@@ -203,17 +217,17 @@ public class SysCoachSalaryRecord extends UpdatableRecordImpl<SysCoachSalaryReco
     }
 
     // -------------------------------------------------------------------------
-    // Record12 type implementation
+    // Record13 type implementation
     // -------------------------------------------------------------------------
 
     @Override
-    public Row12<Long, Long, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, LocalDate, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
-        return (Row12) super.fieldsRow();
+    public Row13<Long, Long, BigDecimal, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, LocalDate, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
+        return (Row13) super.fieldsRow();
     }
 
     @Override
-    public Row12<Long, Long, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, LocalDate, LocalDateTime, LocalDateTime, Integer> valuesRow() {
-        return (Row12) super.valuesRow();
+    public Row13<Long, Long, BigDecimal, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, LocalDate, LocalDateTime, LocalDateTime, Integer> valuesRow() {
+        return (Row13) super.valuesRow();
     }
 
     @Override
@@ -232,47 +246,52 @@ public class SysCoachSalaryRecord extends UpdatableRecordImpl<SysCoachSalaryReco
     }
 
     @Override
-    public Field<BigDecimal> field4() {
-        return SysCoachSalary.SYS_COACH_SALARY.SOCIAL_INSURANCE;
+    public Field<Integer> field4() {
+        return SysCoachSalary.SYS_COACH_SALARY.GUARANTEED_HOURS;
     }
 
     @Override
     public Field<BigDecimal> field5() {
-        return SysCoachSalary.SYS_COACH_SALARY.CLASS_FEE;
+        return SysCoachSalary.SYS_COACH_SALARY.SOCIAL_INSURANCE;
     }
 
     @Override
     public Field<BigDecimal> field6() {
-        return SysCoachSalary.SYS_COACH_SALARY.PERFORMANCE_BONUS;
+        return SysCoachSalary.SYS_COACH_SALARY.CLASS_FEE;
     }
 
     @Override
     public Field<BigDecimal> field7() {
-        return SysCoachSalary.SYS_COACH_SALARY.COMMISSION;
+        return SysCoachSalary.SYS_COACH_SALARY.PERFORMANCE_BONUS;
     }
 
     @Override
     public Field<BigDecimal> field8() {
+        return SysCoachSalary.SYS_COACH_SALARY.COMMISSION;
+    }
+
+    @Override
+    public Field<BigDecimal> field9() {
         return SysCoachSalary.SYS_COACH_SALARY.DIVIDEND;
     }
 
     @Override
-    public Field<LocalDate> field9() {
+    public Field<LocalDate> field10() {
         return SysCoachSalary.SYS_COACH_SALARY.EFFECTIVE_DATE;
     }
 
     @Override
-    public Field<LocalDateTime> field10() {
+    public Field<LocalDateTime> field11() {
         return SysCoachSalary.SYS_COACH_SALARY.CREATED_TIME;
     }
 
     @Override
-    public Field<LocalDateTime> field11() {
+    public Field<LocalDateTime> field12() {
         return SysCoachSalary.SYS_COACH_SALARY.UPDATE_TIME;
     }
 
     @Override
-    public Field<Integer> field12() {
+    public Field<Integer> field13() {
         return SysCoachSalary.SYS_COACH_SALARY.DELETED;
     }
 
@@ -292,47 +311,52 @@ public class SysCoachSalaryRecord extends UpdatableRecordImpl<SysCoachSalaryReco
     }
 
     @Override
-    public BigDecimal component4() {
-        return getSocialInsurance();
+    public Integer component4() {
+        return getGuaranteedHours();
     }
 
     @Override
     public BigDecimal component5() {
-        return getClassFee();
+        return getSocialInsurance();
     }
 
     @Override
     public BigDecimal component6() {
-        return getPerformanceBonus();
+        return getClassFee();
     }
 
     @Override
     public BigDecimal component7() {
-        return getCommission();
+        return getPerformanceBonus();
     }
 
     @Override
     public BigDecimal component8() {
+        return getCommission();
+    }
+
+    @Override
+    public BigDecimal component9() {
         return getDividend();
     }
 
     @Override
-    public LocalDate component9() {
+    public LocalDate component10() {
         return getEffectiveDate();
     }
 
     @Override
-    public LocalDateTime component10() {
+    public LocalDateTime component11() {
         return getCreatedTime();
     }
 
     @Override
-    public LocalDateTime component11() {
+    public LocalDateTime component12() {
         return getUpdateTime();
     }
 
     @Override
-    public Integer component12() {
+    public Integer component13() {
         return getDeleted();
     }
 
@@ -352,47 +376,52 @@ public class SysCoachSalaryRecord extends UpdatableRecordImpl<SysCoachSalaryReco
     }
 
     @Override
-    public BigDecimal value4() {
-        return getSocialInsurance();
+    public Integer value4() {
+        return getGuaranteedHours();
     }
 
     @Override
     public BigDecimal value5() {
-        return getClassFee();
+        return getSocialInsurance();
     }
 
     @Override
     public BigDecimal value6() {
-        return getPerformanceBonus();
+        return getClassFee();
     }
 
     @Override
     public BigDecimal value7() {
-        return getCommission();
+        return getPerformanceBonus();
     }
 
     @Override
     public BigDecimal value8() {
+        return getCommission();
+    }
+
+    @Override
+    public BigDecimal value9() {
         return getDividend();
     }
 
     @Override
-    public LocalDate value9() {
+    public LocalDate value10() {
         return getEffectiveDate();
     }
 
     @Override
-    public LocalDateTime value10() {
+    public LocalDateTime value11() {
         return getCreatedTime();
     }
 
     @Override
-    public LocalDateTime value11() {
+    public LocalDateTime value12() {
         return getUpdateTime();
     }
 
     @Override
-    public Integer value12() {
+    public Integer value13() {
         return getDeleted();
     }
 
@@ -415,61 +444,67 @@ public class SysCoachSalaryRecord extends UpdatableRecordImpl<SysCoachSalaryReco
     }
 
     @Override
-    public SysCoachSalaryRecord value4(BigDecimal value) {
-        setSocialInsurance(value);
+    public SysCoachSalaryRecord value4(Integer value) {
+        setGuaranteedHours(value);
         return this;
     }
 
     @Override
     public SysCoachSalaryRecord value5(BigDecimal value) {
-        setClassFee(value);
+        setSocialInsurance(value);
         return this;
     }
 
     @Override
     public SysCoachSalaryRecord value6(BigDecimal value) {
-        setPerformanceBonus(value);
+        setClassFee(value);
         return this;
     }
 
     @Override
     public SysCoachSalaryRecord value7(BigDecimal value) {
-        setCommission(value);
+        setPerformanceBonus(value);
         return this;
     }
 
     @Override
     public SysCoachSalaryRecord value8(BigDecimal value) {
+        setCommission(value);
+        return this;
+    }
+
+    @Override
+    public SysCoachSalaryRecord value9(BigDecimal value) {
         setDividend(value);
         return this;
     }
 
     @Override
-    public SysCoachSalaryRecord value9(LocalDate value) {
+    public SysCoachSalaryRecord value10(LocalDate value) {
         setEffectiveDate(value);
         return this;
     }
 
     @Override
-    public SysCoachSalaryRecord value10(LocalDateTime value) {
+    public SysCoachSalaryRecord value11(LocalDateTime value) {
         setCreatedTime(value);
         return this;
     }
 
     @Override
-    public SysCoachSalaryRecord value11(LocalDateTime value) {
+    public SysCoachSalaryRecord value12(LocalDateTime value) {
         setUpdateTime(value);
         return this;
     }
 
     @Override
-    public SysCoachSalaryRecord value12(Integer value) {
+    public SysCoachSalaryRecord value13(Integer value) {
         setDeleted(value);
         return this;
     }
 
     @Override
-    public SysCoachSalaryRecord values(Long value1, Long value2, BigDecimal value3, BigDecimal value4, BigDecimal value5, BigDecimal value6, BigDecimal value7, BigDecimal value8, LocalDate value9, LocalDateTime value10, LocalDateTime value11, Integer value12) {
+    public SysCoachSalaryRecord values(Long value1, Long value2, BigDecimal value3, Integer value4, BigDecimal value5, BigDecimal value6, BigDecimal value7, BigDecimal value8, BigDecimal value9, LocalDate value10, LocalDateTime value11, LocalDateTime value12, Integer value13) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -482,6 +517,7 @@ public class SysCoachSalaryRecord extends UpdatableRecordImpl<SysCoachSalaryReco
         value10(value10);
         value11(value11);
         value12(value12);
+        value13(value13);
         return this;
     }
 
@@ -499,12 +535,13 @@ public class SysCoachSalaryRecord extends UpdatableRecordImpl<SysCoachSalaryReco
     /**
      * Create a detached, initialised SysCoachSalaryRecord
      */
-    public SysCoachSalaryRecord(Long id, Long coachId, BigDecimal baseSalary, BigDecimal socialInsurance, BigDecimal classFee, BigDecimal performanceBonus, BigDecimal commission, BigDecimal dividend, LocalDate effectiveDate, LocalDateTime createdTime, LocalDateTime updateTime, Integer deleted) {
+    public SysCoachSalaryRecord(Long id, Long coachId, BigDecimal baseSalary, Integer guaranteedHours, BigDecimal socialInsurance, BigDecimal classFee, BigDecimal performanceBonus, BigDecimal commission, BigDecimal dividend, LocalDate effectiveDate, LocalDateTime createdTime, LocalDateTime updateTime, Integer deleted) {
         super(SysCoachSalary.SYS_COACH_SALARY);
 
         setId(id);
         setCoachId(coachId);
         setBaseSalary(baseSalary);
+        setGuaranteedHours(guaranteedHours);
         setSocialInsurance(socialInsurance);
         setClassFee(classFee);
         setPerformanceBonus(performanceBonus);

@@ -1417,7 +1417,18 @@ public class StudentService {
     paymentRecord.setNotes(request.getNotes());
     paymentRecord.setCampusId(campusId);
     paymentRecord.setInstitutionId(institutionId);
-    // paymentRecord.setTransactionDate(request.getTransactionDate()); // 表中没有此字段，如果需要需添加迁移
+    
+    // 设置缴费日期（实际缴费发生的日期）
+    if (request.getTransactionDate() != null) {
+        paymentRecord.setTransactionDate(request.getTransactionDate());
+        log.info("设置缴费日期: studentId={}, courseId={}, transactionDate={}", 
+                request.getStudentId(), request.getCourseId(), request.getTransactionDate());
+    } else {
+        // 如果没有指定缴费日期，使用当前日期
+        paymentRecord.setTransactionDate(LocalDate.now());
+        log.info("未指定缴费日期，使用当前日期: studentId={}, courseId={}, transactionDate={}", 
+                request.getStudentId(), request.getCourseId(), LocalDate.now());
+    }
 
     Long paymentId = studentPaymentModel.createPayment(paymentRecord);
 

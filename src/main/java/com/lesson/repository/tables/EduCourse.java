@@ -20,7 +20,6 @@ import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row15;
 import org.jooq.Row16;
 import org.jooq.Schema;
 import org.jooq.Table;
@@ -173,7 +172,7 @@ public class EduCourse extends TableImpl<EduCourseRecord> {
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.EDU_COURSE_IDX_CAMPUS_ID, Indexes.EDU_COURSE_IDX_INSTITUTION_ID, Indexes.EDU_COURSE_IDX_NAME, Indexes.EDU_COURSE_IDX_STATUS, Indexes.EDU_COURSE_IDX_TYPE_ID);
+        return Arrays.<Index>asList(Indexes.EDU_COURSE_IDX_CAMPUS_ID, Indexes.EDU_COURSE_IDX_INSTITUTION_ID, Indexes.EDU_COURSE_IDX_IS_MULTI_TEACHER, Indexes.EDU_COURSE_IDX_NAME, Indexes.EDU_COURSE_IDX_STATUS, Indexes.EDU_COURSE_IDX_TYPE_ID);
     }
 
     @Override
@@ -218,7 +217,7 @@ public class EduCourse extends TableImpl<EduCourseRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row15 type methods
+    // Row16 type methods
     // -------------------------------------------------------------------------
 
     @Override

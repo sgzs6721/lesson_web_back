@@ -127,7 +127,7 @@ public class SysCoachCourse extends TableImpl<SysCoachCourseRecord> {
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.SYS_COACH_COURSE_IDX_COACH_ID, Indexes.SYS_COACH_COURSE_IDX_COURSE_ID);
+        return Arrays.<Index>asList(Indexes.SYS_COACH_COURSE_IDX_COACH_FEE, Indexes.SYS_COACH_COURSE_IDX_COACH_ID, Indexes.SYS_COACH_COURSE_IDX_COURSE_ID);
     }
 
     @Override
@@ -155,18 +155,28 @@ public class SysCoachCourse extends TableImpl<SysCoachCourseRecord> {
         return new SysCoachCourse(alias, this);
     }
 
+    /**
+     * Rename this table
+     */
     @Override
     public SysCoachCourse rename(String name) {
         return new SysCoachCourse(DSL.name(name), null);
     }
 
+    /**
+     * Rename this table
+     */
     @Override
     public SysCoachCourse rename(Name name) {
         return new SysCoachCourse(name, null);
     }
 
+    // -------------------------------------------------------------------------
+    // Row7 type methods
+    // -------------------------------------------------------------------------
+
     @Override
     public Row7<Long, Long, Long, BigDecimal, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
-        return (Row7<Long, Long, Long, BigDecimal, LocalDateTime, LocalDateTime, Integer>) super.fieldsRow();
+        return (Row7) super.fieldsRow();
     }
-} 
+}

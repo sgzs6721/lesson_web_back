@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 
 import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record15;
-import org.jooq.Row15;
+import org.jooq.Record18;
+import org.jooq.Row18;
 import org.jooq.impl.UpdatableRecordImpl;
 
 
@@ -20,7 +20,7 @@ import org.jooq.impl.UpdatableRecordImpl;
  * 教练表
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class SysCoachRecord extends UpdatableRecordImpl<SysCoachRecord> implements Record15<Long, String, String, Integer, String, String, String, LocalDate, Integer, String, Long, Long, LocalDateTime, LocalDateTime, Integer> {
+public class SysCoachRecord extends UpdatableRecordImpl<SysCoachRecord> implements Record18<Long, String, String, String, Integer, String, String, String, String, LocalDate, LocalDate, Integer, String, Long, Long, LocalDateTime, LocalDateTime, Integer> {
 
     private static final long serialVersionUID = 1L;
 
@@ -67,171 +67,213 @@ public class SysCoachRecord extends UpdatableRecordImpl<SysCoachRecord> implemen
     }
 
     /**
+     * Setter for <code>lesson_prod.sys_coach.work_type</code>. 工作类型：FULL_TIME-全职，PART_TIME-兼职
+     */
+    public void setWorkType(String value) {
+        set(3, value);
+    }
+
+    /**
+     * Getter for <code>lesson_prod.sys_coach.work_type</code>. 工作类型：FULL_TIME-全职，PART_TIME-兼职
+     */
+    public String getWorkType() {
+        return (String) get(3);
+    }
+
+    /**
      * Setter for <code>lesson_prod.sys_coach.age</code>. 年龄
      */
     public void setAge(Integer value) {
-        set(3, value);
+        set(4, value);
     }
 
     /**
      * Getter for <code>lesson_prod.sys_coach.age</code>. 年龄
      */
     public Integer getAge() {
-        return (Integer) get(3);
+        return (Integer) get(4);
     }
 
     /**
      * Setter for <code>lesson_prod.sys_coach.phone</code>. 联系电话
      */
     public void setPhone(String value) {
-        set(4, value);
+        set(5, value);
     }
 
     /**
      * Getter for <code>lesson_prod.sys_coach.phone</code>. 联系电话
      */
     public String getPhone() {
-        return (String) get(4);
+        return (String) get(5);
+    }
+
+    /**
+     * Setter for <code>lesson_prod.sys_coach.id_number</code>. 身份证号
+     */
+    public void setIdNumber(String value) {
+        set(6, value);
+    }
+
+    /**
+     * Getter for <code>lesson_prod.sys_coach.id_number</code>. 身份证号
+     */
+    public String getIdNumber() {
+        return (String) get(6);
     }
 
     /**
      * Setter for <code>lesson_prod.sys_coach.avatar</code>. 头像URL
      */
     public void setAvatar(String value) {
-        set(5, value);
+        set(7, value);
     }
 
     /**
      * Getter for <code>lesson_prod.sys_coach.avatar</code>. 头像URL
      */
     public String getAvatar() {
-        return (String) get(5);
+        return (String) get(7);
     }
 
     /**
      * Setter for <code>lesson_prod.sys_coach.job_title</code>. 职位
      */
     public void setJobTitle(String value) {
-        set(6, value);
+        set(8, value);
     }
 
     /**
      * Getter for <code>lesson_prod.sys_coach.job_title</code>. 职位
      */
     public String getJobTitle() {
-        return (String) get(6);
+        return (String) get(8);
     }
 
     /**
      * Setter for <code>lesson_prod.sys_coach.hire_date</code>. 入职日期
      */
     public void setHireDate(LocalDate value) {
-        set(7, value);
+        set(9, value);
     }
 
     /**
      * Getter for <code>lesson_prod.sys_coach.hire_date</code>. 入职日期
      */
     public LocalDate getHireDate() {
-        return (LocalDate) get(7);
+        return (LocalDate) get(9);
+    }
+
+    /**
+     * Setter for <code>lesson_prod.sys_coach.coaching_date</code>. 执教日期
+     */
+    public void setCoachingDate(LocalDate value) {
+        set(10, value);
+    }
+
+    /**
+     * Getter for <code>lesson_prod.sys_coach.coaching_date</code>. 执教日期
+     */
+    public LocalDate getCoachingDate() {
+        return (LocalDate) get(10);
     }
 
     /**
      * Setter for <code>lesson_prod.sys_coach.experience</code>. 教龄(年)
      */
     public void setExperience(Integer value) {
-        set(8, value);
+        set(11, value);
     }
 
     /**
      * Getter for <code>lesson_prod.sys_coach.experience</code>. 教龄(年)
      */
     public Integer getExperience() {
-        return (Integer) get(8);
+        return (Integer) get(11);
     }
 
     /**
      * Setter for <code>lesson_prod.sys_coach.status</code>. 状态：在职/休假中/离职
      */
     public void setStatus(String value) {
-        set(9, value);
+        set(12, value);
     }
 
     /**
      * Getter for <code>lesson_prod.sys_coach.status</code>. 状态：在职/休假中/离职
      */
     public String getStatus() {
-        return (String) get(9);
+        return (String) get(12);
     }
 
     /**
      * Setter for <code>lesson_prod.sys_coach.campus_id</code>. 所属校区ID
      */
     public void setCampusId(Long value) {
-        set(10, value);
+        set(13, value);
     }
 
     /**
      * Getter for <code>lesson_prod.sys_coach.campus_id</code>. 所属校区ID
      */
     public Long getCampusId() {
-        return (Long) get(10);
+        return (Long) get(13);
     }
 
     /**
      * Setter for <code>lesson_prod.sys_coach.institution_id</code>. 所属机构ID
      */
     public void setInstitutionId(Long value) {
-        set(11, value);
+        set(14, value);
     }
 
     /**
      * Getter for <code>lesson_prod.sys_coach.institution_id</code>. 所属机构ID
      */
     public Long getInstitutionId() {
-        return (Long) get(11);
+        return (Long) get(14);
     }
 
     /**
      * Setter for <code>lesson_prod.sys_coach.created_time</code>. 创建时间
      */
     public void setCreatedTime(LocalDateTime value) {
-        set(12, value);
+        set(15, value);
     }
 
     /**
      * Getter for <code>lesson_prod.sys_coach.created_time</code>. 创建时间
      */
     public LocalDateTime getCreatedTime() {
-        return (LocalDateTime) get(12);
+        return (LocalDateTime) get(15);
     }
 
     /**
      * Setter for <code>lesson_prod.sys_coach.update_time</code>. 更新时间
      */
     public void setUpdateTime(LocalDateTime value) {
-        set(13, value);
+        set(16, value);
     }
 
     /**
      * Getter for <code>lesson_prod.sys_coach.update_time</code>. 更新时间
      */
     public LocalDateTime getUpdateTime() {
-        return (LocalDateTime) get(13);
+        return (LocalDateTime) get(16);
     }
 
     /**
      * Setter for <code>lesson_prod.sys_coach.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public void setDeleted(Integer value) {
-        set(14, value);
+        set(17, value);
     }
 
     /**
      * Getter for <code>lesson_prod.sys_coach.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public Integer getDeleted() {
-        return (Integer) get(14);
+        return (Integer) get(17);
     }
 
     // -------------------------------------------------------------------------
@@ -244,17 +286,17 @@ public class SysCoachRecord extends UpdatableRecordImpl<SysCoachRecord> implemen
     }
 
     // -------------------------------------------------------------------------
-    // Record15 type implementation
+    // Record18 type implementation
     // -------------------------------------------------------------------------
 
     @Override
-    public Row15<Long, String, String, Integer, String, String, String, LocalDate, Integer, String, Long, Long, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
-        return (Row15) super.fieldsRow();
+    public Row18<Long, String, String, String, Integer, String, String, String, String, LocalDate, LocalDate, Integer, String, Long, Long, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
+        return (Row18) super.fieldsRow();
     }
 
     @Override
-    public Row15<Long, String, String, Integer, String, String, String, LocalDate, Integer, String, Long, Long, LocalDateTime, LocalDateTime, Integer> valuesRow() {
-        return (Row15) super.valuesRow();
+    public Row18<Long, String, String, String, Integer, String, String, String, String, LocalDate, LocalDate, Integer, String, Long, Long, LocalDateTime, LocalDateTime, Integer> valuesRow() {
+        return (Row18) super.valuesRow();
     }
 
     @Override
@@ -273,62 +315,77 @@ public class SysCoachRecord extends UpdatableRecordImpl<SysCoachRecord> implemen
     }
 
     @Override
-    public Field<Integer> field4() {
+    public Field<String> field4() {
+        return SysCoach.SYS_COACH.WORK_TYPE;
+    }
+
+    @Override
+    public Field<Integer> field5() {
         return SysCoach.SYS_COACH.AGE;
     }
 
     @Override
-    public Field<String> field5() {
+    public Field<String> field6() {
         return SysCoach.SYS_COACH.PHONE;
     }
 
     @Override
-    public Field<String> field6() {
+    public Field<String> field7() {
+        return SysCoach.SYS_COACH.ID_NUMBER;
+    }
+
+    @Override
+    public Field<String> field8() {
         return SysCoach.SYS_COACH.AVATAR;
     }
 
     @Override
-    public Field<String> field7() {
+    public Field<String> field9() {
         return SysCoach.SYS_COACH.JOB_TITLE;
     }
 
     @Override
-    public Field<LocalDate> field8() {
+    public Field<LocalDate> field10() {
         return SysCoach.SYS_COACH.HIRE_DATE;
     }
 
     @Override
-    public Field<Integer> field9() {
+    public Field<LocalDate> field11() {
+        return SysCoach.SYS_COACH.COACHING_DATE;
+    }
+
+    @Override
+    public Field<Integer> field12() {
         return SysCoach.SYS_COACH.EXPERIENCE;
     }
 
     @Override
-    public Field<String> field10() {
+    public Field<String> field13() {
         return SysCoach.SYS_COACH.STATUS;
     }
 
     @Override
-    public Field<Long> field11() {
+    public Field<Long> field14() {
         return SysCoach.SYS_COACH.CAMPUS_ID;
     }
 
     @Override
-    public Field<Long> field12() {
+    public Field<Long> field15() {
         return SysCoach.SYS_COACH.INSTITUTION_ID;
     }
 
     @Override
-    public Field<LocalDateTime> field13() {
+    public Field<LocalDateTime> field16() {
         return SysCoach.SYS_COACH.CREATED_TIME;
     }
 
     @Override
-    public Field<LocalDateTime> field14() {
+    public Field<LocalDateTime> field17() {
         return SysCoach.SYS_COACH.UPDATE_TIME;
     }
 
     @Override
-    public Field<Integer> field15() {
+    public Field<Integer> field18() {
         return SysCoach.SYS_COACH.DELETED;
     }
 
@@ -348,62 +405,77 @@ public class SysCoachRecord extends UpdatableRecordImpl<SysCoachRecord> implemen
     }
 
     @Override
-    public Integer component4() {
+    public String component4() {
+        return getWorkType();
+    }
+
+    @Override
+    public Integer component5() {
         return getAge();
     }
 
     @Override
-    public String component5() {
+    public String component6() {
         return getPhone();
     }
 
     @Override
-    public String component6() {
+    public String component7() {
+        return getIdNumber();
+    }
+
+    @Override
+    public String component8() {
         return getAvatar();
     }
 
     @Override
-    public String component7() {
+    public String component9() {
         return getJobTitle();
     }
 
     @Override
-    public LocalDate component8() {
+    public LocalDate component10() {
         return getHireDate();
     }
 
     @Override
-    public Integer component9() {
+    public LocalDate component11() {
+        return getCoachingDate();
+    }
+
+    @Override
+    public Integer component12() {
         return getExperience();
     }
 
     @Override
-    public String component10() {
+    public String component13() {
         return getStatus();
     }
 
     @Override
-    public Long component11() {
+    public Long component14() {
         return getCampusId();
     }
 
     @Override
-    public Long component12() {
+    public Long component15() {
         return getInstitutionId();
     }
 
     @Override
-    public LocalDateTime component13() {
+    public LocalDateTime component16() {
         return getCreatedTime();
     }
 
     @Override
-    public LocalDateTime component14() {
+    public LocalDateTime component17() {
         return getUpdateTime();
     }
 
     @Override
-    public Integer component15() {
+    public Integer component18() {
         return getDeleted();
     }
 
@@ -423,62 +495,77 @@ public class SysCoachRecord extends UpdatableRecordImpl<SysCoachRecord> implemen
     }
 
     @Override
-    public Integer value4() {
+    public String value4() {
+        return getWorkType();
+    }
+
+    @Override
+    public Integer value5() {
         return getAge();
     }
 
     @Override
-    public String value5() {
+    public String value6() {
         return getPhone();
     }
 
     @Override
-    public String value6() {
+    public String value7() {
+        return getIdNumber();
+    }
+
+    @Override
+    public String value8() {
         return getAvatar();
     }
 
     @Override
-    public String value7() {
+    public String value9() {
         return getJobTitle();
     }
 
     @Override
-    public LocalDate value8() {
+    public LocalDate value10() {
         return getHireDate();
     }
 
     @Override
-    public Integer value9() {
+    public LocalDate value11() {
+        return getCoachingDate();
+    }
+
+    @Override
+    public Integer value12() {
         return getExperience();
     }
 
     @Override
-    public String value10() {
+    public String value13() {
         return getStatus();
     }
 
     @Override
-    public Long value11() {
+    public Long value14() {
         return getCampusId();
     }
 
     @Override
-    public Long value12() {
+    public Long value15() {
         return getInstitutionId();
     }
 
     @Override
-    public LocalDateTime value13() {
+    public LocalDateTime value16() {
         return getCreatedTime();
     }
 
     @Override
-    public LocalDateTime value14() {
+    public LocalDateTime value17() {
         return getUpdateTime();
     }
 
     @Override
-    public Integer value15() {
+    public Integer value18() {
         return getDeleted();
     }
 
@@ -501,79 +588,97 @@ public class SysCoachRecord extends UpdatableRecordImpl<SysCoachRecord> implemen
     }
 
     @Override
-    public SysCoachRecord value4(Integer value) {
+    public SysCoachRecord value4(String value) {
+        setWorkType(value);
+        return this;
+    }
+
+    @Override
+    public SysCoachRecord value5(Integer value) {
         setAge(value);
         return this;
     }
 
     @Override
-    public SysCoachRecord value5(String value) {
+    public SysCoachRecord value6(String value) {
         setPhone(value);
         return this;
     }
 
     @Override
-    public SysCoachRecord value6(String value) {
+    public SysCoachRecord value7(String value) {
+        setIdNumber(value);
+        return this;
+    }
+
+    @Override
+    public SysCoachRecord value8(String value) {
         setAvatar(value);
         return this;
     }
 
     @Override
-    public SysCoachRecord value7(String value) {
+    public SysCoachRecord value9(String value) {
         setJobTitle(value);
         return this;
     }
 
     @Override
-    public SysCoachRecord value8(LocalDate value) {
+    public SysCoachRecord value10(LocalDate value) {
         setHireDate(value);
         return this;
     }
 
     @Override
-    public SysCoachRecord value9(Integer value) {
+    public SysCoachRecord value11(LocalDate value) {
+        setCoachingDate(value);
+        return this;
+    }
+
+    @Override
+    public SysCoachRecord value12(Integer value) {
         setExperience(value);
         return this;
     }
 
     @Override
-    public SysCoachRecord value10(String value) {
+    public SysCoachRecord value13(String value) {
         setStatus(value);
         return this;
     }
 
     @Override
-    public SysCoachRecord value11(Long value) {
+    public SysCoachRecord value14(Long value) {
         setCampusId(value);
         return this;
     }
 
     @Override
-    public SysCoachRecord value12(Long value) {
+    public SysCoachRecord value15(Long value) {
         setInstitutionId(value);
         return this;
     }
 
     @Override
-    public SysCoachRecord value13(LocalDateTime value) {
+    public SysCoachRecord value16(LocalDateTime value) {
         setCreatedTime(value);
         return this;
     }
 
     @Override
-    public SysCoachRecord value14(LocalDateTime value) {
+    public SysCoachRecord value17(LocalDateTime value) {
         setUpdateTime(value);
         return this;
     }
 
     @Override
-    public SysCoachRecord value15(Integer value) {
+    public SysCoachRecord value18(Integer value) {
         setDeleted(value);
         return this;
     }
 
     @Override
-    public SysCoachRecord values(Long value1, String value2, String value3, Integer value4, String value5, String value6, String value7, LocalDate value8, Integer value9, String value10, Long value11, Long value12, LocalDateTime value13, LocalDateTime value14, Integer value15) {
+    public SysCoachRecord values(Long value1, String value2, String value3, String value4, Integer value5, String value6, String value7, String value8, String value9, LocalDate value10, LocalDate value11, Integer value12, String value13, Long value14, Long value15, LocalDateTime value16, LocalDateTime value17, Integer value18) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -589,6 +694,9 @@ public class SysCoachRecord extends UpdatableRecordImpl<SysCoachRecord> implemen
         value13(value13);
         value14(value14);
         value15(value15);
+        value16(value16);
+        value17(value17);
+        value18(value18);
         return this;
     }
 
@@ -606,17 +714,20 @@ public class SysCoachRecord extends UpdatableRecordImpl<SysCoachRecord> implemen
     /**
      * Create a detached, initialised SysCoachRecord
      */
-    public SysCoachRecord(Long id, String name, String gender, Integer age, String phone, String avatar, String jobTitle, LocalDate hireDate, Integer experience, String status, Long campusId, Long institutionId, LocalDateTime createdTime, LocalDateTime updateTime, Integer deleted) {
+    public SysCoachRecord(Long id, String name, String gender, String workType, Integer age, String phone, String idNumber, String avatar, String jobTitle, LocalDate hireDate, LocalDate coachingDate, Integer experience, String status, Long campusId, Long institutionId, LocalDateTime createdTime, LocalDateTime updateTime, Integer deleted) {
         super(SysCoach.SYS_COACH);
 
         setId(id);
         setName(name);
         setGender(gender);
+        setWorkType(workType);
         setAge(age);
         setPhone(phone);
+        setIdNumber(idNumber);
         setAvatar(avatar);
         setJobTitle(jobTitle);
         setHireDate(hireDate);
+        setCoachingDate(coachingDate);
         setExperience(experience);
         setStatus(status);
         setCampusId(campusId);

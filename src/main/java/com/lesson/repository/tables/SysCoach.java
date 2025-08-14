@@ -20,7 +20,7 @@ import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row15;
+import org.jooq.Row18;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -68,9 +68,9 @@ public class SysCoach extends TableImpl<SysCoachRecord> {
     public final TableField<SysCoachRecord, String> GENDER = createField(DSL.name("gender"), SQLDataType.VARCHAR(20).nullable(false), this, "性别");
 
     /**
-     * The column <code>lesson_prod.sys_coach.work_type</code>. 工作类型：FULLTIME-全职，PARTTIME-兼职
+     * The column <code>lesson_prod.sys_coach.work_type</code>. 工作类型：FULL_TIME-全职，PART_TIME-兼职
      */
-    public final TableField<SysCoachRecord, String> WORK_TYPE = createField(DSL.name("work_type"), SQLDataType.VARCHAR(20).nullable(false).defaultValue(DSL.inline("FULLTIME", SQLDataType.VARCHAR)), this, "工作类型：FULLTIME-全职，PARTTIME-兼职");
+    public final TableField<SysCoachRecord, String> WORK_TYPE = createField(DSL.name("work_type"), SQLDataType.VARCHAR(20).nullable(false).defaultValue(DSL.inline("FULL_TIME", SQLDataType.VARCHAR)), this, "工作类型：FULL_TIME-全职，PART_TIME-兼职");
 
     /**
      * The column <code>lesson_prod.sys_coach.age</code>. 年龄
@@ -182,7 +182,7 @@ public class SysCoach extends TableImpl<SysCoachRecord> {
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.SYS_COACH_IDX_CAMPUS_ID, Indexes.SYS_COACH_IDX_CREATED_TIME, Indexes.SYS_COACH_IDX_INSTITUTION_ID, Indexes.SYS_COACH_IDX_JOB_TITLE, Indexes.SYS_COACH_IDX_NAME, Indexes.SYS_COACH_IDX_PHONE, Indexes.SYS_COACH_IDX_STATUS);
+        return Arrays.<Index>asList(Indexes.SYS_COACH_IDX_CAMPUS_ID, Indexes.SYS_COACH_IDX_COACHING_DATE, Indexes.SYS_COACH_IDX_CREATED_TIME, Indexes.SYS_COACH_IDX_ID_NUMBER, Indexes.SYS_COACH_IDX_INSTITUTION_ID, Indexes.SYS_COACH_IDX_JOB_TITLE, Indexes.SYS_COACH_IDX_NAME, Indexes.SYS_COACH_IDX_PHONE, Indexes.SYS_COACH_IDX_STATUS, Indexes.SYS_COACH_IDX_WORK_TYPE);
     }
 
     @Override
@@ -197,7 +197,7 @@ public class SysCoach extends TableImpl<SysCoachRecord> {
 
     @Override
     public List<UniqueKey<SysCoachRecord>> getKeys() {
-        return Arrays.<UniqueKey<SysCoachRecord>>asList(Keys.KEY_SYS_COACH_PRIMARY);
+        return Arrays.<UniqueKey<SysCoachRecord>>asList(Keys.KEY_SYS_COACH_PRIMARY, Keys.KEY_SYS_COACH_UK_ID_NUMBER_DELETED);
     }
 
     @Override
@@ -227,11 +227,11 @@ public class SysCoach extends TableImpl<SysCoachRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row15 type methods
+    // Row18 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row15<Long, String, String, Integer, String, String, String, LocalDate, Integer, String, Long, Long, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
-        return (Row15) super.fieldsRow();
+    public Row18<Long, String, String, String, Integer, String, String, String, String, LocalDate, LocalDate, Integer, String, Long, Long, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
+        return (Row18) super.fieldsRow();
     }
 }

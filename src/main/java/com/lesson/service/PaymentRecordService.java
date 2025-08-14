@@ -12,6 +12,7 @@ import org.jooq.SelectConditionStep;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ import java.util.List;
 import static org.jooq.impl.DSL.field;
 import static org.jooq.impl.DSL.sum;
 import static org.jooq.impl.DSL.count;
+import org.jooq.impl.DSL;
 import com.lesson.repository.Tables;
 import org.springframework.util.CollectionUtils;
 import com.lesson.enums.PaymentType;
@@ -119,20 +121,34 @@ public class PaymentRecordService {
                 try {
             PaymentRecordListVO.Item item = new PaymentRecordListVO.Item();
                     
-                    // 安全处理时间字段，添加详细调试信息
-                    Object rawCreatedTime = r.get(Tables.EDU_STUDENT_PAYMENT.CREATED_TIME);
-                    log.debug("缴费记录ID[{}]原始时间字段值: {} (类型: {})", 
-                             r.get(Tables.EDU_STUDENT_PAYMENT.ID), rawCreatedTime, 
-                             rawCreatedTime != null ? rawCreatedTime.getClass().getName() : "null");
+                    // 优先使用缴费日期（transaction_date），如果没有则使用创建时间
+                    Object rawTransactionDate = r.get(Tables.EDU_STUDENT_PAYMENT.TRANSACTION_DATE);
+                    log.debug("缴费记录ID[{}]原始缴费日期字段值: {} (类型: {})", 
+                             r.get(Tables.EDU_STUDENT_PAYMENT.ID), rawTransactionDate, 
+                             rawTransactionDate != null ? rawTransactionDate.getClass().getName() : "null");
                     
-                    LocalDateTime createdTime = r.get(Tables.EDU_STUDENT_PAYMENT.CREATED_TIME, LocalDateTime.class);
-                    if (createdTime != null) {
-                        item.setDate(createdTime.format(dateFormatter));
-                        log.debug("缴费记录ID[{}]解析后时间: {}", r.get(Tables.EDU_STUDENT_PAYMENT.ID), createdTime);
+                    LocalDate transactionDate = r.get(Tables.EDU_STUDENT_PAYMENT.TRANSACTION_DATE, LocalDate.class);
+                    if (transactionDate != null) {
+                        item.setDate(transactionDate.format(dateFormatter));
+                        log.debug("缴费记录ID[{}]使用缴费日期: {}", r.get(Tables.EDU_STUDENT_PAYMENT.ID), transactionDate);
                     } else {
-                        // 如果created_time为null，尝试从其他字段获取时间信息
-                        log.warn("缴费记录ID[{}]的created_time为null，使用当前时间", r.get(Tables.EDU_STUDENT_PAYMENT.ID));
-                        item.setDate(LocalDateTime.now().format(dateFormatter));
+                        // 如果缴费日期为null，降级使用创建时间
+                        log.debug("缴费记录ID[{}]缴费日期为null，降级使用创建时间", r.get(Tables.EDU_STUDENT_PAYMENT.ID));
+                        
+                        Object rawCreatedTime = r.get(Tables.EDU_STUDENT_PAYMENT.CREATED_TIME);
+                        log.debug("缴费记录ID[{}]原始创建时间字段值: {} (类型: {})", 
+                                 r.get(Tables.EDU_STUDENT_PAYMENT.ID), rawCreatedTime, 
+                                 rawCreatedTime != null ? rawCreatedTime.getClass().getName() : "null");
+                        
+                        LocalDateTime createdTime = r.get(Tables.EDU_STUDENT_PAYMENT.CREATED_TIME, LocalDateTime.class);
+                        if (createdTime != null) {
+                            item.setDate(createdTime.format(dateFormatter));
+                            log.debug("缴费记录ID[{}]使用创建时间: {}", r.get(Tables.EDU_STUDENT_PAYMENT.ID), createdTime);
+                        } else {
+                            // 如果创建时间也为null，使用当前时间
+                            log.warn("缴费记录ID[{}]的创建时间也为null，使用当前时间", r.get(Tables.EDU_STUDENT_PAYMENT.ID));
+                            item.setDate(LocalDateTime.now().format(dateFormatter));
+                        }
                     }
                     
                     item.setStudent(r.get(Tables.EDU_STUDENT.NAME));

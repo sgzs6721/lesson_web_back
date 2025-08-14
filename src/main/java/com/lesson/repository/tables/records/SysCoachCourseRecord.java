@@ -137,12 +137,12 @@ public class SysCoachCourseRecord extends UpdatableRecordImpl<SysCoachCourseReco
 
     @Override
     public Row7<Long, Long, Long, BigDecimal, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
-        return (Row7<Long, Long, Long, BigDecimal, LocalDateTime, LocalDateTime, Integer>) super.fieldsRow();
+        return (Row7) super.fieldsRow();
     }
 
     @Override
     public Row7<Long, Long, Long, BigDecimal, LocalDateTime, LocalDateTime, Integer> valuesRow() {
-        return (Row7<Long, Long, Long, BigDecimal, LocalDateTime, LocalDateTime, Integer>) super.valuesRow();
+        return (Row7) super.valuesRow();
     }
 
     @Override
@@ -329,4 +329,4 @@ public class SysCoachCourseRecord extends UpdatableRecordImpl<SysCoachCourseReco
         setUpdateTime(updateTime);
         setDeleted(deleted);
     }
-} 
+}
