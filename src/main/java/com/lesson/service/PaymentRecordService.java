@@ -12,6 +12,7 @@ import org.jooq.SelectConditionStep;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -86,6 +87,22 @@ public class PaymentRecordService {
                     .fetchOne(0, Long.class);
 
             log.info("查询到总记录数：{}", total);
+            
+            // 添加调试信息：检查第一条记录的时间字段
+            if (total > 0) {
+                Record firstRecord = dsl.select(Tables.EDU_STUDENT_PAYMENT.ID, Tables.EDU_STUDENT_PAYMENT.CREATED_TIME)
+                    .from(Tables.EDU_STUDENT_PAYMENT)
+                    .where(listConditions)
+                    .limit(1)
+                    .fetchOne();
+                if (firstRecord != null) {
+                    Object rawTime = firstRecord.get(Tables.EDU_STUDENT_PAYMENT.CREATED_TIME);
+                    log.info("第一条记录时间字段调试 - ID: {}, 原始值: {}, 类型: {}", 
+                             firstRecord.get(Tables.EDU_STUDENT_PAYMENT.ID),
+                             rawTime,
+                             rawTime != null ? rawTime.getClass().getName() : "null");
+                }
+            }
 
         List<Record> records = query
                     .orderBy(Tables.EDU_STUDENT_PAYMENT.CREATED_TIME.desc())
@@ -101,7 +118,23 @@ public class PaymentRecordService {
         for (Record r : records) {
                 try {
             PaymentRecordListVO.Item item = new PaymentRecordListVO.Item();
-                    item.setDate(r.get(Tables.EDU_STUDENT_PAYMENT.CREATED_TIME).format(dateFormatter));
+                    
+                    // 安全处理时间字段，添加详细调试信息
+                    Object rawCreatedTime = r.get(Tables.EDU_STUDENT_PAYMENT.CREATED_TIME);
+                    log.debug("缴费记录ID[{}]原始时间字段值: {} (类型: {})", 
+                             r.get(Tables.EDU_STUDENT_PAYMENT.ID), rawCreatedTime, 
+                             rawCreatedTime != null ? rawCreatedTime.getClass().getName() : "null");
+                    
+                    LocalDateTime createdTime = r.get(Tables.EDU_STUDENT_PAYMENT.CREATED_TIME, LocalDateTime.class);
+                    if (createdTime != null) {
+                        item.setDate(createdTime.format(dateFormatter));
+                        log.debug("缴费记录ID[{}]解析后时间: {}", r.get(Tables.EDU_STUDENT_PAYMENT.ID), createdTime);
+                    } else {
+                        // 如果created_time为null，尝试从其他字段获取时间信息
+                        log.warn("缴费记录ID[{}]的created_time为null，使用当前时间", r.get(Tables.EDU_STUDENT_PAYMENT.ID));
+                        item.setDate(LocalDateTime.now().format(dateFormatter));
+                    }
+                    
                     item.setStudent(r.get(Tables.EDU_STUDENT.NAME));
                     item.setCourse(r.get(Tables.EDU_COURSE.NAME));
                     item.setAmount(r.get(Tables.EDU_STUDENT_PAYMENT.AMOUNT).toPlainString());

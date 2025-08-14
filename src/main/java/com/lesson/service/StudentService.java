@@ -1046,6 +1046,19 @@ public class StudentService {
       studentCourse.setConsumedHours(studentCourse.getConsumedHours().add(hoursConsumed));
       studentCourse.setUpdateTime(LocalDateTime.now());
       
+      // 检查是否是第一次消课，如果是则需要设置endDate
+      if (studentCourse.getEndDate() == null) {
+        // 第一次消课，需要设置endDate为消课日期+有效期
+        // 从缴费记录中获取有效期信息
+        LocalDate endDate = calculateEndDateFromFirstPayment(request.getStudentId(), request.getCourseId(), request.getCourseDate());
+        if (endDate != null) {
+          studentCourse.setEndDate(endDate);
+          log.info("学员[{}]第一次消课，设置endDate为: {}", request.getStudentId(), endDate);
+        } else {
+          log.warn("学员[{}]第一次消课，但未找到缴费记录的有效期信息", request.getStudentId());
+        }
+      }
+      
       // 检查剩余课时
       BigDecimal remainingHours = studentCourse.getTotalHours().subtract(studentCourse.getConsumedHours());
       
@@ -1410,11 +1423,23 @@ public class StudentService {
 
     // 4. 更新学员课程信息 (edu_student_course)
     // - 增加总课时 (正课 + 赠送)
-    // - 更新有效期
+    // - 更新有效期：未开始消课时endDate为null，开始消课后为消课日期+有效期
     // - 如果是续费且原状态是GRADUATED/EXPIRED等，可能需要重置为STUDYING
     BigDecimal addedTotalHours = request.getCourseHours().add(request.getGiftHours());
     studentCourse.setTotalHours(studentCourse.getTotalHours().add(addedTotalHours));
-    studentCourse.setEndDate(validUntil); // 使用计算后的有效期
+    
+    // 如果学员还没有开始消课，endDate设为null；如果已经开始消课，设为消课日期+有效期
+    if (studentCourse.getConsumedHours() == null || studentCourse.getConsumedHours().compareTo(BigDecimal.ZERO) == 0) {
+        // 未开始消课，endDate设为null
+        studentCourse.setEndDate(null);
+        log.info("学员未开始消课，设置endDate为null: studentId={}, courseId={}", 
+                request.getStudentId(), request.getCourseId());
+    } else {
+        // 已经开始消课，endDate设为消课日期+有效期
+        studentCourse.setEndDate(validUntil);
+        log.info("学员已开始消课，设置endDate为: studentId={}, courseId={}, endDate={}", 
+                request.getStudentId(), request.getCourseId(), validUntil);
+    }
     
     log.info("设置学员课程有效期: studentId={}, courseId={}, validityPeriodId={}, endDate={}", 
             request.getStudentId(), request.getCourseId(), request.getValidityPeriodId(), studentCourse.getEndDate());
@@ -1460,6 +1485,12 @@ public class StudentService {
     // 设置总课时和有效期
     response.setTotalHours(studentCourse.getTotalHours().toString());
     response.setValidityPeriodId(request.getValidityPeriodId());
+    
+    // 计算有效期月数
+    Integer validityPeriodMonths = calculateValidityPeriodMonths(request.getValidityPeriodId());
+    response.setValidityPeriodMonths(validityPeriodMonths);
+    
+    // 设置有效期至（如果endDate为null，则validUntil也为null）
     response.setValidUntil(studentCourse.getEndDate() != null ? studentCourse.getEndDate().toString() : null);
 
     return response;
@@ -1516,6 +1547,97 @@ public class StudentService {
     } else {
       // 默认一年有效期
       return LocalDate.now().plusYears(1);
+    }
+  }
+
+  /**
+   * 根据有效期常量ID计算有效期月数
+   *
+   * @param validityPeriodId 有效期常量ID
+   * @return 有效期月数
+   */
+  private Integer calculateValidityPeriodMonths(Long validityPeriodId) {
+    if (validityPeriodId == null) {
+      // 默认12个月
+      return 12;
+    }
+
+    // 查询该常量ID对应的常量值
+    String constantValue = dsl.select(Tables.SYS_CONSTANT.CONSTANT_VALUE)
+        .from(Tables.SYS_CONSTANT)
+        .where(Tables.SYS_CONSTANT.ID.eq(validityPeriodId))
+        .and(Tables.SYS_CONSTANT.TYPE.eq(ConstantType.VALIDITY_PERIOD.getName()))
+        .fetchOneInto(String.class);
+
+    if (constantValue == null) {
+      // 如果没有找到对应的常量值，默认12个月
+      return 12;
+    }
+    
+    // 根据常量值确定有效期月数
+    if (constantValue.contains("1个月")) {
+      return 1;
+    } else if (constantValue.contains("3个月")) {
+      return 3;
+    } else if (constantValue.contains("6个月")) {
+      return 6;
+    } else if (constantValue.contains("1年")) {
+      return 12;
+    } else if (constantValue.contains("2年")) {
+      return 24;
+    } else if (constantValue.contains("3年")) {
+      return 36;
+    } else if (constantValue.contains("永久")) {
+      // 永久有效期返回-1表示永久
+      return -1;
+    } else {
+      // 默认12个月
+      return 12;
+    }
+  }
+
+  /**
+   * 根据学员的缴费记录计算第一次消课时的有效期
+   *
+   * @param studentId 学员ID
+   * @param courseId 课程ID
+   * @param courseDate 消课日期
+   * @return 计算后的有效期结束日期，如果未找到缴费记录则返回null
+   */
+  private LocalDate calculateEndDateFromFirstPayment(Long studentId, Long courseId, LocalDate courseDate) {
+    try {
+      // 查询该学员该课程的最新缴费记录的有效期
+      LocalDate validUntil = dsl.select(Tables.EDU_STUDENT_PAYMENT.VALID_UNTIL)
+          .from(Tables.EDU_STUDENT_PAYMENT)
+          .where(Tables.EDU_STUDENT_PAYMENT.STUDENT_ID.eq(studentId.toString()))
+          .and(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.eq(courseId.toString()))
+          .and(Tables.EDU_STUDENT_PAYMENT.DELETED.eq(0))
+          .orderBy(Tables.EDU_STUDENT_PAYMENT.CREATED_TIME.desc())
+          .limit(1)
+          .fetchOneInto(LocalDate.class);
+
+      if (validUntil == null) {
+        log.warn("未找到学员[{}]课程[{}]的缴费记录", studentId, courseId);
+        return null;
+      }
+
+      // 计算从消课日期到有效期的剩余天数
+      long daysBetween = java.time.temporal.ChronoUnit.DAYS.between(courseDate, validUntil);
+      
+      if (daysBetween <= 0) {
+        log.warn("学员[{}]课程[{}]的有效期[{}]已过期，消课日期[{}]", studentId, courseId, validUntil, courseDate);
+        return null;
+      }
+
+      // 返回有效期结束日期（保持不变，因为这是从缴费记录中获取的）
+      log.info("学员[{}]课程[{}]消课日期[{}]，缴费记录有效期[{}]，剩余天数[{}]", 
+               studentId, courseId, courseDate, validUntil, daysBetween);
+      
+      return validUntil;
+      
+    } catch (Exception e) {
+      log.error("计算学员[{}]课程[{}]的有效期时发生错误", studentId, courseId, e);
+      return null;
     }
   }
 

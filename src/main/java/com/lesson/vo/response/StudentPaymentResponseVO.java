@@ -25,6 +25,9 @@ public class StudentPaymentResponseVO {
     @Schema(description = "有效期常量ID", example = "1")
     private Long validityPeriodId;
     
+    @Schema(description = "有效期月数", example = "12")
+    private Integer validityPeriodMonths;
+    
     @Schema(description = "有效期至", example = "2025-12-31")
     private String validUntil;
 } 
