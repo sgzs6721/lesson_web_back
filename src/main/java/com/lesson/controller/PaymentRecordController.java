@@ -18,9 +18,9 @@ public class PaymentRecordController {
 
     private final PaymentRecordService paymentRecordService;
 
-    @PostMapping("/list")
+    @GetMapping("/list")
     @Operation(summary = "缴费记录列表", description = "分页查询缴费记录")
-    public Result<PaymentRecordListVO> list(@RequestBody PaymentRecordQueryRequest request) {
+    public Result<PaymentRecordListVO> list(@ModelAttribute PaymentRecordQueryRequest request) {
         return Result.success(paymentRecordService.listPaymentRecords(request));
     }
 
