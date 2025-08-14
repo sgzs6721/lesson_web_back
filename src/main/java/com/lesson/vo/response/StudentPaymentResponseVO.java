@@ -22,8 +22,8 @@ public class StudentPaymentResponseVO {
     @Schema(description = "总课时数", example = "20.0")
     private String totalHours;
 
-    @Schema(description = "有效期（月数）", example = "12")
-    private Integer validityPeriod;
+    @Schema(description = "有效期常量ID", example = "1")
+    private Long validityPeriodId;
     
     @Schema(description = "有效期至", example = "2025-12-31")
     private String validUntil;

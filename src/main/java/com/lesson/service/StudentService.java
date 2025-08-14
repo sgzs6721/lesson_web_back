@@ -1397,8 +1397,8 @@ public class StudentService {
     paymentRecord.setPaymentMethod(request.getPaymentMethod().name());
     paymentRecord.setCourseHours(request.getCourseHours());
     paymentRecord.setGiftHours(request.getGiftHours());
-    // 计算有效期结束日期：当前日期 + 有效期月数
-    LocalDate validUntil = LocalDate.now().plusMonths(request.getValidityPeriod());
+    // 根据有效期常量ID计算有效期结束日期
+    LocalDate validUntil = calculateEndDateFromConstantType(request.getValidityPeriodId());
     paymentRecord.setValidUntil(validUntil);
     paymentRecord.setGiftItems(giftItemsDbString); // 存储转换后的字符串
     paymentRecord.setNotes(request.getNotes());
@@ -1416,8 +1416,8 @@ public class StudentService {
     studentCourse.setTotalHours(studentCourse.getTotalHours().add(addedTotalHours));
     studentCourse.setEndDate(validUntil); // 使用计算后的有效期
     
-    log.info("设置学员课程有效期: studentId={}, courseId={}, validityPeriod={}个月, endDate={}", 
-            request.getStudentId(), request.getCourseId(), request.getValidityPeriod(), studentCourse.getEndDate());
+    log.info("设置学员课程有效期: studentId={}, courseId={}, validityPeriodId={}, endDate={}", 
+            request.getStudentId(), request.getCourseId(), request.getValidityPeriodId(), studentCourse.getEndDate());
 
     // 更新课程状态为学习中（缴费后直接进入学习状态）
     studentCourse.setStatus(StudentCourseStatus.STUDYING.getName());
@@ -1459,7 +1459,7 @@ public class StudentService {
     
     // 设置总课时和有效期
     response.setTotalHours(studentCourse.getTotalHours().toString());
-    response.setValidityPeriod(request.getValidityPeriod());
+    response.setValidityPeriodId(request.getValidityPeriodId());
     response.setValidUntil(studentCourse.getEndDate() != null ? studentCourse.getEndDate().toString() : null);
 
     return response;
@@ -1471,6 +1471,52 @@ public class StudentService {
                   .where(Tables.EDU_STUDENT.ID.eq(studentId)
                          .and(Tables.EDU_STUDENT.DELETED.eq(0)))
                   .fetchOne();
+  }
+
+  /**
+   * 根据有效期常量ID计算结束日期
+   *
+   * @param validityPeriodId 有效期常量ID
+   * @return 计算后的结束日期
+   */
+  private LocalDate calculateEndDateFromConstantType(Long validityPeriodId) {
+    if (validityPeriodId == null) {
+      // 默认一年有效期
+      return LocalDate.now().plusYears(1);
+    }
+
+    // 查询该常量ID对应的常量值
+    String constantValue = dsl.select(Tables.SYS_CONSTANT.CONSTANT_VALUE)
+        .from(Tables.SYS_CONSTANT)
+        .where(Tables.SYS_CONSTANT.ID.eq(validityPeriodId))
+        .and(Tables.SYS_CONSTANT.TYPE.eq(ConstantType.VALIDITY_PERIOD.getName()))
+        .fetchOneInto(String.class);
+
+    if (constantValue == null) {
+      // 如果没有找到对应的常量值，默认一年有效期
+      return LocalDate.now().plusYears(1);
+    }
+
+    // 根据常量值确定有效期
+    if (constantValue.contains("1个月")) {
+      return LocalDate.now().plusMonths(1);
+    } else if (constantValue.contains("3个月")) {
+      return LocalDate.now().plusMonths(3);
+    } else if (constantValue.contains("6个月")) {
+      return LocalDate.now().plusMonths(6);
+    } else if (constantValue.contains("1年")) {
+      return LocalDate.now().plusYears(1);
+    } else if (constantValue.contains("2年")) {
+      return LocalDate.now().plusYears(2);
+    } else if (constantValue.contains("3年")) {
+      return LocalDate.now().plusYears(3);
+    } else if (constantValue.contains("永久")) {
+      // 永久有效期设置为100年
+      return LocalDate.now().plusYears(100);
+    } else {
+      // 默认一年有效期
+      return LocalDate.now().plusYears(1);
+    }
   }
 
   /**

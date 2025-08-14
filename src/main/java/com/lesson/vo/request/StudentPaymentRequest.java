@@ -60,8 +60,8 @@ public class StudentPaymentRequest {
     private BigDecimal giftHours = BigDecimal.ZERO; // 默认为0
 
     @NotNull(message = "有效期不能为空")
-    @ApiModelProperty(value = "课程有效期（月数）", required = true, example = "12")
-    private Integer validityPeriod;
+    @ApiModelProperty(value = "有效期常量ID（关联sys_constant表，类型为VALIDITY_PERIOD）", required = true, example = "1")
+    private Long validityPeriodId;
 
     @ApiModelProperty(value = "赠品常量ID列表", example = "[1, 2, 3]")
     private List<Long> giftItems;
