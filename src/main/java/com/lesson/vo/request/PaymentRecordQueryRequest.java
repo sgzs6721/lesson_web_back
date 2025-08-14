@@ -9,6 +9,9 @@ import com.lesson.enums.PaymentType;
 @Data
 @Schema(description = "缴费记录查询参数")
 public class PaymentRecordQueryRequest {
+    @Schema(description = "学员ID", example = "1001")
+    private Long studentId;
+
     @Schema(description = "学员名/ID/课程，支持模糊搜索", example = "张小明")
     private String keyword;
 

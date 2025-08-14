@@ -61,6 +61,9 @@ public class PaymentRecordService {
         if (request.getPayType() != null && !request.getPayType().isEmpty()) {
                 listConditions = listConditions.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_METHOD.eq(request.getPayType()));
         }
+        if (request.getStudentId() != null) {
+                listConditions = listConditions.and(Tables.EDU_STUDENT_PAYMENT.STUDENT_ID.eq(request.getStudentId().toString()));
+        }
         if (request.getCampusId() != null) {
                 listConditions = listConditions.and(Tables.EDU_STUDENT_PAYMENT.CAMPUS_ID.eq(request.getCampusId()));
         }
@@ -204,6 +207,9 @@ public class PaymentRecordService {
         }
         if (request.getPayType() != null && !request.getPayType().isEmpty()) {
             baseCondition = baseCondition.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_METHOD.eq(request.getPayType()));
+        }
+        if (request.getStudentId() != null) {
+            baseCondition = baseCondition.and(Tables.EDU_STUDENT_PAYMENT.STUDENT_ID.eq(request.getStudentId().toString()));
         }
         if (request.getCampusId() != null) {
             baseCondition = baseCondition.and(Tables.EDU_STUDENT_PAYMENT.CAMPUS_ID.eq(request.getCampusId()));
