@@ -252,52 +252,30 @@ public class PaymentRecordService {
 
         log.info("构建的统计查询条件：{}", baseCondition);
         
-        // 先检查数据库中是否有缴费记录
-        long totalRecords = dsl.selectCount()
-                .from(Tables.EDU_STUDENT_PAYMENT)
-                .where(Tables.EDU_STUDENT_PAYMENT.DELETED.eq(0))
-                .fetchOne(0, Long.class);
-        log.info("数据库中总缴费记录数: {}", totalRecords);
-        
-        // 检查缴费类型分布
-        List<String> paymentTypes = dsl.select(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE)
-                .from(Tables.EDU_STUDENT_PAYMENT)
-                .where(Tables.EDU_STUDENT_PAYMENT.DELETED.eq(0))
-                .fetchInto(String.class);
-        log.info("数据库中缴费类型分布: {}", paymentTypes);
 
-        // 缴费次数
+
+        // 缴费次数 - 修复缴费类型匹配问题
         long paymentCount = dsl.selectCount()
                 .from(Tables.EDU_STUDENT_PAYMENT)
-                .leftJoin(Tables.EDU_STUDENT).on(Tables.EDU_STUDENT_PAYMENT.STUDENT_ID.eq(Tables.EDU_STUDENT.ID.cast(String.class)))
-                .leftJoin(Tables.EDU_COURSE).on(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.eq(Tables.EDU_COURSE.ID.cast(String.class)))
-                .where(baseCondition.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE.in(PaymentType.NEW.getValue(), PaymentType.RENEW.getValue())))
+                .where(baseCondition.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE.in("新增", "续费", "NEW", "RENEW")))
                 .fetchOptional(0, Long.class).orElse(0L);
-        
-        log.info("缴费次数查询结果: {}", paymentCount);
 
-        // 缴费总额
+        // 缴费总额 - 修复缴费类型匹配问题
         double paymentTotal = dsl.select(sum(Tables.EDU_STUDENT_PAYMENT.AMOUNT))
                 .from(Tables.EDU_STUDENT_PAYMENT)
-                .leftJoin(Tables.EDU_STUDENT).on(Tables.EDU_STUDENT_PAYMENT.STUDENT_ID.eq(Tables.EDU_STUDENT.ID.cast(String.class)))
-                .leftJoin(Tables.EDU_COURSE).on(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.eq(Tables.EDU_COURSE.ID.cast(String.class)))
-                .where(baseCondition.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE.in(PaymentType.NEW.getValue(), PaymentType.RENEW.getValue())))
+                .where(baseCondition.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE.in("新增", "续费", "NEW", "RENEW")))
                 .fetchOptional(0, BigDecimal.class).orElse(BigDecimal.ZERO).doubleValue();
 
-        // 退费次数
+        // 退费次数 - 修复缴费类型匹配问题
         long refundCount = dsl.selectCount()
                 .from(Tables.EDU_STUDENT_PAYMENT)
-                .leftJoin(Tables.EDU_STUDENT).on(Tables.EDU_STUDENT_PAYMENT.STUDENT_ID.eq(Tables.EDU_STUDENT.ID.cast(String.class)))
-                .leftJoin(Tables.EDU_COURSE).on(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.eq(Tables.EDU_COURSE.ID.cast(String.class)))
-                .where(baseCondition.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE.eq(PaymentType.REFUND.getValue())))
+                .where(baseCondition.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE.in("退费", "REFUND")))
                 .fetchOptional(0, Long.class).orElse(0L);
 
-        // 退费总额
+        // 退费总额 - 修复缴费类型匹配问题
         double refundTotal = dsl.select(sum(Tables.EDU_STUDENT_PAYMENT.AMOUNT))
                 .from(Tables.EDU_STUDENT_PAYMENT)
-                .leftJoin(Tables.EDU_STUDENT).on(Tables.EDU_STUDENT_PAYMENT.STUDENT_ID.eq(Tables.EDU_STUDENT.ID.cast(String.class)))
-                .leftJoin(Tables.EDU_COURSE).on(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.eq(Tables.EDU_COURSE.ID.cast(String.class)))
-                .where(baseCondition.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE.eq(PaymentType.REFUND.getValue())))
+                .where(baseCondition.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE.in("退费", "REFUND")))
                 .fetchOptional(0, BigDecimal.class).orElse(BigDecimal.ZERO).doubleValue();
 
         log.info("统计结果 - 缴费次数: {}, 缴费总额: {}, 退费次数: {}, 退费总额: {}", 
