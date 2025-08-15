@@ -59,9 +59,25 @@ public class PaymentRecordService {
                 }
         }
         if (request.getPaymentTypes() != null && !request.getPaymentTypes().isEmpty()) {
-                listConditions = listConditions.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE.in(
-                    request.getPaymentTypes().stream().map(PaymentType::getValue).collect(java.util.stream.Collectors.toList())
-                ));
+                // 构建缴费类型过滤条件，同时支持中英文值
+                List<String> paymentTypeValues = new ArrayList<>();
+                for (PaymentType paymentType : request.getPaymentTypes()) {
+                    switch (paymentType) {
+                        case NEW:
+                            paymentTypeValues.add("NEW");
+                            paymentTypeValues.add("新增");
+                            break;
+                        case RENEW:
+                            paymentTypeValues.add("RENEW");
+                            paymentTypeValues.add("续费");
+                            break;
+                        case REFUND:
+                            paymentTypeValues.add("REFUND");
+                            paymentTypeValues.add("退费");
+                            break;
+                    }
+                }
+                listConditions = listConditions.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE.in(paymentTypeValues));
         }
         if (request.getPayType() != null && !request.getPayType().isEmpty()) {
                 listConditions = listConditions.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_METHOD.eq(request.getPayType()));
