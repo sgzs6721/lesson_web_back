@@ -25,9 +25,9 @@ public class PaymentRecordController {
         return Result.success(paymentRecordService.listPaymentRecords(request));
     }
 
-    @PostMapping("/stat")
+    @GetMapping("/stat")
     @Operation(summary = "缴费统计", description = "统计缴费次数、缴费金额、退费次数、退费金额")
-    public Result<PaymentRecordStatVO> stat(@RequestBody PaymentRecordQueryRequest request) {
+    public Result<PaymentRecordStatVO> stat(@ModelAttribute PaymentRecordQueryRequest request) {
         return Result.success(paymentRecordService.statPaymentRecords(request));
     }
 

@@ -203,6 +203,8 @@ public class PaymentRecordService {
     }
 
     public PaymentRecordStatVO statPaymentRecords(PaymentRecordQueryRequest request) {
+        log.info("开始统计缴费记录，请求参数：{}", request);
+        
         // Base condition for all statistics, mirroring listPaymentRecords' conditions
         Condition baseCondition = Tables.EDU_STUDENT_PAYMENT.DELETED.eq(0);
 
@@ -246,6 +248,8 @@ public class PaymentRecordService {
             baseCondition = baseCondition.and(Tables.EDU_STUDENT_PAYMENT.CREATED_TIME.lessOrEqual(request.getEndDate().atTime(23, 59, 59)));
         }
 
+        log.info("构建的统计查询条件：{}", baseCondition);
+
         // 缴费次数
         long paymentCount = dsl.selectCount()
                 .from(Tables.EDU_STUDENT_PAYMENT)
@@ -277,6 +281,9 @@ public class PaymentRecordService {
                 .leftJoin(Tables.EDU_COURSE).on(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.eq(Tables.EDU_COURSE.ID.cast(String.class)))
                 .where(baseCondition.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE.eq(PaymentType.REFUND.getValue())))
                 .fetchOptional(0, BigDecimal.class).orElse(BigDecimal.ZERO).doubleValue();
+
+        log.info("统计结果 - 缴费次数: {}, 缴费总额: {}, 退费次数: {}, 退费总额: {}", 
+                paymentCount, paymentTotal, refundCount, refundTotal);
 
         PaymentRecordStatVO vo = new PaymentRecordStatVO();
         vo.setPaymentCount(paymentCount);
