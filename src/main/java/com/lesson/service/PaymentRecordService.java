@@ -161,6 +161,7 @@ public class PaymentRecordService {
                         }
                     }
                     
+                    item.setStudentId(r.get(Tables.EDU_STUDENT_PAYMENT.STUDENT_ID));
                     item.setStudent(r.get(Tables.EDU_STUDENT.NAME));
                     item.setCourse(r.get(Tables.EDU_COURSE.NAME));
                     item.setAmount(r.get(Tables.EDU_STUDENT_PAYMENT.AMOUNT).toPlainString());

@@ -20,6 +20,9 @@ public class PaymentRecordListVO {
         @Schema(description = "日期", example = "2023-06-01")
         private String date;
 
+        @Schema(description = "学员ID", example = "1001")
+        private String studentId;
+
         @Schema(description = "学员", example = "张小明 (STU001)")
         private String student;
 
