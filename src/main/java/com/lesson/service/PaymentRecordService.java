@@ -1,6 +1,7 @@
 package com.lesson.service;
 
 import com.lesson.vo.request.PaymentRecordQueryRequest;
+import com.lesson.vo.request.PaymentRecordStatRequest;
 import com.lesson.vo.request.PaymentRecordUpdateRequest;
 import com.lesson.vo.response.PaymentRecordListVO;
 import com.lesson.vo.response.PaymentRecordStatVO;
@@ -203,7 +204,7 @@ public class PaymentRecordService {
         }
     }
 
-    public PaymentRecordStatVO statPaymentRecords(PaymentRecordQueryRequest request) {
+    public PaymentRecordStatVO statPaymentRecords(PaymentRecordStatRequest request) {
         log.info("开始统计缴费记录，请求参数：{}", request);
         
         // Base condition for all statistics, mirroring listPaymentRecords' conditions
@@ -250,6 +251,20 @@ public class PaymentRecordService {
         }
 
         log.info("构建的统计查询条件：{}", baseCondition);
+        
+        // 先检查数据库中是否有缴费记录
+        long totalRecords = dsl.selectCount()
+                .from(Tables.EDU_STUDENT_PAYMENT)
+                .where(Tables.EDU_STUDENT_PAYMENT.DELETED.eq(0))
+                .fetchOne(0, Long.class);
+        log.info("数据库中总缴费记录数: {}", totalRecords);
+        
+        // 检查缴费类型分布
+        List<String> paymentTypes = dsl.select(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE)
+                .from(Tables.EDU_STUDENT_PAYMENT)
+                .where(Tables.EDU_STUDENT_PAYMENT.DELETED.eq(0))
+                .fetchInto(String.class);
+        log.info("数据库中缴费类型分布: {}", paymentTypes);
 
         // 缴费次数
         long paymentCount = dsl.selectCount()
@@ -258,6 +273,8 @@ public class PaymentRecordService {
                 .leftJoin(Tables.EDU_COURSE).on(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.eq(Tables.EDU_COURSE.ID.cast(String.class)))
                 .where(baseCondition.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE.in(PaymentType.NEW.getValue(), PaymentType.RENEW.getValue())))
                 .fetchOptional(0, Long.class).orElse(0L);
+        
+        log.info("缴费次数查询结果: {}", paymentCount);
 
         // 缴费总额
         double paymentTotal = dsl.select(sum(Tables.EDU_STUDENT_PAYMENT.AMOUNT))

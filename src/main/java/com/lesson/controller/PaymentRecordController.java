@@ -3,6 +3,7 @@ package com.lesson.controller;
 import com.lesson.common.Result;
 import com.lesson.service.PaymentRecordService;
 import com.lesson.vo.request.PaymentRecordQueryRequest;
+import com.lesson.vo.request.PaymentRecordStatRequest;
 import com.lesson.vo.request.PaymentRecordUpdateRequest;
 import com.lesson.vo.response.PaymentRecordListVO;
 import com.lesson.vo.response.PaymentRecordStatVO;
@@ -27,7 +28,7 @@ public class PaymentRecordController {
 
     @GetMapping("/stat")
     @Operation(summary = "缴费统计", description = "统计缴费次数、缴费金额、退费次数、退费金额")
-    public Result<PaymentRecordStatVO> stat(@ModelAttribute PaymentRecordQueryRequest request) {
+    public Result<PaymentRecordStatVO> stat(@ModelAttribute PaymentRecordStatRequest request) {
         return Result.success(paymentRecordService.statPaymentRecords(request));
     }
 
