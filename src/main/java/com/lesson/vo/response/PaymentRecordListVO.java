@@ -17,6 +17,9 @@ public class PaymentRecordListVO {
     @Data
     @Schema(description = "缴费记录项")
     public static class Item {
+        @Schema(description = "缴费记录ID", example = "1001")
+        private Long id;
+
         @Schema(description = "日期", example = "2023-06-01")
         private String date;
 

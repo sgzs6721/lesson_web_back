@@ -148,6 +148,9 @@ public class PaymentRecordService {
                 try {
             PaymentRecordListVO.Item item = new PaymentRecordListVO.Item();
                     
+                    // 设置缴费记录ID
+                    item.setId(r.get(Tables.EDU_STUDENT_PAYMENT.ID));
+                    
                     // 优先使用缴费日期（transaction_date），如果没有则使用创建时间
                     Object rawTransactionDate = r.get(Tables.EDU_STUDENT_PAYMENT.TRANSACTION_DATE);
                     log.debug("缴费记录ID[{}]原始缴费日期字段值: {} (类型: {})", 
