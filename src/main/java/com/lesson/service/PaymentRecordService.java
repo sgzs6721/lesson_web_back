@@ -1,6 +1,7 @@
 package com.lesson.service;
 
 import com.lesson.vo.request.PaymentRecordQueryRequest;
+import com.lesson.vo.request.PaymentRecordUpdateRequest;
 import com.lesson.vo.response.PaymentRecordListVO;
 import com.lesson.vo.response.PaymentRecordStatVO;
 import lombok.RequiredArgsConstructor;
@@ -259,5 +260,82 @@ public class PaymentRecordService {
         vo.setRefundCount(refundCount);
         vo.setRefundTotal(refundTotal);
         return vo;
+    }
+
+    /**
+     * 编辑缴费记录
+     */
+    public void updatePaymentRecord(PaymentRecordUpdateRequest request) {
+        try {
+            log.info("开始编辑缴费记录，请求参数：{}", request);
+            
+            // 验证缴费记录是否存在
+            boolean exists = dsl.selectCount()
+                    .from(Tables.EDU_STUDENT_PAYMENT)
+                    .where(Tables.EDU_STUDENT_PAYMENT.ID.eq(request.getId()))
+                    .and(Tables.EDU_STUDENT_PAYMENT.DELETED.eq(0))
+                    .fetchOne(0, Long.class) > 0;
+            
+            if (!exists) {
+                throw new RuntimeException("缴费记录不存在或已被删除");
+            }
+            
+            // 获取有效期常量值
+            String validityPeriodValue = null;
+            if (request.getValidityPeriodId() != null) {
+                validityPeriodValue = dsl.select(Tables.SYS_CONSTANT.CONSTANT_VALUE)
+                        .from(Tables.SYS_CONSTANT)
+                        .where(Tables.SYS_CONSTANT.ID.eq(request.getValidityPeriodId()))
+                        .and(Tables.SYS_CONSTANT.TYPE.eq("VALIDITY_PERIOD"))
+                        .and(Tables.SYS_CONSTANT.DELETED.eq(0))
+                        .fetchOneInto(String.class);
+                
+                if (validityPeriodValue == null) {
+                    throw new RuntimeException("无效的有效期类型");
+                }
+            }
+            
+            // 获取赠品常量值
+            String giftItemsValue = null;
+            if (request.getGiftIds() != null && !request.getGiftIds().isEmpty()) {
+                List<String> giftNames = dsl.select(Tables.SYS_CONSTANT.CONSTANT_VALUE)
+                        .from(Tables.SYS_CONSTANT)
+                        .where(Tables.SYS_CONSTANT.ID.in(request.getGiftIds()))
+                        .and(Tables.SYS_CONSTANT.TYPE.eq("GIFT"))
+                        .and(Tables.SYS_CONSTANT.DELETED.eq(0))
+                        .fetchInto(String.class);
+                
+                if (giftNames.size() != request.getGiftIds().size()) {
+                    throw new RuntimeException("部分赠品类型无效");
+                }
+                
+                giftItemsValue = String.join(",", giftNames);
+            }
+            
+            // 更新缴费记录
+            int updatedRows = dsl.update(Tables.EDU_STUDENT_PAYMENT)
+                    .set(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE, request.getPaymentType().getValue())
+                    .set(Tables.EDU_STUDENT_PAYMENT.AMOUNT, request.getAmount())
+                    .set(Tables.EDU_STUDENT_PAYMENT.COURSE_HOURS, request.getCourseHours())
+                    .set(Tables.EDU_STUDENT_PAYMENT.PAYMENT_METHOD, request.getPaymentMethod())
+                    .set(Tables.EDU_STUDENT_PAYMENT.TRANSACTION_DATE, request.getTransactionDate())
+                    .set(Tables.EDU_STUDENT_PAYMENT.GIFT_HOURS, request.getGiftedHours())
+                    .set(Tables.EDU_STUDENT_PAYMENT.GIFT_ITEMS, giftItemsValue)
+                    .set(Tables.EDU_STUDENT_PAYMENT.NOTES, request.getRemarks())
+                    .set(Tables.EDU_STUDENT_PAYMENT.UPDATE_TIME, java.time.LocalDateTime.now())
+                    .where(Tables.EDU_STUDENT_PAYMENT.ID.eq(request.getId()))
+                    .and(Tables.EDU_STUDENT_PAYMENT.DELETED.eq(0))
+                    .execute();
+            
+            if (updatedRows == 0) {
+                throw new RuntimeException("更新缴费记录失败");
+            }
+            
+            log.info("缴费记录编辑成功，ID：{}", request.getId());
+            
+        } catch (Exception e) {
+            log.error("编辑缴费记录时发生错误：", e);
+            throw new RuntimeException("编辑缴费记录失败：" + e.getMessage(), e);
+        }
     }
 }

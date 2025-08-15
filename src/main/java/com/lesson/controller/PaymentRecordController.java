@@ -3,6 +3,7 @@ package com.lesson.controller;
 import com.lesson.common.Result;
 import com.lesson.service.PaymentRecordService;
 import com.lesson.vo.request.PaymentRecordQueryRequest;
+import com.lesson.vo.request.PaymentRecordUpdateRequest;
 import com.lesson.vo.response.PaymentRecordListVO;
 import com.lesson.vo.response.PaymentRecordStatVO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,5 +29,12 @@ public class PaymentRecordController {
     @Operation(summary = "缴费统计", description = "统计缴费次数、缴费金额、退费次数、退费金额")
     public Result<PaymentRecordStatVO> stat(@RequestBody PaymentRecordQueryRequest request) {
         return Result.success(paymentRecordService.statPaymentRecords(request));
+    }
+
+    @PutMapping("/update")
+    @Operation(summary = "编辑缴费记录", description = "更新缴费记录信息")
+    public Result<Void> update(@RequestBody PaymentRecordUpdateRequest request) {
+        paymentRecordService.updatePaymentRecord(request);
+        return Result.success();
     }
 } 
