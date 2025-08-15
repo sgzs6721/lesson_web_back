@@ -16,6 +16,9 @@ public class PaymentRecordQueryRequest {
     private String keyword;
 
     @Schema(description = "课程ID", example = "1001")
+    private Long courseId;
+
+    @Schema(description = "课程ID列表（批量查询）", example = "[1001, 1002]")
     private List<Long> courseIds;
 
     @Schema(description = "课时类型", example = "30次课")
@@ -41,4 +44,10 @@ public class PaymentRecordQueryRequest {
 
     @Schema(description = "每页条数", example = "20")
     private Integer pageSize = 20;
+
+    @Schema(description = "排序字段", example = "createdTime")
+    private String sortField = "createdTime";
+
+    @Schema(description = "排序方向", example = "desc", allowableValues = {"asc", "desc"})
+    private String sortOrder = "desc";
 }

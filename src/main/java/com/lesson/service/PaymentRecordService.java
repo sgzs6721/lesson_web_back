@@ -44,8 +44,11 @@ public class PaymentRecordService {
                         .or(Tables.EDU_COURSE.NAME.like("%" + request.getKeyword() + "%"))
             );
         }
+        if (request.getCourseId() != null) {
+                listConditions = listConditions.and(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.eq(request.getCourseId().toString()));
+        }
         if (!CollectionUtils.isEmpty(request.getCourseIds())) {
-                listConditions = listConditions.and(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.in(request.getCourseIds().toString()));
+                listConditions = listConditions.and(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.in(request.getCourseIds().stream().map(String::valueOf).collect(java.util.stream.Collectors.toList())));
         }
         if (!CollectionUtils.isEmpty(request.getPaymentTypes())) {
                 try {
@@ -110,8 +113,11 @@ public class PaymentRecordService {
                 }
             }
 
+        // 构建排序字段
+        org.jooq.SortField<?> orderByField = buildSortField(request.getSortField(), request.getSortOrder());
+        
         List<Record> records = query
-                    .orderBy(Tables.EDU_STUDENT_PAYMENT.CREATED_TIME.desc())
+                    .orderBy(orderByField)
                 .limit(request.getPageSize())
                 .offset((request.getPageNum() - 1) * request.getPageSize())
                 .fetch();
@@ -163,6 +169,21 @@ public class PaymentRecordService {
                     item.setLessonType(courseType);
                     item.setPaymentType(r.get(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE));
                     item.setPayType(r.get(Tables.EDU_STUDENT_PAYMENT.PAYMENT_METHOD));
+                    
+                    // 设置新增字段
+                    item.setCourseId(r.get(Tables.EDU_STUDENT_PAYMENT.COURSE_ID));
+                    item.setGiftedHours(r.get(Tables.EDU_STUDENT_PAYMENT.GIFT_HOURS));
+                    
+                    // 直接设置赠品名称
+                    item.setGifts(r.get(Tables.EDU_STUDENT_PAYMENT.GIFT_ITEMS));
+                    
+                    // 设置有效期
+                    LocalDate validUntil = r.get(Tables.EDU_STUDENT_PAYMENT.VALID_UNTIL, LocalDate.class);
+                    if (validUntil != null) {
+                        item.setValidUntil(validUntil.format(dateFormatter));
+                    }
+                    
+                    item.setRemarks(r.get(Tables.EDU_STUDENT_PAYMENT.NOTES));
             list.add(item);
                 } catch (Exception e) {
                     log.error("处理记录时发生错误：", e);
@@ -191,8 +212,11 @@ public class PaymentRecordService {
                     .or(Tables.EDU_COURSE.NAME.like("%" + request.getKeyword() + "%"))
             );
         }
+        if (request.getCourseId() != null) {
+            baseCondition = baseCondition.and(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.eq(request.getCourseId().toString()));
+        }
         if (!CollectionUtils.isEmpty(request.getCourseIds())) {
-            baseCondition = baseCondition.and(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.in(request.getCourseIds().toString()));
+            baseCondition = baseCondition.and(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.in(request.getCourseIds().stream().map(String::valueOf).collect(java.util.stream.Collectors.toList())));
         }
         if (request.getLessonType() != null && !request.getLessonType().isEmpty()) {
             try {
@@ -338,4 +362,68 @@ public class PaymentRecordService {
             throw new RuntimeException("编辑缴费记录失败：" + e.getMessage(), e);
         }
     }
+
+    /**
+     * 构建排序字段
+     */
+    private org.jooq.SortField<?> buildSortField(String sortField, String sortOrder) {
+        if (sortField == null || sortField.isEmpty()) {
+            sortField = "createdTime";
+        }
+        if (sortOrder == null || sortOrder.isEmpty()) {
+            sortOrder = "desc";
+        }
+
+        org.jooq.SortField<?> field;
+        switch (sortField.toLowerCase()) {
+            case "id":
+                field = Tables.EDU_STUDENT_PAYMENT.ID.desc();
+                break;
+            case "amount":
+                field = Tables.EDU_STUDENT_PAYMENT.AMOUNT.desc();
+                break;
+            case "coursehours":
+            case "course_hours":
+                field = Tables.EDU_STUDENT_PAYMENT.COURSE_HOURS.desc();
+                break;
+            case "transactiondate":
+            case "transaction_date":
+                field = Tables.EDU_STUDENT_PAYMENT.TRANSACTION_DATE.desc();
+                break;
+            case "createdtime":
+            case "created_time":
+            default:
+                field = Tables.EDU_STUDENT_PAYMENT.CREATED_TIME.desc();
+                break;
+        }
+
+        // 根据排序方向调整
+        if ("asc".equalsIgnoreCase(sortOrder)) {
+            switch (sortField.toLowerCase()) {
+                case "id":
+                    field = Tables.EDU_STUDENT_PAYMENT.ID.asc();
+                    break;
+                case "amount":
+                    field = Tables.EDU_STUDENT_PAYMENT.AMOUNT.asc();
+                    break;
+                case "coursehours":
+                case "course_hours":
+                    field = Tables.EDU_STUDENT_PAYMENT.COURSE_HOURS.asc();
+                    break;
+                case "transactiondate":
+                case "transaction_date":
+                    field = Tables.EDU_STUDENT_PAYMENT.TRANSACTION_DATE.asc();
+                    break;
+                case "createdtime":
+                case "created_time":
+                default:
+                    field = Tables.EDU_STUDENT_PAYMENT.CREATED_TIME.asc();
+                    break;
+            }
+        }
+
+        return field;
+    }
+
+
 }

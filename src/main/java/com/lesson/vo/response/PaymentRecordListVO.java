@@ -43,5 +43,20 @@ public class PaymentRecordListVO {
 
         @Schema(description = "支付类型", example = "微信支付")
         private String payType;
+
+        @Schema(description = "课程ID", example = "1001")
+        private String courseId;
+
+        @Schema(description = "赠课课时", example = "5.0")
+        private BigDecimal giftedHours;
+
+        @Schema(description = "赠品", example = "球拍,球衣")
+        private String gifts;
+
+        @Schema(description = "有效期", example = "2025-12-31")
+        private String validUntil;
+
+        @Schema(description = "备注", example = "学员主动要求增加课时")
+        private String remarks;
     }
 } 
