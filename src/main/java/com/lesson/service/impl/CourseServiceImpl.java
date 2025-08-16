@@ -10,6 +10,9 @@ import com.lesson.model.SysConstantModel;
 import com.lesson.model.record.CoachDetailRecord;
 import com.lesson.model.record.CourseDetailRecord;
 import com.lesson.repository.tables.records.SysConstantRecord;
+import com.lesson.repository.Tables;
+import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
 import com.lesson.service.CourseService;
 import com.lesson.service.CourseHoursRedisService;
 import com.lesson.service.CampusStatsRedisService;
@@ -42,6 +45,7 @@ public class CourseServiceImpl implements CourseService {
     private final SysCoachModel sysCoachModel;
     private final CourseHoursRedisService courseHoursRedisService;
     private final CampusStatsRedisService campusStatsRedisService;
+    private final DSLContext dsl;
 
     @Override
     @Transactional
@@ -367,6 +371,14 @@ public class CourseServiceImpl implements CourseService {
                     }
                 }
 
+                // 动态计算课程总课时（从学员课程关系中统计）
+                BigDecimal actualTotalHours = calculateCourseTotalHours(record.getId());
+                vo.setTotalHours(actualTotalHours);
+
+                // 动态计算课程已消耗课时（从学员课程关系中统计）
+                BigDecimal actualConsumedHours = calculateCourseConsumedHours(record.getId());
+                vo.setConsumedHours(actualConsumedHours);
+
                 // 设置教练信息
                 List<CoachDetailRecord> coaches = courseCoachMap.get(record.getId());
                 if (coaches != null && !coaches.isEmpty()) {
@@ -399,6 +411,42 @@ public class CourseServiceImpl implements CourseService {
             request.getCampusId(),
             request.getInstitutionId()
         );
+    }
+
+    /**
+     * 计算课程总课时（从学员课程关系中统计）
+     */
+    private BigDecimal calculateCourseTotalHours(Long courseId) {
+        try {
+            BigDecimal totalHours = dsl.select(DSL.sum(Tables.EDU_STUDENT_COURSE.TOTAL_HOURS))
+                    .from(Tables.EDU_STUDENT_COURSE)
+                    .where(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(courseId))
+                    .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
+                    .fetchOneInto(BigDecimal.class);
+            
+            return totalHours != null ? totalHours : BigDecimal.ZERO;
+        } catch (Exception e) {
+            log.warn("计算课程总课时时发生错误: courseId={}, error={}", courseId, e.getMessage());
+            return BigDecimal.ZERO;
+        }
+    }
+
+    /**
+     * 计算课程已消耗课时（从学员课程关系中统计）
+     */
+    private BigDecimal calculateCourseConsumedHours(Long courseId) {
+        try {
+            BigDecimal consumedHours = dsl.select(DSL.sum(Tables.EDU_STUDENT_COURSE.CONSUMED_HOURS))
+                    .from(Tables.EDU_STUDENT_COURSE)
+                    .where(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(courseId))
+                    .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
+                    .fetchOneInto(BigDecimal.class);
+            
+            return consumedHours != null ? consumedHours : BigDecimal.ZERO;
+        } catch (Exception e) {
+            log.warn("计算课程已消耗课时时发生错误: courseId={}, error={}", courseId, e.getMessage());
+            return BigDecimal.ZERO;
+        }
     }
 
     private CourseVO convertToVO(CourseDetailRecord record) {
