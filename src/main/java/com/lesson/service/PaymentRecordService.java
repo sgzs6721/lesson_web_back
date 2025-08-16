@@ -406,10 +406,10 @@ public class PaymentRecordService {
      */
     private org.jooq.SortField<?> buildSortField(String sortField, String sortOrder) {
         if (sortField == null || sortField.isEmpty()) {
-            sortField = "createdTime";
+            sortField = "transactionDate"; // 默认按缴费日期排序
         }
         if (sortOrder == null || sortOrder.isEmpty()) {
-            sortOrder = "desc";
+            sortOrder = "desc"; // 默认倒序
         }
 
         org.jooq.SortField<?> field;
@@ -424,14 +424,14 @@ public class PaymentRecordService {
             case "course_hours":
                 field = Tables.EDU_STUDENT_PAYMENT.COURSE_HOURS.desc();
                 break;
-            case "transactiondate":
-            case "transaction_date":
-                field = Tables.EDU_STUDENT_PAYMENT.TRANSACTION_DATE.desc();
-                break;
             case "createdtime":
             case "created_time":
-            default:
                 field = Tables.EDU_STUDENT_PAYMENT.CREATED_TIME.desc();
+                break;
+            case "transactiondate":
+            case "transaction_date":
+            default:
+                field = Tables.EDU_STUDENT_PAYMENT.TRANSACTION_DATE.desc(); // 默认按缴费日期倒序
                 break;
         }
 
@@ -448,14 +448,14 @@ public class PaymentRecordService {
                 case "course_hours":
                     field = Tables.EDU_STUDENT_PAYMENT.COURSE_HOURS.asc();
                     break;
-                case "transactiondate":
-                case "transaction_date":
-                    field = Tables.EDU_STUDENT_PAYMENT.TRANSACTION_DATE.asc();
-                    break;
                 case "createdtime":
                 case "created_time":
-                default:
                     field = Tables.EDU_STUDENT_PAYMENT.CREATED_TIME.asc();
+                    break;
+                case "transactiondate":
+                case "transaction_date":
+                default:
+                    field = Tables.EDU_STUDENT_PAYMENT.TRANSACTION_DATE.asc();
                     break;
             }
         }

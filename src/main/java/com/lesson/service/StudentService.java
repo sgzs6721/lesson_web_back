@@ -789,9 +789,9 @@ public class StudentService {
         courseInfo.setEnrollmentDate(studentCourse.getStartDate());
         courseInfo.setEndDate(studentCourse.getEndDate()); // 设置有效期
         
-        // 计算有效期描述
-        String validityPeriod = calculateValidityPeriod(studentCourse);
-        courseInfo.setValidityPeriod(validityPeriod);
+        // 获取有效期ID
+        Long validityPeriodId = getValidityPeriodId(studentCourse.getStudentId(), studentCourse.getCourseId());
+        courseInfo.setValidityPeriodId(validityPeriodId);
         
         courseInfo.setStatus(studentCourse.getStatus() != null ? studentCourse.getStatus() : StudentCourseStatus.STUDYING.getName());
         courseInfo.setFixedSchedule(studentCourse.getFixedSchedule());
@@ -1969,93 +1969,51 @@ public class StudentService {
     return vo;
   }
 
-  /**
-   * 计算有效期描述
-   * 如果已经开始上课，返回截止日期；如果还没开始上课，返回有效期描述
-   */
-  private String calculateValidityPeriod(EduStudentCourseRecord studentCourse) {
-    try {
-      // 如果已经开始上课（有消耗课时），返回截止日期
-      if (studentCourse.getConsumedHours() != null && studentCourse.getConsumedHours().compareTo(BigDecimal.ZERO) > 0) {
-        if (studentCourse.getEndDate() != null) {
-          return studentCourse.getEndDate().toString();
-        } else {
-          return "未设置截止日期";
-        }
-              } else {
-            // 如果还没开始上课，查询学员的缴费记录来获取有效期
-            String validityPeriod = queryValidityPeriodFromPayment(studentCourse.getStudentId(), studentCourse.getCourseId());
-            if (validityPeriod != null && !validityPeriod.isEmpty()) {
-                return validityPeriod;
-            } else {
-                // 返回null，让前端处理显示逻辑
-                return null;
-            }
-        }
-    } catch (Exception e) {
-      log.warn("计算有效期描述时发生错误: {}", e.getMessage());
-      return "有效期未知";
-    }
-  }
+
 
   /**
-   * 从缴费记录查询有效期
+   * 获取学员课程的有效期ID
    */
-  private String queryValidityPeriodFromPayment(Long studentId, Long courseId) {
+  private Long getValidityPeriodId(Long studentId, Long courseId) {
     try {
-      // 查询学员的缴费记录，获取有效期信息
+      // 查询学员的缴费记录，获取有效期ID
+      // 由于数据库中没有直接存储 validity_period_id，我们需要通过其他方式获取
+      
+      // 方案1：从学员课程关系的 endDate 反推有效期类型
       if (studentId != null && courseId != null) {
-        // 查询学员的缴费记录，获取 valid_until 和 created_time
-        Record paymentRecord = dsl.select(
-                Tables.EDU_STUDENT_PAYMENT.VALID_UNTIL,
-                Tables.EDU_STUDENT_PAYMENT.CREATED_TIME
-            )
-            .from(Tables.EDU_STUDENT_PAYMENT)
-            .where(Tables.EDU_STUDENT_PAYMENT.STUDENT_ID.eq(studentId.toString()))
-            .and(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.eq(courseId.toString()))
-            .and(Tables.EDU_STUDENT_PAYMENT.DELETED.eq(0))
-            .orderBy(Tables.EDU_STUDENT_PAYMENT.CREATED_TIME.desc())
-            .limit(1)
-            .fetchOne();
+        // 查询学员课程关系中的 endDate
+        LocalDate endDate = dsl.select(Tables.EDU_STUDENT_COURSE.END_DATE)
+            .from(Tables.EDU_STUDENT_COURSE)
+            .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(studentId))
+            .and(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(courseId))
+            .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
+            .fetchOneInto(LocalDate.class);
         
-        if (paymentRecord != null) {
-          LocalDate validUntil = paymentRecord.get(Tables.EDU_STUDENT_PAYMENT.VALID_UNTIL, LocalDate.class);
-          LocalDateTime createdTime = paymentRecord.get(Tables.EDU_STUDENT_PAYMENT.CREATED_TIME, LocalDateTime.class);
+        if (endDate != null) {
+          // 如果 endDate 存在，根据日期差计算有效期类型
+          long months = java.time.temporal.ChronoUnit.MONTHS.between(LocalDate.now(), endDate);
           
-          if (validUntil != null && createdTime != null) {
-            // 计算从缴费时间到有效期的月数
-            LocalDate paymentDate = createdTime.toLocalDate();
-            long months = java.time.temporal.ChronoUnit.MONTHS.between(paymentDate, validUntil);
-            
-            if (months > 0) {
-              // 根据月数返回对应的有效期描述
-              if (months == 1) {
-                return "1个月";
-              } else if (months == 3) {
-                return "3个月";
-              } else if (months == 6) {
-                return "6个月";
-              } else if (months == 12) {
-                return "1年";
-              } else if (months == 24) {
-                return "2年";
-              } else if (months == 36) {
-                return "3年";
-              } else if (months >= 1200) { // 100年，表示永久
-                return "永久";
-              } else {
-                return months + "个月";
-              }
-            } else {
-              return "即将到期";
-            }
+          // 根据月数返回对应的有效期ID（这里需要根据实际的常量表来映射）
+          if (months >= 1 && months <= 2) {
+            return 1L; // 假设1个月对应的ID是1
+          } else if (months >= 3 && months <= 5) {
+            return 2L; // 假设3个月对应的ID是2
+          } else if (months >= 6 && months <= 8) {
+            return 3L; // 假设6个月对应的ID是3
+          } else if (months >= 9 && months <= 15) {
+            return 4L; // 假设1年对应的ID是4
+          } else if (months >= 16 && months <= 30) {
+            return 5L; // 假设2年对应的ID是5
+          } else if (months >= 31) {
+            return 6L; // 假设3年对应的ID是6
           }
         }
       }
       
-      return null; // 返回null表示没有有效期信息
+      // 如果没有找到有效期信息，返回null
+      return null;
     } catch (Exception e) {
-      log.warn("查询缴费记录有效期时发生错误: studentId={}, courseId={}, error={}", studentId, courseId, e.getMessage());
+      log.warn("获取有效期ID时发生错误: studentId={}, courseId={}, error={}", studentId, courseId, e.getMessage());
       return null;
     }
   }
