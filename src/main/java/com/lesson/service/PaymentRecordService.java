@@ -279,27 +279,35 @@ public class PaymentRecordService {
         
 
 
-        // 缴费次数 - 修复缴费类型匹配问题
+        // 缴费次数 - 修复缴费类型匹配问题，添加必要的JOIN
         long paymentCount = dsl.selectCount()
                 .from(Tables.EDU_STUDENT_PAYMENT)
+                .leftJoin(Tables.EDU_STUDENT).on(Tables.EDU_STUDENT_PAYMENT.STUDENT_ID.eq(Tables.EDU_STUDENT.ID.cast(String.class)))
+                .leftJoin(Tables.EDU_COURSE).on(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.eq(Tables.EDU_COURSE.ID.cast(String.class)))
                 .where(baseCondition.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE.in("新增", "续费", "NEW", "RENEW")))
                 .fetchOptional(0, Long.class).orElse(0L);
 
-        // 缴费总额 - 修复缴费类型匹配问题
+        // 缴费总额 - 修复缴费类型匹配问题，添加必要的JOIN
         double paymentTotal = dsl.select(sum(Tables.EDU_STUDENT_PAYMENT.AMOUNT))
                 .from(Tables.EDU_STUDENT_PAYMENT)
+                .leftJoin(Tables.EDU_STUDENT).on(Tables.EDU_STUDENT_PAYMENT.STUDENT_ID.eq(Tables.EDU_STUDENT.ID.cast(String.class)))
+                .leftJoin(Tables.EDU_COURSE).on(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.eq(Tables.EDU_COURSE.ID.cast(String.class)))
                 .where(baseCondition.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE.in("新增", "续费", "NEW", "RENEW")))
                 .fetchOptional(0, BigDecimal.class).orElse(BigDecimal.ZERO).doubleValue();
 
-        // 退费次数 - 修复缴费类型匹配问题
+        // 退费次数 - 修复缴费类型匹配问题，添加必要的JOIN
         long refundCount = dsl.selectCount()
                 .from(Tables.EDU_STUDENT_PAYMENT)
+                .leftJoin(Tables.EDU_STUDENT).on(Tables.EDU_STUDENT_PAYMENT.STUDENT_ID.eq(Tables.EDU_STUDENT.ID.cast(String.class)))
+                .leftJoin(Tables.EDU_COURSE).on(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.eq(Tables.EDU_COURSE.ID.cast(String.class)))
                 .where(baseCondition.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE.in("退费", "REFUND")))
                 .fetchOptional(0, Long.class).orElse(0L);
 
-        // 退费总额 - 修复缴费类型匹配问题
+        // 退费总额 - 修复缴费类型匹配问题，添加必要的JOIN
         double refundTotal = dsl.select(sum(Tables.EDU_STUDENT_PAYMENT.AMOUNT))
                 .from(Tables.EDU_STUDENT_PAYMENT)
+                .leftJoin(Tables.EDU_STUDENT).on(Tables.EDU_STUDENT_PAYMENT.STUDENT_ID.eq(Tables.EDU_STUDENT.ID.cast(String.class)))
+                .leftJoin(Tables.EDU_COURSE).on(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.eq(Tables.EDU_COURSE.ID.cast(String.class)))
                 .where(baseCondition.and(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE.in("退费", "REFUND")))
                 .fetchOptional(0, BigDecimal.class).orElse(BigDecimal.ZERO).doubleValue();
 
