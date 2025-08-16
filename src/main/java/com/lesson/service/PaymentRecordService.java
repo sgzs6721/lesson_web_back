@@ -202,6 +202,12 @@ public class PaymentRecordService {
                     LocalDate validUntil = r.get(Tables.EDU_STUDENT_PAYMENT.VALID_UNTIL, LocalDate.class);
                     if (validUntil != null) {
                         item.setValidUntil(validUntil.format(dateFormatter));
+                        
+                        // 计算有效期月数
+                        if (transactionDate != null) {
+                            long months = java.time.temporal.ChronoUnit.MONTHS.between(transactionDate, validUntil);
+                            item.setValidityPeriodMonths((int) months);
+                        }
                     }
                     
                     item.setRemarks(r.get(Tables.EDU_STUDENT_PAYMENT.NOTES));

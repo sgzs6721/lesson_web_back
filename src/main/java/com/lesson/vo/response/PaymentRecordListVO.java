@@ -62,6 +62,9 @@ public class PaymentRecordListVO {
         @Schema(description = "有效期", example = "2025-12-31")
         private String validUntil;
 
+        @Schema(description = "有效期月数", example = "3")
+        private Integer validityPeriodMonths;
+
         @Schema(description = "备注", example = "学员主动要求增加课时")
         private String remarks;
     }
