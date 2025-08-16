@@ -118,6 +118,8 @@ public class PaymentRecordService {
             if (total > 0) {
                 Record firstRecord = dsl.select(Tables.EDU_STUDENT_PAYMENT.ID, Tables.EDU_STUDENT_PAYMENT.CREATED_TIME)
                     .from(Tables.EDU_STUDENT_PAYMENT)
+                    .leftJoin(Tables.EDU_STUDENT).on(Tables.EDU_STUDENT_PAYMENT.STUDENT_ID.eq(Tables.EDU_STUDENT.ID.cast(String.class)))
+                    .leftJoin(Tables.EDU_COURSE).on(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.eq(Tables.EDU_COURSE.ID.cast(String.class)))
                     .where(listConditions)
                     .limit(1)
                     .fetchOne();
@@ -374,7 +376,6 @@ public class PaymentRecordService {
             
             // 更新缴费记录
             int updatedRows = dsl.update(Tables.EDU_STUDENT_PAYMENT)
-                    .set(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE, request.getPaymentType().getValue())
                     .set(Tables.EDU_STUDENT_PAYMENT.AMOUNT, request.getAmount())
                     .set(Tables.EDU_STUDENT_PAYMENT.COURSE_HOURS, request.getCourseHours())
                     .set(Tables.EDU_STUDENT_PAYMENT.PAYMENT_METHOD, request.getPaymentMethod())
