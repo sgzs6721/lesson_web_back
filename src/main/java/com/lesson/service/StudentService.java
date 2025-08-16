@@ -788,6 +788,11 @@ public class StudentService {
         // 设置其他信息
         courseInfo.setEnrollmentDate(studentCourse.getStartDate());
         courseInfo.setEndDate(studentCourse.getEndDate()); // 设置有效期
+        
+        // 计算有效期描述
+        String validityPeriod = calculateValidityPeriod(studentCourse);
+        courseInfo.setValidityPeriod(validityPeriod);
+        
         courseInfo.setStatus(studentCourse.getStatus() != null ? studentCourse.getStatus() : StudentCourseStatus.STUDYING.getName());
         courseInfo.setFixedSchedule(studentCourse.getFixedSchedule());
 
@@ -1962,6 +1967,49 @@ public class StudentService {
     // 你可以根据需要补充更多字段，比如操作人、学员姓名、课程名称等
 
     return vo;
+  }
+
+  /**
+   * 计算有效期描述
+   * 如果已经开始上课，返回截止日期；如果还没开始上课，返回有效期描述
+   */
+  private String calculateValidityPeriod(EduStudentCourseRecord studentCourse) {
+    try {
+      // 如果已经开始上课（有消耗课时），返回截止日期
+      if (studentCourse.getConsumedHours() != null && studentCourse.getConsumedHours().compareTo(BigDecimal.ZERO) > 0) {
+        if (studentCourse.getEndDate() != null) {
+          return studentCourse.getEndDate().toString();
+        } else {
+          return "未设置截止日期";
+        }
+      } else {
+        // 如果还没开始上课，查询学员的缴费记录来获取有效期
+        String validityPeriod = queryValidityPeriodFromPayment(studentCourse.getStudentId(), studentCourse.getCourseId());
+        if (validityPeriod != null && !validityPeriod.isEmpty()) {
+          return validityPeriod;
+        } else {
+          return "待开始上课";
+        }
+      }
+    } catch (Exception e) {
+      log.warn("计算有效期描述时发生错误: {}", e.getMessage());
+      return "有效期未知";
+    }
+  }
+
+  /**
+   * 从缴费记录查询有效期
+   */
+  private String queryValidityPeriodFromPayment(Long studentId, Long courseId) {
+    try {
+      // 查询学员的缴费记录，获取有效期信息
+      // 由于数据库中没有 validity_period_id 字段，我们暂时返回一个默认值
+      // 后续可以通过其他方式获取有效期信息
+      return "待开始上课";
+    } catch (Exception e) {
+      log.warn("查询缴费记录有效期时发生错误: studentId={}, courseId={}, error={}", studentId, courseId, e.getMessage());
+      return null;
+    }
   }
 
   /**

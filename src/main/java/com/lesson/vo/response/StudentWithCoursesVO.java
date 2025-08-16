@@ -98,6 +98,9 @@ public class StudentWithCoursesVO {
         @Schema(description = "有效期至", example = "2025-11-01")
         private java.time.LocalDate endDate;
 
+        @Schema(description = "有效期描述", example = "3个月")
+        private String validityPeriod;
+
         @Schema(description = "课程状态", example = "NORMAL")
         private String status;
 
