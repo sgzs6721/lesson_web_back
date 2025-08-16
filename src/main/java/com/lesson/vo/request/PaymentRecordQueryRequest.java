@@ -45,8 +45,8 @@ public class PaymentRecordQueryRequest {
     @Schema(description = "每页条数", example = "20")
     private Integer pageSize = 20;
 
-    @Schema(description = "排序字段", example = "createdTime")
-    private String sortField = "createdTime";
+    @Schema(description = "排序字段", example = "transactionDate")
+    private String sortField = "transactionDate";
 
     @Schema(description = "排序方向", example = "desc", allowableValues = {"asc", "desc"})
     private String sortOrder = "desc";

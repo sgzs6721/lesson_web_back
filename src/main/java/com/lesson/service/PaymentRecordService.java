@@ -89,10 +89,10 @@ public class PaymentRecordService {
                 listConditions = listConditions.and(Tables.EDU_STUDENT_PAYMENT.CAMPUS_ID.eq(request.getCampusId()));
         }
         if (request.getStartDate() != null) {
-                listConditions = listConditions.and(Tables.EDU_STUDENT_PAYMENT.CREATED_TIME.greaterOrEqual(request.getStartDate().atStartOfDay()));
+                listConditions = listConditions.and(Tables.EDU_STUDENT_PAYMENT.TRANSACTION_DATE.greaterOrEqual(request.getStartDate()));
         }
         if (request.getEndDate() != null) {
-                listConditions = listConditions.and(Tables.EDU_STUDENT_PAYMENT.CREATED_TIME.lessOrEqual(request.getEndDate().atTime(23, 59, 59)));
+                listConditions = listConditions.and(Tables.EDU_STUDENT_PAYMENT.TRANSACTION_DATE.lessOrEqual(request.getEndDate()));
             }
 
             SelectConditionStep<Record> query = dsl.select()
@@ -134,6 +134,9 @@ public class PaymentRecordService {
 
         // 构建排序字段
         org.jooq.SortField<?> orderByField = buildSortField(request.getSortField(), request.getSortOrder());
+        
+        log.info("排序字段: {}, 排序方向: {}, 构建的排序字段: {}", 
+                request.getSortField(), request.getSortOrder(), orderByField);
         
         List<Record> records = query
                     .orderBy(orderByField)
@@ -209,7 +212,14 @@ public class PaymentRecordService {
                         if (transactionDate != null) {
                             long months = java.time.temporal.ChronoUnit.MONTHS.between(transactionDate, validUntil);
                             item.setValidityPeriodMonths((int) months);
+                            
+                            // 计算有效期类型ID
+                            Long validityPeriodId = calculateValidityPeriodId(months);
+                            item.setValidityPeriodId(validityPeriodId);
                         }
+                    } else {
+                        // 如果没有有效期，设置为null
+                        item.setValidityPeriodId(null);
                     }
                     
                     item.setRemarks(r.get(Tables.EDU_STUDENT_PAYMENT.NOTES));
@@ -458,9 +468,54 @@ public class PaymentRecordService {
                     field = Tables.EDU_STUDENT_PAYMENT.TRANSACTION_DATE.asc();
                     break;
             }
+        } else {
+            // 降序排序
+            switch (sortField.toLowerCase()) {
+                case "id":
+                    field = Tables.EDU_STUDENT_PAYMENT.ID.desc();
+                    break;
+                case "amount":
+                    field = Tables.EDU_STUDENT_PAYMENT.AMOUNT.desc();
+                    break;
+                case "coursehours":
+                case "course_hours":
+                    field = Tables.EDU_STUDENT_PAYMENT.COURSE_HOURS.desc();
+                    break;
+                case "createdtime":
+                case "created_time":
+                    field = Tables.EDU_STUDENT_PAYMENT.CREATED_TIME.desc();
+                    break;
+                case "transactiondate":
+                case "transaction_date":
+                default:
+                    field = Tables.EDU_STUDENT_PAYMENT.TRANSACTION_DATE.desc();
+                    break;
+            }
         }
 
         return field;
+    }
+
+    /**
+     * 根据月数计算有效期类型ID
+     * 这里需要根据实际的常量表来映射，目前使用假设的ID
+     */
+    private Long calculateValidityPeriodId(long months) {
+        if (months >= 1 && months <= 2) {
+            return 1L; // 1-2个月
+        } else if (months >= 3 && months <= 5) {
+            return 2L; // 3-5个月
+        } else if (months >= 6 && months <= 8) {
+            return 3L; // 6-8个月
+        } else if (months >= 9 && months <= 15) {
+            return 4L; // 9-15个月（约1年）
+        } else if (months >= 16 && months <= 30) {
+            return 5L; // 16-30个月（约2年）
+        } else if (months >= 31) {
+            return 6L; // 31个月以上（约3年）
+        } else {
+            return null; // 无效的月数
+        }
     }
 
 
