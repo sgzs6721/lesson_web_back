@@ -145,6 +145,21 @@ public class PaymentRecordService {
                 .fetch();
 
             log.info("获取到分页数据，记录数：{}", records.size());
+            
+            // 添加排序调试信息
+            if (!records.isEmpty()) {
+                log.info("排序调试 - 第一条记录ID: {}, 缴费日期: {}, 创建时间: {}", 
+                    records.get(0).get(Tables.EDU_STUDENT_PAYMENT.ID),
+                    records.get(0).get(Tables.EDU_STUDENT_PAYMENT.TRANSACTION_DATE),
+                    records.get(0).get(Tables.EDU_STUDENT_PAYMENT.CREATED_TIME));
+                
+                if (records.size() > 1) {
+                    log.info("排序调试 - 最后一条记录ID: {}, 缴费日期: {}, 创建时间: {}", 
+                        records.get(records.size() - 1).get(Tables.EDU_STUDENT_PAYMENT.ID),
+                        records.get(records.size() - 1).get(Tables.EDU_STUDENT_PAYMENT.TRANSACTION_DATE),
+                        records.get(records.size() - 1).get(Tables.EDU_STUDENT_PAYMENT.CREATED_TIME));
+                }
+            }
 
         List<PaymentRecordListVO.Item> list = new ArrayList<>();
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -422,77 +437,44 @@ public class PaymentRecordService {
             sortOrder = "desc"; // 默认倒序
         }
 
+        log.info("构建排序字段 - 排序字段: {}, 排序方向: {}", sortField, sortOrder);
+
         org.jooq.SortField<?> field;
+        
+        // 根据排序字段和排序方向直接构建排序字段
         switch (sortField.toLowerCase()) {
             case "id":
-                field = Tables.EDU_STUDENT_PAYMENT.ID.desc();
+                field = "asc".equalsIgnoreCase(sortOrder) ? 
+                    Tables.EDU_STUDENT_PAYMENT.ID.asc() : 
+                    Tables.EDU_STUDENT_PAYMENT.ID.desc();
                 break;
             case "amount":
-                field = Tables.EDU_STUDENT_PAYMENT.AMOUNT.desc();
+                field = "asc".equalsIgnoreCase(sortOrder) ? 
+                    Tables.EDU_STUDENT_PAYMENT.AMOUNT.asc() : 
+                    Tables.EDU_STUDENT_PAYMENT.AMOUNT.desc();
                 break;
             case "coursehours":
             case "course_hours":
-                field = Tables.EDU_STUDENT_PAYMENT.COURSE_HOURS.desc();
+                field = "asc".equalsIgnoreCase(sortOrder) ? 
+                    Tables.EDU_STUDENT_PAYMENT.COURSE_HOURS.asc() : 
+                    Tables.EDU_STUDENT_PAYMENT.COURSE_HOURS.desc();
                 break;
             case "createdtime":
             case "created_time":
-                field = Tables.EDU_STUDENT_PAYMENT.CREATED_TIME.desc();
+                field = "asc".equalsIgnoreCase(sortOrder) ? 
+                    Tables.EDU_STUDENT_PAYMENT.CREATED_TIME.asc() : 
+                    Tables.EDU_STUDENT_PAYMENT.CREATED_TIME.desc();
                 break;
             case "transactiondate":
             case "transaction_date":
             default:
-                field = Tables.EDU_STUDENT_PAYMENT.TRANSACTION_DATE.desc(); // 默认按缴费日期倒序
+                field = "asc".equalsIgnoreCase(sortOrder) ? 
+                    Tables.EDU_STUDENT_PAYMENT.TRANSACTION_DATE.asc() : 
+                    Tables.EDU_STUDENT_PAYMENT.TRANSACTION_DATE.desc();
                 break;
         }
 
-        // 根据排序方向调整
-        if ("asc".equalsIgnoreCase(sortOrder)) {
-            switch (sortField.toLowerCase()) {
-                case "id":
-                    field = Tables.EDU_STUDENT_PAYMENT.ID.asc();
-                    break;
-                case "amount":
-                    field = Tables.EDU_STUDENT_PAYMENT.AMOUNT.asc();
-                    break;
-                case "coursehours":
-                case "course_hours":
-                    field = Tables.EDU_STUDENT_PAYMENT.COURSE_HOURS.asc();
-                    break;
-                case "createdtime":
-                case "created_time":
-                    field = Tables.EDU_STUDENT_PAYMENT.CREATED_TIME.asc();
-                    break;
-                case "transactiondate":
-                case "transaction_date":
-                default:
-                    field = Tables.EDU_STUDENT_PAYMENT.TRANSACTION_DATE.asc();
-                    break;
-            }
-        } else {
-            // 降序排序
-            switch (sortField.toLowerCase()) {
-                case "id":
-                    field = Tables.EDU_STUDENT_PAYMENT.ID.desc();
-                    break;
-                case "amount":
-                    field = Tables.EDU_STUDENT_PAYMENT.AMOUNT.desc();
-                    break;
-                case "coursehours":
-                case "course_hours":
-                    field = Tables.EDU_STUDENT_PAYMENT.COURSE_HOURS.desc();
-                    break;
-                case "createdtime":
-                case "created_time":
-                    field = Tables.EDU_STUDENT_PAYMENT.CREATED_TIME.desc();
-                    break;
-                case "transactiondate":
-                case "transaction_date":
-                default:
-                    field = Tables.EDU_STUDENT_PAYMENT.TRANSACTION_DATE.desc();
-                    break;
-            }
-        }
-
+        log.info("构建的排序字段: {}", field);
         return field;
     }
 
