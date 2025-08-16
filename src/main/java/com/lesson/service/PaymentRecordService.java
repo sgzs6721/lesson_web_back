@@ -116,7 +116,7 @@ public class PaymentRecordService {
             
             // 添加调试信息：检查第一条记录的时间字段
             if (total > 0) {
-                Record firstRecord = dsl.select(Tables.EDU_STUDENT_PAYMENT.ID, Tables.EDU_STUDENT_PAYMENT.CREATED_TIME)
+                Record firstRecord = dsl.select(Tables.EDU_STUDENT_PAYMENT.ID, Tables.EDU_STUDENT_PAYMENT.TRANSACTION_DATE, Tables.EDU_STUDENT_PAYMENT.CREATED_TIME)
                     .from(Tables.EDU_STUDENT_PAYMENT)
                     .leftJoin(Tables.EDU_STUDENT).on(Tables.EDU_STUDENT_PAYMENT.STUDENT_ID.eq(Tables.EDU_STUDENT.ID.cast(String.class)))
                     .leftJoin(Tables.EDU_COURSE).on(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.eq(Tables.EDU_COURSE.ID.cast(String.class)))
@@ -124,11 +124,14 @@ public class PaymentRecordService {
                     .limit(1)
                     .fetchOne();
                 if (firstRecord != null) {
-                    Object rawTime = firstRecord.get(Tables.EDU_STUDENT_PAYMENT.CREATED_TIME);
-                    log.info("第一条记录时间字段调试 - ID: {}, 原始值: {}, 类型: {}", 
+                    Object rawTransactionDate = firstRecord.get(Tables.EDU_STUDENT_PAYMENT.TRANSACTION_DATE);
+                    Object rawCreatedTime = firstRecord.get(Tables.EDU_STUDENT_PAYMENT.CREATED_TIME);
+                    log.info("第一条记录时间字段调试 - ID: {}, 缴费日期: {} (类型: {}), 创建时间: {} (类型: {})", 
                              firstRecord.get(Tables.EDU_STUDENT_PAYMENT.ID),
-                             rawTime,
-                             rawTime != null ? rawTime.getClass().getName() : "null");
+                             rawTransactionDate,
+                             rawTransactionDate != null ? rawTransactionDate.getClass().getName() : "null",
+                             rawCreatedTime,
+                             rawCreatedTime != null ? rawCreatedTime.getClass().getName() : "null");
                 }
             }
 
