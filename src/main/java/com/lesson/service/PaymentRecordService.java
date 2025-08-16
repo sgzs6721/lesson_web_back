@@ -376,6 +376,7 @@ public class PaymentRecordService {
             
             // 更新缴费记录
             int updatedRows = dsl.update(Tables.EDU_STUDENT_PAYMENT)
+                    .set(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE, request.getPaymentType().name()) // 使用英文枚举值
                     .set(Tables.EDU_STUDENT_PAYMENT.AMOUNT, request.getAmount())
                     .set(Tables.EDU_STUDENT_PAYMENT.COURSE_HOURS, request.getCourseHours())
                     .set(Tables.EDU_STUDENT_PAYMENT.PAYMENT_METHOD, request.getPaymentMethod())
