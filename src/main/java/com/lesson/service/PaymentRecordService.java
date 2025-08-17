@@ -416,7 +416,6 @@ public class PaymentRecordService {
                     .set(Tables.EDU_STUDENT_PAYMENT.TRANSACTION_DATE, request.getTransactionDate())
                     .set(Tables.EDU_STUDENT_PAYMENT.GIFT_HOURS, request.getGiftedHours())
                     .set(Tables.EDU_STUDENT_PAYMENT.GIFT_ITEMS, giftItemsValue)
-                    .set(Tables.EDU_STUDENT_PAYMENT.NOTES, request.getRemarks())
                     .set(Tables.EDU_STUDENT_PAYMENT.UPDATE_TIME, java.time.LocalDateTime.now())
                     .where(Tables.EDU_STUDENT_PAYMENT.ID.eq(request.getId()))
                     .and(Tables.EDU_STUDENT_PAYMENT.DELETED.eq(0))
@@ -426,11 +425,125 @@ public class PaymentRecordService {
                 throw new RuntimeException("更新缴费记录失败");
             }
             
+            // 更新学生课程记录中的有效期相关字段
+            updateStudentCourseValidityFields(request);
+            
             log.info("缴费记录编辑成功，ID：{}", request.getId());
             
         } catch (Exception e) {
             log.error("编辑缴费记录时发生错误：", e);
             throw new RuntimeException("编辑缴费记录失败：" + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 更新学生课程记录中的有效期相关字段
+     */
+    private void updateStudentCourseValidityFields(PaymentRecordUpdateRequest request) {
+        try {
+            log.info("开始更新学生课程记录中的有效期字段，缴费记录ID：{}", request.getId());
+            
+            // 获取缴费记录信息
+            Record paymentRecord = dsl.select()
+                    .from(Tables.EDU_STUDENT_PAYMENT)
+                    .where(Tables.EDU_STUDENT_PAYMENT.ID.eq(request.getId()))
+                    .and(Tables.EDU_STUDENT_PAYMENT.DELETED.eq(0))
+                    .fetchOne();
+            
+            if (paymentRecord == null) {
+                log.warn("缴费记录不存在，无法更新学生课程记录，ID：{}", request.getId());
+                return;
+            }
+            
+            String studentId = paymentRecord.get(Tables.EDU_STUDENT_PAYMENT.STUDENT_ID);
+            String courseId = paymentRecord.get(Tables.EDU_STUDENT_PAYMENT.COURSE_ID);
+            
+            if (studentId == null || courseId == null) {
+                log.warn("缴费记录中缺少学员ID或课程ID，无法更新学生课程记录，ID：{}", request.getId());
+                return;
+            }
+            
+            // 查询学生课程记录
+            Record studentCourseRecord = dsl.select()
+                    .from(Tables.EDU_STUDENT_COURSE)
+                    .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(Long.valueOf(studentId)))
+                    .and(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(Long.valueOf(courseId)))
+                    .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
+                    .fetchOne();
+            
+            if (studentCourseRecord == null) {
+                log.warn("学生课程记录不存在，无法更新有效期字段，studentId：{}，courseId：{}", studentId, courseId);
+                return;
+            }
+            
+            // 计算新的有效期结束日期
+            LocalDate newEndDate = null;
+            if (request.getValidityPeriodId() != null) {
+                // 根据有效期常量ID计算结束日期
+                newEndDate = calculateEndDateFromConstantType(request.getValidityPeriodId());
+                log.info("根据有效期ID计算新的结束日期：studentId={}, courseId={}, validityPeriodId={}, newEndDate={}", 
+                        studentId, courseId, request.getValidityPeriodId(), newEndDate);
+            }
+            
+            // 更新学生课程记录
+            int updatedRows = dsl.update(Tables.EDU_STUDENT_COURSE)
+                    .set(Tables.EDU_STUDENT_COURSE.VALIDITY_PERIOD_ID, request.getValidityPeriodId())
+                    .set(Tables.EDU_STUDENT_COURSE.END_DATE, newEndDate)
+                    .set(Tables.EDU_STUDENT_COURSE.UPDATE_TIME, java.time.LocalDateTime.now())
+                    .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(Long.valueOf(studentId)))
+                    .and(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(Long.valueOf(courseId)))
+                    .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
+                    .execute();
+            
+            if (updatedRows > 0) {
+                log.info("学生课程记录有效期字段更新成功：studentId={}, courseId={}, validityPeriodId={}, endDate={}", 
+                        studentId, courseId, request.getValidityPeriodId(), newEndDate);
+            } else {
+                log.warn("学生课程记录有效期字段更新失败：studentId={}, courseId={}", studentId, courseId);
+            }
+            
+        } catch (Exception e) {
+            log.error("更新学生课程记录有效期字段时发生错误：", e);
+            // 不抛出异常，避免影响缴费记录更新的主流程
+        }
+    }
+    
+    /**
+     * 根据有效期常量ID计算结束日期
+     */
+    private LocalDate calculateEndDateFromConstantType(Long validityPeriodId) {
+        if (validityPeriodId == null) {
+            // 默认一年有效期
+            return LocalDate.now().plusYears(1);
+        }
+        
+        try {
+            // 查询该常量ID对应的常量值
+            String constantValue = dsl.select(Tables.SYS_CONSTANT.CONSTANT_VALUE)
+                    .from(Tables.SYS_CONSTANT)
+                    .where(Tables.SYS_CONSTANT.ID.eq(validityPeriodId))
+                    .and(Tables.SYS_CONSTANT.TYPE.eq("VALIDITY_PERIOD"))
+                    .and(Tables.SYS_CONSTANT.DELETED.eq(0))
+                    .fetchOneInto(String.class);
+            
+            if (constantValue == null) {
+                log.warn("未找到有效期常量值，使用默认一年有效期，validityPeriodId：{}", validityPeriodId);
+                return LocalDate.now().plusYears(1);
+            }
+            
+            // 根据常量值计算结束日期（这里需要根据实际的常量值格式来解析）
+            // 假设常量值是数字+单位的形式，如 "12" 表示12个月
+            try {
+                int months = Integer.parseInt(constantValue);
+                return LocalDate.now().plusMonths(months);
+            } catch (NumberFormatException e) {
+                log.warn("有效期常量值格式不正确，使用默认一年有效期，constantValue：{}", constantValue);
+                return LocalDate.now().plusYears(1);
+            }
+            
+        } catch (Exception e) {
+            log.error("计算有效期结束日期时发生错误：", e);
+            return LocalDate.now().plusYears(1);
         }
     }
 
