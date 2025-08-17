@@ -120,5 +120,7 @@ public class Indexes {
     public static final Index SYS_CONSTANT_IDX_TYPE = Internal.createIndex(DSL.name("idx_type"), SysConstant.SYS_CONSTANT, new OrderField[] { SysConstant.SYS_CONSTANT.TYPE }, false);
     public static final Index EDU_COURSE_IDX_TYPE_ID = Internal.createIndex(DSL.name("idx_type_id"), EduCourse.EDU_COURSE, new OrderField[] { EduCourse.EDU_COURSE.TYPE_ID }, false);
     public static final Index SYS_USER_ROLE_IDX_USER_ID = Internal.createIndex(DSL.name("idx_user_id"), SysUserRole.SYS_USER_ROLE, new OrderField[] { SysUserRole.SYS_USER_ROLE.USER_ID }, false);
+    public static final Index EDU_STUDENT_COURSE_IDX_VALIDITY_PERIOD_ID = Internal.createIndex(DSL.name("idx_validity_period_id"), EduStudentCourse.EDU_STUDENT_COURSE, new OrderField[] { EduStudentCourse.EDU_STUDENT_COURSE.VALIDITY_PERIOD_ID }, false);
+    public static final Index EDU_STUDENT_PAYMENT_IDX_VALIDITY_PERIOD_ID = Internal.createIndex(DSL.name("idx_validity_period_id"), EduStudentPayment.EDU_STUDENT_PAYMENT, new OrderField[] { EduStudentPayment.EDU_STUDENT_PAYMENT.VALIDITY_PERIOD_ID }, false);
     public static final Index SYS_COACH_IDX_WORK_TYPE = Internal.createIndex(DSL.name("idx_work_type"), SysCoach.SYS_COACH, new OrderField[] { SysCoach.SYS_COACH.WORK_TYPE }, false);
 }

@@ -21,7 +21,7 @@ import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row17;
+import org.jooq.Row18;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -97,6 +97,11 @@ public class EduStudentPayment extends TableImpl<EduStudentPaymentRecord> {
      * The column <code>lesson_prod.edu_student_payment.valid_until</code>. 有效期至
      */
     public final TableField<EduStudentPaymentRecord, LocalDate> VALID_UNTIL = createField(DSL.name("valid_until"), SQLDataType.LOCALDATE.nullable(false), this, "有效期至");
+
+    /**
+     * The column <code>lesson_prod.edu_student_payment.validity_period_id</code>. 有效期ID（关联sys_constant表）
+     */
+    public final TableField<EduStudentPaymentRecord, Long> VALIDITY_PERIOD_ID = createField(DSL.name("validity_period_id"), SQLDataType.BIGINT, this, "有效期ID（关联sys_constant表）");
 
     /**
      * The column <code>lesson_prod.edu_student_payment.gift_items</code>. 赠品
@@ -178,7 +183,7 @@ public class EduStudentPayment extends TableImpl<EduStudentPaymentRecord> {
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.EDU_STUDENT_PAYMENT_IDX_COURSE_ID, Indexes.EDU_STUDENT_PAYMENT_IDX_PAYMENT_TYPE, Indexes.EDU_STUDENT_PAYMENT_IDX_STUDENT_ID);
+        return Arrays.<Index>asList(Indexes.EDU_STUDENT_PAYMENT_IDX_COURSE_ID, Indexes.EDU_STUDENT_PAYMENT_IDX_PAYMENT_TYPE, Indexes.EDU_STUDENT_PAYMENT_IDX_STUDENT_ID, Indexes.EDU_STUDENT_PAYMENT_IDX_VALIDITY_PERIOD_ID);
     }
 
     @Override
@@ -223,11 +228,11 @@ public class EduStudentPayment extends TableImpl<EduStudentPaymentRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row17 type methods
+    // Row18 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row17<Long, String, String, String, BigDecimal, String, BigDecimal, BigDecimal, LocalDate, String, String, Long, Long, LocalDateTime, LocalDateTime, Integer, LocalDate> fieldsRow() {
-        return (Row17) super.fieldsRow();
+    public Row18<Long, String, String, String, BigDecimal, String, BigDecimal, BigDecimal, LocalDate, Long, String, String, Long, Long, LocalDateTime, LocalDateTime, Integer, LocalDate> fieldsRow() {
+        return (Row18) super.fieldsRow();
     }
 }

@@ -756,6 +756,8 @@ public class StudentService {
             .fetchOneInto(String.class);
 
         // 查询教练信息
+        log.info("查询教练信息 - courseId: {}, courseName: {}", course.getId(), course.getName());
+        
         org.jooq.Result<org.jooq.Record2<Long, String>> coachRecords = dsl.select(Tables.SYS_COACH.ID, Tables.SYS_COACH.NAME)
             .from(Tables.SYS_COACH_COURSE)
             .join(Tables.SYS_COACH).on(Tables.SYS_COACH_COURSE.COACH_ID.eq(Tables.SYS_COACH.ID))
@@ -763,6 +765,8 @@ public class StudentService {
             .and(Tables.SYS_COACH_COURSE.DELETED.eq(0))
             .and(Tables.SYS_COACH.DELETED.eq(0))
             .fetch();
+        
+        log.info("教练查询结果 - 记录数: {}", coachRecords.size());
         
         // 获取第一个教练的ID和所有教练的名称
         Long coachId = null;
@@ -772,6 +776,9 @@ public class StudentService {
             coachNames = coachRecords.stream()
                 .map(r -> r.get(Tables.SYS_COACH.NAME))
                 .collect(Collectors.toList());
+            log.info("找到教练 - coachId: {}, coachNames: {}", coachId, coachNames);
+        } else {
+            log.warn("未找到课程对应的教练 - courseId: {}", course.getId());
         }
         String coachName = String.join("，", coachNames);
 
@@ -807,8 +814,8 @@ public class StudentService {
         }
         courseInfo.setEndDate(endDate);
         
-        // 获取有效期ID
-        Long validityPeriodId = getValidityPeriodId(studentCourse.getStudentId(), studentCourse.getCourseId());
+        // 获取有效期ID - 直接从学员课程关系中获取
+        Long validityPeriodId = studentCourse.getValidityPeriodId();
         courseInfo.setValidityPeriodId(validityPeriodId);
         
         courseInfo.setStatus(studentCourse.getStatus() != null ? studentCourse.getStatus() : StudentCourseStatus.STUDYING.getName());
@@ -1458,10 +1465,18 @@ public class StudentService {
     // 4. 更新学员课程信息 (edu_student_course)
     // - 增加总课时 (正课 + 赠送)
     // - 更新有效期：未开始消课时endDate为null，开始消课后为消课日期+有效期
+    // - 更新有效期ID：从缴费请求中获取并存储到学员课程关系中
     // - 如果是续费且原状态是GRADUATED/EXPIRED等，可能需要重置为STUDYING
     BigDecimal addedTotalHours = request.getCourseHours().add(request.getGiftHours());
     studentCourse.setTotalHours(studentCourse.getTotalHours().add(addedTotalHours));
-    
+
+    // 设置有效期ID到学员课程关系中
+    if (request.getValidityPeriodId() != null) {
+        studentCourse.setValidityPeriodId(request.getValidityPeriodId());
+        log.info("设置学员课程有效期ID: studentId={}, courseId={}, validityPeriodId={}", 
+                request.getStudentId(), request.getCourseId(), request.getValidityPeriodId());
+    }
+
     // 如果学员还没有开始消课，endDate设为null；如果已经开始消课，设为消课日期+有效期
     if (studentCourse.getConsumedHours() == null || studentCourse.getConsumedHours().compareTo(BigDecimal.ZERO) == 0) {
         // 未开始消课，endDate设为null

@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
 
 import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record17;
-import org.jooq.Row17;
+import org.jooq.Record18;
+import org.jooq.Row18;
 import org.jooq.impl.UpdatableRecordImpl;
 
 
@@ -21,7 +21,7 @@ import org.jooq.impl.UpdatableRecordImpl;
  * 学员缴费记录表
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class EduStudentPaymentRecord extends UpdatableRecordImpl<EduStudentPaymentRecord> implements Record17<Long, String, String, String, BigDecimal, String, BigDecimal, BigDecimal, LocalDate, String, String, Long, Long, LocalDateTime, LocalDateTime, Integer, LocalDate> {
+public class EduStudentPaymentRecord extends UpdatableRecordImpl<EduStudentPaymentRecord> implements Record18<Long, String, String, String, BigDecimal, String, BigDecimal, BigDecimal, LocalDate, Long, String, String, Long, Long, LocalDateTime, LocalDateTime, Integer, LocalDate> {
 
     private static final long serialVersionUID = 1L;
 
@@ -152,115 +152,129 @@ public class EduStudentPaymentRecord extends UpdatableRecordImpl<EduStudentPayme
     }
 
     /**
+     * Setter for <code>lesson_prod.edu_student_payment.validity_period_id</code>. 有效期ID（关联sys_constant表）
+     */
+    public void setValidityPeriodId(Long value) {
+        set(9, value);
+    }
+
+    /**
+     * Getter for <code>lesson_prod.edu_student_payment.validity_period_id</code>. 有效期ID（关联sys_constant表）
+     */
+    public Long getValidityPeriodId() {
+        return (Long) get(9);
+    }
+
+    /**
      * Setter for <code>lesson_prod.edu_student_payment.gift_items</code>. 赠品
      */
     public void setGiftItems(String value) {
-        set(9, value);
+        set(10, value);
     }
 
     /**
      * Getter for <code>lesson_prod.edu_student_payment.gift_items</code>. 赠品
      */
     public String getGiftItems() {
-        return (String) get(9);
+        return (String) get(10);
     }
 
     /**
      * Setter for <code>lesson_prod.edu_student_payment.notes</code>. 备注
      */
     public void setNotes(String value) {
-        set(10, value);
+        set(11, value);
     }
 
     /**
      * Getter for <code>lesson_prod.edu_student_payment.notes</code>. 备注
      */
     public String getNotes() {
-        return (String) get(10);
+        return (String) get(11);
     }
 
     /**
      * Setter for <code>lesson_prod.edu_student_payment.campus_id</code>. 校区ID
      */
     public void setCampusId(Long value) {
-        set(11, value);
+        set(12, value);
     }
 
     /**
      * Getter for <code>lesson_prod.edu_student_payment.campus_id</code>. 校区ID
      */
     public Long getCampusId() {
-        return (Long) get(11);
+        return (Long) get(12);
     }
 
     /**
      * Setter for <code>lesson_prod.edu_student_payment.institution_id</code>. 机构ID
      */
     public void setInstitutionId(Long value) {
-        set(12, value);
+        set(13, value);
     }
 
     /**
      * Getter for <code>lesson_prod.edu_student_payment.institution_id</code>. 机构ID
      */
     public Long getInstitutionId() {
-        return (Long) get(12);
+        return (Long) get(13);
     }
 
     /**
      * Setter for <code>lesson_prod.edu_student_payment.created_time</code>. 创建时间
      */
     public void setCreatedTime(LocalDateTime value) {
-        set(13, value);
+        set(14, value);
     }
 
     /**
      * Getter for <code>lesson_prod.edu_student_payment.created_time</code>. 创建时间
      */
     public LocalDateTime getCreatedTime() {
-        return (LocalDateTime) get(13);
+        return (LocalDateTime) get(14);
     }
 
     /**
      * Setter for <code>lesson_prod.edu_student_payment.update_time</code>. 更新时间
      */
     public void setUpdateTime(LocalDateTime value) {
-        set(14, value);
+        set(15, value);
     }
 
     /**
      * Getter for <code>lesson_prod.edu_student_payment.update_time</code>. 更新时间
      */
     public LocalDateTime getUpdateTime() {
-        return (LocalDateTime) get(14);
+        return (LocalDateTime) get(15);
     }
 
     /**
      * Setter for <code>lesson_prod.edu_student_payment.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public void setDeleted(Integer value) {
-        set(15, value);
+        set(16, value);
     }
 
     /**
      * Getter for <code>lesson_prod.edu_student_payment.deleted</code>. 是否删除：0-未删除，1-已删除
      */
     public Integer getDeleted() {
-        return (Integer) get(15);
+        return (Integer) get(16);
     }
 
     /**
      * Setter for <code>lesson_prod.edu_student_payment.transaction_date</code>. 缴费日期（实际缴费发生的日期）
      */
     public void setTransactionDate(LocalDate value) {
-        set(16, value);
+        set(17, value);
     }
 
     /**
      * Getter for <code>lesson_prod.edu_student_payment.transaction_date</code>. 缴费日期（实际缴费发生的日期）
      */
     public LocalDate getTransactionDate() {
-        return (LocalDate) get(16);
+        return (LocalDate) get(17);
     }
 
     // -------------------------------------------------------------------------
@@ -273,17 +287,17 @@ public class EduStudentPaymentRecord extends UpdatableRecordImpl<EduStudentPayme
     }
 
     // -------------------------------------------------------------------------
-    // Record17 type implementation
+    // Record18 type implementation
     // -------------------------------------------------------------------------
 
     @Override
-    public Row17<Long, String, String, String, BigDecimal, String, BigDecimal, BigDecimal, LocalDate, String, String, Long, Long, LocalDateTime, LocalDateTime, Integer, LocalDate> fieldsRow() {
-        return (Row17) super.fieldsRow();
+    public Row18<Long, String, String, String, BigDecimal, String, BigDecimal, BigDecimal, LocalDate, Long, String, String, Long, Long, LocalDateTime, LocalDateTime, Integer, LocalDate> fieldsRow() {
+        return (Row18) super.fieldsRow();
     }
 
     @Override
-    public Row17<Long, String, String, String, BigDecimal, String, BigDecimal, BigDecimal, LocalDate, String, String, Long, Long, LocalDateTime, LocalDateTime, Integer, LocalDate> valuesRow() {
-        return (Row17) super.valuesRow();
+    public Row18<Long, String, String, String, BigDecimal, String, BigDecimal, BigDecimal, LocalDate, Long, String, String, Long, Long, LocalDateTime, LocalDateTime, Integer, LocalDate> valuesRow() {
+        return (Row18) super.valuesRow();
     }
 
     @Override
@@ -332,42 +346,47 @@ public class EduStudentPaymentRecord extends UpdatableRecordImpl<EduStudentPayme
     }
 
     @Override
-    public Field<String> field10() {
-        return EduStudentPayment.EDU_STUDENT_PAYMENT.GIFT_ITEMS;
+    public Field<Long> field10() {
+        return EduStudentPayment.EDU_STUDENT_PAYMENT.VALIDITY_PERIOD_ID;
     }
 
     @Override
     public Field<String> field11() {
+        return EduStudentPayment.EDU_STUDENT_PAYMENT.GIFT_ITEMS;
+    }
+
+    @Override
+    public Field<String> field12() {
         return EduStudentPayment.EDU_STUDENT_PAYMENT.NOTES;
     }
 
     @Override
-    public Field<Long> field12() {
+    public Field<Long> field13() {
         return EduStudentPayment.EDU_STUDENT_PAYMENT.CAMPUS_ID;
     }
 
     @Override
-    public Field<Long> field13() {
+    public Field<Long> field14() {
         return EduStudentPayment.EDU_STUDENT_PAYMENT.INSTITUTION_ID;
     }
 
     @Override
-    public Field<LocalDateTime> field14() {
+    public Field<LocalDateTime> field15() {
         return EduStudentPayment.EDU_STUDENT_PAYMENT.CREATED_TIME;
     }
 
     @Override
-    public Field<LocalDateTime> field15() {
+    public Field<LocalDateTime> field16() {
         return EduStudentPayment.EDU_STUDENT_PAYMENT.UPDATE_TIME;
     }
 
     @Override
-    public Field<Integer> field16() {
+    public Field<Integer> field17() {
         return EduStudentPayment.EDU_STUDENT_PAYMENT.DELETED;
     }
 
     @Override
-    public Field<LocalDate> field17() {
+    public Field<LocalDate> field18() {
         return EduStudentPayment.EDU_STUDENT_PAYMENT.TRANSACTION_DATE;
     }
 
@@ -417,42 +436,47 @@ public class EduStudentPaymentRecord extends UpdatableRecordImpl<EduStudentPayme
     }
 
     @Override
-    public String component10() {
-        return getGiftItems();
+    public Long component10() {
+        return getValidityPeriodId();
     }
 
     @Override
     public String component11() {
+        return getGiftItems();
+    }
+
+    @Override
+    public String component12() {
         return getNotes();
     }
 
     @Override
-    public Long component12() {
+    public Long component13() {
         return getCampusId();
     }
 
     @Override
-    public Long component13() {
+    public Long component14() {
         return getInstitutionId();
     }
 
     @Override
-    public LocalDateTime component14() {
+    public LocalDateTime component15() {
         return getCreatedTime();
     }
 
     @Override
-    public LocalDateTime component15() {
+    public LocalDateTime component16() {
         return getUpdateTime();
     }
 
     @Override
-    public Integer component16() {
+    public Integer component17() {
         return getDeleted();
     }
 
     @Override
-    public LocalDate component17() {
+    public LocalDate component18() {
         return getTransactionDate();
     }
 
@@ -502,42 +526,47 @@ public class EduStudentPaymentRecord extends UpdatableRecordImpl<EduStudentPayme
     }
 
     @Override
-    public String value10() {
-        return getGiftItems();
+    public Long value10() {
+        return getValidityPeriodId();
     }
 
     @Override
     public String value11() {
+        return getGiftItems();
+    }
+
+    @Override
+    public String value12() {
         return getNotes();
     }
 
     @Override
-    public Long value12() {
+    public Long value13() {
         return getCampusId();
     }
 
     @Override
-    public Long value13() {
+    public Long value14() {
         return getInstitutionId();
     }
 
     @Override
-    public LocalDateTime value14() {
+    public LocalDateTime value15() {
         return getCreatedTime();
     }
 
     @Override
-    public LocalDateTime value15() {
+    public LocalDateTime value16() {
         return getUpdateTime();
     }
 
     @Override
-    public Integer value16() {
+    public Integer value17() {
         return getDeleted();
     }
 
     @Override
-    public LocalDate value17() {
+    public LocalDate value18() {
         return getTransactionDate();
     }
 
@@ -596,55 +625,61 @@ public class EduStudentPaymentRecord extends UpdatableRecordImpl<EduStudentPayme
     }
 
     @Override
-    public EduStudentPaymentRecord value10(String value) {
-        setGiftItems(value);
+    public EduStudentPaymentRecord value10(Long value) {
+        setValidityPeriodId(value);
         return this;
     }
 
     @Override
     public EduStudentPaymentRecord value11(String value) {
+        setGiftItems(value);
+        return this;
+    }
+
+    @Override
+    public EduStudentPaymentRecord value12(String value) {
         setNotes(value);
         return this;
     }
 
     @Override
-    public EduStudentPaymentRecord value12(Long value) {
+    public EduStudentPaymentRecord value13(Long value) {
         setCampusId(value);
         return this;
     }
 
     @Override
-    public EduStudentPaymentRecord value13(Long value) {
+    public EduStudentPaymentRecord value14(Long value) {
         setInstitutionId(value);
         return this;
     }
 
     @Override
-    public EduStudentPaymentRecord value14(LocalDateTime value) {
+    public EduStudentPaymentRecord value15(LocalDateTime value) {
         setCreatedTime(value);
         return this;
     }
 
     @Override
-    public EduStudentPaymentRecord value15(LocalDateTime value) {
+    public EduStudentPaymentRecord value16(LocalDateTime value) {
         setUpdateTime(value);
         return this;
     }
 
     @Override
-    public EduStudentPaymentRecord value16(Integer value) {
+    public EduStudentPaymentRecord value17(Integer value) {
         setDeleted(value);
         return this;
     }
 
     @Override
-    public EduStudentPaymentRecord value17(LocalDate value) {
+    public EduStudentPaymentRecord value18(LocalDate value) {
         setTransactionDate(value);
         return this;
     }
 
     @Override
-    public EduStudentPaymentRecord values(Long value1, String value2, String value3, String value4, BigDecimal value5, String value6, BigDecimal value7, BigDecimal value8, LocalDate value9, String value10, String value11, Long value12, Long value13, LocalDateTime value14, LocalDateTime value15, Integer value16, LocalDate value17) {
+    public EduStudentPaymentRecord values(Long value1, String value2, String value3, String value4, BigDecimal value5, String value6, BigDecimal value7, BigDecimal value8, LocalDate value9, Long value10, String value11, String value12, Long value13, Long value14, LocalDateTime value15, LocalDateTime value16, Integer value17, LocalDate value18) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -662,6 +697,7 @@ public class EduStudentPaymentRecord extends UpdatableRecordImpl<EduStudentPayme
         value15(value15);
         value16(value16);
         value17(value17);
+        value18(value18);
         return this;
     }
 
@@ -679,7 +715,7 @@ public class EduStudentPaymentRecord extends UpdatableRecordImpl<EduStudentPayme
     /**
      * Create a detached, initialised EduStudentPaymentRecord
      */
-    public EduStudentPaymentRecord(Long id, String studentId, String courseId, String paymentType, BigDecimal amount, String paymentMethod, BigDecimal courseHours, BigDecimal giftHours, LocalDate validUntil, String giftItems, String notes, Long campusId, Long institutionId, LocalDateTime createdTime, LocalDateTime updateTime, Integer deleted, LocalDate transactionDate) {
+    public EduStudentPaymentRecord(Long id, String studentId, String courseId, String paymentType, BigDecimal amount, String paymentMethod, BigDecimal courseHours, BigDecimal giftHours, LocalDate validUntil, Long validityPeriodId, String giftItems, String notes, Long campusId, Long institutionId, LocalDateTime createdTime, LocalDateTime updateTime, Integer deleted, LocalDate transactionDate) {
         super(EduStudentPayment.EDU_STUDENT_PAYMENT);
 
         setId(id);
@@ -691,6 +727,7 @@ public class EduStudentPaymentRecord extends UpdatableRecordImpl<EduStudentPayme
         setCourseHours(courseHours);
         setGiftHours(giftHours);
         setValidUntil(validUntil);
+        setValidityPeriodId(validityPeriodId);
         setGiftItems(giftItems);
         setNotes(notes);
         setCampusId(campusId);

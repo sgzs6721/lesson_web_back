@@ -21,7 +21,7 @@ import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row14;
+import org.jooq.Row15;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -94,6 +94,11 @@ public class EduStudentCourse extends TableImpl<EduStudentCourseRecord> {
     public final TableField<EduStudentCourseRecord, LocalDate> END_DATE = createField(DSL.name("end_date"), SQLDataType.LOCALDATE, this, "有效期至");
 
     /**
+     * The column <code>lesson_prod.edu_student_course.validity_period_id</code>. 有效期ID（关联sys_constant表）
+     */
+    public final TableField<EduStudentCourseRecord, Long> VALIDITY_PERIOD_ID = createField(DSL.name("validity_period_id"), SQLDataType.BIGINT, this, "有效期ID（关联sys_constant表）");
+
+    /**
      * The column <code>lesson_prod.edu_student_course.fixed_schedule</code>. 固定排课时间，JSON格式
      */
     public final TableField<EduStudentCourseRecord, String> FIXED_SCHEDULE = createField(DSL.name("fixed_schedule"), SQLDataType.CLOB, this, "固定排课时间，JSON格式");
@@ -163,7 +168,7 @@ public class EduStudentCourse extends TableImpl<EduStudentCourseRecord> {
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.EDU_STUDENT_COURSE_IDX_CAMPUS_ID, Indexes.EDU_STUDENT_COURSE_IDX_COURSE_ID, Indexes.EDU_STUDENT_COURSE_IDX_INSTITUTION_ID, Indexes.EDU_STUDENT_COURSE_IDX_STATUS, Indexes.EDU_STUDENT_COURSE_IDX_STUDENT_ID);
+        return Arrays.<Index>asList(Indexes.EDU_STUDENT_COURSE_IDX_CAMPUS_ID, Indexes.EDU_STUDENT_COURSE_IDX_COURSE_ID, Indexes.EDU_STUDENT_COURSE_IDX_INSTITUTION_ID, Indexes.EDU_STUDENT_COURSE_IDX_STATUS, Indexes.EDU_STUDENT_COURSE_IDX_STUDENT_ID, Indexes.EDU_STUDENT_COURSE_IDX_VALIDITY_PERIOD_ID);
     }
 
     @Override
@@ -208,11 +213,11 @@ public class EduStudentCourse extends TableImpl<EduStudentCourseRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row14 type methods
+    // Row15 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row14<Long, Long, Long, BigDecimal, BigDecimal, String, LocalDate, LocalDate, String, Long, Long, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
-        return (Row14) super.fieldsRow();
+    public Row15<Long, Long, Long, BigDecimal, BigDecimal, String, LocalDate, LocalDate, Long, String, Long, Long, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
+        return (Row15) super.fieldsRow();
     }
 }
