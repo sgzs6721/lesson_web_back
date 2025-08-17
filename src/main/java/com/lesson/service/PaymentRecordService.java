@@ -226,24 +226,9 @@ public class PaymentRecordService {
                     // 直接设置赠品名称
                     item.setGifts(r.get(Tables.EDU_STUDENT_PAYMENT.GIFT_ITEMS));
                     
-                    // 设置有效期
-                    LocalDate validUntil = r.get(Tables.EDU_STUDENT_PAYMENT.VALID_UNTIL, LocalDate.class);
-                    if (validUntil != null) {
-                        item.setValidUntil(validUntil.format(dateFormatter));
-                        
-                        // 计算有效期月数
-                        if (transactionDate != null) {
-                            long months = java.time.temporal.ChronoUnit.MONTHS.between(transactionDate, validUntil);
-                            item.setValidityPeriodMonths((int) months);
-                            
-                            // 计算有效期类型ID
-                            Long validityPeriodId = calculateValidityPeriodId(months);
-                            item.setValidityPeriodId(validityPeriodId);
-                        }
-                    } else {
-                        // 如果没有有效期，设置为null
-                        item.setValidityPeriodId(null);
-                    }
+                    // 设置有效期ID（直接从数据库读取）
+                    Long validityPeriodId = r.get(Tables.EDU_STUDENT_PAYMENT.VALIDITY_PERIOD_ID);
+                    item.setValidityPeriodId(validityPeriodId);
                     
                     item.setRemarks(r.get(Tables.EDU_STUDENT_PAYMENT.NOTES));
             list.add(item);
@@ -407,6 +392,12 @@ public class PaymentRecordService {
                 giftItemsValue = String.join(",", giftNames);
             }
             
+
+            
+            // 添加调试日志
+            log.info("缴费记录更新参数 - validityPeriodId: {}, amount: {}, courseHours: {}, paymentType: {}", 
+                    request.getValidityPeriodId(), request.getAmount(), request.getCourseHours(), request.getPaymentType());
+            
             // 更新缴费记录
             int updatedRows = dsl.update(Tables.EDU_STUDENT_PAYMENT)
                     .set(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE, request.getPaymentType().name()) // 使用英文枚举值
@@ -416,10 +407,13 @@ public class PaymentRecordService {
                     .set(Tables.EDU_STUDENT_PAYMENT.TRANSACTION_DATE, request.getTransactionDate())
                     .set(Tables.EDU_STUDENT_PAYMENT.GIFT_HOURS, request.getGiftedHours())
                     .set(Tables.EDU_STUDENT_PAYMENT.GIFT_ITEMS, giftItemsValue)
+                    .set(Tables.EDU_STUDENT_PAYMENT.VALIDITY_PERIOD_ID, request.getValidityPeriodId()) // 保存有效期ID
                     .set(Tables.EDU_STUDENT_PAYMENT.UPDATE_TIME, java.time.LocalDateTime.now())
                     .where(Tables.EDU_STUDENT_PAYMENT.ID.eq(request.getId()))
                     .and(Tables.EDU_STUDENT_PAYMENT.DELETED.eq(0))
                     .execute();
+            
+            log.info("缴费记录更新结果 - 更新行数: {}", updatedRows);
             
             if (updatedRows == 0) {
                 throw new RuntimeException("更新缴费记录失败");

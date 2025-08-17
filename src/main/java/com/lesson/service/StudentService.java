@@ -1448,9 +1448,7 @@ public class StudentService {
                 request.getStudentId(), request.getCourseId(), request.getValidityPeriodId());
     }
     
-    // 根据有效期常量ID计算有效期结束日期
-    LocalDate validUntil = calculateEndDateFromConstantType(request.getValidityPeriodId());
-    paymentRecord.setValidUntil(validUntil);
+
     paymentRecord.setGiftItems(giftItemsDbString); // 存储转换后的字符串
     paymentRecord.setNotes(request.getNotes());
     paymentRecord.setCampusId(campusId);
@@ -1485,17 +1483,20 @@ public class StudentService {
                 request.getStudentId(), request.getCourseId(), request.getValidityPeriodId());
     }
 
-    // 如果学员还没有开始消课，endDate设为null；如果已经开始消课，设为消课日期+有效期
+    // 如果学员还没有开始消课，endDate设为null；如果已经开始消课，根据有效期ID计算
     if (studentCourse.getConsumedHours() == null || studentCourse.getConsumedHours().compareTo(BigDecimal.ZERO) == 0) {
         // 未开始消课，endDate设为null
         studentCourse.setEndDate(null);
         log.info("学员未开始消课，设置endDate为null: studentId={}, courseId={}", 
                 request.getStudentId(), request.getCourseId());
     } else {
-        // 已经开始消课，endDate设为消课日期+有效期
-        studentCourse.setEndDate(validUntil);
-        log.info("学员已开始消课，设置endDate为: studentId={}, courseId={}, endDate={}", 
-                request.getStudentId(), request.getCourseId(), validUntil);
+        // 已经开始消课，根据有效期ID计算endDate
+        if (request.getValidityPeriodId() != null) {
+            LocalDate calculatedEndDate = calculateEndDateFromConstantType(request.getValidityPeriodId());
+            studentCourse.setEndDate(calculatedEndDate);
+            log.info("学员已开始消课，根据有效期ID计算endDate: studentId={}, courseId={}, validityPeriodId={}, endDate={}", 
+                    request.getStudentId(), request.getCourseId(), request.getValidityPeriodId(), calculatedEndDate);
+        }
     }
     
     log.info("设置学员课程有效期: studentId={}, courseId={}, validityPeriodId={}, endDate={}", 
@@ -1542,13 +1543,6 @@ public class StudentService {
     // 设置总课时和有效期
     response.setTotalHours(studentCourse.getTotalHours().toString());
     response.setValidityPeriodId(request.getValidityPeriodId());
-    
-    // 计算有效期月数
-    Integer validityPeriodMonths = calculateValidityPeriodMonths(request.getValidityPeriodId());
-    response.setValidityPeriodMonths(validityPeriodMonths);
-    
-    // 设置有效期至（如果endDate为null，则validUntil也为null）
-    response.setValidUntil(studentCourse.getEndDate() != null ? studentCourse.getEndDate().toString() : null);
 
     return response;
   }
