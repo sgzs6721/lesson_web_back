@@ -1440,6 +1440,14 @@ public class StudentService {
     paymentRecord.setPaymentMethod(request.getPaymentMethod().name());
     paymentRecord.setCourseHours(request.getCourseHours());
     paymentRecord.setGiftHours(request.getGiftHours());
+    
+    // 设置有效期ID到缴费记录中
+    if (request.getValidityPeriodId() != null) {
+        paymentRecord.setValidityPeriodId(request.getValidityPeriodId());
+        log.info("设置缴费记录有效期ID: studentId={}, courseId={}, validityPeriodId={}", 
+                request.getStudentId(), request.getCourseId(), request.getValidityPeriodId());
+    }
+    
     // 根据有效期常量ID计算有效期结束日期
     LocalDate validUntil = calculateEndDateFromConstantType(request.getValidityPeriodId());
     paymentRecord.setValidUntil(validUntil);
