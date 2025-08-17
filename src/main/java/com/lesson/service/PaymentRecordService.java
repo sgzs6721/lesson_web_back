@@ -141,6 +141,11 @@ public class PaymentRecordService {
         log.info("排序字段: {}, 排序方向: {}, 构建的排序字段: {}", 
                 request.getSortField(), request.getSortOrder(), orderByField);
         
+        // 构建完整的查询SQL用于调试
+        String finalSql = query.orderBy(orderByField).getSQL();
+        log.info("最终查询SQL: {}", finalSql);
+        log.info("排序字段: {}", orderByField);
+        
         List<Record> records = query
                     .orderBy(orderByField)
                 .limit(request.getPageSize())

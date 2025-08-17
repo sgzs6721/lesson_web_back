@@ -755,14 +755,24 @@ public class StudentService {
             .where(Tables.SYS_CONSTANT.ID.eq(course.getTypeId()))
             .fetchOneInto(String.class);
 
-        // 查询教练名称
-        List<String> coachNames = dsl.select(Tables.SYS_COACH.NAME)
+        // 查询教练信息
+        org.jooq.Result<org.jooq.Record2<Long, String>> coachRecords = dsl.select(Tables.SYS_COACH.ID, Tables.SYS_COACH.NAME)
             .from(Tables.SYS_COACH_COURSE)
             .join(Tables.SYS_COACH).on(Tables.SYS_COACH_COURSE.COACH_ID.eq(Tables.SYS_COACH.ID))
             .where(Tables.SYS_COACH_COURSE.COURSE_ID.eq(course.getId()))
             .and(Tables.SYS_COACH_COURSE.DELETED.eq(0))
             .and(Tables.SYS_COACH.DELETED.eq(0))
-            .fetchInto(String.class);
+            .fetch();
+        
+        // 获取第一个教练的ID和所有教练的名称
+        Long coachId = null;
+        List<String> coachNames = new ArrayList<>();
+        if (!coachRecords.isEmpty()) {
+            coachId = coachRecords.get(0).get(Tables.SYS_COACH.ID);
+            coachNames = coachRecords.stream()
+                .map(r -> r.get(Tables.SYS_COACH.NAME))
+                .collect(Collectors.toList());
+        }
         String coachName = String.join("，", coachNames);
 
         // 创建课程信息
@@ -772,6 +782,7 @@ public class StudentService {
         courseInfo.setCourseName(course.getName());
         courseInfo.setCourseTypeId(course.getTypeId());
         courseInfo.setCourseTypeName(courseTypeName);
+        courseInfo.setCoachId(coachId); // 设置教练ID
         courseInfo.setCoachName(coachName != null ? coachName : "");
         courseInfo.setTotalHours(studentCourse.getTotalHours());
         courseInfo.setConsumedHours(studentCourse.getConsumedHours());
@@ -787,7 +798,14 @@ public class StudentService {
 
         // 设置其他信息
         courseInfo.setEnrollmentDate(studentCourse.getStartDate());
-        courseInfo.setEndDate(studentCourse.getEndDate()); // 设置有效期
+        
+        // 设置有效期结束日期
+        LocalDate endDate = studentCourse.getEndDate();
+        if (endDate == null) {
+            // 如果endDate为null，尝试从缴费记录中计算
+            endDate = calculateEndDateFromFirstPayment(studentCourse.getStudentId(), studentCourse.getCourseId(), LocalDate.now());
+        }
+        courseInfo.setEndDate(endDate);
         
         // 获取有效期ID
         Long validityPeriodId = getValidityPeriodId(studentCourse.getStudentId(), studentCourse.getCourseId());
