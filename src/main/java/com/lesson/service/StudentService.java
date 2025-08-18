@@ -819,13 +819,15 @@ public class StudentService {
         
         LocalDate endDate = null;
         Long validityPeriodId = null;
+        boolean hasStarted = studentCourse.getConsumedHours() != null 
+            && studentCourse.getConsumedHours().compareTo(BigDecimal.ZERO) > 0;
         
         if (paymentRecord != null) {
             // 从缴费记录获取有效期ID
             validityPeriodId = paymentRecord.get(Tables.EDU_STUDENT_PAYMENT.VALIDITY_PERIOD_ID);
             
             // 如果已经开始上课，根据第一次上课时间计算endDate
-            if (studentCourse.getConsumedHours() != null && studentCourse.getConsumedHours().compareTo(BigDecimal.ZERO) > 0) {
+            if (hasStarted) {
                 // 查询第一次上课时间（查找上课记录，不是操作记录）
                 LocalDate firstClassDate = dsl.select(DSL.min(Tables.EDU_STUDENT_COURSE_RECORD.COURSE_DATE))
                     .from(Tables.EDU_STUDENT_COURSE_RECORD)
@@ -837,25 +839,22 @@ public class StudentService {
                 
                 if (firstClassDate != null && validityPeriodId != null) {
                     // 根据第一次上课时间和有效期ID计算endDate
-                    endDate = calculateEndDateFromConstantType(validityPeriodId);
+                    endDate = calculateEndDateFromConstantType(validityPeriodId, firstClassDate);
                     log.info("根据第一次上课时间计算endDate: studentId={}, courseId={}, firstClassDate={}, validityPeriodId={}, endDate={}", 
                             studentCourse.getStudentId(), studentCourse.getCourseId(), firstClassDate, validityPeriodId, endDate);
                 }
             } else {
-                // 如果还没开始上课，根据有效期ID计算endDate
-                if (validityPeriodId != null) {
-                    endDate = calculateEndDateFromConstantType(validityPeriodId);
-                    log.info("根据有效期ID计算endDate: studentId={}, courseId={}, validityPeriodId={}, endDate={}", 
-                            studentCourse.getStudentId(), studentCourse.getCourseId(), validityPeriodId, endDate);
-                }
+                // 未开始消课，不计算 endDate，保持为 null
+                log.info("未开始消课，不计算endDate: studentId={}, courseId={}, validityPeriodId={}",
+                        studentCourse.getStudentId(), studentCourse.getCourseId(), validityPeriodId);
             }
         }
         
         // 如果还是没有endDate，使用学员课程关系中的endDate
         if (endDate == null) {
             endDate = studentCourse.getEndDate();
-            if (endDate == null) {
-                // 最后兜底，尝试从缴费记录中计算
+            // 兜底：仅在已开始消课时尝试通过历史规则计算；未开始则保持为null
+            if (endDate == null && hasStarted) {
                 endDate = calculateEndDateFromFirstPayment(studentCourse.getStudentId(), studentCourse.getCourseId(), LocalDate.now());
             }
         }
@@ -1664,6 +1663,47 @@ public class StudentService {
     } else {
       // 默认一年有效期
       return LocalDate.now().plusYears(1);
+    }
+  }
+
+  /**
+   * 根据有效期常量ID与起始日期计算结束日期
+   *
+   * @param validityPeriodId 有效期常量ID
+   * @param startDate 起始日期（例如第一次上课日期）
+   * @return 计算后的结束日期
+   */
+  private LocalDate calculateEndDateFromConstantType(Long validityPeriodId, LocalDate startDate) {
+    if (validityPeriodId == null) {
+      return startDate.plusYears(1);
+    }
+
+    String constantValue = dsl.select(Tables.SYS_CONSTANT.CONSTANT_VALUE)
+        .from(Tables.SYS_CONSTANT)
+        .where(Tables.SYS_CONSTANT.ID.eq(validityPeriodId))
+        .and(Tables.SYS_CONSTANT.TYPE.eq(ConstantType.VALIDITY_PERIOD.getName()))
+        .fetchOneInto(String.class);
+
+    if (constantValue == null) {
+      return startDate.plusYears(1);
+    }
+
+    if (constantValue.contains("1个月")) {
+      return startDate.plusMonths(1);
+    } else if (constantValue.contains("3个月")) {
+      return startDate.plusMonths(3);
+    } else if (constantValue.contains("6个月")) {
+      return startDate.plusMonths(6);
+    } else if (constantValue.contains("1年")) {
+      return startDate.plusYears(1);
+    } else if (constantValue.contains("2年")) {
+      return startDate.plusYears(2);
+    } else if (constantValue.contains("3年")) {
+      return startDate.plusYears(3);
+    } else if (constantValue.contains("永久")) {
+      return startDate.plusYears(100);
+    } else {
+      return startDate.plusYears(1);
     }
   }
 
