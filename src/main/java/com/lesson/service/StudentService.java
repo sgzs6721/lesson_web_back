@@ -806,16 +806,62 @@ public class StudentService {
         // 设置其他信息
         courseInfo.setEnrollmentDate(studentCourse.getStartDate());
         
-        // 设置有效期结束日期
-        LocalDate endDate = studentCourse.getEndDate();
-        if (endDate == null) {
-            // 如果endDate为null，尝试从缴费记录中计算
-            endDate = calculateEndDateFromFirstPayment(studentCourse.getStudentId(), studentCourse.getCourseId(), LocalDate.now());
-        }
-        courseInfo.setEndDate(endDate);
+        // 根据缴费记录来设置endDate和validityPeriodId
+        // 查询该学员该课程的最新缴费记录
+        org.jooq.Record paymentRecord = dsl.select()
+            .from(Tables.EDU_STUDENT_PAYMENT)
+            .where(Tables.EDU_STUDENT_PAYMENT.STUDENT_ID.eq(studentCourse.getStudentId().toString()))
+            .and(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.eq(studentCourse.getCourseId().toString()))
+            .and(Tables.EDU_STUDENT_PAYMENT.DELETED.eq(0))
+            .orderBy(Tables.EDU_STUDENT_PAYMENT.TRANSACTION_DATE.desc())
+            .limit(1)
+            .fetchOne();
         
-        // 获取有效期ID - 直接从学员课程关系中获取
-        Long validityPeriodId = studentCourse.getValidityPeriodId();
+        LocalDate endDate = null;
+        Long validityPeriodId = null;
+        
+        if (paymentRecord != null) {
+            // 从缴费记录获取有效期ID
+            validityPeriodId = paymentRecord.get(Tables.EDU_STUDENT_PAYMENT.VALIDITY_PERIOD_ID);
+            
+            // 如果已经开始上课，根据第一次上课时间计算endDate
+            if (studentCourse.getConsumedHours() != null && studentCourse.getConsumedHours().compareTo(BigDecimal.ZERO) > 0) {
+                // 查询第一次上课时间（查找上课记录，不是操作记录）
+                LocalDate firstClassDate = dsl.select(DSL.min(Tables.EDU_STUDENT_COURSE_RECORD.COURSE_DATE))
+                    .from(Tables.EDU_STUDENT_COURSE_RECORD)
+                    .where(Tables.EDU_STUDENT_COURSE_RECORD.STUDENT_ID.eq(studentCourse.getStudentId()))
+                    .and(Tables.EDU_STUDENT_COURSE_RECORD.COURSE_ID.eq(studentCourse.getCourseId()))
+                    .and(Tables.EDU_STUDENT_COURSE_RECORD.DELETED.eq(0))
+                    .and(Tables.EDU_STUDENT_COURSE_RECORD.STATUS.eq("CHECK_IN")) // 只统计已打卡的课程
+                    .fetchOneInto(LocalDate.class);
+                
+                if (firstClassDate != null && validityPeriodId != null) {
+                    // 根据第一次上课时间和有效期ID计算endDate
+                    endDate = calculateEndDateFromConstantType(validityPeriodId);
+                    log.info("根据第一次上课时间计算endDate: studentId={}, courseId={}, firstClassDate={}, validityPeriodId={}, endDate={}", 
+                            studentCourse.getStudentId(), studentCourse.getCourseId(), firstClassDate, validityPeriodId, endDate);
+                }
+            } else {
+                // 如果还没开始上课，使用缴费记录中的valid_until
+                LocalDate validUntil = paymentRecord.get(Tables.EDU_STUDENT_PAYMENT.VALID_UNTIL);
+                if (validUntil != null) {
+                    endDate = validUntil;
+                    log.info("使用缴费记录中的valid_until: studentId={}, courseId={}, validUntil={}", 
+                            studentCourse.getStudentId(), studentCourse.getCourseId(), validUntil);
+                }
+            }
+        }
+        
+        // 如果还是没有endDate，使用学员课程关系中的endDate
+        if (endDate == null) {
+            endDate = studentCourse.getEndDate();
+            if (endDate == null) {
+                // 最后兜底，尝试从缴费记录中计算
+                endDate = calculateEndDateFromFirstPayment(studentCourse.getStudentId(), studentCourse.getCourseId(), LocalDate.now());
+            }
+        }
+        
+        courseInfo.setEndDate(endDate);
         courseInfo.setValidityPeriodId(validityPeriodId);
         
         courseInfo.setStatus(studentCourse.getStatus() != null ? studentCourse.getStatus() : StudentCourseStatus.STUDYING.getName());
@@ -1446,8 +1492,25 @@ public class StudentService {
         paymentRecord.setValidityPeriodId(request.getValidityPeriodId());
         log.info("设置缴费记录有效期ID: studentId={}, courseId={}, validityPeriodId={}", 
                 request.getStudentId(), request.getCourseId(), request.getValidityPeriodId());
+        
+        // 根据有效期ID计算valid_until字段
+        LocalDate validUntil = calculateEndDateFromConstantType(request.getValidityPeriodId());
+        paymentRecord.setValidUntil(validUntil);
+        log.info("根据有效期ID计算valid_until: studentId={}, courseId={}, validityPeriodId={}, validUntil={}", 
+                request.getStudentId(), request.getCourseId(), request.getValidityPeriodId(), validUntil);
+    } else {
+        log.warn("缴费请求中validityPeriodId为null: studentId={}, courseId={}", 
+                request.getStudentId(), request.getCourseId());
+        // 如果validityPeriodId为null，设置一个默认的有效期（比如当前日期+1年）
+        LocalDate defaultValidUntil = LocalDate.now().plusYears(1);
+        paymentRecord.setValidUntil(defaultValidUntil);
+        log.info("设置默认有效期: studentId={}, courseId={}, defaultValidUntil={}", 
+                request.getStudentId(), request.getCourseId(), defaultValidUntil);
     }
     
+    // 添加调试日志，显示缴费记录的所有字段
+    log.info("缴费记录创建前 - validityPeriodId: {}, validUntil: {}, studentId: {}, courseId: {}, amount: {}", 
+            paymentRecord.getValidityPeriodId(), paymentRecord.getValidUntil(), paymentRecord.getStudentId(), paymentRecord.getCourseId(), paymentRecord.getAmount());
 
     paymentRecord.setGiftItems(giftItemsDbString); // 存储转换后的字符串
     paymentRecord.setNotes(request.getNotes());
@@ -1467,6 +1530,10 @@ public class StudentService {
     }
 
     Long paymentId = studentPaymentModel.createPayment(paymentRecord);
+    
+    // 添加调试日志，确认缴费记录创建后的状态
+    log.info("缴费记录创建成功 - paymentId: {}, validityPeriodId: {}", 
+            paymentId, paymentRecord.getValidityPeriodId());
 
     // 4. 更新学员课程信息 (edu_student_course)
     // - 增加总课时 (正课 + 赠送)
