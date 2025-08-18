@@ -842,12 +842,11 @@ public class StudentService {
                             studentCourse.getStudentId(), studentCourse.getCourseId(), firstClassDate, validityPeriodId, endDate);
                 }
             } else {
-                // 如果还没开始上课，使用缴费记录中的valid_until
-                LocalDate validUntil = paymentRecord.get(Tables.EDU_STUDENT_PAYMENT.VALID_UNTIL);
-                if (validUntil != null) {
-                    endDate = validUntil;
-                    log.info("使用缴费记录中的valid_until: studentId={}, courseId={}, validUntil={}", 
-                            studentCourse.getStudentId(), studentCourse.getCourseId(), validUntil);
+                // 如果还没开始上课，根据有效期ID计算endDate
+                if (validityPeriodId != null) {
+                    endDate = calculateEndDateFromConstantType(validityPeriodId);
+                    log.info("根据有效期ID计算endDate: studentId={}, courseId={}, validityPeriodId={}, endDate={}", 
+                            studentCourse.getStudentId(), studentCourse.getCourseId(), validityPeriodId, endDate);
                 }
             }
         }
