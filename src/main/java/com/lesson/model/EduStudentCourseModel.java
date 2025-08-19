@@ -197,6 +197,13 @@ public class EduStudentCourseModel {
                .and(EDU_STUDENT_COURSE_OPERATION.COURSE_ID.eq(EDU_STUDENT_COURSE.COURSE_ID))
         ).as("last_class_time");
 
+        // 只有上过课第一次课，才返回endDate
+        Field<LocalDate> conditionalEndDateField = DSL.case_()
+            .when(EDU_STUDENT_COURSE.CONSUMED_HOURS.isNotNull().and(EDU_STUDENT_COURSE.CONSUMED_HOURS.gt(BigDecimal.ZERO)), 
+                  EDU_STUDENT_COURSE.END_DATE)
+            .otherwise((LocalDate) null)
+            .as("end_date");
+
         return dsl.select(
                     EDU_STUDENT.ID.as("student_id"),
                     EDU_STUDENT.NAME.as("student_name"),
@@ -209,7 +216,7 @@ public class EduStudentCourseModel {
                     EDU_STUDENT_COURSE.CONSUMED_HOURS,
                     remainingHoursField, // 添加计算后的剩余课时字段
                     EDU_STUDENT_COURSE.START_DATE.as("enrollment_date"),
-                    EDU_STUDENT_COURSE.END_DATE.as("end_date"),
+                    conditionalEndDateField, // 使用条件性的end_date字段
                     EDU_STUDENT_COURSE.STATUS,
                     EDU_STUDENT_COURSE.CAMPUS_ID,
                     EDU_STUDENT_COURSE.INSTITUTION_ID,

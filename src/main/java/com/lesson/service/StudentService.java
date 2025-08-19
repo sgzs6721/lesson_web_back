@@ -1021,7 +1021,19 @@ public class StudentService {
 
         vo.setLastClassTime(lastClassTime);
         vo.setEnrollmentDate(studentCourse.getStartDate());
-        vo.setEndDate(studentCourse.getEndDate()); // 设置有效期
+        
+        // 只有上过课第一次课，才计算和返回endDate
+        LocalDate endDate = null;
+        if (studentCourse.getConsumedHours() != null && studentCourse.getConsumedHours().compareTo(BigDecimal.ZERO) > 0) {
+            // 已经开始消课，设置endDate
+            endDate = studentCourse.getEndDate();
+            // 如果endDate为null，尝试通过历史规则计算
+            if (endDate == null) {
+                endDate = calculateEndDateFromFirstPayment(studentCourse.getStudentId(), studentCourse.getCourseId(), LocalDate.now());
+            }
+        }
+        vo.setEndDate(endDate); // 设置有效期
+        
         vo.setStatus(studentCourse.getStatus());
 
         vo.setCampusId(studentCourse.getCampusId());
