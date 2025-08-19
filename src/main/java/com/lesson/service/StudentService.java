@@ -348,7 +348,7 @@ public class StudentService {
 
     // 5. 不再全量逻辑删除课程关系，防止状态被意外重置。
 
-    // 6. 处理课程信息（按传入逐项更新/新增；未传课程不动）
+    // 6. 处理课程信息（仅更新现有课程关系，不创建新关系）
     for (StudentWithCourseUpdateRequest.CourseInfo courseInfo : request.getCourseInfoList()) {
       // 获取课程信息
       EduCourseRecord courseRecord = dsl.selectFrom(Tables.EDU_COURSE)
@@ -360,35 +360,29 @@ public class StudentService {
         throw new IllegalArgumentException("课程不存在：" + courseInfo.getCourseId());
       }
 
-      // 6.1 获取或创建学员课程关系
+      // 6.1 获取学员课程关系
       EduStudentCourseRecord studentCourseRecord = null;
       if (courseInfo.getStudentCourseId() != null) {
+        // 如果提供了学员课程关系ID，则查找并更新现有记录
         studentCourseRecord = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
             .where(Tables.EDU_STUDENT_COURSE.ID.eq(courseInfo.getStudentCourseId()))
+            .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
             .fetchOne();
         if (studentCourseRecord == null) {
           throw new IllegalArgumentException("学员课程关系不存在：" + courseInfo.getStudentCourseId());
         }
-      } else {
-        // 根据 studentId+courseId 尝试匹配已有关系（包含已被标记删除的）
-        studentCourseRecord = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
-            .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(request.getStudentId()))
-            .and(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(courseInfo.getCourseId()))
-            .orderBy(Tables.EDU_STUDENT_COURSE.ID.desc())
-            .limit(1)
-            .fetchOne();
-        if (studentCourseRecord == null) {
-          // 不存在则创建新记录，默认待缴费
-          studentCourseRecord = new EduStudentCourseRecord();
-          studentCourseRecord.setStudentId(request.getStudentId());
-          studentCourseRecord.setCourseId(courseInfo.getCourseId());
-          studentCourseRecord.setConsumedHours(java.math.BigDecimal.ZERO);
-          studentCourseRecord.setStatus(StudentCourseStatus.WAITING_PAYMENT.getName());
-          studentCourseRecord.setStartDate(courseInfo.getEnrollDate());
-          studentCourseRecord.setCampusId(studentInfo.getCampusId());
-          studentCourseRecord.setInstitutionId(institutionId);
-          studentCourseRecord.setTotalHours(courseRecord.getTotalHours());
+        
+        // 验证学员ID和课程ID是否匹配
+        if (!studentCourseRecord.getStudentId().equals(request.getStudentId())) {
+          throw new IllegalArgumentException("学员课程关系与学员ID不匹配");
         }
+        if (!studentCourseRecord.getCourseId().equals(courseInfo.getCourseId())) {
+          throw new IllegalArgumentException("学员课程关系与课程ID不匹配");
+        }
+      } else {
+        // 编辑模式下，如果没有提供studentCourseId，则抛出异常
+        // 防止意外创建新记录
+        throw new IllegalArgumentException("编辑学员课程时必须提供学员课程关系ID(studentCourseId)，以防止意外创建新记录");
       }
 
       // 6.2 不修改课程状态（除非是新建关系时设置默认值）

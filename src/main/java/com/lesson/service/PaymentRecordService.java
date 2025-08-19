@@ -32,6 +32,8 @@ import com.lesson.enums.PaymentType;
 @RequiredArgsConstructor
 public class PaymentRecordService {
     private final DSLContext dsl;
+    private final CourseHoursRedisService courseHoursRedisService;
+    private final CampusStatsRedisService campusStatsRedisService;
 
     public PaymentRecordListVO listPaymentRecords(PaymentRecordQueryRequest request) {
         try {
@@ -479,10 +481,23 @@ public class PaymentRecordService {
                         studentId, courseId, request.getValidityPeriodId(), newEndDate);
             }
             
-            // 更新学生课程记录
+            // 获取当前学员课程记录的总课时，用于累加计算
+            BigDecimal currentTotalHours = studentCourseRecord.get(Tables.EDU_STUDENT_COURSE.TOTAL_HOURS);
+            if (currentTotalHours == null) {
+                currentTotalHours = BigDecimal.ZERO;
+            }
+            
+            // 计算新的总课时：原有课时 + 新增课时
+            BigDecimal newTotalHours = currentTotalHours.add(request.getCourseHours()).add(request.getGiftedHours());
+            
+            log.info("课时累加计算：原有课时={}, 新增正课={}, 新增赠课={}, 新总课时={}", 
+                    currentTotalHours, request.getCourseHours(), request.getGiftedHours(), newTotalHours);
+            
+            // 更新学生课程记录 - 包括课时信息和有效期
             int updatedRows = dsl.update(Tables.EDU_STUDENT_COURSE)
                     .set(Tables.EDU_STUDENT_COURSE.VALIDITY_PERIOD_ID, request.getValidityPeriodId())
                     .set(Tables.EDU_STUDENT_COURSE.END_DATE, newEndDate)
+                    .set(Tables.EDU_STUDENT_COURSE.TOTAL_HOURS, newTotalHours)
                     .set(Tables.EDU_STUDENT_COURSE.UPDATE_TIME, java.time.LocalDateTime.now())
                     .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(Long.valueOf(studentId)))
                     .and(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(Long.valueOf(courseId)))
@@ -492,6 +507,38 @@ public class PaymentRecordService {
             if (updatedRows > 0) {
                 log.info("学生课程记录有效期字段更新成功：studentId={}, courseId={}, validityPeriodId={}, endDate={}", 
                         studentId, courseId, request.getValidityPeriodId(), newEndDate);
+                
+                // 同步更新Redis缓存中的课程总课时统计
+                try {
+                    // 获取机构ID和校区ID
+                    Long institutionId = paymentRecord.get(Tables.EDU_STUDENT_PAYMENT.INSTITUTION_ID);
+                    Long campusId = paymentRecord.get(Tables.EDU_STUDENT_PAYMENT.CAMPUS_ID);
+                    
+                    if (institutionId != null && campusId != null) {
+                        // 重新计算整个课程的总课时（从数据库汇总所有学员的课时）
+                        BigDecimal courseTotalHours = dsl.select(DSL.sum(Tables.EDU_STUDENT_COURSE.TOTAL_HOURS))
+                                .from(Tables.EDU_STUDENT_COURSE)
+                                .where(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(Long.valueOf(courseId)))
+                                .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
+                                .fetchOneInto(BigDecimal.class);
+                        
+                        if (courseTotalHours == null) {
+                            courseTotalHours = BigDecimal.ZERO;
+                        }
+                        
+                        // 更新课程总课时缓存（使用重新计算的课程总课时）
+                        courseHoursRedisService.updateCourseTotalHours(institutionId, campusId, Long.valueOf(courseId), courseTotalHours);
+                        
+                        // 刷新校区统计数据缓存
+                        campusStatsRedisService.refreshCampusStats(institutionId, campusId);
+                        
+                        log.info("缴费记录编辑后，已重新计算并更新课程总课时缓存：institutionId={}, campusId={}, courseId={}, courseTotalHours={}", 
+                                institutionId, campusId, courseId, courseTotalHours);
+                    }
+                } catch (Exception e) {
+                    log.error("同步更新Redis缓存失败：", e);
+                    // 不抛出异常，避免影响主流程
+                }
             } else {
                 log.warn("学生课程记录有效期字段更新失败：studentId={}, courseId={}", studentId, courseId);
             }
