@@ -79,8 +79,7 @@ public class StudentService {
   private final EduStudentPaymentModel studentPaymentModel;
   private final EduCourseModel courseModel;
   private final SysConstantModel constantModel;
-  private final CourseHoursRedisService courseHoursRedisService;
-  private final CampusStatsRedisService campusStatsRedisService;
+
 
   /**
    * 从请求中获取机构ID
@@ -177,8 +176,7 @@ public class StudentService {
       studentCourseModel.createStudentCourse(studentCourseRecord);
     }
 
-    // 7. 更新Redis统计数据
-    campusStatsRedisService.incrementStudentCount(institutionId, studentInfo.getCampusId());
+    log.info("学员创建成功，校区ID：{}", studentInfo.getCampusId());
 
     return studentId;
   }
@@ -273,8 +271,7 @@ public class StudentService {
         courseInfoList.add(responseCourseInfo);
       }
 
-      // 6. 更新Redis统计数据
-      campusStatsRedisService.incrementStudentCount(institutionId, studentInfo.getCampusId());
+      log.info("学员课程关系创建成功，校区ID：{}", studentInfo.getCampusId());
 
       // 7. 构建响应对象
       StudentCreateResponseVO response = new StudentCreateResponseVO();
@@ -340,10 +337,9 @@ public class StudentService {
     // 3. 存储学员记录
     studentModel.updateStudent(studentRecord);
 
-    // 4. 更新Redis统计数据（如果校区发生变化）
+    // 4. 记录校区变更日志
     if (!java.util.Objects.equals(oldCampusIdBeforeUpdate, studentInfo.getCampusId())) {
-      campusStatsRedisService.decrementStudentCount(institutionId, oldCampusIdBeforeUpdate);
-      campusStatsRedisService.incrementStudentCount(institutionId, studentInfo.getCampusId());
+      log.info("学员校区变更：从校区{}变更为校区{}", oldCampusIdBeforeUpdate, studentInfo.getCampusId());
     }
 
     // 5. 不再全量逻辑删除课程关系，防止状态被意外重置。
@@ -1581,24 +1577,7 @@ public class StudentService {
     studentCourse.setUpdateTime(LocalDateTime.now());
     studentCourseModel.updateStudentCourse(studentCourse);
 
-    // 5. 缓存缴费课时信息到Redis
-    courseHoursRedisService.cachePaymentHours(
-        institutionId,
-        campusId,
-        request.getCourseId(),
-        request.getStudentId(),
-        request.getCourseHours(),
-        request.getGiftHours(),
-        paymentId
-    );
-
-    // 6. 更新课程总课时缓存
-    courseHoursRedisService.updateCourseTotalHours(
-        institutionId,
-        campusId,
-        request.getCourseId(),
-        studentCourse.getTotalHours()
-    );
+    log.info("学员缴费成功，总课时已更新为：{}", studentCourse.getTotalHours());
 
     log.info("学员缴费成功: studentId={}, courseId={}, paymentId={}, regularHours={}, giftHours={}, totalHours={}",
             request.getStudentId(), request.getCourseId(), paymentId,
@@ -2262,8 +2241,7 @@ public class StudentService {
           .fetchOneInto(Integer.class);
       log.info("学员 {} 有 {} 条课程关系记录需要删除", studentId, courseCount);
       
-      // 更新Redis统计数据
-      campusStatsRedisService.decrementStudentCount(student.getInstitutionId(), student.getCampusId());
+          log.info("学员删除成功，校区ID：{}", student.getCampusId());
       log.info("已更新Redis统计数据，减少学员数量");
       
       // 同时删除学员课程关系记录（逻辑删除）
