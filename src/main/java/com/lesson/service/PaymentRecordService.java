@@ -481,17 +481,34 @@ public class PaymentRecordService {
                         studentId, courseId, request.getValidityPeriodId(), newEndDate);
             }
             
-            // 获取当前学员课程记录的总课时，用于累加计算
+            // 获取原始缴费记录的课时信息，用于计算差值
+            BigDecimal originalCourseHours = paymentRecord.get(Tables.EDU_STUDENT_PAYMENT.COURSE_HOURS);
+            BigDecimal originalGiftHours = paymentRecord.get(Tables.EDU_STUDENT_PAYMENT.GIFT_HOURS);
+            
+            if (originalCourseHours == null) {
+                originalCourseHours = BigDecimal.ZERO;
+            }
+            if (originalGiftHours == null) {
+                originalGiftHours = BigDecimal.ZERO;
+            }
+            
+            // 计算课时差值：新课时 - 原课时
+            BigDecimal courseHoursDiff = request.getCourseHours().subtract(originalCourseHours);
+            BigDecimal giftHoursDiff = request.getGiftedHours().subtract(originalGiftHours);
+            BigDecimal totalHoursDiff = courseHoursDiff.add(giftHoursDiff);
+            
+            // 获取当前学员课程记录的总课时
             BigDecimal currentTotalHours = studentCourseRecord.get(Tables.EDU_STUDENT_COURSE.TOTAL_HOURS);
             if (currentTotalHours == null) {
                 currentTotalHours = BigDecimal.ZERO;
             }
             
-            // 计算新的总课时：原有课时 + 新增课时
-            BigDecimal newTotalHours = currentTotalHours.add(request.getCourseHours()).add(request.getGiftedHours());
+            // 计算新的总课时：原有课时 + 课时差值
+            BigDecimal newTotalHours = currentTotalHours.add(totalHoursDiff);
             
-            log.info("课时累加计算：原有课时={}, 新增正课={}, 新增赠课={}, 新总课时={}", 
-                    currentTotalHours, request.getCourseHours(), request.getGiftedHours(), newTotalHours);
+            log.info("课时差值计算：原缴费正课={}, 原缴费赠课={}, 新缴费正课={}, 新缴费赠课={}, 课时差值={}, 原有总课时={}, 新总课时={}", 
+                    originalCourseHours, originalGiftHours, request.getCourseHours(), request.getGiftedHours(), 
+                    totalHoursDiff, currentTotalHours, newTotalHours);
             
             // 更新学生课程记录 - 包括课时信息和有效期
             int updatedRows = dsl.update(Tables.EDU_STUDENT_COURSE)
