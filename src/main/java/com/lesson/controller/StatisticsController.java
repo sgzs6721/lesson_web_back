@@ -548,7 +548,6 @@ public class StatisticsController {
         Integer refundedStudents = 0;    // 退费学员
         Integer waitingRenewalStudents = 0; // 待续费学员
         Integer waitingPaymentStudents = 0; // 待缴费学员
-        Integer waitingClassStudents = 0;   // 待上课学员
 
         if (targetCampusId != null && targetCampusId > 0) {
             // 校区统计：统计指定校区的数据
@@ -666,13 +665,7 @@ public class StatisticsController {
                     .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq(com.lesson.enums.StudentCourseStatus.WAITING_PAYMENT.getName()))
                     .fetchOneInto(Integer.class);
                     
-            waitingClassStudents = dslContext.selectCount()
-                    .from(EduStudentCourse.EDU_STUDENT_COURSE)
-                    .where(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
-                    .and(EduStudentCourse.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
-                    .and(EduStudentCourse.EDU_STUDENT_COURSE.CAMPUS_ID.eq(targetCampusId))
-                    .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq(com.lesson.enums.StudentCourseStatus.WAITING_CLASS.getName()))
-                    .fetchOneInto(Integer.class);
+
         } else {
             // 超级管理员：统计整个机构的数据
             totalStudents = campusStatsRedisService.getInstitutionStudentCount(institutionId);
@@ -779,12 +772,7 @@ public class StatisticsController {
                     .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq(com.lesson.enums.StudentCourseStatus.WAITING_PAYMENT.getName()))
                     .fetchOneInto(Integer.class);
                     
-            waitingClassStudents = dslContext.selectCount()
-                    .from(EduStudentCourse.EDU_STUDENT_COURSE)
-                    .where(EduStudentCourse.EDU_STUDENT_COURSE.DELETED.eq(0))
-                    .and(EduStudentCourse.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId))
-                    .and(EduStudentCourse.EDU_STUDENT_COURSE.STATUS.eq(com.lesson.enums.StudentCourseStatus.WAITING_CLASS.getName()))
-                    .fetchOneInto(Integer.class);
+
         }
 
         Map<String, Object> result = new HashMap<>();
@@ -798,7 +786,7 @@ public class StatisticsController {
         result.put("refundedStudents", refundedStudents != null ? refundedStudents : 0);    // 退费学员
         result.put("waitingRenewalStudents", waitingRenewalStudents != null ? waitingRenewalStudents : 0); // 待续费学员
         result.put("waitingPaymentStudents", waitingPaymentStudents != null ? waitingPaymentStudents : 0); // 待缴费学员
-        result.put("waitingClassStudents", waitingClassStudents != null ? waitingClassStudents : 0);   // 待上课学员
+
 
         return Result.success(result);
     }
