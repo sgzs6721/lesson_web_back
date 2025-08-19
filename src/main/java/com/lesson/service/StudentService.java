@@ -731,10 +731,17 @@ public class StudentService {
       }
 
       // 查询学员的课程列表
-      List<EduStudentCourseRecord> studentCourses = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
+      SelectConditionStep<EduStudentCourseRecord> courseQuery = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
           .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(student.getId()))
-          .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
-          .fetch();
+          .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0));
+      
+      // 添加状态筛选
+      if (request.getStatus() != null) {
+          courseQuery.and(Tables.EDU_STUDENT_COURSE.STATUS.eq(request.getStatus().getName()));
+          log.info("添加状态筛选: studentId={}, status={}", student.getId(), request.getStatus().getName());
+      }
+      
+      List<EduStudentCourseRecord> studentCourses = courseQuery.fetch();
 
       List<StudentWithCoursesVO.CourseInfo> courseInfos = new ArrayList<>();
 
@@ -949,10 +956,17 @@ public class StudentService {
 
     for (EduStudentRecord student : students) {
       // 查询学员的课程列表
-      List<EduStudentCourseRecord> studentCourses = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
+      SelectConditionStep<EduStudentCourseRecord> courseQuery = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
           .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(student.getId()))
-          .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
-          .fetch();
+          .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0));
+      
+      // 添加状态筛选
+      if (request.getStatus() != null) {
+          courseQuery.and(Tables.EDU_STUDENT_COURSE.STATUS.eq(request.getStatus().getName()));
+          log.info("添加状态筛选: studentId={}, status={}", student.getId(), request.getStatus().getName());
+      }
+      
+      List<EduStudentCourseRecord> studentCourses = courseQuery.fetch();
 
       for (EduStudentCourseRecord studentCourse : studentCourses) {
         // 检查课程状态，如果不是在学状态，则跳过

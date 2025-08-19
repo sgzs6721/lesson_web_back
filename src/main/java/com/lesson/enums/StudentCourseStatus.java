@@ -8,9 +8,8 @@ public enum StudentCourseStatus {
     EXPIRED(2, "expired", "过期"),
     GRADUATED(3, "graduated", "结业"),
     WAITING_PAYMENT(4, "waiting_payment", "待缴费"),
-    WAITING_CLASS(5, "waiting_class", "待上课"),
-    WAITING_RENEWAL(6, "waiting_renewal", "待续费"),
-    REFUNDED(7, "refunded", "已退费");
+    WAITING_RENEWAL(5, "waiting_renewal", "待续费"),
+    REFUNDED(6, "refunded", "已退费");
 
     private final Integer code;
     private final String name;
