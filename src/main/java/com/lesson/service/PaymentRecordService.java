@@ -470,18 +470,13 @@ public class PaymentRecordService {
                 return;
             }
             
-            // 检查学员是否已经上过课
-            boolean hasAttendedClass = checkStudentHasAttendedClass(Long.valueOf(studentId), Long.valueOf(courseId));
-            
-            // 计算新的有效期结束日期（只有上过课才计算）
+            // 计算新的有效期结束日期
             LocalDate newEndDate = null;
-            if (request.getValidityPeriodId() != null && hasAttendedClass) {
+            if (request.getValidityPeriodId() != null) {
                 // 根据有效期常量ID计算结束日期
                 newEndDate = calculateEndDateFromConstantType(request.getValidityPeriodId());
-                log.info("学员已上过课，根据有效期ID计算新的结束日期：studentId={}, courseId={}, validityPeriodId={}, newEndDate={}", 
+                log.info("根据有效期ID计算新的结束日期：studentId={}, courseId={}, validityPeriodId={}, newEndDate={}", 
                         studentId, courseId, request.getValidityPeriodId(), newEndDate);
-            } else if (request.getValidityPeriodId() != null && !hasAttendedClass) {
-                log.info("学员还未上过课，暂不计算结束日期：studentId={}, courseId={}", studentId, courseId);
             }
             
             // 获取原始缴费记录的课时信息，用于计算差值
@@ -520,71 +515,28 @@ public class PaymentRecordService {
                     studentId, courseId, recalculatedTotalHours, newTotalHours);
             
             // 更新学生课程记录 - 包括课时信息和有效期（使用重新计算的总课时）
-            int updatedRows;
-            if (newEndDate != null) {
-                // 有endDate时，更新所有字段
-                updatedRows = dsl.update(Tables.EDU_STUDENT_COURSE)
-                        .set(Tables.EDU_STUDENT_COURSE.VALIDITY_PERIOD_ID, request.getValidityPeriodId())
-                        .set(Tables.EDU_STUDENT_COURSE.END_DATE, newEndDate)
-                        .set(Tables.EDU_STUDENT_COURSE.TOTAL_HOURS, recalculatedTotalHours)
-                        .set(Tables.EDU_STUDENT_COURSE.UPDATE_TIME, java.time.LocalDateTime.now())
-                        .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(Long.valueOf(studentId)))
-                        .and(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(Long.valueOf(courseId)))
-                        .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
-                        .execute();
-            } else {
-                // 没有endDate时，不更新endDate字段
-                updatedRows = dsl.update(Tables.EDU_STUDENT_COURSE)
-                        .set(Tables.EDU_STUDENT_COURSE.VALIDITY_PERIOD_ID, request.getValidityPeriodId())
-                        .set(Tables.EDU_STUDENT_COURSE.TOTAL_HOURS, recalculatedTotalHours)
-                        .set(Tables.EDU_STUDENT_COURSE.UPDATE_TIME, java.time.LocalDateTime.now())
-                        .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(Long.valueOf(studentId)))
-                        .and(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(Long.valueOf(courseId)))
-                        .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
-                        .execute();
-            }
+            int updatedRows = dsl.update(Tables.EDU_STUDENT_COURSE)
+                    .set(Tables.EDU_STUDENT_COURSE.VALIDITY_PERIOD_ID, request.getValidityPeriodId())
+                    .set(Tables.EDU_STUDENT_COURSE.END_DATE, newEndDate)
+                    .set(Tables.EDU_STUDENT_COURSE.TOTAL_HOURS, recalculatedTotalHours)
+                    .set(Tables.EDU_STUDENT_COURSE.UPDATE_TIME, java.time.LocalDateTime.now())
+                    .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(Long.valueOf(studentId)))
+                    .and(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(Long.valueOf(courseId)))
+                    .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
+                    .execute();
             
             if (updatedRows > 0) {
-                if (newEndDate != null) {
-                    log.info("学生课程记录更新成功：studentId={}, courseId={}, validityPeriodId={}, endDate={}", 
-                            studentId, courseId, request.getValidityPeriodId(), newEndDate);
-                } else {
-                    log.info("学生课程记录更新成功：studentId={}, courseId={}, validityPeriodId={}, 暂未设置endDate（学员未上课）", 
-                            studentId, courseId, request.getValidityPeriodId());
-                }
+                log.info("学生课程记录有效期字段更新成功：studentId={}, courseId={}, validityPeriodId={}, endDate={}", 
+                        studentId, courseId, request.getValidityPeriodId(), newEndDate);
                 
                 log.info("缴费记录编辑后，学员课程总课时已更新为：{}", recalculatedTotalHours);
             } else {
-                log.warn("学生课程记录更新失败：studentId={}, courseId={}", studentId, courseId);
+                log.warn("学生课程记录有效期字段更新失败：studentId={}, courseId={}", studentId, courseId);
             }
             
         } catch (Exception e) {
             log.error("更新学生课程记录有效期字段时发生错误：", e);
             // 不抛出异常，避免影响缴费记录更新的主流程
-        }
-    }
-    
-    /**
-     * 检查学员是否已经上过课
-     */
-    private boolean checkStudentHasAttendedClass(Long studentId, Long courseId) {
-        try {
-            // 查询该学员该课程是否有上课记录
-            Integer attendanceCount = dsl.selectCount()
-                    .from(Tables.EDU_STUDENT_COURSE_RECORD)
-                    .where(Tables.EDU_STUDENT_COURSE_RECORD.STUDENT_ID.eq(studentId))
-                    .and(Tables.EDU_STUDENT_COURSE_RECORD.COURSE_ID.eq(courseId))
-                    .and(Tables.EDU_STUDENT_COURSE_RECORD.DELETED.eq(0))
-                    .fetchOneInto(Integer.class);
-            
-            boolean hasAttended = attendanceCount != null && attendanceCount > 0;
-            log.info("检查学员上课记录：studentId={}, courseId={}, 上课记录数={}, 是否上过课={}", 
-                    studentId, courseId, attendanceCount, hasAttended);
-            
-            return hasAttended;
-        } catch (Exception e) {
-            log.error("检查学员上课记录失败：", e);
-            return false; // 出错时默认返回false，避免影响主流程
         }
     }
     

@@ -342,9 +342,27 @@ public class StudentService {
       log.info("学员校区变更：从校区{}变更为校区{}", oldCampusIdBeforeUpdate, studentInfo.getCampusId());
     }
 
-    // 5. 不再全量逻辑删除课程关系，防止状态被意外重置。
+    // 5. 先删除学员的所有现有课程关系（逻辑删除）
+    List<EduStudentCourseRecord> existingStudentCourses = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
+        .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(request.getStudentId()))
+        .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
+        .fetch();
 
-    // 6. 处理课程信息（仅更新现有课程关系，不创建新关系）
+    log.info("学员 {} 现有课程关系数量: {}", request.getStudentId(), existingStudentCourses.size());
+
+    // 6. 批量逻辑删除所有现有课程关系
+    if (!existingStudentCourses.isEmpty()) {
+      int deletedCount = dsl.update(Tables.EDU_STUDENT_COURSE)
+          .set(Tables.EDU_STUDENT_COURSE.DELETED, 1)
+          .set(Tables.EDU_STUDENT_COURSE.UPDATE_TIME, LocalDateTime.now())
+          .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(request.getStudentId()))
+          .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
+          .execute();
+      
+      log.info("已删除学员 {} 的 {} 条课程关系记录", request.getStudentId(), deletedCount);
+    }
+
+    // 9. 重新创建所有课程关系
     for (StudentWithCourseUpdateRequest.CourseInfo courseInfo : request.getCourseInfoList()) {
       // 获取课程信息
       EduCourseRecord courseRecord = dsl.selectFrom(Tables.EDU_COURSE)
@@ -356,54 +374,42 @@ public class StudentService {
         throw new IllegalArgumentException("课程不存在：" + courseInfo.getCourseId());
       }
 
-      // 6.1 获取学员课程关系
-      EduStudentCourseRecord studentCourseRecord = null;
-      if (courseInfo.getStudentCourseId() != null) {
-        // 如果提供了学员课程关系ID，则查找并更新现有记录
-        studentCourseRecord = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
-            .where(Tables.EDU_STUDENT_COURSE.ID.eq(courseInfo.getStudentCourseId()))
-            .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
-            .fetchOne();
-        if (studentCourseRecord == null) {
-          throw new IllegalArgumentException("学员课程关系不存在：" + courseInfo.getStudentCourseId());
-        }
-        
-        // 验证学员ID和课程ID是否匹配
-        if (!studentCourseRecord.getStudentId().equals(request.getStudentId())) {
-          throw new IllegalArgumentException("学员课程关系与学员ID不匹配");
-        }
-        if (!studentCourseRecord.getCourseId().equals(courseInfo.getCourseId())) {
-          throw new IllegalArgumentException("学员课程关系与课程ID不匹配");
-        }
-      } else {
-        // 编辑模式下，如果没有提供studentCourseId，则抛出异常
-        // 防止意外创建新记录
-        throw new IllegalArgumentException("编辑学员课程时必须提供学员课程关系ID(studentCourseId)，以防止意外创建新记录");
-      }
+      // 9.1 创建新的学员课程关系记录
+      EduStudentCourseRecord newStudentCourseRecord = new EduStudentCourseRecord();
+      newStudentCourseRecord.setStudentId(request.getStudentId());
+      newStudentCourseRecord.setCourseId(courseInfo.getCourseId());
+      newStudentCourseRecord.setCampusId(studentInfo.getCampusId());
+      newStudentCourseRecord.setInstitutionId(institutionId);
+      newStudentCourseRecord.setStartDate(courseInfo.getEnrollDate());
+      newStudentCourseRecord.setTotalHours(courseRecord.getTotalHours());
+      newStudentCourseRecord.setConsumedHours(BigDecimal.ZERO); // 重置已消耗课时
+      newStudentCourseRecord.setStatus(StudentCourseStatus.STUDYING.getName()); // 重置状态为学习中
+      newStudentCourseRecord.setDeleted(0);
+      newStudentCourseRecord.setCreatedTime(LocalDateTime.now());
+      newStudentCourseRecord.setUpdateTime(LocalDateTime.now());
 
-      // 6.2 不修改课程状态（除非是新建关系时设置默认值）
-
-      // 7. 处理固定排课时间
+      // 9.2 处理固定排课时间
       try {
         if (courseInfo.getFixedScheduleTimes() != null && !courseInfo.getFixedScheduleTimes().isEmpty()) {
           String fixedScheduleJson = objectMapper.writeValueAsString(courseInfo.getFixedScheduleTimes());
-          studentCourseRecord.setFixedSchedule(fixedScheduleJson);
+          newStudentCourseRecord.setFixedSchedule(fixedScheduleJson);
+        } else {
+          newStudentCourseRecord.setFixedSchedule(null);
         }
       } catch (JsonProcessingException e) {
         log.error("序列化固定排课时间失败", e);
         throw new RuntimeException("序列化固定排课时间失败", e);
       }
 
-      // 8. 确保记录为未删除
-      studentCourseRecord.setDeleted(0);
-
-      // 9. 按存在与否选择更新或创建
-      if (studentCourseRecord.getId() != null) {
-        studentCourseModel.updateStudentCourse(studentCourseRecord);
-      } else {
-        studentCourseModel.createStudentCourse(studentCourseRecord);
-      }
+      // 9.3 创建新的学员课程关系
+      Long newStudentCourseId = studentCourseModel.createStudentCourse(newStudentCourseRecord);
+      
+      log.info("创建学员课程关系成功：学员ID={}, 课程ID={}, 新关系ID={}", 
+               request.getStudentId(), courseInfo.getCourseId(), newStudentCourseId);
     }
+
+    log.info("学员更新完成：学员ID={}, 原有课程数={}, 更新后课程数={}", 
+             request.getStudentId(), existingStudentCourses.size(), request.getCourseInfoList().size());
   }
 
   /**
@@ -847,14 +853,15 @@ public class StudentService {
             }
         }
         
-        // 如果还是没有endDate，使用学员课程关系中的endDate
-        if (endDate == null) {
+        // 如果还是没有endDate，仅在已开始消课时使用学员课程关系中的endDate
+        if (endDate == null && hasStarted) {
             endDate = studentCourse.getEndDate();
-            // 兜底：仅在已开始消课时尝试通过历史规则计算；未开始则保持为null
-            if (endDate == null && hasStarted) {
+            // 兜底：尝试通过历史规则计算
+            if (endDate == null) {
                 endDate = calculateEndDateFromFirstPayment(studentCourse.getStudentId(), studentCourse.getCourseId(), LocalDate.now());
             }
         }
+        // 如果未开始消课，endDate保持为null
         
         courseInfo.setEndDate(endDate);
         courseInfo.setValidityPeriodId(validityPeriodId);
