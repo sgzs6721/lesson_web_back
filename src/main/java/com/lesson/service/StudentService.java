@@ -1011,6 +1011,29 @@ public class StudentService {
         );
       }
 
+      // 如果指定了课程ID，需要先查询报名了该课程的学员ID列表
+      List<Long> studentIdsWithCourse = null;
+      if (request.getCourseId() != null) {
+        log.info("按课程ID过滤，课程ID: {}", request.getCourseId());
+        studentIdsWithCourse = dsl.selectDistinct(Tables.EDU_STUDENT_COURSE.STUDENT_ID)
+            .from(Tables.EDU_STUDENT_COURSE)
+            .where(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(request.getCourseId()))
+            .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
+            .and(institutionId != null ? Tables.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId) : DSL.noCondition())
+            .and(request.getCampusId() != null ? Tables.EDU_STUDENT_COURSE.CAMPUS_ID.eq(request.getCampusId()) : DSL.noCondition())
+            .fetchInto(Long.class);
+        log.info("找到报名课程 {} 的学员ID列表: {}", request.getCourseId(), studentIdsWithCourse);
+        
+        if (studentIdsWithCourse.isEmpty()) {
+          // 如果没有学员报名该课程，直接返回空结果
+          log.info("没有学员报名课程 {}，返回空结果", request.getCourseId());
+          return PageResult.of(Collections.emptyList(), 0, request.getPageNum(), request.getPageSize());
+        }
+        
+        // 添加学员ID过滤条件
+        query.and(Tables.EDU_STUDENT.ID.in(studentIdsWithCourse));
+      }
+
       // 如果指定了报名年月或报名日期范围，需要先查询在该时间段报名的学员ID列表
       List<Long> studentIdsWithEnrollmentDate = null;
       if (request.getEnrollmentYearMonth() != null || (request.getEnrollDateStart() != null && request.getEnrollDateEnd() != null)) {
@@ -1049,6 +1072,31 @@ public class StudentService {
         query.and(Tables.EDU_STUDENT.ID.in(studentIdsWithEnrollmentDate));
       }
 
+      // 如果指定了课程状态，需要先查询有该状态课程的学员ID列表
+      List<Long> studentIdsWithStatus = null;
+      if (request.getStatus() != null) {
+        log.info("按课程状态过滤，状态: {}", request.getStatus().getName());
+        
+        studentIdsWithStatus = dsl.selectDistinct(Tables.EDU_STUDENT_COURSE.STUDENT_ID)
+            .from(Tables.EDU_STUDENT_COURSE)
+            .where(Tables.EDU_STUDENT_COURSE.STATUS.eq(request.getStatus().getName()))
+            .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
+            .and(institutionId != null ? Tables.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId) : DSL.noCondition())
+            .and(request.getCampusId() != null ? Tables.EDU_STUDENT_COURSE.CAMPUS_ID.eq(request.getCampusId()) : DSL.noCondition())
+            .fetchInto(Long.class);
+        
+        log.info("找到状态为 {} 的学员ID列表: {}", request.getStatus().getName(), studentIdsWithStatus);
+        
+        if (studentIdsWithStatus.isEmpty()) {
+          // 如果没有学员有该状态的课程，直接返回空结果
+          log.info("没有学员有状态为 {} 的课程，返回空结果", request.getStatus().getName());
+          return PageResult.of(Collections.emptyList(), 0, request.getPageNum(), request.getPageSize());
+        }
+        
+        // 添加学员ID过滤条件
+        query.and(Tables.EDU_STUDENT.ID.in(studentIdsWithStatus));
+      }
+
       // 先查询总数
       total = dsl.selectCount()
           .from(Tables.EDU_STUDENT)
@@ -1058,8 +1106,14 @@ public class StudentService {
           .and(request.getKeyword() != null && !request.getKeyword().isEmpty() ? (
                Tables.EDU_STUDENT.NAME.like("%" + request.getKeyword().trim() + "%")
                .or(Tables.EDU_STUDENT.ID.cast(String.class).like("%" + request.getKeyword().trim() + "%"))
-               .or(Tables.EDU_STUDENT.PHONE.like("%" + request.getKeyword() + "%"))
+               .or(Tables.EDU_STUDENT.PHONE.like("%" + request.getKeyword().trim() + "%"))
           ) : DSL.noCondition())
+          .and(request.getCourseId() != null && studentIdsWithCourse != null && !studentIdsWithCourse.isEmpty() ?
+               Tables.EDU_STUDENT.ID.in(studentIdsWithCourse) : DSL.noCondition())
+          .and(request.getEnrollmentYearMonth() != null && studentIdsWithEnrollmentDate != null && !studentIdsWithEnrollmentDate.isEmpty() ?
+               Tables.EDU_STUDENT.ID.in(studentIdsWithEnrollmentDate) : DSL.noCondition())
+          .and(request.getStatus() != null && studentIdsWithStatus != null && !studentIdsWithStatus.isEmpty() ?
+               Tables.EDU_STUDENT.ID.in(studentIdsWithStatus) : DSL.noCondition())
           .fetchOne(0, Long.class);
 
       // 分页查询
