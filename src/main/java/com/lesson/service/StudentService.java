@@ -636,7 +636,13 @@ public class StudentService {
       }
 
       if (request.getKeyword() != null && !request.getKeyword().isEmpty()) {
-        query.and(Tables.EDU_STUDENT.NAME.like("%" + request.getKeyword() + "%"));
+        // 支持学员姓名、ID、电话的模糊搜索
+        String keyword = request.getKeyword().trim();
+        query.and(
+          Tables.EDU_STUDENT.NAME.like("%" + keyword + "%")
+          .or(Tables.EDU_STUDENT.ID.cast(String.class).like("%" + keyword + "%"))
+          .or(Tables.EDU_STUDENT.PHONE.like("%" + keyword + "%"))
+        );
       }
 
       // 如果指定了课程ID，需要先查询报名了该课程的学员ID列表
@@ -663,6 +669,71 @@ public class StudentService {
         query.and(Tables.EDU_STUDENT.ID.in(studentIdsWithCourse));
       }
 
+      // 如果指定了报名年月或报名日期范围，需要先查询在该时间段报名的学员ID列表
+      List<Long> studentIdsWithEnrollmentDate = null;
+      if (request.getEnrollmentYearMonth() != null || (request.getEnrollDateStart() != null && request.getEnrollDateEnd() != null)) {
+        LocalDate startDate = null;
+        LocalDate endDate = null;
+        
+        if (request.getEnrollmentYearMonth() != null) {
+          // 使用报名年月
+          log.info("按报名年月过滤，报名年月: {}", request.getEnrollmentYearMonth());
+          startDate = request.getEnrollmentYearMonth().atDay(1);
+          endDate = request.getEnrollmentYearMonth().atEndOfMonth();
+        } else {
+          // 使用报名日期范围
+          log.info("按报名日期范围过滤，开始日期: {}, 结束日期: {}", request.getEnrollDateStart(), request.getEnrollDateEnd());
+          startDate = request.getEnrollDateStart();
+          endDate = request.getEnrollDateEnd();
+        }
+        
+        studentIdsWithEnrollmentDate = dsl.selectDistinct(Tables.EDU_STUDENT_COURSE.STUDENT_ID)
+            .from(Tables.EDU_STUDENT_COURSE)
+            .where(Tables.EDU_STUDENT_COURSE.START_DATE.between(startDate, endDate))
+            .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
+            .and(institutionId != null ? Tables.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId) : DSL.noCondition())
+            .and(currentUserCampusId != null ? Tables.EDU_STUDENT_COURSE.CAMPUS_ID.eq(currentUserCampusId) : 
+                 (request.getCampusId() != null ? Tables.EDU_STUDENT_COURSE.CAMPUS_ID.eq(request.getCampusId()) : DSL.noCondition()))
+            .fetchInto(Long.class);
+        
+        log.info("找到报名时间段 {} 到 {} 的学员ID列表: {}", startDate, endDate, studentIdsWithEnrollmentDate);
+        
+        if (studentIdsWithEnrollmentDate.isEmpty()) {
+          // 如果没有学员在该时间段报名，直接返回空结果
+          log.info("没有学员在报名时间段 {} 到 {} 报名，返回空结果", startDate, endDate);
+          return PageResult.of(Collections.emptyList(), 0, request.getPageNum(), request.getPageSize());
+        }
+        
+        // 添加学员ID过滤条件
+        query.and(Tables.EDU_STUDENT.ID.in(studentIdsWithEnrollmentDate));
+      }
+
+      // 如果指定了课程状态，需要先查询有该状态课程的学员ID列表
+      List<Long> studentIdsWithStatus = null;
+      if (request.getStatus() != null) {
+        log.info("按课程状态过滤，状态: {}", request.getStatus().getName());
+        
+        studentIdsWithStatus = dsl.selectDistinct(Tables.EDU_STUDENT_COURSE.STUDENT_ID)
+            .from(Tables.EDU_STUDENT_COURSE)
+            .where(Tables.EDU_STUDENT_COURSE.STATUS.eq(request.getStatus().getName()))
+            .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
+            .and(institutionId != null ? Tables.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId) : DSL.noCondition())
+            .and(currentUserCampusId != null ? Tables.EDU_STUDENT_COURSE.CAMPUS_ID.eq(currentUserCampusId) : 
+                 (request.getCampusId() != null ? Tables.EDU_STUDENT_COURSE.CAMPUS_ID.eq(request.getCampusId()) : DSL.noCondition()))
+            .fetchInto(Long.class);
+        
+        log.info("找到状态为 {} 的学员ID列表: {}", request.getStatus().getName(), studentIdsWithStatus);
+        
+        if (studentIdsWithStatus.isEmpty()) {
+          // 如果没有学员有该状态的课程，直接返回空结果
+          log.info("没有学员有状态为 {} 的课程，返回空结果", request.getStatus().getName());
+          return PageResult.of(Collections.emptyList(), 0, request.getPageNum(), request.getPageSize());
+        }
+        
+        // 添加学员ID过滤条件
+        query.and(Tables.EDU_STUDENT.ID.in(studentIdsWithStatus));
+      }
+
       // 先查询总数
       total = dsl.selectCount()
           .from(Tables.EDU_STUDENT)
@@ -670,10 +741,17 @@ public class StudentService {
           .and(institutionId != null ? Tables.EDU_STUDENT.INSTITUTION_ID.eq(institutionId) : DSL.noCondition())
           .and(currentUserCampusId != null ? Tables.EDU_STUDENT.CAMPUS_ID.eq(currentUserCampusId) : 
                (request.getCampusId() != null ? Tables.EDU_STUDENT.CAMPUS_ID.eq(request.getCampusId()) : DSL.noCondition()))
-          .and(request.getKeyword() != null && !request.getKeyword().isEmpty() ?
-               Tables.EDU_STUDENT.NAME.like("%" + request.getKeyword() + "%") : DSL.noCondition())
+          .and(request.getKeyword() != null && !request.getKeyword().isEmpty() ? (
+               Tables.EDU_STUDENT.NAME.like("%" + request.getKeyword().trim() + "%")
+               .or(Tables.EDU_STUDENT.ID.cast(String.class).like("%" + request.getKeyword().trim() + "%"))
+               .or(Tables.EDU_STUDENT.PHONE.like("%" + request.getKeyword().trim() + "%"))
+          ) : DSL.noCondition())
           .and(request.getCourseId() != null && studentIdsWithCourse != null && !studentIdsWithCourse.isEmpty() ?
                Tables.EDU_STUDENT.ID.in(studentIdsWithCourse) : DSL.noCondition())
+          .and(request.getEnrollmentYearMonth() != null && studentIdsWithEnrollmentDate != null && !studentIdsWithEnrollmentDate.isEmpty() ?
+               Tables.EDU_STUDENT.ID.in(studentIdsWithEnrollmentDate) : DSL.noCondition())
+          .and(request.getStatus() != null && studentIdsWithStatus != null && !studentIdsWithStatus.isEmpty() ?
+               Tables.EDU_STUDENT.ID.in(studentIdsWithStatus) : DSL.noCondition())
           .fetchOne(0, Long.class);
 
       // 分页查询
@@ -731,11 +809,8 @@ public class StudentService {
           .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(student.getId()))
           .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0));
       
-      // 添加状态筛选
-      if (request.getStatus() != null) {
-          courseQuery.and(Tables.EDU_STUDENT_COURSE.STATUS.eq(request.getStatus().getName()));
-          log.info("添加状态筛选: studentId={}, status={}", student.getId(), request.getStatus().getName());
-      }
+      // 注意：状态筛选现在在学员查询层面处理，这里不再需要
+      // 这样可以确保显示所有符合条件的学员，而不仅仅是特定状态的课程
       
       List<EduStudentCourseRecord> studentCourses = courseQuery.fetch();
 
@@ -927,7 +1002,51 @@ public class StudentService {
       }
 
       if (request.getKeyword() != null && !request.getKeyword().isEmpty()) {
-        query.and(Tables.EDU_STUDENT.NAME.like("%" + request.getKeyword() + "%"));
+        // 支持学员姓名、ID、电话的模糊搜索
+        String keyword = request.getKeyword().trim();
+        query.and(
+          Tables.EDU_STUDENT.NAME.like("%" + keyword + "%")
+          .or(Tables.EDU_STUDENT.ID.cast(String.class).like("%" + keyword + "%"))
+          .or(Tables.EDU_STUDENT.PHONE.like("%" + keyword + "%"))
+        );
+      }
+
+      // 如果指定了报名年月或报名日期范围，需要先查询在该时间段报名的学员ID列表
+      List<Long> studentIdsWithEnrollmentDate = null;
+      if (request.getEnrollmentYearMonth() != null || (request.getEnrollDateStart() != null && request.getEnrollDateEnd() != null)) {
+        LocalDate startDate = null;
+        LocalDate endDate = null;
+        
+        if (request.getEnrollmentYearMonth() != null) {
+          // 使用报名年月
+          log.info("按报名年月过滤，报名年月: {}", request.getEnrollmentYearMonth());
+          startDate = request.getEnrollmentYearMonth().atDay(1);
+          endDate = request.getEnrollmentYearMonth().atEndOfMonth();
+        } else {
+          // 使用报名日期范围
+          log.info("按报名日期范围过滤，开始日期: {}, 结束日期: {}", request.getEnrollDateStart(), request.getEnrollDateEnd());
+          startDate = request.getEnrollDateStart();
+          endDate = request.getEnrollDateEnd();
+        }
+        
+        studentIdsWithEnrollmentDate = dsl.selectDistinct(Tables.EDU_STUDENT_COURSE.STUDENT_ID)
+            .from(Tables.EDU_STUDENT_COURSE)
+            .where(Tables.EDU_STUDENT_COURSE.START_DATE.between(startDate, endDate))
+            .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
+            .and(institutionId != null ? Tables.EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId) : DSL.noCondition())
+            .and(request.getCampusId() != null ? Tables.EDU_STUDENT_COURSE.CAMPUS_ID.eq(request.getCampusId()) : DSL.noCondition())
+            .fetchInto(Long.class);
+        
+        log.info("找到报名时间段 {} 到 {} 的学员ID列表: {}", startDate, endDate, studentIdsWithEnrollmentDate);
+        
+        if (studentIdsWithEnrollmentDate.isEmpty()) {
+          // 如果没有学员在该时间段报名，直接返回空结果
+          log.info("没有学员在报名时间段 {} 到 {} 报名，返回空结果", startDate, endDate);
+          return PageResult.of(Collections.emptyList(), 0, request.getPageNum(), request.getPageSize());
+        }
+        
+        // 添加学员ID过滤条件
+        query.and(Tables.EDU_STUDENT.ID.in(studentIdsWithEnrollmentDate));
       }
 
       // 先查询总数
@@ -936,8 +1055,11 @@ public class StudentService {
           .where(Tables.EDU_STUDENT.DELETED.eq(0))
           .and(institutionId != null ? Tables.EDU_STUDENT.INSTITUTION_ID.eq(institutionId) : DSL.noCondition())
           .and(request.getCampusId() != null ? Tables.EDU_STUDENT.CAMPUS_ID.eq(request.getCampusId()) : DSL.noCondition())
-          .and(request.getKeyword() != null && !request.getKeyword().isEmpty() ?
-               Tables.EDU_STUDENT.NAME.like("%" + request.getKeyword() + "%") : DSL.noCondition())
+          .and(request.getKeyword() != null && !request.getKeyword().isEmpty() ? (
+               Tables.EDU_STUDENT.NAME.like("%" + request.getKeyword().trim() + "%")
+               .or(Tables.EDU_STUDENT.ID.cast(String.class).like("%" + request.getKeyword().trim() + "%"))
+               .or(Tables.EDU_STUDENT.PHONE.like("%" + request.getKeyword() + "%"))
+          ) : DSL.noCondition())
           .fetchOne(0, Long.class);
 
       // 分页查询

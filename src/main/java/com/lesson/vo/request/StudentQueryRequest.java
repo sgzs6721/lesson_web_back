@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDate;
 import java.time.YearMonth;
 
 /**
@@ -45,6 +46,20 @@ public class StudentQueryRequest {
     @ApiModelProperty(value = "报名年月 (格式: yyyy-MM)", example = "2025-04")
     @DateTimeFormat(pattern = "yyyy-MM")
     private YearMonth enrollmentYearMonth;
+
+    /**
+     * 报名开始日期
+     */
+    @ApiModelProperty(value = "报名开始日期 (格式: yyyy-MM-dd)", example = "2025-11-01")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate enrollDateStart;
+
+    /**
+     * 报名结束日期
+     */
+    @ApiModelProperty(value = "报名结束日期 (格式: yyyy-MM-dd)", example = "2025-11-30")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate enrollDateEnd;
 
     /**
      * 排序字段
