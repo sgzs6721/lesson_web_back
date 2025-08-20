@@ -813,6 +813,8 @@ public class StudentService {
       // 这样可以确保显示所有符合条件的学员，而不仅仅是特定状态的课程
       
       List<EduStudentCourseRecord> studentCourses = courseQuery.fetch();
+      
+      log.info("学员 {} 的课程数量: {}", student.getName(), studentCourses.size());
 
       List<StudentWithCoursesVO.CourseInfo> courseInfos = new ArrayList<>();
 
@@ -950,6 +952,9 @@ public class StudentService {
       studentVO.setCourses(courseInfos);
       result.add(studentVO);
     }
+
+    log.info("查询结果统计 - 总数: {}, 实际构建学员数: {}, 分页: 第{}页, 每页{}条", 
+             total, result.size(), request.getPageNum(), request.getPageSize());
 
     return PageResult.of(result, total, request.getPageNum(), request.getPageSize());
   }
