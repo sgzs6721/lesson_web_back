@@ -735,6 +735,7 @@ public class StudentService {
       }
 
       // 先查询总数
+      // 注意：这里需要确保总数计算与实际数据构建的筛选条件完全一致
       total = dsl.selectCount()
           .from(Tables.EDU_STUDENT)
           .where(Tables.EDU_STUDENT.DELETED.eq(0))
@@ -753,6 +754,8 @@ public class StudentService {
           .and(request.getStatus() != null && studentIdsWithStatus != null && !studentIdsWithStatus.isEmpty() ?
                Tables.EDU_STUDENT.ID.in(studentIdsWithStatus) : DSL.noCondition())
           .fetchOne(0, Long.class);
+      
+      log.info("总数计算完成 - 应用筛选条件后的总数: {}", total);
 
       // 分页查询
       students = query
@@ -764,6 +767,8 @@ public class StudentService {
 
     // 构建返回结果
     List<StudentWithCoursesVO> result = new ArrayList<>();
+    
+    log.info("开始构建学员数据，查询到的学员数量: {}", students.size());
 
     for (EduStudentRecord student : students) {
       // 创建学员VO
@@ -951,6 +956,9 @@ public class StudentService {
 
       studentVO.setCourses(courseInfos);
       result.add(studentVO);
+      
+      log.info("学员 {} (ID: {}) 构建完成 - 课程数量: {}, 总课程信息: {}", 
+               student.getName(), student.getId(), studentCourses.size(), courseInfos.size());
     }
 
     log.info("查询结果统计 - 总数: {}, 实际构建学员数: {}, 分页: 第{}页, 每页{}条", 
