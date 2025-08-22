@@ -37,6 +37,7 @@ import java.time.LocalTime;
 import java.util.*;
 
 import org.jooq.Record;
+import org.jooq.Record1;
 import org.jooq.SelectConditionStep;
 import com.lesson.vo.response.StudentWithCoursesVO;
 import lombok.RequiredArgsConstructor;
@@ -736,7 +737,7 @@ public class StudentService {
 
       // 先查询总数 - 使用与分页查询完全相同的条件
       // 构建总数查询，确保与分页查询条件完全一致
-      SelectConditionStep<Record> countQuery = dsl.select()
+      SelectConditionStep<Record1<Integer>> countQuery = dsl.selectCount()
           .from(Tables.EDU_STUDENT)
           .where(Tables.EDU_STUDENT.DELETED.eq(0));
 
