@@ -768,7 +768,8 @@ public class StudentService {
       }
 
       // 添加报名日期筛选条件
-      if (request.getEnrollmentYearMonth() != null && studentIdsWithEnrollmentDate != null && !studentIdsWithEnrollmentDate.isEmpty()) {
+      if ((request.getEnrollmentYearMonth() != null || (request.getEnrollDateStart() != null && request.getEnrollDateEnd() != null)) 
+          && studentIdsWithEnrollmentDate != null && !studentIdsWithEnrollmentDate.isEmpty()) {
         countQuery.and(Tables.EDU_STUDENT.ID.in(studentIdsWithEnrollmentDate));
       }
 
