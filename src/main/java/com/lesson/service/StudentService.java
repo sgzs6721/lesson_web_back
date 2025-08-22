@@ -756,6 +756,17 @@ public class StudentService {
           .fetchOne(0, Long.class);
       
       log.info("总数计算完成 - 应用筛选条件后的总数: {}", total);
+      
+      // 调试筛选条件
+      log.info("筛选条件调试 - 课程ID: {}, 学员ID列表大小: {}", 
+               request.getCourseId(), 
+               studentIdsWithCourse != null ? studentIdsWithCourse.size() : "null");
+      log.info("筛选条件调试 - 报名日期: {}, 学员ID列表大小: {}", 
+               request.getEnrollmentYearMonth(), 
+               studentIdsWithEnrollmentDate != null ? studentIdsWithEnrollmentDate.size() : "null");
+      log.info("筛选条件调试 - 状态: {}, 学员ID列表大小: {}", 
+               request.getStatus() != null ? request.getStatus().getName() : "null", 
+               studentIdsWithStatus != null ? studentIdsWithStatus.size() : "null");
 
       // 分页查询
       students = query
@@ -763,6 +774,8 @@ public class StudentService {
           .limit(request.getPageSize())
           .offset((request.getPageNum() - 1) * request.getPageSize())
           .fetchInto(EduStudentRecord.class);
+          
+      log.info("分页查询完成 - 查询到的学员数量: {} (期望: {})", students.size(), request.getPageSize());
     }
 
     // 构建返回结果
