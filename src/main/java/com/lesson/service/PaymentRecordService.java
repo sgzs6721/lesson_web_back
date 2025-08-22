@@ -51,13 +51,8 @@ public class PaymentRecordService {
         if (!CollectionUtils.isEmpty(request.getCourseIds())) {
                 listConditions = listConditions.and(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.in(request.getCourseIds().stream().map(String::valueOf).collect(java.util.stream.Collectors.toList())));
         }
-        if (!CollectionUtils.isEmpty(request.getPaymentTypes())) {
-                try {
-                    listConditions = listConditions.and(Tables.EDU_STUDENT_PAYMENT.COURSE_HOURS.eq(new BigDecimal(request.getLessonType())));
-                } catch (NumberFormatException e) {
-                    log.warn("无效的 lessonType 格式：{}", request.getLessonType(), e);
-                }
-        }
+        // 注意：这个条件判断有问题，应该删除或者修正
+        // 缴费类型筛选已经在下面的代码中处理了
         if (request.getPaymentTypes() != null && !request.getPaymentTypes().isEmpty()) {
                 // 构建缴费类型过滤条件，同时支持中英文值
                 List<String> paymentTypeValues = new ArrayList<>();
@@ -646,6 +641,7 @@ public class PaymentRecordService {
                     Tables.EDU_STUDENT_PAYMENT.CREATED_TIME.asc() : 
                     Tables.EDU_STUDENT_PAYMENT.CREATED_TIME.desc();
                 break;
+            case "date":
             case "transactiondate":
             case "transaction_date":
             default:
