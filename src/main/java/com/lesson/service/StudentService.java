@@ -734,26 +734,50 @@ public class StudentService {
         query.and(Tables.EDU_STUDENT.ID.in(studentIdsWithStatus));
       }
 
-      // 先查询总数
-      // 注意：这里需要确保总数计算与实际数据构建的筛选条件完全一致
-      total = dsl.selectCount()
+      // 先查询总数 - 使用与分页查询完全相同的条件
+      // 构建总数查询，确保与分页查询条件完全一致
+      SelectConditionStep<Record> countQuery = dsl.select()
           .from(Tables.EDU_STUDENT)
-          .where(Tables.EDU_STUDENT.DELETED.eq(0))
-          .and(institutionId != null ? Tables.EDU_STUDENT.INSTITUTION_ID.eq(institutionId) : DSL.noCondition())
-          .and(currentUserCampusId != null ? Tables.EDU_STUDENT.CAMPUS_ID.eq(currentUserCampusId) : 
-               (request.getCampusId() != null ? Tables.EDU_STUDENT.CAMPUS_ID.eq(request.getCampusId()) : DSL.noCondition()))
-          .and(request.getKeyword() != null && !request.getKeyword().isEmpty() ? (
-               Tables.EDU_STUDENT.NAME.like("%" + request.getKeyword().trim() + "%")
-               .or(Tables.EDU_STUDENT.ID.cast(String.class).like("%" + request.getKeyword().trim() + "%"))
-               .or(Tables.EDU_STUDENT.PHONE.like("%" + request.getKeyword().trim() + "%"))
-          ) : DSL.noCondition())
-          .and(request.getCourseId() != null && studentIdsWithCourse != null && !studentIdsWithCourse.isEmpty() ?
-               Tables.EDU_STUDENT.ID.in(studentIdsWithCourse) : DSL.noCondition())
-          .and(request.getEnrollmentYearMonth() != null && studentIdsWithEnrollmentDate != null && !studentIdsWithEnrollmentDate.isEmpty() ?
-               Tables.EDU_STUDENT.ID.in(studentIdsWithEnrollmentDate) : DSL.noCondition())
-          .and(request.getStatus() != null && studentIdsWithStatus != null && !studentIdsWithStatus.isEmpty() ?
-               Tables.EDU_STUDENT.ID.in(studentIdsWithStatus) : DSL.noCondition())
-          .fetchOne(0, Long.class);
+          .where(Tables.EDU_STUDENT.DELETED.eq(0));
+
+      // 添加筛选条件 - 与分页查询完全一致
+      if (institutionId != null) {
+        countQuery.and(Tables.EDU_STUDENT.INSTITUTION_ID.eq(institutionId));
+      }
+
+      // 校区权限控制
+      if (currentUserCampusId != null) {
+        countQuery.and(Tables.EDU_STUDENT.CAMPUS_ID.eq(currentUserCampusId));
+      } else if (request.getCampusId() != null) {
+        countQuery.and(Tables.EDU_STUDENT.CAMPUS_ID.eq(request.getCampusId()));
+      }
+
+      if (request.getKeyword() != null && !request.getKeyword().isEmpty()) {
+        String keyword = request.getKeyword().trim();
+        countQuery.and(
+          Tables.EDU_STUDENT.NAME.like("%" + keyword + "%")
+          .or(Tables.EDU_STUDENT.ID.cast(String.class).like("%" + keyword + "%"))
+          .or(Tables.EDU_STUDENT.PHONE.like("%" + keyword + "%"))
+        );
+      }
+
+      // 添加课程ID筛选条件
+      if (request.getCourseId() != null && studentIdsWithCourse != null && !studentIdsWithCourse.isEmpty()) {
+        countQuery.and(Tables.EDU_STUDENT.ID.in(studentIdsWithCourse));
+      }
+
+      // 添加报名日期筛选条件
+      if (request.getEnrollmentYearMonth() != null && studentIdsWithEnrollmentDate != null && !studentIdsWithEnrollmentDate.isEmpty()) {
+        countQuery.and(Tables.EDU_STUDENT.ID.in(studentIdsWithEnrollmentDate));
+      }
+
+      // 添加状态筛选条件
+      if (request.getStatus() != null && studentIdsWithStatus != null && !studentIdsWithStatus.isEmpty()) {
+        countQuery.and(Tables.EDU_STUDENT.ID.in(studentIdsWithStatus));
+      }
+
+      // 执行总数查询
+      total = countQuery.fetchOne(0, Long.class);
       
       log.info("总数计算完成 - 应用筛选条件后的总数: {}", total);
       
