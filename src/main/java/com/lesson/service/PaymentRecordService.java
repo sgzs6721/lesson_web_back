@@ -424,4 +424,49 @@ public class PaymentRecordService {
         log.info("构建的排序字段: {}", field);
         return field;
     }
+
+    /**
+     * 编辑缴费记录
+     */
+    public void updatePaymentRecord(PaymentRecordUpdateRequest request) {
+        try {
+            log.info("开始编辑缴费记录，请求参数：{}", request);
+            
+            // 验证缴费记录是否存在
+            boolean exists = dsl.selectCount()
+                    .from(Tables.EDU_STUDENT_PAYMENT)
+                    .where(Tables.EDU_STUDENT_PAYMENT.ID.eq(request.getId()))
+                    .and(Tables.EDU_STUDENT_PAYMENT.DELETED.eq(0))
+                    .fetchOne(0, Long.class) > 0;
+            
+            if (!exists) {
+                throw new RuntimeException("缴费记录不存在或已被删除");
+            }
+            
+            // 更新缴费记录
+            int updatedRows = dsl.update(Tables.EDU_STUDENT_PAYMENT)
+                    .set(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE, request.getPaymentType().name())
+                    .set(Tables.EDU_STUDENT_PAYMENT.AMOUNT, request.getAmount())
+                    .set(Tables.EDU_STUDENT_PAYMENT.COURSE_HOURS, request.getCourseHours())
+                    .set(Tables.EDU_STUDENT_PAYMENT.PAYMENT_METHOD, request.getPaymentMethod())
+                    .set(Tables.EDU_STUDENT_PAYMENT.TRANSACTION_DATE, request.getTransactionDate())
+                    .set(Tables.EDU_STUDENT_PAYMENT.GIFT_HOURS, request.getGiftedHours())
+                    .set(Tables.EDU_STUDENT_PAYMENT.UPDATE_TIME, java.time.LocalDateTime.now())
+                    .where(Tables.EDU_STUDENT_PAYMENT.ID.eq(request.getId()))
+                    .and(Tables.EDU_STUDENT_PAYMENT.DELETED.eq(0))
+                    .execute();
+            
+            log.info("缴费记录更新结果 - 更新行数: {}", updatedRows);
+            
+            if (updatedRows == 0) {
+                throw new RuntimeException("更新缴费记录失败");
+            }
+            
+            log.info("缴费记录编辑成功，ID：{}", request.getId());
+            
+        } catch (Exception e) {
+            log.error("编辑缴费记录时发生错误：", e);
+            throw new RuntimeException("编辑缴费记录失败：" + e.getMessage(), e);
+        }
+    }
 } 
