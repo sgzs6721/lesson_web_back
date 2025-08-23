@@ -106,5 +106,24 @@ public class StudentWithCoursesVO {
 
         @Schema(description = "固定排课时间，JSON格式")
         private String fixedSchedule;
+
+        // 共享课程相关字段
+        @Schema(description = "是否共享课程", example = "false")
+        private Boolean isShared;
+
+        @Schema(description = "共享来源课程ID", example = "2001")
+        private Long sharedSourceCourseId;
+
+        @Schema(description = "共享来源课程名称", example = "杨教练一对一")
+        private String sharedSourceCourseName;
+
+        @Schema(description = "共享学员ID", example = "1001")
+        private Long sharedStudentId;
+
+        @Schema(description = "共享学员姓名", example = "王韵涵")
+        private String sharedStudentName;
+
+        @Schema(description = "共享课时数", example = "10.0")
+        private java.math.BigDecimal sharedHours;
     }
 }

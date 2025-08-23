@@ -988,6 +988,9 @@ public class StudentService {
         courseInfo.setConsumedHours(studentCourse.getConsumedHours());
         courseInfo.setRemainingHours(studentCourse.getTotalHours().subtract(studentCourse.getConsumedHours()));
 
+        // 查询课程共享信息
+        queryCourseSharingInfo(courseInfo, course.getId());
+
         // 查询最近上课时间
         LocalDate lastClassTime = dsl.select(DSL.max(Tables.EDU_STUDENT_COURSE_OPERATION.OPERATION_TIME).cast(LocalDate.class))
             .from(Tables.EDU_STUDENT_COURSE_OPERATION)
@@ -1073,6 +1076,40 @@ public class StudentService {
              total, result.size(), request.getPageNum(), request.getPageSize());
 
     return PageResult.of(result, total, request.getPageNum(), request.getPageSize());
+  }
+
+  /**
+   * 查询课程共享信息
+   */
+  private void queryCourseSharingInfo(StudentWithCoursesVO.CourseInfo courseInfo, Long courseId) {
+    try {
+      // 查询该课程是否有共享记录
+      org.jooq.Record sharingRecord = dsl.select()
+          .from(Tables.EDU_COURSE_SHARING)
+          .leftJoin(Tables.EDU_STUDENT).on(Tables.EDU_COURSE_SHARING.STUDENT_ID.eq(Tables.EDU_STUDENT.ID))
+          .leftJoin(Tables.EDU_COURSE).on(Tables.EDU_COURSE_SHARING.SOURCE_COURSE_ID.eq(Tables.EDU_COURSE.ID))
+          .where(Tables.EDU_COURSE_SHARING.TARGET_COURSE_ID.eq(courseId))
+          .and(Tables.EDU_COURSE_SHARING.DELETED.eq(0))
+          .and(Tables.EDU_COURSE_SHARING.STATUS.eq("ACTIVE"))
+          .fetchOne();
+      
+      if (sharingRecord != null) {
+        courseInfo.setIsShared(true);
+        courseInfo.setSharedSourceCourseId(sharingRecord.get(Tables.EDU_COURSE_SHARING.SOURCE_COURSE_ID));
+        courseInfo.setSharedSourceCourseName(sharingRecord.get(Tables.EDU_COURSE.NAME));
+        courseInfo.setSharedStudentId(sharingRecord.get(Tables.EDU_COURSE_SHARING.STUDENT_ID));
+        courseInfo.setSharedStudentName(sharingRecord.get(Tables.EDU_STUDENT.NAME));
+        courseInfo.setSharedHours(sharingRecord.get(Tables.EDU_COURSE_SHARING.SHARED_HOURS));
+        
+        log.debug("课程{}是共享课程，来源课程：{}，学员：{}", 
+                courseId, courseInfo.getSharedSourceCourseName(), courseInfo.getSharedStudentName());
+      } else {
+        courseInfo.setIsShared(false);
+      }
+    } catch (Exception e) {
+      log.warn("查询课程共享信息时发生错误: courseId={}, error={}", courseId, e.getMessage());
+      courseInfo.setIsShared(false);
+    }
   }
 
   /**

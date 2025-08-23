@@ -422,6 +422,21 @@ public class CourseServiceImpl implements CourseService {
      */
     private BigDecimal calculateCourseTotalHours(Long courseId) {
         try {
+            // 先检查是否是共享课程
+            BigDecimal sharedHours = dsl.select(Tables.EDU_COURSE_SHARING.SHARED_HOURS)
+                    .from(Tables.EDU_COURSE_SHARING)
+                    .where(Tables.EDU_COURSE_SHARING.TARGET_COURSE_ID.eq(courseId))
+                    .and(Tables.EDU_COURSE_SHARING.DELETED.eq(0))
+                    .and(Tables.EDU_COURSE_SHARING.STATUS.eq("ACTIVE"))
+                    .fetchOneInto(BigDecimal.class);
+            
+            if (sharedHours != null && sharedHours.compareTo(BigDecimal.ZERO) > 0) {
+                // 如果是共享课程，直接返回共享课时
+                log.debug("课程{}是共享课程，使用共享课时：{}", courseId, sharedHours);
+                return sharedHours;
+            }
+            
+            // 如果不是共享课程，从学员课程关系中统计
             BigDecimal totalHours = dsl.select(DSL.sum(Tables.EDU_STUDENT_COURSE.TOTAL_HOURS))
                     .from(Tables.EDU_STUDENT_COURSE)
                     .where(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(courseId))
@@ -440,6 +455,33 @@ public class CourseServiceImpl implements CourseService {
      */
     private BigDecimal calculateCourseConsumedHours(Long courseId) {
         try {
+            // 先检查是否是共享课程
+            BigDecimal sharedHours = dsl.select(Tables.EDU_COURSE_SHARING.SHARED_HOURS)
+                    .from(Tables.EDU_COURSE_SHARING)
+                    .where(Tables.EDU_COURSE_SHARING.TARGET_COURSE_ID.eq(courseId))
+                    .and(Tables.EDU_COURSE_SHARING.DELETED.eq(0))
+                    .and(Tables.EDU_COURSE_SHARING.STATUS.eq("ACTIVE"))
+                    .fetchOneInto(BigDecimal.class);
+            
+            if (sharedHours != null && sharedHours.compareTo(BigDecimal.ZERO) > 0) {
+                // 如果是共享课程，从学员课程关系中统计已消耗课时
+                BigDecimal consumedHours = dsl.select(DSL.sum(Tables.EDU_STUDENT_COURSE.CONSUMED_HOURS))
+                        .from(Tables.EDU_STUDENT_COURSE)
+                        .where(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(courseId))
+                        .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
+                        .fetchOneInto(BigDecimal.class);
+                
+                // 确保已消耗课时不超过共享课时
+                BigDecimal actualConsumed = consumedHours != null ? consumedHours : BigDecimal.ZERO;
+                if (actualConsumed.compareTo(sharedHours) > 0) {
+                    log.warn("课程{}已消耗课时({})超过共享课时({})，使用共享课时作为上限", 
+                            courseId, actualConsumed, sharedHours);
+                    return sharedHours;
+                }
+                return actualConsumed;
+            }
+            
+            // 如果不是共享课程，从学员课程关系中统计
             BigDecimal consumedHours = dsl.select(DSL.sum(Tables.EDU_STUDENT_COURSE.CONSUMED_HOURS))
                     .from(Tables.EDU_STUDENT_COURSE)
                     .where(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(courseId))
