@@ -6,6 +6,7 @@ package com.lesson.repository;
 
 import com.lesson.repository.tables.EduCourse;
 import com.lesson.repository.tables.EduCourseRecord;
+import com.lesson.repository.tables.EduCourseSharing;
 import com.lesson.repository.tables.EduStudent;
 import com.lesson.repository.tables.EduStudentClassTransfer;
 import com.lesson.repository.tables.EduStudentCourse;
@@ -42,6 +43,11 @@ public class Tables {
      * 课程上课记录表
      */
     public static final EduCourseRecord EDU_COURSE_RECORD = EduCourseRecord.EDU_COURSE_RECORD;
+
+    /**
+     * 课程共享表
+     */
+    public static final EduCourseSharing EDU_COURSE_SHARING = EduCourseSharing.EDU_COURSE_SHARING;
 
     /**
      * 学员表

@@ -6,6 +6,7 @@ package com.lesson.repository;
 
 import com.lesson.repository.tables.EduCourse;
 import com.lesson.repository.tables.EduCourseRecord;
+import com.lesson.repository.tables.EduCourseSharing;
 import com.lesson.repository.tables.EduStudent;
 import com.lesson.repository.tables.EduStudentClassTransfer;
 import com.lesson.repository.tables.EduStudentCourse;
@@ -48,6 +49,8 @@ public class Indexes {
     public static final Index EDU_STUDENT_COURSE_IDX_CAMPUS_ID = Internal.createIndex(DSL.name("idx_campus_id"), EduStudentCourse.EDU_STUDENT_COURSE, new OrderField[] { EduStudentCourse.EDU_STUDENT_COURSE.CAMPUS_ID }, false);
     public static final Index SYS_COACH_IDX_CAMPUS_ID = Internal.createIndex(DSL.name("idx_campus_id"), SysCoach.SYS_COACH, new OrderField[] { SysCoach.SYS_COACH.CAMPUS_ID }, false);
     public static final Index SYS_USER_IDX_CAMPUS_ID = Internal.createIndex(DSL.name("idx_campus_id"), SysUser.SYS_USER, new OrderField[] { SysUser.SYS_USER.CAMPUS_ID }, false);
+    public static final Index EDU_COURSE_SHARING_IDX_CAMPUS_INSTITUTION = Internal.createIndex(DSL.name("idx_campus_institution"), EduCourseSharing.EDU_COURSE_SHARING, new OrderField[] { EduCourseSharing.EDU_COURSE_SHARING.CAMPUS_ID, EduCourseSharing.EDU_COURSE_SHARING.INSTITUTION_ID }, false);
+    public static final Index EDU_COURSE_SHARING_IDX_COACH = Internal.createIndex(DSL.name("idx_coach"), EduCourseSharing.EDU_COURSE_SHARING, new OrderField[] { EduCourseSharing.EDU_COURSE_SHARING.COACH_ID }, false);
     public static final Index SYS_COACH_COURSE_IDX_COACH_FEE = Internal.createIndex(DSL.name("idx_coach_fee"), SysCoachCourse.SYS_COACH_COURSE, new OrderField[] { SysCoachCourse.SYS_COACH_COURSE.COACH_FEE }, false);
     public static final Index EDU_COURSE_RECORD_IDX_COACH_ID = Internal.createIndex(DSL.name("idx_coach_id"), EduCourseRecord.EDU_COURSE_RECORD, new OrderField[] { EduCourseRecord.EDU_COURSE_RECORD.COACH_ID }, false);
     public static final Index EDU_STUDENT_COURSE_RECORD_IDX_COACH_ID = Internal.createIndex(DSL.name("idx_coach_id"), EduStudentCourseRecord.EDU_STUDENT_COURSE_RECORD, new OrderField[] { EduStudentCourseRecord.EDU_STUDENT_COURSE_RECORD.COACH_ID }, false);
@@ -72,6 +75,7 @@ public class Indexes {
     public static final Index SYS_ROLE_PERMISSION_IDX_CREATED_TIME = Internal.createIndex(DSL.name("idx_created_time"), SysRolePermission.SYS_ROLE_PERMISSION, new OrderField[] { SysRolePermission.SYS_ROLE_PERMISSION.CREATED_TIME }, false);
     public static final Index SYS_USER_IDX_CREATED_TIME = Internal.createIndex(DSL.name("idx_created_time"), SysUser.SYS_USER, new OrderField[] { SysUser.SYS_USER.CREATED_TIME }, false);
     public static final Index SYS_USER_ROLE_IDX_CREATED_TIME = Internal.createIndex(DSL.name("idx_created_time"), SysUserRole.SYS_USER_ROLE, new OrderField[] { SysUserRole.SYS_USER_ROLE.CREATED_TIME }, false);
+    public static final Index EDU_COURSE_SHARING_IDX_DELETED = Internal.createIndex(DSL.name("idx_deleted"), EduCourseSharing.EDU_COURSE_SHARING, new OrderField[] { EduCourseSharing.EDU_COURSE_SHARING.DELETED }, false);
     public static final Index SYS_COACH_SALARY_IDX_EFFECTIVE_DATE = Internal.createIndex(DSL.name("idx_effective_date"), SysCoachSalary.SYS_COACH_SALARY, new OrderField[] { SysCoachSalary.SYS_COACH_SALARY.EFFECTIVE_DATE }, false);
     public static final Index SYS_COACH_IDX_ID_NUMBER = Internal.createIndex(DSL.name("idx_id_number"), SysCoach.SYS_COACH, new OrderField[] { SysCoach.SYS_COACH.ID_NUMBER }, false);
     public static final Index EDU_COURSE_IDX_INSTITUTION_ID = Internal.createIndex(DSL.name("idx_institution_id"), EduCourse.EDU_COURSE, new OrderField[] { EduCourse.EDU_COURSE.INSTITUTION_ID }, false);
@@ -82,6 +86,7 @@ public class Indexes {
     public static final Index SYS_COACH_IDX_INSTITUTION_ID = Internal.createIndex(DSL.name("idx_institution_id"), SysCoach.SYS_COACH, new OrderField[] { SysCoach.SYS_COACH.INSTITUTION_ID }, false);
     public static final Index SYS_USER_IDX_INSTITUTION_ID = Internal.createIndex(DSL.name("idx_institution_id"), SysUser.SYS_USER, new OrderField[] { SysUser.SYS_USER.INSTITUTION_ID }, false);
     public static final Index EDU_COURSE_IDX_IS_MULTI_TEACHER = Internal.createIndex(DSL.name("idx_is_multi_teacher"), EduCourse.EDU_COURSE, new OrderField[] { EduCourse.EDU_COURSE.IS_MULTI_TEACHER }, false);
+    public static final Index EDU_STUDENT_COURSE_IDX_IS_SHARED = Internal.createIndex(DSL.name("idx_is_shared"), EduStudentCourse.EDU_STUDENT_COURSE, new OrderField[] { EduStudentCourse.EDU_STUDENT_COURSE.IS_SHARED }, false);
     public static final Index SYS_COACH_IDX_JOB_TITLE = Internal.createIndex(DSL.name("idx_job_title"), SysCoach.SYS_COACH, new OrderField[] { SysCoach.SYS_COACH.JOB_TITLE }, false);
     public static final Index SYS_INSTITUTION_IDX_MANAGER_PHONE = Internal.createIndex(DSL.name("idx_manager_phone"), SysInstitution.SYS_INSTITUTION, new OrderField[] { SysInstitution.SYS_INSTITUTION.MANAGER_PHONE }, false);
     public static final Index EDU_COURSE_IDX_NAME = Internal.createIndex(DSL.name("idx_name"), EduCourse.EDU_COURSE, new OrderField[] { EduCourse.EDU_COURSE.NAME }, false);
@@ -99,8 +104,10 @@ public class Indexes {
     public static final Index SYS_USER_IDX_REAL_NAME = Internal.createIndex(DSL.name("idx_real_name"), SysUser.SYS_USER, new OrderField[] { SysUser.SYS_USER.REAL_NAME }, false);
     public static final Index SYS_USER_IDX_ROLE_ID = Internal.createIndex(DSL.name("idx_role_id"), SysUser.SYS_USER, new OrderField[] { SysUser.SYS_USER.ROLE_ID }, false);
     public static final Index SYS_USER_ROLE_IDX_ROLE_ID = Internal.createIndex(DSL.name("idx_role_id"), SysUserRole.SYS_USER_ROLE, new OrderField[] { SysUserRole.SYS_USER_ROLE.ROLE_ID }, false);
+    public static final Index EDU_STUDENT_COURSE_IDX_SHARING_ID = Internal.createIndex(DSL.name("idx_sharing_id"), EduStudentCourse.EDU_STUDENT_COURSE, new OrderField[] { EduStudentCourse.EDU_STUDENT_COURSE.SHARING_ID }, false);
     public static final Index EDU_COURSE_RECORD_IDX_START_TIME = Internal.createIndex(DSL.name("idx_start_time"), EduCourseRecord.EDU_COURSE_RECORD, new OrderField[] { EduCourseRecord.EDU_COURSE_RECORD.START_TIME }, false);
     public static final Index EDU_COURSE_IDX_STATUS = Internal.createIndex(DSL.name("idx_status"), EduCourse.EDU_COURSE, new OrderField[] { EduCourse.EDU_COURSE.STATUS }, false);
+    public static final Index EDU_COURSE_SHARING_IDX_STATUS = Internal.createIndex(DSL.name("idx_status"), EduCourseSharing.EDU_COURSE_SHARING, new OrderField[] { EduCourseSharing.EDU_COURSE_SHARING.STATUS }, false);
     public static final Index EDU_STUDENT_IDX_STATUS = Internal.createIndex(DSL.name("idx_status"), EduStudent.EDU_STUDENT, new OrderField[] { EduStudent.EDU_STUDENT.STATUS }, false);
     public static final Index EDU_STUDENT_COURSE_IDX_STATUS = Internal.createIndex(DSL.name("idx_status"), EduStudentCourse.EDU_STUDENT_COURSE, new OrderField[] { EduStudentCourse.EDU_STUDENT_COURSE.STATUS }, false);
     public static final Index SYS_CAMPUS_IDX_STATUS = Internal.createIndex(DSL.name("idx_status"), SysCampus.SYS_CAMPUS, new OrderField[] { SysCampus.SYS_CAMPUS.STATUS }, false);
@@ -109,6 +116,7 @@ public class Indexes {
     public static final Index SYS_INSTITUTION_IDX_STATUS = Internal.createIndex(DSL.name("idx_status"), SysInstitution.SYS_INSTITUTION, new OrderField[] { SysInstitution.SYS_INSTITUTION.STATUS }, false);
     public static final Index SYS_ROLE_IDX_STATUS = Internal.createIndex(DSL.name("idx_status"), SysRole.SYS_ROLE, new OrderField[] { SysRole.SYS_ROLE.STATUS }, false);
     public static final Index SYS_USER_IDX_STATUS = Internal.createIndex(DSL.name("idx_status"), SysUser.SYS_USER, new OrderField[] { SysUser.SYS_USER.STATUS }, false);
+    public static final Index EDU_COURSE_SHARING_IDX_STUDENT_COURSE = Internal.createIndex(DSL.name("idx_student_course"), EduCourseSharing.EDU_COURSE_SHARING, new OrderField[] { EduCourseSharing.EDU_COURSE_SHARING.STUDENT_ID, EduCourseSharing.EDU_COURSE_SHARING.SOURCE_COURSE_ID }, false);
     public static final Index EDU_STUDENT_CLASS_TRANSFER_IDX_STUDENT_ID = Internal.createIndex(DSL.name("idx_student_id"), EduStudentClassTransfer.EDU_STUDENT_CLASS_TRANSFER, new OrderField[] { EduStudentClassTransfer.EDU_STUDENT_CLASS_TRANSFER.STUDENT_ID }, false);
     public static final Index EDU_STUDENT_COURSE_IDX_STUDENT_ID = Internal.createIndex(DSL.name("idx_student_id"), EduStudentCourse.EDU_STUDENT_COURSE, new OrderField[] { EduStudentCourse.EDU_STUDENT_COURSE.STUDENT_ID }, false);
     public static final Index EDU_STUDENT_COURSE_OPERATION_IDX_STUDENT_ID = Internal.createIndex(DSL.name("idx_student_id"), EduStudentCourseOperation.EDU_STUDENT_COURSE_OPERATION, new OrderField[] { EduStudentCourseOperation.EDU_STUDENT_COURSE_OPERATION.STUDENT_ID }, false);
@@ -116,6 +124,7 @@ public class Indexes {
     public static final Index EDU_STUDENT_COURSE_TRANSFER_IDX_STUDENT_ID = Internal.createIndex(DSL.name("idx_student_id"), EduStudentCourseTransfer.EDU_STUDENT_COURSE_TRANSFER, new OrderField[] { EduStudentCourseTransfer.EDU_STUDENT_COURSE_TRANSFER.STUDENT_ID }, false);
     public static final Index EDU_STUDENT_PAYMENT_IDX_STUDENT_ID = Internal.createIndex(DSL.name("idx_student_id"), EduStudentPayment.EDU_STUDENT_PAYMENT, new OrderField[] { EduStudentPayment.EDU_STUDENT_PAYMENT.STUDENT_ID }, false);
     public static final Index EDU_STUDENT_REFUND_IDX_STUDENT_ID = Internal.createIndex(DSL.name("idx_student_id"), EduStudentRefund.EDU_STUDENT_REFUND, new OrderField[] { EduStudentRefund.EDU_STUDENT_REFUND.STUDENT_ID }, false);
+    public static final Index EDU_COURSE_SHARING_IDX_TARGET_COURSE = Internal.createIndex(DSL.name("idx_target_course"), EduCourseSharing.EDU_COURSE_SHARING, new OrderField[] { EduCourseSharing.EDU_COURSE_SHARING.TARGET_COURSE_ID }, false);
     public static final Index EDU_STUDENT_COURSE_TRANSFER_IDX_TARGET_COURSE_ID = Internal.createIndex(DSL.name("idx_target_course_id"), EduStudentCourseTransfer.EDU_STUDENT_COURSE_TRANSFER, new OrderField[] { EduStudentCourseTransfer.EDU_STUDENT_COURSE_TRANSFER.TARGET_COURSE_ID }, false);
     public static final Index SYS_CONSTANT_IDX_TYPE = Internal.createIndex(DSL.name("idx_type"), SysConstant.SYS_CONSTANT, new OrderField[] { SysConstant.SYS_CONSTANT.TYPE }, false);
     public static final Index EDU_COURSE_IDX_TYPE_ID = Internal.createIndex(DSL.name("idx_type_id"), EduCourse.EDU_COURSE, new OrderField[] { EduCourse.EDU_COURSE.TYPE_ID }, false);

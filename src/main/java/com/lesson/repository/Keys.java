@@ -5,6 +5,7 @@ package com.lesson.repository;
 
 
 import com.lesson.repository.tables.EduCourse;
+import com.lesson.repository.tables.EduCourseSharing;
 import com.lesson.repository.tables.EduStudent;
 import com.lesson.repository.tables.EduStudentClassTransfer;
 import com.lesson.repository.tables.EduStudentCourse;
@@ -25,6 +26,7 @@ import com.lesson.repository.tables.SysUser;
 import com.lesson.repository.tables.SysUserRole;
 import com.lesson.repository.tables.records.EduCourseRecord;
 import com.lesson.repository.tables.records.EduCourseRecordRecord;
+import com.lesson.repository.tables.records.EduCourseSharingRecord;
 import com.lesson.repository.tables.records.EduStudentClassTransferRecord;
 import com.lesson.repository.tables.records.EduStudentCourseOperationRecord;
 import com.lesson.repository.tables.records.EduStudentCourseRecord;
@@ -65,6 +67,7 @@ public class Keys {
     public static final UniqueKey<EduCourseRecord> KEY_EDU_COURSE_IDX_UNIQUE_NAME_CAMPUS_INSTITUTION = Internal.createUniqueKey(EduCourse.EDU_COURSE, DSL.name("KEY_edu_course_idx_unique_name_campus_institution"), new TableField[] { EduCourse.EDU_COURSE.NAME, EduCourse.EDU_COURSE.CAMPUS_ID, EduCourse.EDU_COURSE.INSTITUTION_ID, EduCourse.EDU_COURSE.DELETED }, true);
     public static final UniqueKey<EduCourseRecord> KEY_EDU_COURSE_PRIMARY = Internal.createUniqueKey(EduCourse.EDU_COURSE, DSL.name("KEY_edu_course_PRIMARY"), new TableField[] { EduCourse.EDU_COURSE.ID }, true);
     public static final UniqueKey<EduCourseRecordRecord> KEY_EDU_COURSE_RECORD_PRIMARY = Internal.createUniqueKey(com.lesson.repository.tables.EduCourseRecord.EDU_COURSE_RECORD, DSL.name("KEY_edu_course_record_PRIMARY"), new TableField[] { com.lesson.repository.tables.EduCourseRecord.EDU_COURSE_RECORD.ID }, true);
+    public static final UniqueKey<EduCourseSharingRecord> KEY_EDU_COURSE_SHARING_PRIMARY = Internal.createUniqueKey(EduCourseSharing.EDU_COURSE_SHARING, DSL.name("KEY_edu_course_sharing_PRIMARY"), new TableField[] { EduCourseSharing.EDU_COURSE_SHARING.ID }, true);
     public static final UniqueKey<EduStudentRecord> KEY_EDU_STUDENT_PRIMARY = Internal.createUniqueKey(EduStudent.EDU_STUDENT, DSL.name("KEY_edu_student_PRIMARY"), new TableField[] { EduStudent.EDU_STUDENT.ID }, true);
     public static final UniqueKey<EduStudentClassTransferRecord> KEY_EDU_STUDENT_CLASS_TRANSFER_PRIMARY = Internal.createUniqueKey(EduStudentClassTransfer.EDU_STUDENT_CLASS_TRANSFER, DSL.name("KEY_edu_student_class_transfer_PRIMARY"), new TableField[] { EduStudentClassTransfer.EDU_STUDENT_CLASS_TRANSFER.ID }, true);
     public static final UniqueKey<EduStudentCourseRecord> KEY_EDU_STUDENT_COURSE_PRIMARY = Internal.createUniqueKey(EduStudentCourse.EDU_STUDENT_COURSE, DSL.name("KEY_edu_student_course_PRIMARY"), new TableField[] { EduStudentCourse.EDU_STUDENT_COURSE.ID }, true);

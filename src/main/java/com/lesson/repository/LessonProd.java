@@ -6,6 +6,7 @@ package com.lesson.repository;
 
 import com.lesson.repository.tables.EduCourse;
 import com.lesson.repository.tables.EduCourseRecord;
+import com.lesson.repository.tables.EduCourseSharing;
 import com.lesson.repository.tables.EduStudent;
 import com.lesson.repository.tables.EduStudentClassTransfer;
 import com.lesson.repository.tables.EduStudentCourse;
@@ -56,6 +57,11 @@ public class LessonProd extends SchemaImpl {
      * 课程上课记录表
      */
     public final EduCourseRecord EDU_COURSE_RECORD = EduCourseRecord.EDU_COURSE_RECORD;
+
+    /**
+     * 课程共享表
+     */
+    public final EduCourseSharing EDU_COURSE_SHARING = EduCourseSharing.EDU_COURSE_SHARING;
 
     /**
      * 学员表
@@ -170,6 +176,7 @@ public class LessonProd extends SchemaImpl {
         return Arrays.<Table<?>>asList(
             EduCourse.EDU_COURSE,
             EduCourseRecord.EDU_COURSE_RECORD,
+            EduCourseSharing.EDU_COURSE_SHARING,
             EduStudent.EDU_STUDENT,
             EduStudentClassTransfer.EDU_STUDENT_CLASS_TRANSFER,
             EduStudentCourse.EDU_STUDENT_COURSE,

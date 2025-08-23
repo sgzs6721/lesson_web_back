@@ -95,6 +95,42 @@ public class CourseVO {
     @Schema(description = "教练信息")
     private List<CoachInfo> coaches;
 
+    /**
+     * 是否共享课程
+     */
+    @Schema(description = "是否共享课程：true-是，false-否", example = "false")
+    private Boolean isShared = false;
+
+    /**
+     * 共享来源课程ID
+     */
+    @Schema(description = "共享来源课程ID（如果是共享课程）", example = "1001")
+    private Long sharedSourceCourseId;
+
+    /**
+     * 共享来源课程名称
+     */
+    @Schema(description = "共享来源课程名称（如果是共享课程）", example = "杨教练一对一")
+    private String sharedSourceCourseName;
+
+    /**
+     * 共享学员ID
+     */
+    @Schema(description = "共享学员ID（如果是共享课程）", example = "2001")
+    private Long sharedStudentId;
+
+    /**
+     * 共享学员姓名
+     */
+    @Schema(description = "共享学员姓名（如果是共享课程）", example = "王韵涵")
+    private String sharedStudentName;
+
+    /**
+     * 共享课时数
+     */
+    @Schema(description = "共享课时数（如果是共享课程）", example = "10.0")
+    private BigDecimal sharedHours;
+
     @Data
     @Schema(description = "教练简单信息")
     public static class CoachInfo {

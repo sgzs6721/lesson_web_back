@@ -443,6 +443,34 @@ public class PaymentRecordService {
                 throw new RuntimeException("缴费记录不存在或已被删除");
             }
             
+            // 获取原缴费记录信息，用于计算课时差值
+            Record oldPaymentRecord = dsl.select()
+                    .from(Tables.EDU_STUDENT_PAYMENT)
+                    .where(Tables.EDU_STUDENT_PAYMENT.ID.eq(request.getId()))
+                    .and(Tables.EDU_STUDENT_PAYMENT.DELETED.eq(0))
+                    .fetchOne();
+            
+            if (oldPaymentRecord == null) {
+                throw new RuntimeException("无法获取原缴费记录信息");
+            }
+            
+            // 获取原课时信息
+            BigDecimal oldCourseHours = oldPaymentRecord.get(Tables.EDU_STUDENT_PAYMENT.COURSE_HOURS);
+            BigDecimal oldGiftHours = oldPaymentRecord.get(Tables.EDU_STUDENT_PAYMENT.GIFT_HOURS);
+            String oldStudentId = oldPaymentRecord.get(Tables.EDU_STUDENT_PAYMENT.STUDENT_ID);
+            String oldCourseId = oldPaymentRecord.get(Tables.EDU_STUDENT_PAYMENT.COURSE_ID);
+            
+            if (oldCourseHours == null) oldCourseHours = BigDecimal.ZERO;
+            if (oldGiftHours == null) oldGiftHours = BigDecimal.ZERO;
+            
+            // 计算课时差值
+            BigDecimal courseHoursDiff = request.getCourseHours().subtract(oldCourseHours);
+            BigDecimal giftHoursDiff = request.getGiftedHours().subtract(oldGiftHours);
+            BigDecimal totalHoursDiff = courseHoursDiff.add(giftHoursDiff);
+            
+            log.info("课时变更计算：原正课={}, 原赠课={}, 新正课={}, 新赠课={}, 课时差值={}", 
+                    oldCourseHours, oldGiftHours, request.getCourseHours(), request.getGiftedHours(), totalHoursDiff);
+            
             // 更新缴费记录
             int updatedRows = dsl.update(Tables.EDU_STUDENT_PAYMENT)
                     .set(Tables.EDU_STUDENT_PAYMENT.PAYMENT_TYPE, request.getPaymentType().name())
@@ -462,11 +490,134 @@ public class PaymentRecordService {
                 throw new RuntimeException("更新缴费记录失败");
             }
             
+            // 同步更新学员课程关系表中的课时数据
+            if (totalHoursDiff.compareTo(BigDecimal.ZERO) != 0) {
+                updateStudentCourseHours(oldStudentId, oldCourseId, totalHoursDiff);
+                log.info("已同步更新学员课程课时：学员ID={}, 课程ID={}, 课时差值={}", 
+                        oldStudentId, oldCourseId, totalHoursDiff);
+            }
+            
             log.info("缴费记录编辑成功，ID：{}", request.getId());
             
         } catch (Exception e) {
             log.error("编辑缴费记录时发生错误：", e);
             throw new RuntimeException("编辑缴费记录失败：" + e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * 同步更新学员课程关系表中的课时数据
+     */
+    private void updateStudentCourseHours(String studentId, String courseId, BigDecimal hoursDiff) {
+        try {
+            // 查找学员课程关系记录
+            Record studentCourseRecord = dsl.select()
+                    .from(Tables.EDU_STUDENT_COURSE)
+                    .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(Long.valueOf(studentId)))
+                    .and(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(Long.valueOf(courseId)))
+                    .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
+                    .fetchOne();
+            
+            if (studentCourseRecord == null) {
+                log.warn("未找到学员课程关系记录，无法更新课时：学员ID={}, 课程ID={}", studentId, courseId);
+                return;
+            }
+            
+            // 获取当前总课时
+            BigDecimal currentTotalHours = studentCourseRecord.get(Tables.EDU_STUDENT_COURSE.TOTAL_HOURS);
+            if (currentTotalHours == null) {
+                currentTotalHours = BigDecimal.ZERO;
+            }
+            
+            // 计算新的总课时
+            BigDecimal newTotalHours = currentTotalHours.add(hoursDiff);
+            
+            // 确保总课时不为负数
+            if (newTotalHours.compareTo(BigDecimal.ZERO) < 0) {
+                newTotalHours = BigDecimal.ZERO;
+                log.warn("计算后的总课时为负数，已调整为0：学员ID={}, 课程ID={}, 原课时={}, 差值={}", 
+                        studentId, courseId, currentTotalHours, hoursDiff);
+            }
+            
+            // 更新学员课程关系表中的总课时
+            int updatedRows = dsl.update(Tables.EDU_STUDENT_COURSE)
+                    .set(Tables.EDU_STUDENT_COURSE.TOTAL_HOURS, newTotalHours)
+                    .set(Tables.EDU_STUDENT_COURSE.UPDATE_TIME, java.time.LocalDateTime.now())
+                    .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(Long.valueOf(studentId)))
+                    .and(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(Long.valueOf(courseId)))
+                    .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
+                    .execute();
+            
+            if (updatedRows > 0) {
+                log.info("学员课程课时更新成功：学员ID={}, 课程ID={}, 原课时={}, 新课时={}", 
+                        studentId, courseId, currentTotalHours, newTotalHours);
+            } else {
+                log.warn("学员课程课时更新失败：学员ID={}, 课程ID={}", studentId, courseId);
+            }
+            
+        } catch (Exception e) {
+            log.error("更新学员课程课时时发生错误：学员ID={}, 课程ID={}", studentId, courseId, e);
+        }
+    }
+
+    /**
+     * 删除缴费记录
+     */
+    public void deletePaymentRecord(Long id) {
+        try {
+            log.info("开始删除缴费记录，ID：{}", id);
+            
+            // 获取缴费记录信息，用于计算课时差值
+            Record paymentRecord = dsl.select()
+                    .from(Tables.EDU_STUDENT_PAYMENT)
+                    .where(Tables.EDU_STUDENT_PAYMENT.ID.eq(id))
+                    .and(Tables.EDU_STUDENT_PAYMENT.DELETED.eq(0))
+                    .fetchOne();
+            
+            if (paymentRecord == null) {
+                throw new RuntimeException("缴费记录不存在或已被删除");
+            }
+            
+            // 获取课时信息
+            BigDecimal courseHours = paymentRecord.get(Tables.EDU_STUDENT_PAYMENT.COURSE_HOURS);
+            BigDecimal giftHours = paymentRecord.get(Tables.EDU_STUDENT_PAYMENT.GIFT_HOURS);
+            String studentId = paymentRecord.get(Tables.EDU_STUDENT_PAYMENT.STUDENT_ID);
+            String courseId = paymentRecord.get(Tables.EDU_STUDENT_PAYMENT.COURSE_ID);
+            
+            if (courseHours == null) courseHours = BigDecimal.ZERO;
+            if (giftHours == null) giftHours = BigDecimal.ZERO;
+            
+            // 计算需要减少的总课时
+            BigDecimal totalHoursToReduce = courseHours.add(giftHours);
+            
+            log.info("删除缴费记录课时计算：正课={}, 赠课={}, 总减少课时={}", 
+                    courseHours, giftHours, totalHoursToReduce);
+            
+            // 逻辑删除缴费记录
+            int deletedRows = dsl.update(Tables.EDU_STUDENT_PAYMENT)
+                    .set(Tables.EDU_STUDENT_PAYMENT.DELETED, 1)
+                    .set(Tables.EDU_STUDENT_PAYMENT.UPDATE_TIME, java.time.LocalDateTime.now())
+                    .where(Tables.EDU_STUDENT_PAYMENT.ID.eq(id))
+                    .and(Tables.EDU_STUDENT_PAYMENT.DELETED.eq(0))
+                    .execute();
+            
+            if (deletedRows == 0) {
+                throw new RuntimeException("删除缴费记录失败");
+            }
+            
+            // 同步减少学员课程关系表中的课时数据
+            if (totalHoursToReduce.compareTo(BigDecimal.ZERO) > 0) {
+                // 传入负数，表示减少课时
+                updateStudentCourseHours(studentId, courseId, totalHoursToReduce.negate());
+                log.info("已同步减少学员课程课时：学员ID={}, 课程ID={}, 减少课时={}", 
+                        studentId, courseId, totalHoursToReduce);
+            }
+            
+            log.info("缴费记录删除成功，ID：{}", id);
+            
+        } catch (Exception e) {
+            log.error("删除缴费记录时发生错误：", e);
+            throw new RuntimeException("删除缴费记录失败：" + e.getMessage(), e);
         }
     }
 } 

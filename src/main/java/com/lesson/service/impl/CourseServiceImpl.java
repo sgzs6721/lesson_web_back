@@ -10,9 +10,6 @@ import com.lesson.model.SysConstantModel;
 import com.lesson.model.record.CoachDetailRecord;
 import com.lesson.model.record.CourseDetailRecord;
 import com.lesson.repository.tables.records.SysConstantRecord;
-import com.lesson.repository.Tables;
-import org.jooq.DSLContext;
-import org.jooq.impl.DSL;
 import com.lesson.service.CourseService;
 import com.lesson.service.CourseHoursRedisService;
 import com.lesson.service.CampusStatsRedisService;
@@ -34,6 +31,10 @@ import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
+import com.lesson.repository.Tables;
 
 @Slf4j
 @Service
@@ -379,6 +380,9 @@ public class CourseServiceImpl implements CourseService {
                 BigDecimal actualConsumedHours = calculateCourseConsumedHours(record.getId());
                 vo.setConsumedHours(actualConsumedHours);
 
+                // 查询共享课程信息
+                queryCourseSharingInfo(vo, record.getId());
+
                 // 设置教练信息
                 List<CoachDetailRecord> coaches = courseCoachMap.get(record.getId());
                 if (coaches != null && !coaches.isEmpty()) {
@@ -446,6 +450,40 @@ public class CourseServiceImpl implements CourseService {
         } catch (Exception e) {
             log.warn("计算课程已消耗课时时发生错误: courseId={}, error={}", courseId, e.getMessage());
             return BigDecimal.ZERO;
+        }
+    }
+
+    /**
+     * 查询课程共享信息
+     */
+    private void queryCourseSharingInfo(CourseVO vo, Long courseId) {
+        try {
+            // 查询该课程是否有共享记录
+            org.jooq.Record sharingRecord = dsl.select()
+                    .from(Tables.EDU_COURSE_SHARING)
+                    .leftJoin(Tables.EDU_STUDENT).on(Tables.EDU_COURSE_SHARING.STUDENT_ID.eq(Tables.EDU_STUDENT.ID))
+                    .leftJoin(Tables.EDU_COURSE).on(Tables.EDU_COURSE_SHARING.SOURCE_COURSE_ID.eq(Tables.EDU_COURSE.ID))
+                    .where(Tables.EDU_COURSE_SHARING.TARGET_COURSE_ID.eq(courseId))
+                    .and(Tables.EDU_COURSE_SHARING.DELETED.eq(0))
+                    .and(Tables.EDU_COURSE_SHARING.STATUS.eq("ACTIVE"))
+                    .fetchOne();
+            
+            if (sharingRecord != null) {
+                vo.setIsShared(true);
+                vo.setSharedSourceCourseId(sharingRecord.get(Tables.EDU_COURSE_SHARING.SOURCE_COURSE_ID));
+                vo.setSharedSourceCourseName(sharingRecord.get(Tables.EDU_COURSE.NAME));
+                vo.setSharedStudentId(sharingRecord.get(Tables.EDU_COURSE_SHARING.STUDENT_ID));
+                vo.setSharedStudentName(sharingRecord.get(Tables.EDU_STUDENT.NAME));
+                vo.setSharedHours(sharingRecord.get(Tables.EDU_COURSE_SHARING.SHARED_HOURS));
+                
+                log.debug("课程{}是共享课程，来源课程：{}，学员：{}", 
+                        courseId, vo.getSharedSourceCourseName(), vo.getSharedStudentName());
+            } else {
+                vo.setIsShared(false);
+            }
+        } catch (Exception e) {
+            log.warn("查询课程共享信息时发生错误: courseId={}, error={}", courseId, e.getMessage());
+            vo.setIsShared(false);
         }
     }
 

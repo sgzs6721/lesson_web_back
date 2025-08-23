@@ -21,7 +21,7 @@ import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row15;
+import org.jooq.Row17;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -82,6 +82,16 @@ public class EduStudentCourse extends TableImpl<EduStudentCourseRecord> {
      * The column <code>lesson_prod.edu_student_course.status</code>. 状态：STUDYING-在学，SUSPENDED-停课，GRADUATED-结业
      */
     public final TableField<EduStudentCourseRecord, String> STATUS = createField(DSL.name("status"), SQLDataType.VARCHAR(20).nullable(false), this, "状态：STUDYING-在学，SUSPENDED-停课，GRADUATED-结业");
+
+    /**
+     * The column <code>lesson_prod.edu_student_course.is_shared</code>. 是否共享课程：0-否，1-是
+     */
+    public final TableField<EduStudentCourseRecord, Integer> IS_SHARED = createField(DSL.name("is_shared"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.inline("0", SQLDataType.INTEGER)), this, "是否共享课程：0-否，1-是");
+
+    /**
+     * The column <code>lesson_prod.edu_student_course.sharing_id</code>. 关联的共享记录ID
+     */
+    public final TableField<EduStudentCourseRecord, Long> SHARING_ID = createField(DSL.name("sharing_id"), SQLDataType.BIGINT, this, "关联的共享记录ID");
 
     /**
      * The column <code>lesson_prod.edu_student_course.start_date</code>. 报名日期
@@ -168,7 +178,7 @@ public class EduStudentCourse extends TableImpl<EduStudentCourseRecord> {
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.EDU_STUDENT_COURSE_IDX_CAMPUS_ID, Indexes.EDU_STUDENT_COURSE_IDX_COURSE_ID, Indexes.EDU_STUDENT_COURSE_IDX_INSTITUTION_ID, Indexes.EDU_STUDENT_COURSE_IDX_STATUS, Indexes.EDU_STUDENT_COURSE_IDX_STUDENT_ID, Indexes.EDU_STUDENT_COURSE_IDX_VALIDITY_PERIOD_ID);
+        return Arrays.<Index>asList(Indexes.EDU_STUDENT_COURSE_IDX_CAMPUS_ID, Indexes.EDU_STUDENT_COURSE_IDX_COURSE_ID, Indexes.EDU_STUDENT_COURSE_IDX_INSTITUTION_ID, Indexes.EDU_STUDENT_COURSE_IDX_IS_SHARED, Indexes.EDU_STUDENT_COURSE_IDX_SHARING_ID, Indexes.EDU_STUDENT_COURSE_IDX_STATUS, Indexes.EDU_STUDENT_COURSE_IDX_STUDENT_ID, Indexes.EDU_STUDENT_COURSE_IDX_VALIDITY_PERIOD_ID);
     }
 
     @Override
@@ -213,11 +223,11 @@ public class EduStudentCourse extends TableImpl<EduStudentCourseRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row15 type methods
+    // Row17 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row15<Long, Long, Long, BigDecimal, BigDecimal, String, LocalDate, LocalDate, Long, String, Long, Long, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
-        return (Row15) super.fieldsRow();
+    public Row17<Long, Long, Long, BigDecimal, BigDecimal, String, Integer, Long, LocalDate, LocalDate, Long, String, Long, Long, LocalDateTime, LocalDateTime, Integer> fieldsRow() {
+        return (Row17) super.fieldsRow();
     }
 }

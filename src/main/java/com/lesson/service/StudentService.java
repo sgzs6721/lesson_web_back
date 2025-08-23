@@ -403,21 +403,34 @@ public class StudentService {
         throw new IllegalArgumentException("课程不存在：" + courseInfo.getCourseId());
       }
 
-      // 7.1 创建新的学员课程关系记录
+      // 7.1 计算该学员在此课程中的实际课时（从缴费记录中统计）
+      BigDecimal actualTotalHours = calculateStudentCourseHoursFromPayments(request.getStudentId(), courseInfo.getCourseId());
+      
+      // 如果没有缴费记录，使用课程默认课时
+      if (actualTotalHours.compareTo(BigDecimal.ZERO) == 0) {
+        actualTotalHours = courseRecord.getTotalHours();
+        log.info("学员{}在课程{}中没有缴费记录，使用课程默认课时：{}", 
+                request.getStudentId(), courseInfo.getCourseId(), actualTotalHours);
+      } else {
+        log.info("学员{}在课程{}中从缴费记录统计的实际课时：{}", 
+                request.getStudentId(), courseInfo.getCourseId(), actualTotalHours);
+      }
+
+      // 7.2 创建新的学员课程关系记录
       EduStudentCourseRecord newStudentCourseRecord = new EduStudentCourseRecord();
       newStudentCourseRecord.setStudentId(request.getStudentId());
       newStudentCourseRecord.setCourseId(courseInfo.getCourseId());
       newStudentCourseRecord.setCampusId(studentInfo.getCampusId());
       newStudentCourseRecord.setInstitutionId(institutionId);
       newStudentCourseRecord.setStartDate(courseInfo.getEnrollDate());
-      newStudentCourseRecord.setTotalHours(courseRecord.getTotalHours());
+      newStudentCourseRecord.setTotalHours(actualTotalHours); // 使用实际课时，而不是课程默认课时
       newStudentCourseRecord.setConsumedHours(BigDecimal.ZERO); // 重置已消耗课时
       newStudentCourseRecord.setStatus(StudentCourseStatus.STUDYING.getName()); // 重置状态为学习中
       newStudentCourseRecord.setDeleted(0);
       newStudentCourseRecord.setCreatedTime(LocalDateTime.now());
       newStudentCourseRecord.setUpdateTime(LocalDateTime.now());
 
-      // 7.2 处理固定排课时间
+      // 7.3 处理固定排课时间
       try {
         if (courseInfo.getFixedScheduleTimes() != null && !courseInfo.getFixedScheduleTimes().isEmpty()) {
           String fixedScheduleJson = objectMapper.writeValueAsString(courseInfo.getFixedScheduleTimes());
@@ -430,23 +443,23 @@ public class StudentService {
         throw new RuntimeException("序列化固定排课时间失败", e);
       }
 
-      // 7.3 创建新的学员课程关系
+      // 7.4 创建新的学员课程关系
       Long newStudentCourseId = studentCourseModel.createStudentCourse(newStudentCourseRecord);
       
-      log.info("创建学员课程关系成功：学员ID={}, 课程ID={}, 新关系ID={}", 
-               request.getStudentId(), courseInfo.getCourseId(), newStudentCourseId);
+      log.info("创建学员课程关系成功：学员ID={}, 课程ID={}, 新关系ID={}, 实际课时={}", 
+               request.getStudentId(), courseInfo.getCourseId(), newStudentCourseId, actualTotalHours);
       
-      // 7.4 同步更新新校区的课时统计（增加课时）
-      if (courseRecord.getTotalHours() != null) {
+      // 7.5 同步更新新校区的课时统计（增加课时）
+      if (actualTotalHours.compareTo(BigDecimal.ZERO) > 0) {
         campusStatsRedisService.incrementTotalHours(institutionId, studentInfo.getCampusId(), 
-            courseRecord.getTotalHours().intValue());
+            actualTotalHours.intValue());
         log.info("增加新校区总课时：校区ID={}, 增加课时={}", 
-            studentInfo.getCampusId(), courseRecord.getTotalHours());
+            studentInfo.getCampusId(), actualTotalHours);
       }
       
       // 更新课程课时缓存
       courseHoursRedisService.updateCourseTotalHours(institutionId, studentInfo.getCampusId(), 
-          courseInfo.getCourseId(), courseRecord.getTotalHours());
+          courseInfo.getCourseId(), actualTotalHours);
     }
 
     // 8. 刷新相关校区的统计数据缓存
@@ -2544,8 +2557,19 @@ public class StudentService {
           .fetchOneInto(Integer.class);
       log.info("学员 {} 有 {} 条课程关系记录需要删除", studentId, courseCount);
       
-          log.info("学员删除成功，校区ID：{}", student.getCampusId());
-      log.info("已更新Redis统计数据，减少学员数量");
+      // 获取学员课程关系记录，用于更新课时统计
+      List<Record> studentCourseRecords = dsl.select()
+          .from(Tables.EDU_STUDENT_COURSE)
+          .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(studentId))
+          .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
+          .fetch();
+      
+      // 更新校区统计数据（减少学员数量）
+      if (student.getCampusId() != null) {
+        campusStatsRedisService.decrementStudentCount(student.getInstitutionId(), student.getCampusId());
+        log.info("学员删除成功，校区ID：{}", student.getCampusId());
+        log.info("已更新Redis统计数据，减少学员数量");
+      }
       
       // 同时删除学员课程关系记录（逻辑删除）
       log.info("准备执行UPDATE语句，学员ID: {}", studentId);
@@ -2558,11 +2582,34 @@ public class StudentService {
           .fetch();
       log.info("找到 {} 条需要更新的记录", recordsToUpdate.size());
       
+      // 更新课时统计（减少校区和课程的课时）
       for (Record record : recordsToUpdate) {
           Long recordId = record.get(Tables.EDU_STUDENT_COURSE.ID);
           Long courseId = record.get(Tables.EDU_STUDENT_COURSE.COURSE_ID);
           String status = record.get(Tables.EDU_STUDENT_COURSE.STATUS);
-          log.info("记录ID: {}, 课程ID: {}, 状态: {}", recordId, courseId, status);
+          BigDecimal totalHours = record.get(Tables.EDU_STUDENT_COURSE.TOTAL_HOURS);
+          BigDecimal consumedHours = record.get(Tables.EDU_STUDENT_COURSE.CONSUMED_HOURS);
+          Long campusId = record.get(Tables.EDU_STUDENT_COURSE.CAMPUS_ID);
+          
+          log.info("记录ID: {}, 课程ID: {}, 状态: {}, 总课时: {}, 已消耗课时: {}, 校区ID: {}", 
+                   recordId, courseId, status, totalHours, consumedHours, campusId);
+          
+          // 减少校区课时统计
+          if (campusId != null && totalHours != null && totalHours.compareTo(BigDecimal.ZERO) > 0) {
+            campusStatsRedisService.decrementTotalHours(student.getInstitutionId(), campusId, totalHours.intValue());
+            log.info("减少校区总课时：校区ID={}, 减少课时={}", campusId, totalHours);
+          }
+          
+          if (campusId != null && consumedHours != null && consumedHours.compareTo(BigDecimal.ZERO) > 0) {
+            campusStatsRedisService.decrementConsumedHours(student.getInstitutionId(), campusId, consumedHours.intValue());
+            log.info("减少校区已消耗课时：校区ID={}, 减少课时={}", campusId, consumedHours);
+          }
+          
+          // 删除课程课时缓存
+          if (campusId != null) {
+            courseHoursRedisService.deleteCourseTotalHours(student.getInstitutionId(), campusId, courseId);
+            log.info("删除课程课时缓存：校区ID={}, 课程ID={}", campusId, courseId);
+          }
       }
       
       int updatedRows = dsl.update(Tables.EDU_STUDENT_COURSE)
@@ -2604,6 +2651,16 @@ public class StudentService {
           log.info("强制删除后，学员 {} 还有 {} 条未删除的课程关系记录", studentId, finalRemainingCount);
       }
       
+      // 刷新校区统计数据
+      if (student.getCampusId() != null) {
+        try {
+          campusStatsRedisService.refreshCampusStats(student.getInstitutionId(), student.getCampusId());
+          log.info("已刷新校区统计数据：校区ID={}", student.getCampusId());
+        } catch (Exception e) {
+          log.warn("刷新校区统计数据失败，但不影响主流程：", e);
+        }
+      }
+      
     } else {
       log.warn("未找到学员记录，学员ID: {}", studentId);
     }
@@ -2619,5 +2676,26 @@ public class StudentService {
         .and(Tables.EDU_STUDENT.DELETED.eq(0))
         .fetchOneInto(Integer.class);
     log.info("删除完成后，学员 {} 在学员表中的状态: deleted={}", studentId, finalStudentCount == 0 ? "已删除" : "未删除");
+  }
+
+  /**
+   * 从缴费记录中计算学员在特定课程中的实际课时
+   */
+  private BigDecimal calculateStudentCourseHoursFromPayments(Long studentId, Long courseId) {
+    try {
+      // 查询该学员在该课程的所有缴费记录（正课+赠课）
+      BigDecimal totalHours = dsl.select(DSL.sum(
+          Tables.EDU_STUDENT_PAYMENT.COURSE_HOURS.add(Tables.EDU_STUDENT_PAYMENT.GIFT_HOURS)))
+          .from(Tables.EDU_STUDENT_PAYMENT)
+          .where(Tables.EDU_STUDENT_PAYMENT.STUDENT_ID.eq(studentId.toString()))
+          .and(Tables.EDU_STUDENT_PAYMENT.COURSE_ID.eq(courseId.toString()))
+          .and(Tables.EDU_STUDENT_PAYMENT.DELETED.eq(0))
+          .fetchOneInto(BigDecimal.class);
+      
+      return totalHours != null ? totalHours : BigDecimal.ZERO;
+    } catch (Exception e) {
+      log.warn("计算学员课程课时时发生错误：学员ID={}, 课程ID={}", studentId, courseId, e);
+      return BigDecimal.ZERO;
+    }
   }
 }

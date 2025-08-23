@@ -38,4 +38,11 @@ public class PaymentRecordController {
         paymentRecordService.updatePaymentRecord(request);
         return Result.success();
     }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "删除缴费记录", description = "删除指定的缴费记录")
+    public Result<Void> delete(@PathVariable Long id) {
+        paymentRecordService.deletePaymentRecord(id);
+        return Result.success();
+    }
 } 
