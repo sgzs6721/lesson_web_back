@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -24,13 +26,17 @@ public class JacksonConfig {
         ObjectMapper objectMapper = new ObjectMapper();
         JavaTimeModule javaTimeModule = new JavaTimeModule();
 
-        // 设置LocalDate的序列化格式
+        // 设置LocalDate的序列化和反序列化格式
         javaTimeModule.addSerializer(LocalDate.class,
             new LocalDateSerializer(DateTimeFormatter.ofPattern(DATE_FORMAT)));
+        javaTimeModule.addDeserializer(LocalDate.class,
+            new LocalDateDeserializer(DateTimeFormatter.ofPattern(DATE_FORMAT)));
 
-        // 设置LocalDateTime的序列化格式
+        // 设置LocalDateTime的序列化和反序列化格式
         javaTimeModule.addSerializer(LocalDateTime.class,
             new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(DATETIME_FORMAT)));
+        javaTimeModule.addDeserializer(LocalDateTime.class,
+            new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern(DATETIME_FORMAT)));
 
         objectMapper.registerModule(javaTimeModule);
 
