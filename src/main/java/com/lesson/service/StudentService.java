@@ -34,7 +34,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.jooq.Record;
 import org.jooq.Record1;
@@ -63,6 +65,8 @@ import com.lesson.vo.response.StudentStatusResponseVO;
 import com.lesson.repository.tables.records.SysCampusRecord;
 import com.lesson.repository.tables.records.SysInstitutionRecord;
 import java.util.ArrayList;
+import com.lesson.service.CampusStatsRedisService;
+import com.lesson.service.CourseHoursRedisService;
 
 /**
  * 学员服务
@@ -80,6 +84,8 @@ public class StudentService {
   private final EduStudentPaymentModel studentPaymentModel;
   private final EduCourseModel courseModel;
   private final SysConstantModel constantModel;
+  private final CampusStatsRedisService campusStatsRedisService;
+  private final CourseHoursRedisService courseHoursRedisService;
 
 
   /**
@@ -351,7 +357,7 @@ public class StudentService {
 
     log.info("学员 {} 现有课程关系数量: {}", request.getStudentId(), existingStudentCourses.size());
 
-    // 6. 批量逻辑删除所有现有课程关系
+    // 6. 批量逻辑删除所有现有课程关系，并同步更新课时统计
     if (!existingStudentCourses.isEmpty()) {
       int deletedCount = dsl.update(Tables.EDU_STUDENT_COURSE)
           .set(Tables.EDU_STUDENT_COURSE.DELETED, 1)
@@ -361,9 +367,31 @@ public class StudentService {
           .execute();
       
       log.info("已删除学员 {} 的 {} 条课程关系记录", request.getStudentId(), deletedCount);
+      
+      // 6.1 同步更新旧校区的课时统计（减少课时）
+      for (EduStudentCourseRecord oldCourse : existingStudentCourses) {
+        if (oldCourse.getCampusId() != null) {
+          // 减少旧校区的总课时和已消耗课时
+          if (oldCourse.getTotalHours() != null) {
+            campusStatsRedisService.decrementTotalHours(institutionId, oldCourse.getCampusId(), 
+                oldCourse.getTotalHours().intValue());
+            log.info("减少旧校区总课时：校区ID={}, 减少课时={}", 
+                oldCourse.getCampusId(), oldCourse.getTotalHours());
+          }
+          if (oldCourse.getConsumedHours() != null && oldCourse.getConsumedHours().compareTo(BigDecimal.ZERO) > 0) {
+            campusStatsRedisService.decrementConsumedHours(institutionId, oldCourse.getCampusId(), 
+                oldCourse.getConsumedHours().intValue());
+            log.info("减少旧校区已消耗课时：校区ID={}, 减少课时={}", 
+                oldCourse.getCampusId(), oldCourse.getConsumedHours());
+          }
+          
+          // 删除相关课程课时缓存
+          courseHoursRedisService.deleteCourseTotalHours(institutionId, oldCourse.getCampusId(), oldCourse.getCourseId());
+        }
+      }
     }
 
-    // 9. 重新创建所有课程关系
+    // 7. 重新创建所有课程关系
     for (StudentWithCourseUpdateRequest.CourseInfo courseInfo : request.getCourseInfoList()) {
       // 获取课程信息
       EduCourseRecord courseRecord = dsl.selectFrom(Tables.EDU_COURSE)
@@ -375,7 +403,7 @@ public class StudentService {
         throw new IllegalArgumentException("课程不存在：" + courseInfo.getCourseId());
       }
 
-      // 9.1 创建新的学员课程关系记录
+      // 7.1 创建新的学员课程关系记录
       EduStudentCourseRecord newStudentCourseRecord = new EduStudentCourseRecord();
       newStudentCourseRecord.setStudentId(request.getStudentId());
       newStudentCourseRecord.setCourseId(courseInfo.getCourseId());
@@ -389,7 +417,7 @@ public class StudentService {
       newStudentCourseRecord.setCreatedTime(LocalDateTime.now());
       newStudentCourseRecord.setUpdateTime(LocalDateTime.now());
 
-      // 9.2 处理固定排课时间
+      // 7.2 处理固定排课时间
       try {
         if (courseInfo.getFixedScheduleTimes() != null && !courseInfo.getFixedScheduleTimes().isEmpty()) {
           String fixedScheduleJson = objectMapper.writeValueAsString(courseInfo.getFixedScheduleTimes());
@@ -402,11 +430,39 @@ public class StudentService {
         throw new RuntimeException("序列化固定排课时间失败", e);
       }
 
-      // 9.3 创建新的学员课程关系
+      // 7.3 创建新的学员课程关系
       Long newStudentCourseId = studentCourseModel.createStudentCourse(newStudentCourseRecord);
       
       log.info("创建学员课程关系成功：学员ID={}, 课程ID={}, 新关系ID={}", 
                request.getStudentId(), courseInfo.getCourseId(), newStudentCourseId);
+      
+      // 7.4 同步更新新校区的课时统计（增加课时）
+      if (courseRecord.getTotalHours() != null) {
+        campusStatsRedisService.incrementTotalHours(institutionId, studentInfo.getCampusId(), 
+            courseRecord.getTotalHours().intValue());
+        log.info("增加新校区总课时：校区ID={}, 增加课时={}", 
+            studentInfo.getCampusId(), courseRecord.getTotalHours());
+      }
+      
+      // 更新课程课时缓存
+      courseHoursRedisService.updateCourseTotalHours(institutionId, studentInfo.getCampusId(), 
+          courseInfo.getCourseId(), courseRecord.getTotalHours());
+    }
+
+    // 8. 刷新相关校区的统计数据缓存
+    try {
+      // 刷新旧校区统计（如果校区发生变化）
+      if (!java.util.Objects.equals(oldCampusIdBeforeUpdate, studentInfo.getCampusId()) && oldCampusIdBeforeUpdate != null) {
+        campusStatsRedisService.refreshCampusStats(institutionId, oldCampusIdBeforeUpdate);
+        log.info("已刷新旧校区统计数据：校区ID={}", oldCampusIdBeforeUpdate);
+      }
+      
+      // 刷新新校区统计
+      campusStatsRedisService.refreshCampusStats(institutionId, studentInfo.getCampusId());
+      log.info("已刷新新校区统计数据：校区ID={}", studentInfo.getCampusId());
+      
+    } catch (Exception e) {
+      log.warn("刷新校区统计数据失败，但不影响主流程：", e);
     }
 
     log.info("学员更新完成：学员ID={}, 原有课程数={}, 更新后课程数={}", 
