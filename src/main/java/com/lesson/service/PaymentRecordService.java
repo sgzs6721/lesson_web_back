@@ -216,10 +216,10 @@ public class PaymentRecordService {
             baseCondition = baseCondition.and(Tables.EDU_STUDENT_PAYMENT.CAMPUS_ID.eq(request.getCampusId()));
         }
         if (request.getStartDate() != null) {
-            baseCondition = baseCondition.and(Tables.EDU_STUDENT_PAYMENT.CREATED_TIME.greaterOrEqual(request.getStartDate().atStartOfDay()));
+            baseCondition = baseCondition.and(Tables.EDU_STUDENT_PAYMENT.TRANSACTION_DATE.greaterOrEqual(request.getStartDate()));
         }
         if (request.getEndDate() != null) {
-            baseCondition = baseCondition.and(Tables.EDU_STUDENT_PAYMENT.CREATED_TIME.lessOrEqual(request.getEndDate().atTime(23, 59, 59)));
+            baseCondition = baseCondition.and(Tables.EDU_STUDENT_PAYMENT.TRANSACTION_DATE.lessOrEqual(request.getEndDate()));
         }
 
         log.info("构建的统计查询基础条件：{}", baseCondition);
