@@ -638,9 +638,19 @@ public class UserServiceImpl implements UserService {
         }
       }
 
-      // 如果当前用户是超级管理员，只允许修改基本信息，不允许修改角色
+      // 如果当前用户是超级管理员，检查是否只修改基本信息（不修改角色）
       if (RoleEnum.SUPER_ADMIN == currentPrimaryRole) {
-          throw new BusinessException("超级管理员不允许变更角色");
+          // 检查角色是否有变化
+          boolean roleChanged = false;
+          if (roleIds.size() != 1 || !roleIds.get(0).equals(existingUser.getRoleId())) {
+              roleChanged = true;
+          }
+          
+          if (roleChanged) {
+              throw new BusinessException("超级管理员不允许变更角色");
+          }
+          
+          // 超级管理员只修改基本信息，不修改角色，允许更新
       }
 
       // 如果手机号变更，检查是否存在冲突
