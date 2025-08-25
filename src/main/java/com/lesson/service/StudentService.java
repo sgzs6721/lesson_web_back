@@ -406,15 +406,18 @@ public class StudentService {
       // 7.1 计算该学员在此课程中的实际课时（从缴费记录中统计）
       BigDecimal actualTotalHours = calculateStudentCourseHoursFromPayments(request.getStudentId(), courseInfo.getCourseId());
       
-      // 如果没有缴费记录，使用课程默认课时
+      // 如果没有缴费记录，课时为0（不默认给课时）
       if (actualTotalHours.compareTo(BigDecimal.ZERO) == 0) {
-        actualTotalHours = courseRecord.getTotalHours();
-        log.info("学员{}在课程{}中没有缴费记录，使用课程默认课时：{}", 
-                request.getStudentId(), courseInfo.getCourseId(), actualTotalHours);
+        actualTotalHours = BigDecimal.ZERO;
+        log.info("学员{}在课程{}中没有缴费记录，课时设置为0", 
+                request.getStudentId(), courseInfo.getCourseId());
       } else {
         log.info("学员{}在课程{}中从缴费记录统计的实际课时：{}", 
                 request.getStudentId(), courseInfo.getCourseId(), actualTotalHours);
       }
+      
+      log.info("学员{}课程{}最终课时设置：总课时={}, 已消耗课时=0（重置）", 
+              request.getStudentId(), courseInfo.getCourseId(), actualTotalHours);
 
       // 7.2 创建新的学员课程关系记录
       EduStudentCourseRecord newStudentCourseRecord = new EduStudentCourseRecord();
