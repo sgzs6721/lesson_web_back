@@ -36,9 +36,11 @@ public class CourseSharingServiceImpl implements CourseSharingService {
         try {
             log.info("开始创建课程共享，请求参数：{}", request);
             
-            // 从token中获取机构ID和校区ID
+            // 从token中获取机构ID
             Long institutionId = getInstitutionId();
-            Long campusId = getCampusId();
+            
+            // 使用请求中的校区ID
+            Long campusId = request.getCampusId();
             
             // 验证学员是否存在
             boolean studentExists = dsl.selectCount()
@@ -73,19 +75,6 @@ public class CourseSharingServiceImpl implements CourseSharingService {
                 throw new RuntimeException("目标课程不存在或已被删除");
             }
             
-            // 验证教练是否存在（如果指定了教练）
-            if (request.getCoachId() != null) {
-                boolean coachExists = dsl.selectCount()
-                        .from(Tables.SYS_COACH)
-                        .where(Tables.SYS_COACH.ID.eq(request.getCoachId()))
-                        .and(Tables.SYS_COACH.DELETED.eq(0))
-                        .fetchOne(0, Long.class) > 0;
-                
-                if (!coachExists) {
-                    throw new RuntimeException("教练不存在或已被删除");
-                }
-            }
-            
             // 检查是否已存在相同的共享记录
             boolean sharingExists = dsl.selectCount()
                     .from(Tables.EDU_COURSE_SHARING)
@@ -100,19 +89,19 @@ public class CourseSharingServiceImpl implements CourseSharingService {
                 throw new RuntimeException("该学员在此课程间已存在有效的共享记录");
             }
             
-            // 创建课程共享记录
+            // 创建课程共享记录（简化版本）
             int insertedRows = dsl.insertInto(Tables.EDU_COURSE_SHARING)
                     .set(Tables.EDU_COURSE_SHARING.STUDENT_ID, request.getStudentId())
                     .set(Tables.EDU_COURSE_SHARING.SOURCE_COURSE_ID, request.getSourceCourseId())
                     .set(Tables.EDU_COURSE_SHARING.TARGET_COURSE_ID, request.getTargetCourseId())
-                    .set(Tables.EDU_COURSE_SHARING.COACH_ID, request.getCoachId())
-                    .set(Tables.EDU_COURSE_SHARING.SHARED_HOURS, request.getSharedHours())
+                    .set(Tables.EDU_COURSE_SHARING.COACH_ID, (Long) null) // 不指定教练
+                    .set(Tables.EDU_COURSE_SHARING.SHARED_HOURS, BigDecimal.ZERO) // 共享课时默认为0
                     .set(Tables.EDU_COURSE_SHARING.STATUS, CourseSharingStatus.ACTIVE.getCode())
-                    .set(Tables.EDU_COURSE_SHARING.START_DATE, request.getStartDate())
-                    .set(Tables.EDU_COURSE_SHARING.END_DATE, request.getEndDate())
+                    .set(Tables.EDU_COURSE_SHARING.START_DATE, LocalDate.now()) // 开始日期为今天
+                    .set(Tables.EDU_COURSE_SHARING.END_DATE, (LocalDate) null) // 结束日期为空
                     .set(Tables.EDU_COURSE_SHARING.CAMPUS_ID, campusId)
                     .set(Tables.EDU_COURSE_SHARING.INSTITUTION_ID, institutionId)
-                    .set(Tables.EDU_COURSE_SHARING.NOTES, request.getNotes())
+                    .set(Tables.EDU_COURSE_SHARING.NOTES, "系统自动创建的课程共享") // 默认备注
                     .set(Tables.EDU_COURSE_SHARING.CREATED_TIME, LocalDateTime.now())
                     .set(Tables.EDU_COURSE_SHARING.UPDATE_TIME, LocalDateTime.now())
                     .set(Tables.EDU_COURSE_SHARING.DELETED, 0)
