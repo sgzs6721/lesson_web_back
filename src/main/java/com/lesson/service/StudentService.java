@@ -13,6 +13,7 @@ import com.lesson.repository.Tables;
 import com.lesson.repository.tables.records.EduCourseRecord;
 import com.lesson.repository.tables.records.EduStudentCourseRecord;
 import com.lesson.repository.tables.records.EduStudentRecord;
+import com.lesson.repository.tables.records.SysCoachRecord;
 import com.lesson.repository.tables.records.SysConstantRecord;
 import com.lesson.vo.PageResult;
 import com.lesson.vo.request.StudentQueryRequest;
@@ -1104,6 +1105,7 @@ public class StudentService {
       org.jooq.Record sharingRecord = dsl.select()
           .from(Tables.EDU_COURSE_SHARING)
           .leftJoin(Tables.EDU_COURSE).on(Tables.EDU_COURSE_SHARING.TARGET_COURSE_ID.eq(Tables.EDU_COURSE.ID))
+          .leftJoin(Tables.SYS_COACH).on(Tables.EDU_COURSE_SHARING.COACH_ID.eq(Tables.SYS_COACH.ID))
           .where(Tables.EDU_COURSE_SHARING.SOURCE_COURSE_ID.eq(courseId))
           .and(Tables.EDU_COURSE_SHARING.DELETED.eq(0))
           .and(Tables.EDU_COURSE_SHARING.STATUS.eq("ACTIVE"))
@@ -1116,17 +1118,13 @@ public class StudentService {
         CourseSharingInfoVO sharingInfo = new CourseSharingInfoVO();
         sharingInfo.setSourceCourseId(courseId); // 当前课程作为源课程
         sharingInfo.setSourceCourseName(sharingRecord.get(Tables.EDU_COURSE.NAME)); // 目标课程名称
-        sharingInfo.setStudentId(null); // 不返回学员ID
-        sharingInfo.setStudentName(null); // 不返回学员名称
-        sharingInfo.setSharedHours(sharingRecord.get(Tables.EDU_COURSE_SHARING.SHARED_HOURS));
-        sharingInfo.setStatus(null); // 不返回状态
-        sharingInfo.setStartDate(null); // 不返回开始日期
-        sharingInfo.setEndDate(null); // 不返回结束日期
+        sharingInfo.setTargetCourseId(sharingRecord.get(Tables.EDU_COURSE_SHARING.TARGET_COURSE_ID)); // 目标课程ID
+        sharingInfo.setCoachName(sharingRecord.get(Tables.SYS_COACH.NAME)); // 教练姓名
         
         courseInfo.setSharingInfo(sharingInfo);
         
-        log.info("课程{}是共享课程，目标课程：{}", 
-                courseId, sharingInfo.getSourceCourseName());
+        log.info("课程{}是共享课程，目标课程：{}，教练：{}", 
+                courseId, sharingInfo.getSourceCourseName(), sharingInfo.getCoachName());
       } else {
         // 不是共享课程，设置为null
         log.info("课程{}没有找到共享记录", courseId);
