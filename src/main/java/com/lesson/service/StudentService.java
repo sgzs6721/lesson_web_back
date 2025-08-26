@@ -42,6 +42,7 @@ import org.jooq.Record;
 import org.jooq.Record1;
 import org.jooq.SelectConditionStep;
 import com.lesson.vo.response.StudentWithCoursesVO;
+import com.lesson.vo.response.CourseSharingInfoVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
@@ -1097,21 +1098,30 @@ public class StudentService {
           .fetchOne();
       
       if (sharingRecord != null) {
-        courseInfo.setIsShared(true);
-        courseInfo.setSharedSourceCourseId(sharingRecord.get(Tables.EDU_COURSE_SHARING.SOURCE_COURSE_ID));
-        courseInfo.setSharedSourceCourseName(sharingRecord.get(Tables.EDU_COURSE.NAME));
-        courseInfo.setSharedStudentId(sharingRecord.get(Tables.EDU_COURSE_SHARING.STUDENT_ID));
-        courseInfo.setSharedStudentName(sharingRecord.get(Tables.EDU_STUDENT.NAME));
-        courseInfo.setSharedHours(sharingRecord.get(Tables.EDU_COURSE_SHARING.SHARED_HOURS));
+        // 创建共享信息对象
+        CourseSharingInfoVO sharingInfo = new CourseSharingInfoVO();
+        sharingInfo.setSourceCourseId(sharingRecord.get(Tables.EDU_COURSE_SHARING.SOURCE_COURSE_ID));
+        sharingInfo.setSourceCourseName(sharingRecord.get(Tables.EDU_COURSE.NAME));
+        sharingInfo.setStudentId(sharingRecord.get(Tables.EDU_COURSE_SHARING.STUDENT_ID));
+        sharingInfo.setStudentName(sharingRecord.get(Tables.EDU_STUDENT.NAME));
+        sharingInfo.setSharedHours(sharingRecord.get(Tables.EDU_COURSE_SHARING.SHARED_HOURS));
+        sharingInfo.setStatus(sharingRecord.get(Tables.EDU_COURSE_SHARING.STATUS));
+        sharingInfo.setStartDate(sharingRecord.get(Tables.EDU_COURSE_SHARING.START_DATE) != null ? 
+            sharingRecord.get(Tables.EDU_COURSE_SHARING.START_DATE).toString() : null);
+        sharingInfo.setEndDate(sharingRecord.get(Tables.EDU_COURSE_SHARING.END_DATE) != null ? 
+            sharingRecord.get(Tables.EDU_COURSE_SHARING.END_DATE).toString() : null);
+        
+        courseInfo.setSharingInfo(sharingInfo);
         
         log.debug("课程{}是共享课程，来源课程：{}，学员：{}", 
-                courseId, courseInfo.getSharedSourceCourseName(), courseInfo.getSharedStudentName());
+                courseId, sharingInfo.getSourceCourseName(), sharingInfo.getStudentName());
       } else {
-        courseInfo.setIsShared(false);
+        // 不是共享课程，设置为null
+        courseInfo.setSharingInfo(null);
       }
     } catch (Exception e) {
       log.warn("查询课程共享信息时发生错误: courseId={}, error={}", courseId, e.getMessage());
-      courseInfo.setIsShared(false);
+      courseInfo.setSharingInfo(null);
     }
   }
 
