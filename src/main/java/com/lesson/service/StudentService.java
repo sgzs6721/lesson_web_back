@@ -1088,6 +1088,7 @@ public class StudentService {
   private void queryCourseSharingInfo(StudentWithCoursesVO.CourseInfo courseInfo, Long courseId) {
     try {
       // 查询该课程是否有共享记录
+      // 注意：这里查询的是该课程是否被其他课程共享（作为目标课程）
       org.jooq.Record sharingRecord = dsl.select()
           .from(Tables.EDU_COURSE_SHARING)
           .leftJoin(Tables.EDU_STUDENT).on(Tables.EDU_COURSE_SHARING.STUDENT_ID.eq(Tables.EDU_STUDENT.ID))
