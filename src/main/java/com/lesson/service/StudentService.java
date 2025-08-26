@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
 
 import org.jooq.Record;
 import org.jooq.Record1;
+import org.jooq.Result;
 import org.jooq.SelectConditionStep;
 import com.lesson.vo.response.StudentWithCoursesVO;
 import com.lesson.vo.response.CourseSharingInfoVO;
@@ -1087,41 +1088,68 @@ public class StudentService {
    */
   private void queryCourseSharingInfo(StudentWithCoursesVO.CourseInfo courseInfo, Long courseId) {
     try {
+      log.info("开始查询课程{}的共享信息", courseId);
+      
+      // 先查询该课程的所有共享记录（不限制状态），看看是否有数据
+      Long totalSharings = dsl.selectCount()
+          .from(Tables.EDU_COURSE_SHARING)
+          .where(Tables.EDU_COURSE_SHARING.SOURCE_COURSE_ID.eq(courseId))
+          .and(Tables.EDU_COURSE_SHARING.DELETED.eq(0))
+          .fetchOneInto(Long.class);
+      
+      log.info("课程{}作为源课程的共享记录总数: {}", courseId, totalSharings);
+      
       // 查询该课程是否有共享记录
-      // 注意：这里查询的是该课程是否被其他课程共享（作为目标课程）
+      // 注意：这里查询的是该课程是否作为源课程被其他课程共享
       org.jooq.Record sharingRecord = dsl.select()
           .from(Tables.EDU_COURSE_SHARING)
-          .leftJoin(Tables.EDU_STUDENT).on(Tables.EDU_COURSE_SHARING.STUDENT_ID.eq(Tables.EDU_STUDENT.ID))
-          .leftJoin(Tables.EDU_COURSE).on(Tables.EDU_COURSE_SHARING.SOURCE_COURSE_ID.eq(Tables.EDU_COURSE.ID))
-          .where(Tables.EDU_COURSE_SHARING.TARGET_COURSE_ID.eq(courseId))
+          .leftJoin(Tables.EDU_COURSE).on(Tables.EDU_COURSE_SHARING.TARGET_COURSE_ID.eq(Tables.EDU_COURSE.ID))
+          .where(Tables.EDU_COURSE_SHARING.SOURCE_COURSE_ID.eq(courseId))
           .and(Tables.EDU_COURSE_SHARING.DELETED.eq(0))
           .and(Tables.EDU_COURSE_SHARING.STATUS.eq("ACTIVE"))
           .fetchOne();
       
       if (sharingRecord != null) {
+        log.info("找到课程{}的共享记录", courseId);
+        
         // 创建共享信息对象
         CourseSharingInfoVO sharingInfo = new CourseSharingInfoVO();
-        sharingInfo.setSourceCourseId(sharingRecord.get(Tables.EDU_COURSE_SHARING.SOURCE_COURSE_ID));
-        sharingInfo.setSourceCourseName(sharingRecord.get(Tables.EDU_COURSE.NAME));
-        sharingInfo.setStudentId(sharingRecord.get(Tables.EDU_COURSE_SHARING.STUDENT_ID));
-        sharingInfo.setStudentName(sharingRecord.get(Tables.EDU_STUDENT.NAME));
+        sharingInfo.setSourceCourseId(courseId); // 当前课程作为源课程
+        sharingInfo.setSourceCourseName(sharingRecord.get(Tables.EDU_COURSE.NAME)); // 目标课程名称
+        sharingInfo.setStudentId(null); // 不返回学员ID
+        sharingInfo.setStudentName(null); // 不返回学员名称
         sharingInfo.setSharedHours(sharingRecord.get(Tables.EDU_COURSE_SHARING.SHARED_HOURS));
-        sharingInfo.setStatus(sharingRecord.get(Tables.EDU_COURSE_SHARING.STATUS));
-        sharingInfo.setStartDate(sharingRecord.get(Tables.EDU_COURSE_SHARING.START_DATE) != null ? 
-            sharingRecord.get(Tables.EDU_COURSE_SHARING.START_DATE).toString() : null);
-        sharingInfo.setEndDate(sharingRecord.get(Tables.EDU_COURSE_SHARING.END_DATE) != null ? 
-            sharingRecord.get(Tables.EDU_COURSE_SHARING.END_DATE).toString() : null);
+        sharingInfo.setStatus(null); // 不返回状态
+        sharingInfo.setStartDate(null); // 不返回开始日期
+        sharingInfo.setEndDate(null); // 不返回结束日期
         
         courseInfo.setSharingInfo(sharingInfo);
         
-        log.debug("课程{}是共享课程，来源课程：{}，学员：{}", 
-                courseId, sharingInfo.getSourceCourseName(), sharingInfo.getStudentName());
+        log.info("课程{}是共享课程，目标课程：{}", 
+                courseId, sharingInfo.getSourceCourseName());
       } else {
         // 不是共享课程，设置为null
+        log.info("课程{}没有找到共享记录", courseId);
         courseInfo.setSharingInfo(null);
+        
+        // 如果没有找到记录，检查一下可能的原因
+        if (totalSharings > 0) {
+          log.warn("课程{}有{}条共享记录，但状态不是ACTIVE，检查状态值", courseId, totalSharings);
+          
+          // 查询所有状态的共享记录
+          Result<Record1<String>> allStatusRecords = dsl.select(Tables.EDU_COURSE_SHARING.STATUS)
+              .from(Tables.EDU_COURSE_SHARING)
+              .where(Tables.EDU_COURSE_SHARING.SOURCE_COURSE_ID.eq(courseId))
+              .and(Tables.EDU_COURSE_SHARING.DELETED.eq(0))
+              .fetch();
+          
+          for (Record1<String> record : allStatusRecords) {
+            log.warn("课程{}的共享记录状态: {}", courseId, record.get(Tables.EDU_COURSE_SHARING.STATUS));
+          }
+        }
       }
     } catch (Exception e) {
-      log.warn("查询课程共享信息时发生错误: courseId={}, error={}", courseId, e.getMessage());
+      log.error("查询课程共享信息时发生错误: courseId={}, error={}", courseId, e.getMessage(), e);
       courseInfo.setSharingInfo(null);
     }
   }
