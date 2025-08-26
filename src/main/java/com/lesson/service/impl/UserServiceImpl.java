@@ -642,8 +642,15 @@ public class UserServiceImpl implements UserService {
       if (RoleEnum.SUPER_ADMIN == currentPrimaryRole) {
           // 检查角色是否有变化
           boolean roleChanged = false;
-          if (roleIds.size() != 1 || !roleIds.get(0).equals(existingUser.getRoleId())) {
-              roleChanged = true;
+          
+          // 如果前端没有传递角色信息，说明只是修改基本信息，允许更新
+          if (roleIds == null || roleIds.isEmpty()) {
+              roleChanged = false;
+          } else {
+              // 检查角色是否有变化
+              if (roleIds.size() != 1 || !roleIds.get(0).equals(existingUser.getRoleId())) {
+                  roleChanged = true;
+              }
           }
           
           if (roleChanged) {
