@@ -25,6 +25,7 @@ import com.lesson.vo.user.UserLoginVO;
 import com.lesson.vo.user.UserRegisterVO;
 import com.lesson.vo.response.UserStatusResponseVO;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Record3;
@@ -41,6 +42,7 @@ import io.jsonwebtoken.Claims;
 /**
  * 用户服务实现
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
