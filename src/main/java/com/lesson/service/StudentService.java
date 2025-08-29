@@ -1091,64 +1091,45 @@ public class StudentService {
     try {
       log.info("开始查询课程{}的共享信息", courseId);
       
-      // 先查询该课程的所有共享记录（不限制状态），看看是否有数据
-      Long totalSharings = dsl.selectCount()
-          .from(Tables.EDU_COURSE_SHARING)
-          .where(Tables.EDU_COURSE_SHARING.SOURCE_COURSE_ID.eq(courseId))
-          .and(Tables.EDU_COURSE_SHARING.DELETED.eq(0))
-          .fetchOneInto(Long.class);
-      
-      log.info("课程{}作为源课程的共享记录总数: {}", courseId, totalSharings);
-      
-      // 查询该课程是否有共享记录
+      // 查询该课程的所有共享记录
       // 注意：这里查询的是该课程是否作为源课程被其他课程共享
-      org.jooq.Record sharingRecord = dsl.select()
+      Result<org.jooq.Record> sharingRecords = dsl.select()
           .from(Tables.EDU_COURSE_SHARING)
           .leftJoin(Tables.EDU_COURSE).on(Tables.EDU_COURSE_SHARING.TARGET_COURSE_ID.eq(Tables.EDU_COURSE.ID))
           .leftJoin(Tables.SYS_COACH).on(Tables.EDU_COURSE_SHARING.COACH_ID.eq(Tables.SYS_COACH.ID))
           .where(Tables.EDU_COURSE_SHARING.SOURCE_COURSE_ID.eq(courseId))
           .and(Tables.EDU_COURSE_SHARING.DELETED.eq(0))
           .and(Tables.EDU_COURSE_SHARING.STATUS.eq("ACTIVE"))
-          .fetchOne();
+          .fetch();
       
-      if (sharingRecord != null) {
-        log.info("找到课程{}的共享记录", courseId);
+      if (sharingRecords != null && !sharingRecords.isEmpty()) {
+        log.info("找到课程{}的{}条共享记录", courseId, sharingRecords.size());
         
-        // 创建共享信息对象
-        CourseSharingInfoVO sharingInfo = new CourseSharingInfoVO();
-        sharingInfo.setSourceCourseId(courseId); // 当前课程作为源课程
-        sharingInfo.setSourceCourseName(sharingRecord.get(Tables.EDU_COURSE.NAME)); // 目标课程名称
-        sharingInfo.setTargetCourseId(sharingRecord.get(Tables.EDU_COURSE_SHARING.TARGET_COURSE_ID)); // 目标课程ID
-        sharingInfo.setCoachName(sharingRecord.get(Tables.SYS_COACH.NAME)); // 教练姓名
+        // 创建共享信息列表
+        List<CourseSharingInfoVO> sharingInfoList = new ArrayList<>();
         
-        courseInfo.setSharingInfo(sharingInfo);
-        
-        log.info("课程{}是共享课程，目标课程：{}，教练：{}", 
-                courseId, sharingInfo.getSourceCourseName(), sharingInfo.getCoachName());
-      } else {
-        // 不是共享课程，设置为null
-        log.info("课程{}没有找到共享记录", courseId);
-        courseInfo.setSharingInfo(null);
-        
-        // 如果没有找到记录，检查一下可能的原因
-        if (totalSharings > 0) {
-          log.warn("课程{}有{}条共享记录，但状态不是ACTIVE，检查状态值", courseId, totalSharings);
+        for (org.jooq.Record sharingRecord : sharingRecords) {
+          CourseSharingInfoVO sharingInfo = new CourseSharingInfoVO();
+          sharingInfo.setSourceCourseId(courseId); // 当前课程作为源课程
+          sharingInfo.setSourceCourseName(sharingRecord.get(Tables.EDU_COURSE.NAME)); // 目标课程名称
+          sharingInfo.setTargetCourseId(sharingRecord.get(Tables.EDU_COURSE_SHARING.TARGET_COURSE_ID)); // 目标课程ID
+          sharingInfo.setCoachName(sharingRecord.get(Tables.SYS_COACH.NAME)); // 教练姓名
           
-          // 查询所有状态的共享记录
-          Result<Record1<String>> allStatusRecords = dsl.select(Tables.EDU_COURSE_SHARING.STATUS)
-              .from(Tables.EDU_COURSE_SHARING)
-              .where(Tables.EDU_COURSE_SHARING.SOURCE_COURSE_ID.eq(courseId))
-              .and(Tables.EDU_COURSE_SHARING.DELETED.eq(0))
-              .fetch();
+          sharingInfoList.add(sharingInfo);
           
-          for (Record1<String> record : allStatusRecords) {
-            log.warn("课程{}的共享记录状态: {}", courseId, record.get(Tables.EDU_COURSE_SHARING.STATUS));
-          }
+          log.info("课程{}的共享记录：目标课程ID={}，目标课程名称={}，教练={}", 
+                  courseId, sharingInfo.getTargetCourseId(), sharingInfo.getSourceCourseName(), sharingInfo.getCoachName());
         }
+        
+        courseInfo.setSharingInfoList(sharingInfoList);
+      } else {
+        // 不是共享课程，设置为空列表
+        log.info("课程{}没有找到共享记录", courseId);
+        courseInfo.setSharingInfoList(new ArrayList<>());
       }
     } catch (Exception e) {
       log.error("查询课程共享信息时发生错误: courseId={}, error={}", courseId, e.getMessage(), e);
-      courseInfo.setSharingInfo(null);
+      courseInfo.setSharingInfoList(new ArrayList<>());
     }
   }
 

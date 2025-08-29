@@ -109,7 +109,7 @@ public class StudentWithCoursesVO {
         private String fixedSchedule;
 
         // 共享课程信息
-        @Schema(description = "课程共享信息", example = "null")
-        private CourseSharingInfoVO sharingInfo;
+        @Schema(description = "课程共享信息列表", example = "[]")
+        private List<CourseSharingInfoVO> sharingInfoList;
     }
 }

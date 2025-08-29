@@ -624,7 +624,8 @@ public class UserServiceImpl implements UserService {
       
       // 验证角色ID列表
       if (roleIds == null || roleIds.isEmpty()) {
-          throw new BusinessException("角色不能为空");
+          // 如果前端没有传递角色信息，说明只是修改基本信息，不修改角色
+          log.info("前端没有传递角色信息，只修改基本信息");
       }
 
       // 获取现有用户的主角色
@@ -667,11 +668,14 @@ public class UserServiceImpl implements UserService {
       }
 
       // 检查是否包含校区管理员角色，如果包含则必须指定校区ID
-      boolean hasCampusAdminRole = roleIds.stream()
-          .anyMatch(roleId -> {
-            RoleEnum roleEnum = roleModel.getRoleEnumById(roleId);
-            return roleEnum == RoleEnum.CAMPUS_ADMIN;
-          });
+      boolean hasCampusAdminRole = false;
+      if (roleIds != null && !roleIds.isEmpty()) {
+          hasCampusAdminRole = roleIds.stream()
+              .anyMatch(roleId -> {
+                RoleEnum roleEnum = roleModel.getRoleEnumById(roleId);
+                return roleEnum == RoleEnum.CAMPUS_ADMIN;
+              });
+      }
 
       // 优先使用从roles中提取的校区ID，其次使用请求中的校区ID
       Long campusId = campusIdFromRoles != null ? campusIdFromRoles : request.getCampusId();
@@ -689,7 +693,7 @@ public class UserServiceImpl implements UserService {
       }
 
       // 使用第一个角色ID作为主角色，保持向后兼容
-      Long primaryRoleId = roleIds.get(0);
+      Long primaryRoleId = roleIds != null && !roleIds.isEmpty() ? roleIds.get(0) : existingUser.getRoleId();
 
       // 更新用户基本信息
       userModel.updateUser(
@@ -704,8 +708,12 @@ public class UserServiceImpl implements UserService {
           passwordEncoder
       );
 
-      // 更新用户角色关联
-      userRoleModel.assignRolesToUser(request.getId(), roleIds);
+      // 只有当角色ID列表不为空时才更新用户角色关联
+      if (roleIds != null && !roleIds.isEmpty()) {
+          userRoleModel.assignRolesToUser(request.getId(), roleIds);
+      } else {
+          log.info("跳过角色关联更新，保持现有角色不变");
+      }
     } catch (BusinessException e) {
       throw e;
     } catch (Exception e) {
