@@ -1113,7 +1113,32 @@ public class StudentService {
           sharingInfo.setSourceCourseId(courseId); // 当前课程作为源课程
           sharingInfo.setSourceCourseName(sharingRecord.get(Tables.EDU_COURSE.NAME)); // 目标课程名称
           sharingInfo.setTargetCourseId(sharingRecord.get(Tables.EDU_COURSE_SHARING.TARGET_COURSE_ID)); // 目标课程ID
-          sharingInfo.setCoachName(sharingRecord.get(Tables.SYS_COACH.NAME)); // 教练姓名
+          
+          // 获取教练姓名：应该是目标课程的教练
+          String coachName = sharingRecord.get(Tables.SYS_COACH.NAME);
+          if (coachName == null) {
+            // 从目标课程中查询教练信息（通过教练课程关联表）
+            Long targetCourseId = sharingRecord.get(Tables.EDU_COURSE_SHARING.TARGET_COURSE_ID);
+            if (targetCourseId != null) {
+              try {
+                org.jooq.Record coachRecord = dsl.select(Tables.SYS_COACH.NAME)
+                    .from(Tables.SYS_COACH_COURSE)
+                    .leftJoin(Tables.SYS_COACH).on(Tables.SYS_COACH_COURSE.COACH_ID.eq(Tables.SYS_COACH.ID))
+                    .where(Tables.SYS_COACH_COURSE.COURSE_ID.eq(targetCourseId))
+                    .and(Tables.SYS_COACH_COURSE.DELETED.eq(0))
+                    .fetchOne();
+                
+                if (coachRecord != null) {
+                  coachName = coachRecord.get(Tables.SYS_COACH.NAME);
+                  log.debug("从目标课程{}中获取教练姓名: {}", targetCourseId, coachName);
+                }
+              } catch (Exception e) {
+                log.warn("查询目标课程教练信息失败: courseId={}, error={}", targetCourseId, e.getMessage());
+              }
+            }
+          }
+          
+          sharingInfo.setCoachName(coachName);
           
           sharingInfoList.add(sharingInfo);
           
