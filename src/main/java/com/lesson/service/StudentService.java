@@ -995,7 +995,7 @@ public class StudentService {
         courseInfo.setRemainingHours(studentCourse.getTotalHours().subtract(studentCourse.getConsumedHours()));
 
         // 查询课程共享信息
-        queryCourseSharingInfo(courseInfo, course.getId());
+        queryCourseSharingInfo(courseInfo, course.getId(), student.getId());
 
         // 查询最近上课时间
         LocalDate lastClassTime = dsl.select(DSL.max(Tables.EDU_STUDENT_COURSE_OPERATION.OPERATION_TIME).cast(LocalDate.class))
@@ -1087,33 +1087,35 @@ public class StudentService {
   /**
    * 查询课程共享信息
    */
-  private void queryCourseSharingInfo(StudentWithCoursesVO.CourseInfo courseInfo, Long courseId) {
+  private void queryCourseSharingInfo(StudentWithCoursesVO.CourseInfo courseInfo, Long courseId, Long studentId) {
     try {
       log.info("开始查询课程{}的共享信息", courseId);
       
-      // 先检查该课程是否真的被共享
+      // 先检查该课程是否真的被该学员共享
       Long sharingCount = dsl.selectCount()
           .from(Tables.EDU_COURSE_SHARING)
           .where(Tables.EDU_COURSE_SHARING.SOURCE_COURSE_ID.eq(courseId))
+          .and(Tables.EDU_COURSE_SHARING.STUDENT_ID.eq(studentId))
           .and(Tables.EDU_COURSE_SHARING.DELETED.eq(0))
           .and(Tables.EDU_COURSE_SHARING.STATUS.eq("ACTIVE"))
           .fetchOneInto(Long.class);
       
-      log.info("课程{}的共享记录总数: {}", courseId, sharingCount);
+      log.info("学员{}的课程{}的共享记录总数: {}", studentId, courseId, sharingCount);
       
       if (sharingCount == 0) {
-        log.info("课程{}没有共享记录，直接返回空列表", courseId);
+        log.info("学员{}的课程{}没有共享记录，直接返回空列表", studentId, courseId);
         courseInfo.setSharingInfoList(new ArrayList<>());
         return;
       }
       
-      // 查询该课程的所有共享记录
-      // 注意：这里查询的是该课程是否作为源课程被其他课程共享
+      // 查询该学员该课程的所有共享记录
+      // 注意：这里查询的是该学员的该课程是否作为源课程被其他课程共享
       Result<org.jooq.Record> sharingRecords = dsl.select()
           .from(Tables.EDU_COURSE_SHARING)
           .leftJoin(Tables.EDU_COURSE).on(Tables.EDU_COURSE_SHARING.TARGET_COURSE_ID.eq(Tables.EDU_COURSE.ID))
           .leftJoin(Tables.SYS_COACH).on(Tables.EDU_COURSE_SHARING.COACH_ID.eq(Tables.SYS_COACH.ID))
           .where(Tables.EDU_COURSE_SHARING.SOURCE_COURSE_ID.eq(courseId))
+          .and(Tables.EDU_COURSE_SHARING.STUDENT_ID.eq(studentId))
           .and(Tables.EDU_COURSE_SHARING.DELETED.eq(0))
           .and(Tables.EDU_COURSE_SHARING.STATUS.eq("ACTIVE"))
           .fetch();
