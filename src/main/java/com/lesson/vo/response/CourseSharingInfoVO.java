@@ -19,6 +19,9 @@ public class CourseSharingInfoVO {
     @Schema(description = "目标课程ID", example = "2002")
     private Long targetCourseId;
     
+    @Schema(description = "目标课程名称", example = "王教练一对一")
+    private String targetCourseName;
+    
     @Schema(description = "教练姓名", example = "杨教练")
     private String coachName;
 }

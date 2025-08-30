@@ -1091,6 +1091,22 @@ public class StudentService {
     try {
       log.info("开始查询课程{}的共享信息", courseId);
       
+      // 先检查该课程是否真的被共享
+      Long sharingCount = dsl.selectCount()
+          .from(Tables.EDU_COURSE_SHARING)
+          .where(Tables.EDU_COURSE_SHARING.SOURCE_COURSE_ID.eq(courseId))
+          .and(Tables.EDU_COURSE_SHARING.DELETED.eq(0))
+          .and(Tables.EDU_COURSE_SHARING.STATUS.eq("ACTIVE"))
+          .fetchOneInto(Long.class);
+      
+      log.info("课程{}的共享记录总数: {}", courseId, sharingCount);
+      
+      if (sharingCount == 0) {
+        log.info("课程{}没有共享记录，直接返回空列表", courseId);
+        courseInfo.setSharingInfoList(new ArrayList<>());
+        return;
+      }
+      
       // 查询该课程的所有共享记录
       // 注意：这里查询的是该课程是否作为源课程被其他课程共享
       Result<org.jooq.Record> sharingRecords = dsl.select()
@@ -1111,8 +1127,26 @@ public class StudentService {
         for (org.jooq.Record sharingRecord : sharingRecords) {
           CourseSharingInfoVO sharingInfo = new CourseSharingInfoVO();
           sharingInfo.setSourceCourseId(courseId); // 当前课程作为源课程
-          sharingInfo.setSourceCourseName(sharingRecord.get(Tables.EDU_COURSE.NAME)); // 目标课程名称
+          
+          // 获取当前课程的名称（源课程名称）
+          String sourceCourseName = null;
+          try {
+            org.jooq.Record sourceCourseRecord = dsl.select(Tables.EDU_COURSE.NAME)
+                .from(Tables.EDU_COURSE)
+                .where(Tables.EDU_COURSE.ID.eq(courseId))
+                .and(Tables.EDU_COURSE.DELETED.eq(0))
+                .fetchOne();
+            if (sourceCourseRecord != null) {
+              sourceCourseName = sourceCourseRecord.get(Tables.EDU_COURSE.NAME);
+            }
+          } catch (Exception e) {
+            log.warn("查询源课程名称失败: courseId={}, error={}", courseId, e.getMessage());
+          }
+          sharingInfo.setSourceCourseName(sourceCourseName);
+          
+          // 目标课程信息
           sharingInfo.setTargetCourseId(sharingRecord.get(Tables.EDU_COURSE_SHARING.TARGET_COURSE_ID)); // 目标课程ID
+          sharingInfo.setTargetCourseName(sharingRecord.get(Tables.EDU_COURSE.NAME)); // 目标课程名称
           
           // 获取教练姓名：应该是目标课程的教练
           String coachName = sharingRecord.get(Tables.SYS_COACH.NAME);
