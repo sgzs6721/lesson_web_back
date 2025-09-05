@@ -220,7 +220,13 @@ public class CampusServiceImpl implements CampusService {
 
         campusVO.setCoachCount(coachCount != null ? coachCount : 0);
         campusVO.setStudentCount(studentCount != null ? studentCount : 0);
-        campusVO.setPendingLessonCount(consumedHours != null ? consumedHours : 0);
+        
+        // 计算待销课时（剩余课时 = 总课时 - 已消耗课时）
+        Integer pendingHours = 0;
+        if (totalHours != null && consumedHours != null) {
+            pendingHours = Math.max(0, totalHours - consumedHours);
+        }
+        campusVO.setPendingLessonCount(pendingHours);
         campusVO.setTotalLessonHours(totalHours != null ? totalHours : 0);
 
         return campusVO;
@@ -413,7 +419,13 @@ public class CampusServiceImpl implements CampusService {
 
             campusVO.setCoachCount(coachCount != null ? coachCount : 0);
             campusVO.setStudentCount(studentCount != null ? studentCount : 0);
-            campusVO.setPendingLessonCount(consumedHours != null ? consumedHours : 0);
+            
+            // 计算待销课时（剩余课时 = 总课时 - 已消耗课时）
+            Integer pendingHours = 0;
+            if (totalHours != null && consumedHours != null) {
+                pendingHours = Math.max(0, totalHours - consumedHours);
+            }
+            campusVO.setPendingLessonCount(pendingHours);
             campusVO.setTotalLessonHours(totalHours != null ? totalHours : 0);
             
             return campusVO;
