@@ -182,10 +182,33 @@ public class UserServiceImpl implements UserService {
       // 将角色枚举转换为角色ID列表
       List<Long> roleIds = null;
       if (request.getRoles() != null && !request.getRoles().isEmpty()) {
-        roleIds = request.getRoles().stream()
-            .map(role -> roleModel.getRoleIdByCode(role.getName()))
-            .filter(id -> id != null)
-            .collect(Collectors.toList());
+        roleIds = new ArrayList<>();
+        for (RoleEnum role : request.getRoles()) {
+          // 先尝试直接使用中文名称查询
+          Long roleId = roleModel.getRoleIdByCode(role.getName());
+          
+          // 如果没找到，尝试英文到中文的映射
+          if (roleId == null) {
+            String chineseRoleName = null;
+            String roleName = role.name(); // 获取英文枚举名称
+            
+            if ("SUPER_ADMIN".equals(roleName)) {
+              chineseRoleName = "超级管理员";
+            } else if ("COLLABORATOR".equals(roleName)) {
+              chineseRoleName = "协同管理员";
+            } else if ("CAMPUS_ADMIN".equals(roleName)) {
+              chineseRoleName = "校区管理员";
+            }
+            
+            if (chineseRoleName != null) {
+              roleId = roleModel.getRoleIdByCode(chineseRoleName);
+            }
+          }
+          
+          if (roleId != null) {
+            roleIds.add(roleId);
+          }
+        }
       }
 
       // 查询总数
