@@ -624,43 +624,40 @@ public class UserServiceImpl implements UserService {
           }
       }
       
-      // 验证角色ID列表
-      if (roleIds == null || roleIds.isEmpty()) {
-          // 如果前端没有传递角色信息，说明只是修改基本信息，不修改角色
-          log.info("前端没有传递角色信息，只修改基本信息");
-      }
-
       // 获取现有用户的主角色
       RoleEnum currentPrimaryRole = roleModel.getRoleEnumById(existingUser.getRoleId());
 
-      // 检查是否包含超级管理员角色（不允许修改为超级管理员）
-      for (Long roleId : roleIds) {
-        RoleEnum roleEnum = roleModel.getRoleEnumById(roleId);
-        if (roleEnum == RoleEnum.SUPER_ADMIN) {
-          throw new BusinessException("不允许修改为超级管理员角色");
-        }
-      }
-
-      // 如果当前用户是超级管理员，检查是否只修改基本信息（不修改角色）
-      if (RoleEnum.SUPER_ADMIN == currentPrimaryRole) {
-          // 检查角色是否有变化
-          boolean roleChanged = false;
+      // 如果前端没有传递角色信息，说明只是修改基本信息，不修改角色
+      if (roleIds == null || roleIds.isEmpty()) {
+          log.info("前端没有传递角色信息，只修改基本信息");
           
-          // 如果前端没有传递角色信息，说明只是修改基本信息，允许更新
-          if (roleIds == null || roleIds.isEmpty()) {
-              roleChanged = false;
-          } else {
+          // 如果当前用户是超级管理员，只修改基本信息是允许的
+          if (RoleEnum.SUPER_ADMIN == currentPrimaryRole) {
+              log.info("超级管理员只修改基本信息，允许更新");
+          }
+      } else {
+          // 前端传递了角色信息，需要检查角色变更
+          
+          // 检查是否包含超级管理员角色（不允许修改为超级管理员）
+          for (Long roleId : roleIds) {
+            RoleEnum roleEnum = roleModel.getRoleEnumById(roleId);
+            if (roleEnum == RoleEnum.SUPER_ADMIN) {
+              throw new BusinessException("不允许修改为超级管理员角色");
+            }
+          }
+
+          // 如果当前用户是超级管理员，不允许修改角色
+          if (RoleEnum.SUPER_ADMIN == currentPrimaryRole) {
               // 检查角色是否有变化
+              boolean roleChanged = false;
               if (roleIds.size() != 1 || !roleIds.get(0).equals(existingUser.getRoleId())) {
                   roleChanged = true;
               }
+              
+              if (roleChanged) {
+                  throw new BusinessException("超级管理员不允许变更角色");
+              }
           }
-          
-          if (roleChanged) {
-              throw new BusinessException("超级管理员不允许变更角色");
-          }
-          
-          // 超级管理员只修改基本信息，不修改角色，允许更新
       }
 
       // 如果手机号变更，检查是否存在冲突
