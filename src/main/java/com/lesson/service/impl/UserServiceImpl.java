@@ -638,14 +638,6 @@ public class UserServiceImpl implements UserService {
       } else {
           // 前端传递了角色信息，需要检查角色变更
           
-          // 检查是否包含超级管理员角色（不允许修改为超级管理员）
-          for (Long roleId : roleIds) {
-            RoleEnum roleEnum = roleModel.getRoleEnumById(roleId);
-            if (roleEnum == RoleEnum.SUPER_ADMIN) {
-              throw new BusinessException("不允许修改为超级管理员角色");
-            }
-          }
-
           // 如果当前用户是超级管理员，不允许修改角色
           if (RoleEnum.SUPER_ADMIN == currentPrimaryRole) {
               // 检查角色是否有变化
@@ -656,6 +648,17 @@ public class UserServiceImpl implements UserService {
               
               if (roleChanged) {
                   throw new BusinessException("超级管理员不允许变更角色");
+              }
+              
+              // 如果角色没有变化，允许更新基本信息
+              log.info("超级管理员角色未变化，允许更新基本信息");
+          } else {
+              // 非超级管理员用户，检查是否包含超级管理员角色（不允许修改为超级管理员）
+              for (Long roleId : roleIds) {
+                RoleEnum roleEnum = roleModel.getRoleEnumById(roleId);
+                if (roleEnum == RoleEnum.SUPER_ADMIN) {
+                  throw new BusinessException("不允许修改为超级管理员角色");
+                }
               }
           }
       }
