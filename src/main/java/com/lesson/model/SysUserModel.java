@@ -190,7 +190,15 @@ public class SysUserModel {
         }
 
         if (roleIds != null && !roleIds.isEmpty()) {
-            conditions = conditions.and(SYS_USER.ROLE_ID.in(roleIds));
+            // 通过用户角色关联表查询，支持多角色筛选
+            conditions = conditions.and(
+                SYS_USER.ID.in(
+                    dsl.select(org.jooq.impl.DSL.field("user_id", Long.class))
+                        .from(org.jooq.impl.DSL.table("sys_user_role"))
+                        .where(org.jooq.impl.DSL.field("role_id", Long.class).in(roleIds))
+                        .and(org.jooq.impl.DSL.field("deleted", Integer.class).eq(0))
+                )
+            );
         }
 
         if (status != null) {
@@ -223,9 +231,16 @@ public class SysUserModel {
             );
         }
         
-        // 角色过滤
+        // 角色过滤 - 通过用户角色关联表查询，支持多角色筛选
         if (roleIds != null && !roleIds.isEmpty()) {
-            query = query.and(SYS_USER.ROLE_ID.in(roleIds));
+            query = query.and(
+                SYS_USER.ID.in(
+                    dsl.select(org.jooq.impl.DSL.field("user_id", Long.class))
+                        .from(org.jooq.impl.DSL.table("sys_user_role"))
+                        .where(org.jooq.impl.DSL.field("role_id", Long.class).in(roleIds))
+                        .and(org.jooq.impl.DSL.field("deleted", Integer.class).eq(0))
+                )
+            );
         }
         
         // 校区过滤
