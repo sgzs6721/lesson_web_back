@@ -29,7 +29,7 @@ public class FinanceModel {
     public BigDecimal sumExpense(FinanceRecordQueryRequest request, String whereSql) {
         BigDecimal total = dsl.select(field("sum(amount)", BigDecimal.class))
                 .from("finance_expense")
-                .where("deleted = 0")
+                .where("finance_expense.deleted = 0")
                 .and(whereSql)
                 .fetchOne(0, BigDecimal.class);
         return total == null ? BigDecimal.ZERO : total;
@@ -85,7 +85,7 @@ public class FinanceModel {
     public BigDecimal sumIncome(FinanceRecordQueryRequest request, String whereSql) {
         BigDecimal total = dsl.select(field("sum(amount)", BigDecimal.class))
                 .from("finance_income")
-                .where("deleted = 0")
+                .where("finance_income.deleted = 0")
                 .and(whereSql)
                 .fetchOne(0, BigDecimal.class);
         return total == null ? BigDecimal.ZERO : total;

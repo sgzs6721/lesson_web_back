@@ -114,7 +114,7 @@ public class FinanceService {
             // 只查询支出记录
             SelectConditionStep<Record> query = dsl.select()
                     .from("finance_expense")
-                    .where("deleted = 0");
+                    .where("finance_expense.deleted = 0");
             applyExpenseQueryConditions(query, request);
             long expenseCount = financeModel.countExpense(request, query);
             total = expenseCount;
@@ -147,7 +147,7 @@ public class FinanceService {
             // 只查询收入记录
             SelectConditionStep<Record> query = dsl.select()
                     .from("finance_income")
-                    .where("deleted = 0");
+                    .where("finance_income.deleted = 0");
             applyIncomeQueryConditions(query, request);
             long incomeCount = financeModel.countIncome(request, query);
             total = incomeCount;
@@ -184,7 +184,7 @@ public class FinanceService {
             // 获取支出记录
             SelectConditionStep<Record> expenseQuery = dsl.select()
                     .from("finance_expense")
-                    .where("deleted = 0");
+                    .where("finance_expense.deleted = 0");
             applyExpenseQueryConditions(expenseQuery, request);
             long expenseCount = financeModel.countExpense(request, expenseQuery);
             BigDecimal expenseTotal = BigDecimal.ZERO;
@@ -198,7 +198,7 @@ public class FinanceService {
             // 获取收入记录
             SelectConditionStep<Record> incomeQuery = dsl.select()
                     .from("finance_income")
-                    .where("deleted = 0");
+                    .where("finance_income.deleted = 0");
             applyIncomeQueryConditions(incomeQuery, request);
             long incomeCount = financeModel.countIncome(request, incomeQuery);
             BigDecimal incomeTotal = BigDecimal.ZERO;
@@ -362,7 +362,7 @@ public class FinanceService {
      * 构建支出条件字符串
      */
     private String buildExpenseWhereConditions(FinanceRecordQueryRequest request) {
-        StringBuilder sb = new StringBuilder("deleted = 0");
+        StringBuilder sb = new StringBuilder("finance_expense.deleted = 0");
         
         if (request.getKeyword() != null && !request.getKeyword().isEmpty()) {
             sb.append(" AND (expense_item LIKE '%").append(request.getKeyword()).append("%'")
@@ -393,7 +393,7 @@ public class FinanceService {
      * 构建收入条件字符串
      */
     private String buildIncomeWhereConditions(FinanceRecordQueryRequest request) {
-        StringBuilder sb = new StringBuilder("deleted = 0");
+        StringBuilder sb = new StringBuilder("finance_income.deleted = 0");
         
         if (request.getKeyword() != null && !request.getKeyword().isEmpty()) {
             sb.append(" AND (income_item LIKE '%").append(request.getKeyword()).append("%'")
@@ -429,7 +429,7 @@ public class FinanceService {
         // 查询支出记录数量和总额
         SelectConditionStep<Record> expenseQuery = dsl.select()
                 .from("finance_expense")
-                .where("deleted = 0");
+                .where("finance_expense.deleted = 0");
         
         applyExpenseQueryConditions(expenseQuery, request);
         
@@ -440,7 +440,7 @@ public class FinanceService {
         if (expenseCount > 0) {
             expenseTotal = dsl.select(field("sum(amount)", BigDecimal.class))
                     .from("finance_expense")
-                    .where("deleted = 0")
+                    .where("finance_expense.deleted = 0")
                     .and(buildExpenseWhereConditions(request))
                     .fetchOne(0, BigDecimal.class);
             
@@ -453,7 +453,7 @@ public class FinanceService {
         // 查询收入记录数量和总额
         SelectConditionStep<Record> incomeQuery = dsl.select()
                 .from("finance_income")
-                .where("deleted = 0");
+                .where("finance_income.deleted = 0");
         
         applyIncomeQueryConditions(incomeQuery, request);
         
@@ -464,7 +464,7 @@ public class FinanceService {
         if (incomeCount > 0) {
             incomeTotal = dsl.select(field("sum(amount)", BigDecimal.class))
                     .from("finance_income")
-                    .where("deleted = 0")
+                    .where("finance_income.deleted = 0")
                     .and(buildIncomeWhereConditions(request))
                     .fetchOne(0, BigDecimal.class);
             

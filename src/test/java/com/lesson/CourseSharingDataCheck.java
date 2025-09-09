@@ -33,7 +33,7 @@ public class CourseSharingDataCheck implements CommandLineRunner {
         
         if (totalCount > 0) {
             // 查询详细数据
-            Result<Record> records = dsl.select(
+            Result<? extends Record> records = dsl.select(
                     EDU_COURSE_SHARING.ID,
                     EDU_COURSE_SHARING.STUDENT_ID,
                     EDU_STUDENT.NAME.as("student_name"),
