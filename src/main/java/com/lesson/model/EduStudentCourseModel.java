@@ -930,7 +930,7 @@ public class EduStudentCourseModel {
         
         Field<BigDecimal> remainingHoursField = totalHoursField.minus(
             DSL.field(
-                DSL.select(DSL.coalesce(DSL.sum(EDU_STUDENT_COURSE_RECORD.HOURS), BigDecimal.ZERO))
+                DSL.select(DSL.coalesce(DSL.sum(EDU_STUDENT_COURSE_RECORD.as("cumulative").HOURS), BigDecimal.ZERO))
                    .from(EDU_STUDENT_COURSE_RECORD.as("cumulative"))
                    .where(EDU_STUDENT_COURSE_RECORD.as("cumulative").STUDENT_ID.eq(EDU_STUDENT_COURSE_RECORD.STUDENT_ID))
                    .and(EDU_STUDENT_COURSE_RECORD.as("cumulative").COURSE_ID.eq(EDU_STUDENT_COURSE_RECORD.COURSE_ID))
