@@ -419,8 +419,19 @@ public class StudentService {
                 request.getStudentId(), courseInfo.getCourseId(), actualTotalHours);
       }
       
-      log.info("学员{}课程{}最终课时设置：总课时={}, 已消耗课时=0（重置）", 
-              request.getStudentId(), courseInfo.getCourseId(), actualTotalHours);
+      // 7.1.1 获取原有的已消耗课时，避免重置
+      BigDecimal originalConsumedHours = BigDecimal.ZERO;
+      for (EduStudentCourseRecord existingRecord : existingStudentCourses) {
+        if (existingRecord.getCourseId().equals(courseInfo.getCourseId())) {
+          originalConsumedHours = existingRecord.getConsumedHours();
+          log.info("保留学员{}课程{}的原有已消耗课时：{}", 
+                  request.getStudentId(), courseInfo.getCourseId(), originalConsumedHours);
+          break;
+        }
+      }
+      
+      log.info("学员{}课程{}最终课时设置：总课时={}, 已消耗课时={}（保留原有）", 
+              request.getStudentId(), courseInfo.getCourseId(), actualTotalHours, originalConsumedHours);
 
       // 7.2 创建新的学员课程关系记录
       EduStudentCourseRecord newStudentCourseRecord = new EduStudentCourseRecord();
@@ -430,7 +441,7 @@ public class StudentService {
       newStudentCourseRecord.setInstitutionId(institutionId);
       newStudentCourseRecord.setStartDate(courseInfo.getEnrollDate());
       newStudentCourseRecord.setTotalHours(actualTotalHours); // 使用实际课时，而不是课程默认课时
-      newStudentCourseRecord.setConsumedHours(BigDecimal.ZERO); // 重置已消耗课时
+      newStudentCourseRecord.setConsumedHours(originalConsumedHours); // 保留原有的已消耗课时
       newStudentCourseRecord.setStatus(StudentCourseStatus.STUDYING.getName()); // 重置状态为学习中
       newStudentCourseRecord.setDeleted(0);
       newStudentCourseRecord.setCreatedTime(LocalDateTime.now());
