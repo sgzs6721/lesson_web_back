@@ -1,0 +1,22 @@
+### 测试修复后的学员考勤记录接口 - 剩余课时应该正确递减
+POST http://jufeng.devtesting.top/lesson/api/student/attendance-list
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzM2NjQ0MjQwLCJleHAiOjE3MzY3MzA2NDB9.8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q
+
+{
+  "studentId": 1,
+  "campusId": 1,
+  "pageNum": 1,
+  "pageSize": 10
+}
+
+### 预期结果：
+### 第一条记录（最早的打卡记录）：
+### - hours: 1.00
+### - remainingHours: 应该等于总课时 - 第一条记录的消耗课时
+### 
+### 第二条记录（较晚的打卡记录）：
+### - hours: 1.00  
+### - remainingHours: 应该等于总课时 - 第一条记录的消耗课时 - 第二条记录的消耗课时
+### 
+### 剩余课时应该逐次递减，而不是都显示相同的值

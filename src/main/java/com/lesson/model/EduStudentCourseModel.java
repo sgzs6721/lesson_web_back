@@ -915,8 +915,20 @@ public class EduStudentCourseModel {
      * 查询学员上课记录列表
      */
     public List<StudentAttendanceListVO> listStudentAttendances(StudentAttendanceQueryRequest request, Long institutionId) {
-        // 计算剩余课时 (total_hours - consumed_hours)
-        Field<BigDecimal> remainingHoursField = EDU_STUDENT_COURSE.TOTAL_HOURS.minus(EDU_STUDENT_COURSE.CONSUMED_HOURS).as("remaining_hours");
+        // 计算每次打卡记录时的剩余课时
+        // 使用子查询计算到当前记录为止的累计消耗课时，然后用总课时减去累计消耗课时
+        Field<BigDecimal> totalHoursField = EDU_STUDENT_COURSE.TOTAL_HOURS;
+        Field<BigDecimal> cumulativeConsumedHoursField = DSL.field(
+            DSL.select(DSL.coalesce(DSL.sum(EDU_STUDENT_COURSE_RECORD.HOURS), BigDecimal.ZERO))
+               .from(EDU_STUDENT_COURSE_RECORD.as("cumulative"))
+               .where(EDU_STUDENT_COURSE_RECORD.as("cumulative").STUDENT_ID.eq(EDU_STUDENT_COURSE_RECORD.STUDENT_ID))
+               .and(EDU_STUDENT_COURSE_RECORD.as("cumulative").COURSE_ID.eq(EDU_STUDENT_COURSE_RECORD.COURSE_ID))
+               .and(EDU_STUDENT_COURSE_RECORD.as("cumulative").DELETED.eq(0))
+               .and(EDU_STUDENT_COURSE_RECORD.as("cumulative").COURSE_DATE.le(EDU_STUDENT_COURSE_RECORD.COURSE_DATE))
+               .and(EDU_STUDENT_COURSE_RECORD.as("cumulative").ID.le(EDU_STUDENT_COURSE_RECORD.ID))
+        ).as("cumulative_consumed_hours");
+        
+        Field<BigDecimal> remainingHoursField = totalHoursField.minus(cumulativeConsumedHoursField).as("remaining_hours");
         
         SelectJoinStep<?> select = dsl.select(
                     EDU_STUDENT_COURSE_RECORD.ID.as("record_id"),
@@ -927,6 +939,8 @@ public class EduStudentCourseModel {
                     EDU_STUDENT_COURSE_RECORD.HOURS,
                     EDU_COURSE.NAME.as("course_name"),
                     SYS_COACH.NAME.as("coach_name"),
+                    totalHoursField.as("total_hours"),
+                    cumulativeConsumedHoursField,
                     remainingHoursField
                 )
                 .from(EDU_STUDENT_COURSE_RECORD)
