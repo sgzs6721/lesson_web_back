@@ -915,6 +915,9 @@ public class EduStudentCourseModel {
      * 查询学员上课记录列表
      */
     public List<StudentAttendanceListVO> listStudentAttendances(StudentAttendanceQueryRequest request, Long institutionId) {
+        // 计算剩余课时 (total_hours - consumed_hours)
+        Field<BigDecimal> remainingHoursField = EDU_STUDENT_COURSE.TOTAL_HOURS.minus(EDU_STUDENT_COURSE.CONSUMED_HOURS).as("remaining_hours");
+        
         SelectJoinStep<?> select = dsl.select(
                     EDU_STUDENT_COURSE_RECORD.ID.as("record_id"),
                     EDU_STUDENT_COURSE_RECORD.COURSE_DATE,
@@ -923,11 +926,15 @@ public class EduStudentCourseModel {
                     EDU_STUDENT_COURSE_RECORD.NOTES,
                     EDU_STUDENT_COURSE_RECORD.HOURS,
                     EDU_COURSE.NAME.as("course_name"),
-                    SYS_COACH.NAME.as("coach_name")
+                    SYS_COACH.NAME.as("coach_name"),
+                    remainingHoursField
                 )
                 .from(EDU_STUDENT_COURSE_RECORD)
                 .join(EDU_COURSE).on(EDU_STUDENT_COURSE_RECORD.COURSE_ID.eq(EDU_COURSE.ID))
-                .leftJoin(SYS_COACH).on(EDU_STUDENT_COURSE_RECORD.COACH_ID.eq(SYS_COACH.ID));
+                .leftJoin(SYS_COACH).on(EDU_STUDENT_COURSE_RECORD.COACH_ID.eq(SYS_COACH.ID))
+                .leftJoin(EDU_STUDENT_COURSE).on(EDU_STUDENT_COURSE_RECORD.STUDENT_ID.eq(EDU_STUDENT_COURSE.STUDENT_ID)
+                    .and(EDU_STUDENT_COURSE_RECORD.COURSE_ID.eq(EDU_STUDENT_COURSE.COURSE_ID))
+                    .and(EDU_STUDENT_COURSE.DELETED.eq(0)));
 
         Condition conditions = EDU_STUDENT_COURSE_RECORD.DELETED.eq(0)
                                .and(EDU_COURSE.DELETED.eq(0)); // 确保关联的课程未删除
@@ -1007,6 +1014,7 @@ public class EduStudentCourseModel {
         vo.setCourseName(record.get("course_name", String.class));
         vo.setNotes(record.get("notes", String.class));
         vo.setHours(record.get("hours", BigDecimal.class));
+        vo.setRemainingHours(record.get("remaining_hours", BigDecimal.class));
         return vo;
     }
 

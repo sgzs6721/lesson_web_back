@@ -33,6 +33,9 @@ public class StudentAttendanceListVO {
     @Schema(description = "消耗课时", example = "1.5")
     private BigDecimal hours;
     
+    @Schema(description = "剩余课时", example = "8.5")
+    private BigDecimal remainingHours;
+    
     // 可能需要的原始数据
     @Schema(description = "记录ID")
     private Long recordId; // 对应 edu_student_course_record.id

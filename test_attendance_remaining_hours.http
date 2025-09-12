@@ -1,0 +1,22 @@
+### 测试学员考勤记录接口 - 包含剩余课时字段
+POST http://jufeng.devtesting.top/lesson/api/student/attendance-list
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzM2NjQ0MjQwLCJleHAiOjE3MzY3MzA2NDB9.8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q
+
+{
+  "studentId": 1,
+  "campusId": 1,
+  "pageNum": 1,
+  "pageSize": 10
+}
+
+### 测试学员考勤记录接口 - 不指定学员ID，获取所有记录
+POST http://jufeng.devtesting.top/lesson/api/student/attendance-list
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzM2NjQ0MjQwLCJleHAiOjE3MzY3MzA2NDB9.8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q
+
+{
+  "campusId": 1,
+  "pageNum": 1,
+  "pageSize": 10
+}
