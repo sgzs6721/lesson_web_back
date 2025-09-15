@@ -2372,10 +2372,13 @@ public class StudentService {
     refundRecord.setHandlingFee(calculatedHandlingFee);
     refundRecord.setDeductionAmount(request.getDeductionAmount());
     refundRecord.setActualRefund(actualRefund);
-    // 注意：数据库表中没有refund_method字段，退费方式信息可以通过常量ID记录
     refundRecord.setReason(request.getReason());
     refundRecord.setCampusId(campusId);
     refundRecord.setInstitutionId(institutionId);
+    // 存储退费方式常量ID (暂时注释，等待jOOQ代码重新生成)
+    // if (request.getRefundMethodId() != null) {
+    //   refundRecord.setRefundMethodConstantId(request.getRefundMethodId());
+    // }
     refundRecord.setCreatedTime(LocalDateTime.now());
     refundRecord.setUpdateTime(LocalDateTime.now());
     refundRecord.setDeleted(0);

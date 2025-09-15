@@ -22,5 +22,10 @@ public enum RefundMethod {
     /**
      * 支付宝
      */
-    ALIPAY
+    ALIPAY,
+    
+    /**
+     * 其他方式
+     */
+    OTHER
 } 
