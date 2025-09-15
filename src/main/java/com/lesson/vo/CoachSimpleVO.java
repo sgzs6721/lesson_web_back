@@ -1,5 +1,6 @@
 package com.lesson.vo;
 
+import com.lesson.common.enums.CoachStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import java.math.BigDecimal;
@@ -22,6 +23,18 @@ public class CoachSimpleVO {
      */
     @Schema(description = "姓名", example = "张教练")
     private String name;
+
+    /**
+     * 状态
+     */
+    @Schema(description = "教练状态", example = "ACTIVE")
+    private CoachStatus status;
+
+    /**
+     * 工作类型
+     */
+    @Schema(description = "工作类型", example = "FULLTIME")
+    private String workType;
 
     /**
      * 课时费
