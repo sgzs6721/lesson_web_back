@@ -29,7 +29,7 @@ public class StudentStatusResponseVO {
     /**
      * 学员状态
      */
-    @ApiModelProperty("学员状态：STUDYING-在学，SUSPENDED-停课，GRADUATED-结业")
+    @ApiModelProperty("学员状态：STUDYING-在学，SUSPENDED-停课，GRADUATED-结业，REFUNDED-已退费")
     private String studentStatus;
 
     /**

@@ -2287,7 +2287,9 @@ public class StudentService {
     }
 
     // 2. 检查是否可以退费 (例如，状态不能是已结业/已退费)
-    if (StudentCourseStatus.GRADUATED.name().equals(studentCourse.getStatus())) { // 假设GRADUATED也代表已退费
+    String currentStatus = studentCourse.getStatus();
+    if (StudentCourseStatus.GRADUATED.name().equals(currentStatus) || 
+        StudentCourseStatus.REFUNDED.name().equals(currentStatus)) {
       throw new BusinessException("该课程已结业或已退费，无法重复退费");
     }
 
@@ -2386,7 +2388,7 @@ public class StudentService {
     Long refundId = refundRecord.getId();
 
     // 5. 更新学员课程信息 (edu_student_course)
-    studentCourse.setStatus(StudentCourseStatus.GRADUATED.name()); // 标记为已结业/退费
+    studentCourse.setStatus(StudentCourseStatus.REFUNDED.name()); // 标记为已退费
     studentCourse.setUpdateTime(LocalDateTime.now());
     studentCourseModel.updateStudentCourse(studentCourse);
 
