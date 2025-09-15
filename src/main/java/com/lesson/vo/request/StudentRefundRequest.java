@@ -61,4 +61,10 @@ public class StudentRefundRequest {
     
     @ApiModelProperty(value = "退费原因（兼容字段，与reason相同）", example = "学员转学")
     private String refundReason;
+    
+    @ApiModelProperty(value = "退费日期", example = "2025-09-15")
+    private String refundDate;
+    
+    @ApiModelProperty(value = "备注信息", example = "手续费类型ID: 1, 手续费: 50, 其他费用: 20")
+    private String notes;
 } 
