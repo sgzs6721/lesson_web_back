@@ -4,6 +4,7 @@ import com.lesson.common.Result;
 import com.lesson.service.CourseSharingService;
 import com.lesson.vo.request.CourseSharingRequest;
 import com.lesson.vo.request.CourseSharingQueryRequest;
+import com.lesson.vo.request.BatchDeleteRequest;
 import com.lesson.vo.response.CourseSharingVO;
 import com.lesson.vo.PageResult;
 import io.swagger.v3.oas.annotations.Operation;
@@ -53,6 +54,13 @@ public class CourseSharingController {
     @Operation(summary = "删除课程共享", description = "删除指定的课程共享记录")
     public Result<Void> delete(@PathVariable Long id) {
         courseSharingService.deleteCourseSharing(id);
+        return Result.success();
+    }
+
+    @PostMapping("/batch-delete")
+    @Operation(summary = "批量删除课程共享", description = "批量删除多个课程共享记录")
+    public Result<Void> batchDelete(@RequestBody @Valid BatchDeleteRequest request) {
+        courseSharingService.batchDeleteCourseSharings(request.getIds());
         return Result.success();
     }
 } 

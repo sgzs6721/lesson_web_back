@@ -4,6 +4,7 @@ import com.lesson.vo.request.CourseSharingRequest;
 import com.lesson.vo.request.CourseSharingQueryRequest;
 import com.lesson.vo.response.CourseSharingVO;
 import com.lesson.vo.PageResult;
+import java.util.List;
 
 /**
  * 课程共享服务接口
@@ -48,4 +49,11 @@ public interface CourseSharingService {
      * @param id 共享记录ID
      */
     void deleteCourseSharing(Long id);
+    
+    /**
+     * 批量删除课程共享
+     *
+     * @param ids 共享记录ID列表
+     */
+    void batchDeleteCourseSharings(List<Long> ids);
 } 

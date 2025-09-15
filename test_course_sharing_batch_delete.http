@@ -1,0 +1,108 @@
+### 课程共享批量删除接口测试
+
+# 1. 创建课程共享记录（用于测试）
+POST http://localhost:8080/api/course/sharing/create
+Content-Type: application/json
+
+{
+  "studentId": 1,
+  "sourceCourseId": 1,
+  "targetCourseId": 2,
+  "coachId": 1,
+  "sharedHours": 10.00,
+  "startDate": "2024-01-01",
+  "endDate": "2024-12-31",
+  "campusId": 1,
+  "institutionId": 1,
+  "notes": "测试课程共享记录1"
+}
+
+###
+
+# 2. 创建第二个课程共享记录
+POST http://localhost:8080/api/course/sharing/create
+Content-Type: application/json
+
+{
+  "studentId": 2,
+  "sourceCourseId": 2,
+  "targetCourseId": 3,
+  "coachId": 2,
+  "sharedHours": 15.00,
+  "startDate": "2024-01-01",
+  "endDate": "2024-12-31",
+  "campusId": 1,
+  "institutionId": 1,
+  "notes": "测试课程共享记录2"
+}
+
+###
+
+# 3. 创建第三个课程共享记录
+POST http://localhost:8080/api/course/sharing/create
+Content-Type: application/json
+
+{
+  "studentId": 3,
+  "sourceCourseId": 3,
+  "targetCourseId": 4,
+  "coachId": 3,
+  "sharedHours": 20.00,
+  "startDate": "2024-01-01",
+  "endDate": "2024-12-31",
+  "campusId": 1,
+  "institutionId": 1,
+  "notes": "测试课程共享记录3"
+}
+
+###
+
+# 4. 查询课程共享列表（获取刚创建的记录ID）
+GET http://localhost:8080/api/course/sharing/list?pageNum=1&pageSize=10
+
+###
+
+# 5. 批量删除课程共享记录（请根据步骤4返回的ID更新下面的ids数组）
+POST http://localhost:8080/api/course/sharing/batch-delete
+Content-Type: application/json
+
+{
+  "ids": [1, 2, 3]
+}
+
+###
+
+# 6. 验证批量删除结果 - 再次查询列表确认记录已被删除
+GET http://localhost:8080/api/course/sharing/list?pageNum=1&pageSize=10
+
+###
+
+# 7. 测试批量删除空ID列表（应该返回错误）
+POST http://localhost:8080/api/course/sharing/batch-delete
+Content-Type: application/json
+
+{
+  "ids": []
+}
+
+###
+
+# 8. 测试批量删除不存在的ID（应该返回错误）
+POST http://localhost:8080/api/course/sharing/batch-delete
+Content-Type: application/json
+
+{
+  "ids": [99999, 99998]
+}
+
+###
+
+# 9. 测试批量删除超过限制的ID数量（应该返回错误）
+POST http://localhost:8080/api/course/sharing/batch-delete
+Content-Type: application/json
+
+{
+  "ids": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101]
+}
+
+###

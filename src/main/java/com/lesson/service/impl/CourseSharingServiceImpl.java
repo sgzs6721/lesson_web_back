@@ -292,6 +292,50 @@ public class CourseSharingServiceImpl implements CourseSharingService {
         }
     }
     
+    @Override
+    @Transactional
+    public void batchDeleteCourseSharings(List<Long> ids) {
+        try {
+            log.info("开始批量删除课程共享，ID列表：{}", ids);
+            
+            if (ids == null || ids.isEmpty()) {
+                throw new RuntimeException("批量删除ID列表不能为空");
+            }
+            
+            // 验证所有ID是否存在且未删除
+            List<Long> existingIds = dsl.select(Tables.EDU_COURSE_SHARING.ID)
+                    .from(Tables.EDU_COURSE_SHARING)
+                    .where(Tables.EDU_COURSE_SHARING.ID.in(ids))
+                    .and(Tables.EDU_COURSE_SHARING.DELETED.eq(0))
+                    .fetchInto(Long.class);
+            
+            if (existingIds.size() != ids.size()) {
+                List<Long> missingIds = ids.stream()
+                        .filter(id -> !existingIds.contains(id))
+                        .collect(java.util.stream.Collectors.toList());
+                throw new RuntimeException("以下ID不存在或已被删除：" + missingIds);
+            }
+            
+            // 批量逻辑删除
+            int deletedRows = dsl.update(Tables.EDU_COURSE_SHARING)
+                    .set(Tables.EDU_COURSE_SHARING.DELETED, 1)
+                    .set(Tables.EDU_COURSE_SHARING.UPDATE_TIME, LocalDateTime.now())
+                    .where(Tables.EDU_COURSE_SHARING.ID.in(ids))
+                    .and(Tables.EDU_COURSE_SHARING.DELETED.eq(0))
+                    .execute();
+            
+            if (deletedRows != ids.size()) {
+                log.warn("批量删除课程共享部分失败，期望删除：{}，实际删除：{}", ids.size(), deletedRows);
+            }
+            
+            log.info("批量删除课程共享成功，删除记录数：{}", deletedRows);
+            
+        } catch (Exception e) {
+            log.error("批量删除课程共享时发生错误：", e);
+            throw new RuntimeException("批量删除课程共享失败：" + e.getMessage(), e);
+        }
+    }
+    
     /**
      * 将数据库记录转换为VO
      */
