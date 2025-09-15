@@ -128,8 +128,12 @@ public class CourseSharingServiceImpl implements CourseSharingService {
         try {
             log.info("开始查询课程共享列表，请求参数：{}", request);
             
-            // 构建查询条件
-            Condition conditions = Tables.EDU_COURSE_SHARING.DELETED.eq(0);
+            // 获取当前机构ID
+            Long institutionId = getInstitutionId();
+            
+            // 构建查询条件（添加机构隔离）
+            Condition conditions = Tables.EDU_COURSE_SHARING.DELETED.eq(0)
+                    .and(Tables.EDU_COURSE_SHARING.INSTITUTION_ID.eq(institutionId));
             
             if (request.getStudentId() != null) {
                 conditions = conditions.and(Tables.EDU_COURSE_SHARING.STUDENT_ID.eq(request.getStudentId()));
@@ -213,10 +217,14 @@ public class CourseSharingServiceImpl implements CourseSharingService {
         try {
             log.info("开始获取课程共享详情，ID：{}", id);
             
+            // 获取当前机构ID
+            Long institutionId = getInstitutionId();
+            
             Record record = dsl.select()
                     .from(Tables.EDU_COURSE_SHARING)
                     .where(Tables.EDU_COURSE_SHARING.ID.eq(id))
                     .and(Tables.EDU_COURSE_SHARING.DELETED.eq(0))
+                    .and(Tables.EDU_COURSE_SHARING.INSTITUTION_ID.eq(institutionId))
                     .fetchOne();
             
             if (record == null) {
@@ -240,18 +248,22 @@ public class CourseSharingServiceImpl implements CourseSharingService {
         try {
             log.info("开始更新课程共享状态，ID：{}，新状态：{}", id, status);
             
+            // 获取当前机构ID
+            Long institutionId = getInstitutionId();
+            
             // 验证状态是否有效
             CourseSharingStatus sharingStatus = CourseSharingStatus.fromCode(status);
             if (sharingStatus == null) {
                 throw new RuntimeException("无效的状态值：" + status);
             }
             
-            // 更新状态
+            // 更新状态（添加机构隔离）
             int updatedRows = dsl.update(Tables.EDU_COURSE_SHARING)
                     .set(Tables.EDU_COURSE_SHARING.STATUS, status)
                     .set(Tables.EDU_COURSE_SHARING.UPDATE_TIME, LocalDateTime.now())
                     .where(Tables.EDU_COURSE_SHARING.ID.eq(id))
                     .and(Tables.EDU_COURSE_SHARING.DELETED.eq(0))
+                    .and(Tables.EDU_COURSE_SHARING.INSTITUTION_ID.eq(institutionId))
                     .execute();
             
             if (updatedRows == 0) {
@@ -272,12 +284,16 @@ public class CourseSharingServiceImpl implements CourseSharingService {
         try {
             log.info("开始删除课程共享，ID：{}", id);
             
-            // 逻辑删除
+            // 获取当前机构ID
+            Long institutionId = getInstitutionId();
+            
+            // 逻辑删除（添加机构隔离）
             int deletedRows = dsl.update(Tables.EDU_COURSE_SHARING)
                     .set(Tables.EDU_COURSE_SHARING.DELETED, 1)
                     .set(Tables.EDU_COURSE_SHARING.UPDATE_TIME, LocalDateTime.now())
                     .where(Tables.EDU_COURSE_SHARING.ID.eq(id))
                     .and(Tables.EDU_COURSE_SHARING.DELETED.eq(0))
+                    .and(Tables.EDU_COURSE_SHARING.INSTITUTION_ID.eq(institutionId))
                     .execute();
             
             if (deletedRows == 0) {
@@ -302,11 +318,15 @@ public class CourseSharingServiceImpl implements CourseSharingService {
                 throw new RuntimeException("批量删除ID列表不能为空");
             }
             
-            // 验证所有ID是否存在且未删除
+            // 获取当前机构ID
+            Long institutionId = getInstitutionId();
+            
+            // 验证所有ID是否存在且未删除（添加机构隔离）
             List<Long> existingIds = dsl.select(Tables.EDU_COURSE_SHARING.ID)
                     .from(Tables.EDU_COURSE_SHARING)
                     .where(Tables.EDU_COURSE_SHARING.ID.in(ids))
                     .and(Tables.EDU_COURSE_SHARING.DELETED.eq(0))
+                    .and(Tables.EDU_COURSE_SHARING.INSTITUTION_ID.eq(institutionId))
                     .fetchInto(Long.class);
             
             if (existingIds.size() != ids.size()) {
@@ -316,12 +336,13 @@ public class CourseSharingServiceImpl implements CourseSharingService {
                 throw new RuntimeException("以下ID不存在或已被删除：" + missingIds);
             }
             
-            // 批量逻辑删除
+            // 批量逻辑删除（添加机构隔离）
             int deletedRows = dsl.update(Tables.EDU_COURSE_SHARING)
                     .set(Tables.EDU_COURSE_SHARING.DELETED, 1)
                     .set(Tables.EDU_COURSE_SHARING.UPDATE_TIME, LocalDateTime.now())
                     .where(Tables.EDU_COURSE_SHARING.ID.in(ids))
                     .and(Tables.EDU_COURSE_SHARING.DELETED.eq(0))
+                    .and(Tables.EDU_COURSE_SHARING.INSTITUTION_ID.eq(institutionId))
                     .execute();
             
             if (deletedRows != ids.size()) {
