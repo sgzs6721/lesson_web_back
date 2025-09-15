@@ -2331,7 +2331,34 @@ public class StudentService {
       actualRefund = BigDecimal.ZERO; // 确保实际退款金额不为负
     }
 
-    // 4. 创建退费记录 (edu_student_refund)
+    // 4. 获取退费方式
+    String refundMethodValue = null;
+    if (request.getRefundMethodId() != null) {
+      try {
+        // 从常量表获取退费方式信息
+        SysConstantRecord methodConstant = dsl.selectFrom(Tables.SYS_CONSTANT)
+            .where(Tables.SYS_CONSTANT.ID.eq(request.getRefundMethodId()))
+            .and(Tables.SYS_CONSTANT.TYPE.eq("PAYMENT_TYPE"))
+            .and(Tables.SYS_CONSTANT.DELETED.eq(0))
+            .fetchOne();
+            
+        if (methodConstant != null) {
+          refundMethodValue = methodConstant.getConstantKey(); // 使用constantKey作为枚举值
+          log.info("根据常量ID {} 获取退费方式：{}", request.getRefundMethodId(), refundMethodValue);
+        } else {
+          log.warn("未找到退费方式常量，ID: {}", request.getRefundMethodId());
+        }
+      } catch (Exception e) {
+        log.error("获取退费方式常量失败，ID: {}", request.getRefundMethodId(), e);
+      }
+    }
+    
+    // 如果常量ID获取失败，使用枚举值
+    if (refundMethodValue == null && request.getRefundMethod() != null) {
+      refundMethodValue = request.getRefundMethod().name();
+    }
+
+    // 5. 创建退费记录 (edu_student_refund)
     EduStudentRefundRecord refundRecord = dsl.newRecord(Tables.EDU_STUDENT_REFUND);
     refundRecord.setStudentId(request.getStudentId().toString());
     refundRecord.setCourseId(request.getCourseId().toString());
@@ -2340,6 +2367,7 @@ public class StudentService {
     refundRecord.setHandlingFee(calculatedHandlingFee);
     refundRecord.setDeductionAmount(request.getDeductionAmount());
     refundRecord.setActualRefund(actualRefund);
+    // 注意：数据库表中没有refund_method字段，退费方式信息可以通过常量ID记录
     refundRecord.setReason(request.getReason());
     refundRecord.setCampusId(campusId);
     refundRecord.setInstitutionId(institutionId);

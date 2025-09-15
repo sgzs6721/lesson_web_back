@@ -56,9 +56,11 @@ public class StudentRefundRequest {
     // @ApiModelProperty(value = "实际退还给学员的金额", required = true, example = "930.00")
     // private BigDecimal actualRefund;
     
-    @NotNull(message = "退款方式不能为空")
-    @ApiModelProperty(value = "退款方式 (CASH, BANK_TRANSFER, WECHAT, ALIPAY)", required = true, example = "ALIPAY")
-    private RefundMethod refundMethod;
+    @ApiModelProperty(value = "退费方式常量ID", example = "1")
+    private Long refundMethodId; // 退费方式常量ID
+
+    @ApiModelProperty(value = "退款方式枚举 (CASH, BANK_TRANSFER, WECHAT, ALIPAY)", example = "ALIPAY")
+    private RefundMethod refundMethod; // 保留枚举字段作为备选
 
     @NotBlank(message = "退费原因不能为空")
     @ApiModelProperty(value = "退费原因", required = true, example = "学员转学")

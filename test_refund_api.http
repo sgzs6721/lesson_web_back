@@ -3,7 +3,7 @@
 GET http://jufeng.devtesting.top/lesson/api/student/refund/detail?studentId=1&courseId=1&campusId=1
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzM2NjQ0MjQwLCJleHAiOjE3MzY3MzA2NDB9.8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q
 
-### 2. 学员退费（使用手续费常量ID）
+### 2. 学员退费（使用常量ID）
 POST http://jufeng.devtesting.top/lesson/api/student/refund
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzM2NjQ0MjQwLCJleHAiOjE3MzY3MzA2NDB9.8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q
@@ -15,8 +15,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiaWF0I
   "refundHours": 0,
   "refundAmount": 111.00,
   "handlingFeeTypeId": 1,
+  "refundMethodId": 1,
   "deductionAmount": 1.00,
-  "refundMethod": "CASH",
   "reason": "学员要求退费"
 }
 
