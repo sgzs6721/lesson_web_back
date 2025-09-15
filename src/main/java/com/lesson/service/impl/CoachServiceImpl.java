@@ -403,12 +403,12 @@ public class CoachServiceImpl implements CoachService {
 
 
     @Override
-    public List<CoachSimpleVO> listSimpleCoaches(Long campusId) {
+    public List<CoachSimpleVO> listSimpleCoaches(Long campusId, CoachStatus status, String workType) {
         try {
             // 查询指定校区的教练简单信息
             List<CoachDetailRecord> records = coachModel.listCoaches(
                 null,  // keyword
-                null,  // status
+                status != null ? status.getCode() : null,  // status - 使用传入的状态参数，转换为String
                 null,  // jobTitle
                 campusId,
                 null,  // institutionId
@@ -435,6 +435,13 @@ public class CoachServiceImpl implements CoachService {
                         }
                         
                         return vo;
+                    })
+                    .filter(vo -> {
+                        // 如果指定了工作类型，进行筛选
+                        if (workType != null && !workType.trim().isEmpty()) {
+                            return workType.equals(vo.getWorkType());
+                        }
+                        return true;
                     })
                     .collect(Collectors.toList());
         } catch (RuntimeException e) {

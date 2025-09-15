@@ -68,9 +68,11 @@ public interface CoachService {
      * 获取教练简单列表
      *
      * @param campusId 校区ID
+     * @param status 教练状态（可选）
+     * @param workType 工作类型（可选）
      * @return 教练简单信息列表
      */
-    List<CoachSimpleVO> listSimpleCoaches(Long campusId);
+    List<CoachSimpleVO> listSimpleCoaches(Long campusId, CoachStatus status, String workType);
     
     /**
      * 获取教练关联的课程

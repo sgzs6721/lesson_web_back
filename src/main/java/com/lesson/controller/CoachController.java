@@ -1,6 +1,7 @@
 package com.lesson.controller;
 
 import com.lesson.common.Result;
+import com.lesson.common.enums.CoachStatus;
 import com.lesson.request.coach.CoachCreateRequest;
 import com.lesson.request.coach.CoachQueryRequest;
 import com.lesson.request.coach.CoachUpdateRequest;
@@ -139,18 +140,22 @@ public class CoachController {
      * 获取教练简单列表
      *
      * @param campusId 校区ID
+     * @param status 教练状态（可选）
+     * @param workType 工作类型（可选）
      * @return 教练简单信息列表
      */
     @GetMapping("/simple/list")
     @Operation(summary = "获取教练简单列表",
-               description = "获取指定校区下所有教练的ID和名称列表",
+               description = "获取指定校区下教练的ID和名称列表，支持按状态和类型筛选",
                responses = {
                    @ApiResponse(responseCode = "200", description = "获取成功",
                                content = @Content(schema = @Schema(implementation = CoachSimpleVO.class)))
                })
     public Result<List<CoachSimpleVO>> listSimple(
-            @Parameter(description = "校区ID", required = true) @RequestParam Long campusId) {
-        return Result.success(coachService.listSimpleCoaches(campusId));
+            @Parameter(description = "校区ID", required = true) @RequestParam Long campusId,
+            @Parameter(description = "教练状态", required = false) @RequestParam(required = false) CoachStatus status,
+            @Parameter(description = "工作类型", required = false) @RequestParam(required = false) String workType) {
+        return Result.success(coachService.listSimpleCoaches(campusId, status, workType));
     }
 
     /**
