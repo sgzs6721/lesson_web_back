@@ -1,0 +1,17 @@
+### 测试首页统计接口
+
+### 1. 获取今日首页完整数据
+GET http://jufeng.devtesting.top/lesson/api/dashboard/today
+Authorization: eyJhbGciOiJIUzM4NCJ9.eyJ1c2VySWQiOjMsIm9yZ0lkIjoyLCJpYXQiOjE3NTc5MDYwMTcsImV4cCI6MTc1ODUxMDgxN30._Sg0Zw93UC41xMvyc9A1a-A3yyKUPCNeQNd8wSZy0i6LYc4hUUlJDavQdJt9eXLI
+
+### 2. 获取今日数据总览
+GET http://jufeng.devtesting.top/lesson/api/dashboard/overview
+Authorization: eyJhbGciOiJIUzM4NCJ9.eyJ1c2VySWQiOjMsIm9yZ0lkIjoyLCJpYXQiOjE3NTc5MDYwMTcsImV4cCI6MTc1ODUxMDgxN30._Sg0Zw93UC41xMvyc9A1a-A3yyKUPCNeQNd8wSZy0i6LYc4hUUlJDavQdJt9eXLI
+
+### 3. 获取今日课程详情
+GET http://jufeng.devtesting.top/lesson/api/dashboard/courses
+Authorization: eyJhbGciOiJIUzM4NCJ9.eyJ1c2VySWQiOjMsIm9yZ0lkIjoyLCJpYXQiOjE3NTc5MDYwMTcsImV4cCI6MTc1ODUxMDgxN30._Sg0Zw93UC41xMvyc9A1a-A3yyKUPCNeQNd8wSZy0i6LYc4hUUlJDavQdJt9eXLI
+
+### 4. 手动刷新数据缓存
+POST http://jufeng.devtesting.top/lesson/api/dashboard/refresh
+Authorization: eyJhbGciOiJIUzM4NCJ9.eyJ1c2VySWQiOjMsIm9yZ0lkIjoyLCJpYXQiOjE3NTc5MDYwMTcsImV4cCI6MTc1ODUxMDgxN30._Sg0Zw93UC41xMvyc9A1a-A3yyKUPCNeQNd8wSZy0i6LYc4hUUlJDavQdJt9eXLI
