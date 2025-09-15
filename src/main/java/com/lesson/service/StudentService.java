@@ -2255,17 +2255,22 @@ public class StudentService {
   public Long processRefund(StudentRefundRequest request) {
     // 0. 获取机构和校区ID
     Long institutionId = getInstitutionId();
-    Long campusId = null;
-    EduStudentRecord student = dsl.selectFrom(Tables.EDU_STUDENT)
-        .where(Tables.EDU_STUDENT.ID.eq(request.getStudentId()))
-        .and(Tables.EDU_STUDENT.DELETED.eq(0))
-        .fetchAny();
-    if (student != null) {
-      campusId = student.getCampusId();
-      if (institutionId == null) institutionId = student.getInstitutionId();
-    } else {
-      throw new BusinessException("学员不存在: " + request.getStudentId());
+    Long campusId = request.getCampusId(); // 优先使用请求中的校区ID
+    
+    // 如果请求中没有提供校区ID，则从学员信息中自动获取
+    if (campusId == null) {
+      EduStudentRecord student = dsl.selectFrom(Tables.EDU_STUDENT)
+          .where(Tables.EDU_STUDENT.ID.eq(request.getStudentId()))
+          .and(Tables.EDU_STUDENT.DELETED.eq(0))
+          .fetchAny();
+      if (student != null) {
+        campusId = student.getCampusId();
+        if (institutionId == null) institutionId = student.getInstitutionId();
+      } else {
+        throw new BusinessException("学员不存在: " + request.getStudentId());
+      }
     }
+    
     if (campusId == null || institutionId == null) {
       throw new BusinessException("无法确定校区或机构信息");
     }

@@ -26,8 +26,7 @@ public class StudentRefundRequest {
     @ApiModelProperty(value = "要退费的课程ID", required = true, example = "1")
     private Long courseId;
 
-    @NotNull(message = "校区ID不能为空")
-    @ApiModelProperty(value = "校区ID", required = true, example = "1")
+    @ApiModelProperty(value = "校区ID（可选，如果不提供则从学员信息中自动获取）", example = "1")
     private Long campusId;
 
     @NotNull(message = "退课课时不能为空")
