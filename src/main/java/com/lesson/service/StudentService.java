@@ -1139,6 +1139,7 @@ public class StudentService {
         
         for (org.jooq.Record sharingRecord : sharingRecords) {
           CourseSharingInfoVO sharingInfo = new CourseSharingInfoVO();
+          sharingInfo.setId(sharingRecord.get(Tables.EDU_COURSE_SHARING.ID)); // 设置共享记录ID
           sharingInfo.setSourceCourseId(courseId); // 当前课程作为源课程
           
           // 获取当前课程的名称（源课程名称）

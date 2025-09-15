@@ -10,6 +10,9 @@ import lombok.Data;
 @Schema(description = "课程共享信息")
 public class CourseSharingInfoVO {
     
+    @Schema(description = "共享记录ID", example = "5001")
+    private Long id;
+    
     @Schema(description = "共享来源课程ID", example = "2001")
     private Long sourceCourseId;
     
