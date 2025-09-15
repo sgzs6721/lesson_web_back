@@ -2253,12 +2253,7 @@ public class StudentService {
    */
   @Transactional(rollbackFor = Exception.class)
   public Long processRefund(StudentRefundRequest request) {
-    // 0. 处理字段兼容性：如果传递了refundReason，则使用refundReason作为reason
-    if (request.getRefundReason() != null && !request.getRefundReason().trim().isEmpty()) {
-      request.setReason(request.getRefundReason());
-    }
-    
-    // 1. 获取机构和校区ID
+    // 0. 获取机构和校区ID
     Long institutionId = getInstitutionId();
     Long campusId = null;
     EduStudentRecord student = dsl.selectFrom(Tables.EDU_STUDENT)
@@ -2291,9 +2286,46 @@ public class StudentService {
       throw new BusinessException("该课程已结业或已退费，无法重复退费");
     }
 
-    // 3. 计算实际退款金额
+    // 3. 计算手续费
+    BigDecimal calculatedHandlingFee = request.getHandlingFee();
+    
+    // 如果提供了手续费类型常量ID，从常量表获取手续费百分比
+    if (request.getHandlingFeeTypeId() != null) {
+      try {
+        // 从常量表获取手续费类型信息
+        SysConstantRecord feeConstant = dsl.selectFrom(Tables.SYS_CONSTANT)
+            .where(Tables.SYS_CONSTANT.ID.eq(request.getHandlingFeeTypeId()))
+            .and(Tables.SYS_CONSTANT.TYPE.eq("HANDLING_FEE_TYPE"))
+            .and(Tables.SYS_CONSTANT.DELETED.eq(0))
+            .fetchOne();
+            
+        if (feeConstant != null) {
+          // 解析常量值中的百分比
+          String constantValue = feeConstant.getConstantValue();
+          if (constantValue != null && !constantValue.isEmpty()) {
+            // 提取数字部分（去掉%等符号）
+            String numericValue = constantValue.replaceAll("[^0-9.]", "");
+            if (!numericValue.isEmpty()) {
+              BigDecimal percentage = new BigDecimal(numericValue);
+              // 按百分比计算手续费
+              calculatedHandlingFee = request.getRefundAmount()
+                  .multiply(percentage)
+                  .divide(new BigDecimal("100"), 2, BigDecimal.ROUND_HALF_UP);
+              log.info("根据常量ID {} 计算手续费：百分比={}%, 手续费金额={}", 
+                      request.getHandlingFeeTypeId(), percentage, calculatedHandlingFee);
+            }
+          }
+        } else {
+          log.warn("未找到手续费类型常量，ID: {}", request.getHandlingFeeTypeId());
+        }
+      } catch (Exception e) {
+        log.error("获取手续费常量失败，ID: {}", request.getHandlingFeeTypeId(), e);
+      }
+    }
+
+    // 4. 计算实际退款金额
     BigDecimal actualRefund = request.getRefundAmount()
-                                   .subtract(request.getHandlingFee())
+                                   .subtract(calculatedHandlingFee)
                                    .subtract(request.getDeductionAmount());
     if (actualRefund.compareTo(BigDecimal.ZERO) < 0) {
       actualRefund = BigDecimal.ZERO; // 确保实际退款金额不为负
@@ -2305,7 +2337,7 @@ public class StudentService {
     refundRecord.setCourseId(request.getCourseId().toString());
     refundRecord.setRefundHours(request.getRefundHours());
     refundRecord.setRefundAmount(request.getRefundAmount());
-    refundRecord.setHandlingFee(request.getHandlingFee());
+    refundRecord.setHandlingFee(calculatedHandlingFee);
     refundRecord.setDeductionAmount(request.getDeductionAmount());
     refundRecord.setActualRefund(actualRefund);
     refundRecord.setReason(request.getReason());

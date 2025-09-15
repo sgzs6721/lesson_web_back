@@ -1,0 +1,42 @@
+### 测试退费接口
+### 1. 获取退费详情
+GET http://jufeng.devtesting.top/lesson/api/student/refund/detail?studentId=1&courseId=1&campusId=1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzM2NjQ0MjQwLCJleHAiOjE3MzY3MzA2NDB9.8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q
+
+### 2. 学员退费（使用手续费常量ID）
+POST http://jufeng.devtesting.top/lesson/api/student/refund
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzM2NjQ0MjQwLCJleHAiOjE3MzY3MzA2NDB9.8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q
+
+{
+  "studentId": 1,
+  "courseId": 1,
+  "campusId": 1,
+  "refundHours": 0,
+  "refundAmount": 111.00,
+  "handlingFeeTypeId": 1,
+  "deductionAmount": 1.00,
+  "refundMethod": "CASH",
+  "reason": "学员要求退费"
+}
+
+### 3. 部分退费测试（固定手续费）
+POST http://jufeng.devtesting.top/lesson/api/student/refund
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzM2NjQ0MjQwLCJleHAiOjE3MzY3MzA2NDB9.8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q
+
+{
+  "studentId": 1,
+  "courseId": 1,
+  "campusId": 1,
+  "refundHours": 5,
+  "refundAmount": 50.00,
+  "handlingFee": 5.00,
+  "deductionAmount": 2.00,
+  "refundMethod": "BANK_TRANSFER",
+  "reason": "部分退费测试"
+}
+
+### 4. 测试退费记录查询
+GET http://jufeng.devtesting.top/lesson/api/student/refund/records?studentId=1&pageNum=1&pageSize=10
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzM2NjQ0MjQwLCJleHAiOjE3MzY3MzA2NDB9.8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q8Q
