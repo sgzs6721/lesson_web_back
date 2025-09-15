@@ -58,4 +58,7 @@ public class StudentRefundRequest {
     @NotBlank(message = "退费原因不能为空")
     @ApiModelProperty(value = "退费原因", required = true, example = "学员转学")
     private String reason;
+    
+    @ApiModelProperty(value = "退费原因（兼容字段，与reason相同）", example = "学员转学")
+    private String refundReason;
 } 

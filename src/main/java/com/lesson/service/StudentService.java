@@ -2253,7 +2253,12 @@ public class StudentService {
    */
   @Transactional(rollbackFor = Exception.class)
   public Long processRefund(StudentRefundRequest request) {
-    // 0. 获取机构和校区ID
+    // 0. 处理字段兼容性：如果传递了refundReason，则使用refundReason作为reason
+    if (request.getRefundReason() != null && !request.getRefundReason().trim().isEmpty()) {
+      request.setReason(request.getRefundReason());
+    }
+    
+    // 1. 获取机构和校区ID
     Long institutionId = getInstitutionId();
     Long campusId = null;
     EduStudentRecord student = dsl.selectFrom(Tables.EDU_STUDENT)
