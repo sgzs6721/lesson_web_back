@@ -1990,23 +1990,23 @@ public class StudentService {
 
     // 3.5. 创建财务收入记录
     try {
-        // 获取"学费收入"的常量ID
-        Long tuitionIncomeCategoryId = dsl.select(Tables.SYS_CONSTANT.ID)
+        // 获取"学员缴费"的常量ID
+        Long studentPaymentCategoryId = dsl.select(Tables.SYS_CONSTANT.ID)
             .from(Tables.SYS_CONSTANT)
-            .where(Tables.SYS_CONSTANT.CONSTANT_KEY.eq("INCOME_TUITION"))
+            .where(Tables.SYS_CONSTANT.CONSTANT_KEY.eq("INCOME_STUDENT_PAYMENT"))
             .and(Tables.SYS_CONSTANT.TYPE.eq("INCOME"))
             .and(Tables.SYS_CONSTANT.DELETED.eq(0))
             .fetchOneInto(Long.class);
         
-        if (tuitionIncomeCategoryId == null) {
-            log.warn("未找到'学费收入'常量，使用NULL作为categoryId");
+        if (studentPaymentCategoryId == null) {
+            log.warn("未找到'学员缴费'常量，使用NULL作为categoryId");
         }
         
         FinanceIncomeRecord incomeRecord = new FinanceIncomeRecord();
         incomeRecord.setIncomeDate(request.getTransactionDate() != null ? request.getTransactionDate() : LocalDate.now());
         incomeRecord.setIncomeItem("学费收入"); // 项目显示为"学费收入"
         incomeRecord.setAmount(request.getAmount());
-        incomeRecord.setCategoryId(tuitionIncomeCategoryId); // 设置为"学费收入"的常量ID
+        incomeRecord.setCategoryId(studentPaymentCategoryId); // 设置为"学员缴费"的常量ID
         incomeRecord.setNotes("学员缴费记录ID: " + paymentId + "，课程: " + getCourseName(request.getCourseId()) + "，学员: " + student.getName());
         incomeRecord.setCampusId(campusId);
         incomeRecord.setInstitutionId(institutionId);
@@ -2015,7 +2015,7 @@ public class StudentService {
         incomeRecord.setDeleted(0);
         
         Long incomeId = financeModel.createIncome(incomeRecord);
-        log.info("财务收入记录创建成功 - incomeId: {}, paymentId: {}, categoryId: {}", incomeId, paymentId, tuitionIncomeCategoryId);
+        log.info("财务收入记录创建成功 - incomeId: {}, paymentId: {}, categoryId: {}", incomeId, paymentId, studentPaymentCategoryId);
     } catch (Exception e) {
         log.error("创建财务收入记录失败，paymentId: {}", paymentId, e);
         throw new BusinessException("创建财务收入记录失败: " + e.getMessage());
