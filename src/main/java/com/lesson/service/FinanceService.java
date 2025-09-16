@@ -4,6 +4,7 @@ import com.lesson.model.record.FinanceExpenseRecord;
 import com.lesson.model.record.FinanceIncomeRecord;
 import com.lesson.vo.request.FinanceRecordQueryRequest;
 import com.lesson.vo.request.FinanceRecordRequest;
+import com.lesson.vo.request.FinanceRecordUpdateRequest;
 import com.lesson.vo.response.FinanceRecordListVO;
 import com.lesson.vo.response.FinanceStatVO;
 import lombok.RequiredArgsConstructor;
@@ -96,6 +97,46 @@ public class FinanceService {
                     0
             )
             .execute();
+        }
+    }
+    
+    /**
+     * 修改财务记录
+     */
+    public void updateFinanceRecord(FinanceRecordUpdateRequest request, Long institutionId) {
+        // 先查询记录类型，判断是收入还是支出
+        Record incomeRecord = dsl.select()
+                .from("finance_income")
+                .where("id = ?", request.getId())
+                .and("deleted = 0")
+                .fetchOne();
+        
+        if (incomeRecord != null) {
+            // 修改收入记录
+            dsl.update(table("finance_income"))
+                    .set(field("income_date"), request.getDate())
+                    .set(field("income_item"), request.getItem())
+                    .set(field("amount"), request.getAmount())
+                    .set(field("category_id"), request.getCategoryId())
+                    .set(field("notes"), request.getNotes())
+                    .set(field("campus_id"), request.getCampusId())
+                    .set(field("update_time"), LocalDateTime.now())
+                    .where(field("id").eq(request.getId()))
+                    .and(field("deleted").eq(0))
+                    .execute();
+        } else {
+            // 修改支出记录
+            dsl.update(table("finance_expense"))
+                    .set(field("expense_date"), request.getDate())
+                    .set(field("expense_item"), request.getItem())
+                    .set(field("amount"), request.getAmount())
+                    .set(field("category_id"), request.getCategoryId())
+                    .set(field("notes"), request.getNotes())
+                    .set(field("campus_id"), request.getCampusId())
+                    .set(field("update_time"), LocalDateTime.now())
+                    .where(field("id").eq(request.getId()))
+                    .and(field("deleted").eq(0))
+                    .execute();
         }
     }
     

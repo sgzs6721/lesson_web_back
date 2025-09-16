@@ -4,6 +4,7 @@ import com.lesson.common.Result;
 import com.lesson.service.FinanceService;
 import com.lesson.vo.request.FinanceRecordQueryRequest;
 import com.lesson.vo.request.FinanceRecordRequest;
+import com.lesson.vo.request.FinanceRecordUpdateRequest;
 import com.lesson.vo.response.FinanceRecordListVO;
 import com.lesson.vo.response.FinanceStatVO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,6 +38,20 @@ public class FinanceController {
             institutionId = 1L;
         }
         financeService.addFinanceRecord(request, institutionId);
+        return Result.success();
+    }
+
+    /**
+     * 修改财务记录
+     */
+    @PutMapping("/record")
+    @Operation(summary = "修改财务记录", description = "修改收入或支出记录")
+    public Result<Void> updateFinanceRecord(@RequestBody @Validated FinanceRecordUpdateRequest request, HttpServletRequest httpServletRequest) {
+        Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
+        if (institutionId == null) {
+            institutionId = 1L;
+        }
+        financeService.updateFinanceRecord(request, institutionId);
         return Result.success();
     }
 
