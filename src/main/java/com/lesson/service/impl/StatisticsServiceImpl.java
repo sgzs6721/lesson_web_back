@@ -9,6 +9,7 @@ import com.lesson.repository.tables.SysConstant;
 import com.lesson.repository.tables.SysCoach;
 import com.lesson.repository.tables.SysCoachSalary;
 import com.lesson.repository.tables.SysCoachCourse;
+import com.lesson.common.exception.BusinessException;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import static org.jooq.impl.DSL.*;
@@ -21,8 +22,10 @@ import com.lesson.vo.response.StudentAnalysisVO;
 import com.lesson.vo.response.CourseAnalysisVO;
 import com.lesson.vo.response.CoachAnalysisVO;
 import com.lesson.vo.response.FinanceAnalysisVO;
+import com.lesson.vo.response.CoachHourStatisticsVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Result;
@@ -33,6 +36,8 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
+import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +50,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class StatisticsServiceImpl implements StatisticsService {
+    
+    private final DSLContext dsl;
     
     private final DSLContext dslContext;
     
@@ -1741,5 +1748,125 @@ public class StatisticsServiceImpl implements StatisticsService {
         analysis.setProfitGrowthRate(BigDecimal.valueOf(13.7));
         
         return analysis;
+    }
+    
+    @Override
+    public CoachHourStatisticsVO getCoachHourStatistics(Long institutionId, Long campusId, String period) {
+        log.info("获取教练课时统计，机构ID: {}, 校区ID: {}, 周期: {}", institutionId, campusId, period);
+        
+        try {
+            LocalDate today = LocalDate.now();
+            LocalDate startDate, endDate;
+            
+            if ("month".equals(period)) {
+                // 本月
+                startDate = today.withDayOfMonth(1);
+                endDate = today.with(TemporalAdjusters.lastDayOfMonth());
+            } else {
+                // 本周（默认）
+                startDate = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+                endDate = today.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+            }
+            
+            // 构建查询条件
+            Condition condition = EduStudentCourseRecord.EDU_STUDENT_COURSE_RECORD.DELETED.eq(0)
+                    .and(EduStudentCourseRecord.EDU_STUDENT_COURSE_RECORD.COURSE_DATE.between(startDate, endDate));
+            
+            if (campusId != null) {
+                condition = condition.and(EduStudentCourseRecord.EDU_STUDENT_COURSE_RECORD.CAMPUS_ID.eq(campusId));
+            }
+            
+            // 查询教练课时统计数据
+            Result<?> records = dsl.select(
+                    EduStudentCourseRecord.EDU_STUDENT_COURSE_RECORD.COACH_ID,
+                    SysCoach.SYS_COACH.NAME.as("coach_name"),
+                    SysCoach.SYS_COACH.WORK_TYPE,
+                    coalesce(sum(EduStudentCourseRecord.EDU_STUDENT_COURSE_RECORD.HOURS), BigDecimal.ZERO).as("total_hours"),
+                    coalesce(sum(case_()
+                            .when(EduStudentCourseRecord.EDU_STUDENT_COURSE_RECORD.STATUS.eq("COMPLETED"), EduStudentCourseRecord.EDU_STUDENT_COURSE_RECORD.HOURS)
+                            .otherwise(BigDecimal.ZERO)
+                    ), BigDecimal.ZERO).as("consumed_hours"),
+                    coalesce(sum(case_()
+                            .when(EduStudentCourseRecord.EDU_STUDENT_COURSE_RECORD.STATUS.ne("COMPLETED"), EduStudentCourseRecord.EDU_STUDENT_COURSE_RECORD.HOURS)
+                            .otherwise(BigDecimal.ZERO)
+                    ), BigDecimal.ZERO).as("pending_hours"),
+                    coalesce(avg(SysCoachCourse.SYS_COACH_COURSE.COACH_FEE), BigDecimal.ZERO).as("avg_hourly_rate")
+                )
+                .from(EduStudentCourseRecord.EDU_STUDENT_COURSE_RECORD)
+                .join(SysCoach.SYS_COACH).on(EduStudentCourseRecord.EDU_STUDENT_COURSE_RECORD.COACH_ID.eq(SysCoach.SYS_COACH.ID))
+                .leftJoin(SysCoachCourse.SYS_COACH_COURSE).on(EduStudentCourseRecord.EDU_STUDENT_COURSE_RECORD.COACH_ID.eq(SysCoachCourse.SYS_COACH_COURSE.COACH_ID))
+                .where(condition)
+                .groupBy(EduStudentCourseRecord.EDU_STUDENT_COURSE_RECORD.COACH_ID, SysCoach.SYS_COACH.NAME, SysCoach.SYS_COACH.WORK_TYPE)
+                .orderBy(sum(EduStudentCourseRecord.EDU_STUDENT_COURSE_RECORD.HOURS).desc())
+                .fetch();
+            
+            List<CoachHourStatisticsVO.CoachHourStatisticsItem> coachList = new ArrayList<>();
+            BigDecimal totalConsumedHours = BigDecimal.ZERO;
+            BigDecimal totalConsumedAmount = BigDecimal.ZERO;
+            BigDecimal totalPendingHours = BigDecimal.ZERO;
+            BigDecimal totalPendingAmount = BigDecimal.ZERO;
+            BigDecimal totalEstimatedSalary = BigDecimal.ZERO;
+            
+            for (Record record : records) {
+                Long coachId = record.get("coach_id", Long.class);
+                String coachName = record.get("coach_name", String.class);
+                String workType = record.get("work_type", String.class);
+                BigDecimal consumedHours = record.get("consumed_hours", BigDecimal.class);
+                BigDecimal pendingHours = record.get("pending_hours", BigDecimal.class);
+                BigDecimal avgHourlyRate = record.get("avg_hourly_rate", BigDecimal.class);
+                
+                // 计算金额
+                BigDecimal consumedAmount = consumedHours.multiply(avgHourlyRate);
+                BigDecimal pendingAmount = pendingHours.multiply(avgHourlyRate);
+                BigDecimal estimatedSalary = consumedAmount; // 预计工资 = 已销课时金额
+                
+                // 转换工作类型显示
+                String workTypeDisplay = "FULL_TIME".equals(workType) ? "全职" : "兼职";
+                
+                CoachHourStatisticsVO.CoachHourStatisticsItem item = new CoachHourStatisticsVO.CoachHourStatisticsItem();
+                item.setCoachId(coachId);
+                item.setCoachName(coachName);
+                item.setConsumedHours(consumedHours);
+                item.setConsumedAmount(consumedAmount);
+                item.setPendingHours(pendingHours);
+                item.setPendingAmount(pendingAmount);
+                item.setHourlyRate(avgHourlyRate);
+                item.setWorkType(workTypeDisplay);
+                item.setEstimatedSalary(estimatedSalary);
+                
+                coachList.add(item);
+                
+                // 累计合计数据
+                totalConsumedHours = totalConsumedHours.add(consumedHours);
+                totalConsumedAmount = totalConsumedAmount.add(consumedAmount);
+                totalPendingHours = totalPendingHours.add(pendingHours);
+                totalPendingAmount = totalPendingAmount.add(pendingAmount);
+                totalEstimatedSalary = totalEstimatedSalary.add(estimatedSalary);
+            }
+            
+            // 构建合计数据
+            CoachHourStatisticsVO.CoachHourStatisticsItem total = new CoachHourStatisticsVO.CoachHourStatisticsItem();
+            total.setCoachId(null);
+            total.setCoachName("合计");
+            total.setConsumedHours(totalConsumedHours);
+            total.setConsumedAmount(totalConsumedAmount);
+            total.setPendingHours(totalPendingHours);
+            total.setPendingAmount(totalPendingAmount);
+            total.setHourlyRate(BigDecimal.ZERO); // 合计不显示课时费
+            total.setWorkType("-");
+            total.setEstimatedSalary(totalEstimatedSalary);
+            
+            // 构建返回结果
+            CoachHourStatisticsVO result = new CoachHourStatisticsVO();
+            result.setCoachList(coachList);
+            result.setTotal(total);
+            
+            log.info("教练课时统计查询完成，共{}个教练", coachList.size());
+            return result;
+            
+        } catch (Exception e) {
+            log.error("获取教练课时统计失败", e);
+            throw new BusinessException("获取教练课时统计失败: " + e.getMessage());
+        }
     }
 } 

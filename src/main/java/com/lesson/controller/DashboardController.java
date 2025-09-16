@@ -42,17 +42,18 @@ public class DashboardController {
     }
 
     /**
-     * 获取今日数据总览
+     * 获取数据总览
      */
     @GetMapping("/overview")
-    @Operation(summary = "获取今日数据总览", description = "获取今日上课老师、学员、打卡次数等统计数据")
-    public Result<DashboardOverviewVO> getTodayOverview() {
+    @Operation(summary = "获取数据总览", description = "获取数据总览，支持本周和本月切换")
+    public Result<DashboardOverviewVO> getOverview(
+            @RequestParam(value = "period", defaultValue = "week") String period) {
         try {
-            log.info("获取今日数据总览");
-            DashboardOverviewVO overview = dashboardService.getTodayOverview();
+            log.info("获取数据总览，周期: {}", period);
+            DashboardOverviewVO overview = dashboardService.getOverview(period);
             return Result.success(overview);
         } catch (Exception e) {
-            log.error("获取今日数据总览失败", e);
+            log.error("获取数据总览失败", e);
             return Result.failed("获取数据总览失败: " + e.getMessage());
         }
     }

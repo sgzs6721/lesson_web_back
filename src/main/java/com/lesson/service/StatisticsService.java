@@ -8,6 +8,7 @@ import com.lesson.vo.response.StudentAnalysisVO;
 import com.lesson.vo.response.CourseAnalysisVO;
 import com.lesson.vo.response.CoachAnalysisVO;
 import com.lesson.vo.response.FinanceAnalysisVO;
+import com.lesson.vo.response.CoachHourStatisticsVO;
 
 import java.util.List;
 
@@ -131,4 +132,9 @@ public interface StatisticsService {
     FinanceAnalysisVO.RevenueAnalysis getFinanceRevenueAnalysis(FinanceAnalysisRequest request);
     FinanceAnalysisVO.CostAnalysis getFinanceCostAnalysis(FinanceAnalysisRequest request);
     FinanceAnalysisVO.ProfitAnalysis getFinanceProfitAnalysis(FinanceAnalysisRequest request);
+    
+    /**
+     * 获取教练课时统计
+     */
+    CoachHourStatisticsVO getCoachHourStatistics(Long institutionId, Long campusId, String period);
 } 

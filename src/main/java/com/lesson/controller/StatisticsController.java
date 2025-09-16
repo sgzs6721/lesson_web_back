@@ -11,6 +11,7 @@ import com.lesson.vo.response.StudentAnalysisVO;
 import com.lesson.vo.response.CourseAnalysisVO;
 import com.lesson.vo.response.CoachAnalysisVO;
 import com.lesson.vo.response.FinanceAnalysisVO;
+import com.lesson.vo.response.CoachHourStatisticsVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -923,5 +924,29 @@ public class StatisticsController {
         }
 
         return Result.success();
+    }
+
+    /**
+     * 获取教练课时统计
+     */
+    @GetMapping("/coach/hour-statistics")
+    @Operation(summary = "获取教练课时统计", description = "获取教练课时统计数据，支持本周和本月切换")
+    public Result<CoachHourStatisticsVO> getCoachHourStatistics(
+            @Parameter(description = "校区ID") @RequestParam(required = false) Long campusId,
+            @Parameter(description = "时间周期", example = "week") @RequestParam(value = "period", defaultValue = "week") String period,
+            HttpServletRequest request) {
+        try {
+            log.info("获取教练课时统计，校区ID: {}, 周期: {}", campusId, period);
+            Long institutionId = (Long) request.getAttribute("orgId");
+            if (institutionId == null) {
+                throw new BusinessException("无法获取机构ID");
+            }
+            
+            CoachHourStatisticsVO result = statisticsService.getCoachHourStatistics(institutionId, campusId, period);
+            return Result.success(result);
+        } catch (Exception e) {
+            log.error("获取教练课时统计失败", e);
+            return Result.failed("获取教练课时统计失败: " + e.getMessage());
+        }
     }
 }
