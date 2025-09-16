@@ -1,5 +1,7 @@
 package com.lesson.model;
 
+import com.lesson.model.record.FinanceIncomeRecord;
+import com.lesson.model.record.FinanceExpenseRecord;
 import com.lesson.vo.request.FinanceRecordQueryRequest;
 import com.lesson.vo.response.FinanceRecordListVO;
 import org.jooq.DSLContext;
@@ -10,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.jooq.impl.DSL.field;
@@ -132,5 +135,47 @@ public class FinanceModel {
                 .limit(request.getPageSize())
                 .offset((request.getPageNum() - 1) * request.getPageSize())
                 .fetch();
+    }
+
+    /**
+     * 创建财务收入记录
+     */
+    public Long createIncome(FinanceIncomeRecord record) {
+        return dsl.insertInto(table("finance_income"))
+                .set(field("income_date"), record.getIncomeDate())
+                .set(field("income_item"), record.getIncomeItem())
+                .set(field("amount"), record.getAmount())
+                .set(field("category"), record.getCategory())
+                .set(field("payment_method"), record.getPaymentMethod())
+                .set(field("notes"), record.getNotes())
+                .set(field("campus_id"), record.getCampusId())
+                .set(field("institution_id"), record.getInstitutionId())
+                .set(field("created_time"), LocalDateTime.now())
+                .set(field("update_time"), LocalDateTime.now())
+                .set(field("deleted"), 0)
+                .returning(field("id"))
+                .fetchOne()
+                .getValue(field("id", Long.class));
+    }
+
+    /**
+     * 创建财务支出记录
+     */
+    public Long createExpense(FinanceExpenseRecord record) {
+        return dsl.insertInto(table("finance_expense"))
+                .set(field("expense_date"), record.getExpenseDate())
+                .set(field("expense_item"), record.getExpenseItem())
+                .set(field("amount"), record.getAmount())
+                .set(field("category"), record.getCategory())
+                .set(field("payment_method"), record.getPaymentMethod())
+                .set(field("notes"), record.getNotes())
+                .set(field("campus_id"), record.getCampusId())
+                .set(field("institution_id"), record.getInstitutionId())
+                .set(field("created_time"), LocalDateTime.now())
+                .set(field("update_time"), LocalDateTime.now())
+                .set(field("deleted"), 0)
+                .returning(field("id"))
+                .fetchOne()
+                .getValue(field("id", Long.class));
     }
 } 

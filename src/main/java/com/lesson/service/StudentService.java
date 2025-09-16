@@ -70,6 +70,9 @@ import com.lesson.repository.tables.records.SysInstitutionRecord;
 import java.util.ArrayList;
 import com.lesson.service.CampusStatsRedisService;
 import com.lesson.service.CourseHoursRedisService;
+import com.lesson.model.FinanceModel;
+import com.lesson.model.record.FinanceIncomeRecord;
+import com.lesson.model.record.FinanceExpenseRecord;
 
 /**
  * 学员服务
@@ -89,6 +92,7 @@ public class StudentService {
   private final SysConstantModel constantModel;
   private final CampusStatsRedisService campusStatsRedisService;
   private final CourseHoursRedisService courseHoursRedisService;
+  private final FinanceModel financeModel;
 
 
   /**
@@ -1984,6 +1988,28 @@ public class StudentService {
     log.info("缴费记录创建成功 - paymentId: {}, validityPeriodId: {}", 
             paymentId, paymentRecord.getValidityPeriodId());
 
+    // 3.5. 创建财务收入记录
+    try {
+        FinanceIncomeRecord incomeRecord = new FinanceIncomeRecord();
+        incomeRecord.setIncomeDate(request.getTransactionDate() != null ? request.getTransactionDate() : LocalDate.now());
+        incomeRecord.setIncomeItem("学员缴费-" + student.getName());
+        incomeRecord.setAmount(request.getAmount());
+        incomeRecord.setCategory("学费收入");
+        incomeRecord.setPaymentMethod(request.getPaymentMethod().name());
+        incomeRecord.setNotes("学员缴费记录ID: " + paymentId + "，课程: " + getCourseName(request.getCourseId()));
+        incomeRecord.setCampusId(campusId);
+        incomeRecord.setInstitutionId(institutionId);
+        incomeRecord.setCreatedTime(LocalDateTime.now());
+        incomeRecord.setUpdateTime(LocalDateTime.now());
+        incomeRecord.setDeleted(0);
+        
+        Long incomeId = financeModel.createIncome(incomeRecord);
+        log.info("财务收入记录创建成功 - incomeId: {}, paymentId: {}", incomeId, paymentId);
+    } catch (Exception e) {
+        log.error("创建财务收入记录失败，paymentId: {}", paymentId, e);
+        throw new BusinessException("创建财务收入记录失败: " + e.getMessage());
+    }
+
     // 4. 更新学员课程信息 (edu_student_course)
     // - 增加总课时 (正课 + 赠送)
     // - 更新有效期：未开始消课时endDate为null，开始消课后为消课日期+有效期
@@ -2387,6 +2413,28 @@ public class StudentService {
     refundRecord.setDeleted(0);
     refundRecord.store();
     Long refundId = refundRecord.getId();
+
+    // 5.5. 创建财务支出记录
+    try {
+        FinanceExpenseRecord expenseRecord = new FinanceExpenseRecord();
+        expenseRecord.setExpenseDate(LocalDate.now());
+        expenseRecord.setExpenseItem("学员退费-" + getStudentName(request.getStudentId()));
+        expenseRecord.setAmount(actualRefund);
+        expenseRecord.setCategory("退费支出");
+        expenseRecord.setPaymentMethod("CASH"); // 默认现金
+        expenseRecord.setNotes("学员退费记录ID: " + refundId + "，原因: " + request.getReason() + "，课程: " + getCourseName(request.getCourseId()));
+        expenseRecord.setCampusId(campusId);
+        expenseRecord.setInstitutionId(institutionId);
+        expenseRecord.setCreatedTime(LocalDateTime.now());
+        expenseRecord.setUpdateTime(LocalDateTime.now());
+        expenseRecord.setDeleted(0);
+        
+        Long expenseId = financeModel.createExpense(expenseRecord);
+        log.info("财务支出记录创建成功 - expenseId: {}, refundId: {}", expenseId, refundId);
+    } catch (Exception e) {
+        log.error("创建财务支出记录失败，refundId: {}", refundId, e);
+        throw new BusinessException("创建财务支出记录失败: " + e.getMessage());
+    }
 
     // 5. 更新学员课程信息 (edu_student_course)
     studentCourse.setStatus(StudentCourseStatus.REFUNDED.name()); // 标记为已退费
@@ -2902,6 +2950,38 @@ public class StudentService {
     } catch (Exception e) {
       log.warn("计算学员课程课时时发生错误：学员ID={}, 课程ID={}", studentId, courseId, e);
       return BigDecimal.ZERO;
+    }
+  }
+
+  /**
+   * 获取课程名称
+   */
+  private String getCourseName(Long courseId) {
+    try {
+      EduCourseRecord course = dsl.selectFrom(Tables.EDU_COURSE)
+          .where(Tables.EDU_COURSE.ID.eq(courseId))
+          .and(Tables.EDU_COURSE.DELETED.eq(0))
+          .fetchOne();
+      return course != null ? course.getName() : "未知课程";
+    } catch (Exception e) {
+      log.warn("获取课程名称失败，courseId: {}", courseId, e);
+      return "未知课程";
+    }
+  }
+
+  /**
+   * 获取学员姓名
+   */
+  private String getStudentName(Long studentId) {
+    try {
+      EduStudentRecord student = dsl.selectFrom(Tables.EDU_STUDENT)
+          .where(Tables.EDU_STUDENT.ID.eq(studentId))
+          .and(Tables.EDU_STUDENT.DELETED.eq(0))
+          .fetchOne();
+      return student != null ? student.getName() : "未知学员";
+    } catch (Exception e) {
+      log.warn("获取学员姓名失败，studentId: {}", studentId, e);
+      return "未知学员";
     }
   }
 }
