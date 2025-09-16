@@ -560,7 +560,7 @@ public class DashboardService {
                     Tables.SYS_COACH.NAME.as("coach_name"),
                     DSL.coalesce(DSL.sum(Tables.EDU_STUDENT_COURSE_RECORD.HOURS), BigDecimal.ZERO).as("total_hours"),
                     DSL.coalesce(DSL.sum(Tables.EDU_STUDENT_COURSE_RECORD.HOURS.multiply(100)), BigDecimal.ZERO).as("total_remuneration"),
-                    DSL.coalesce(DSL.sum(Tables.EDU_STUDENT_COURSE_RECORD.HOURS.multiply(150)), BigDecimal.ZERO).as("total_sales"),
+                    DSL.coalesce(DSL.sum(Tables.EDU_STUDENT_COURSE_RECORD.HOURS.multiply(Tables.EDU_COURSE.PRICE)), BigDecimal.ZERO).as("total_sales"),
                     Tables.EDU_STUDENT_COURSE_RECORD.COURSE_ID
                 )
                 .from(Tables.EDU_STUDENT_COURSE_RECORD)
@@ -568,7 +568,7 @@ public class DashboardService {
                 .join(Tables.SYS_COACH).on(Tables.EDU_STUDENT_COURSE_RECORD.COACH_ID.eq(Tables.SYS_COACH.ID))
                 .where(Tables.EDU_STUDENT_COURSE_RECORD.COURSE_DATE.eq(today))
                 .and(Tables.EDU_STUDENT_COURSE_RECORD.DELETED.eq(0))
-                .groupBy(Tables.EDU_STUDENT_COURSE_RECORD.COURSE_ID, Tables.EDU_COURSE.NAME, Tables.SYS_COACH.NAME)
+                .groupBy(Tables.EDU_STUDENT_COURSE_RECORD.COURSE_ID, Tables.EDU_COURSE.NAME, Tables.SYS_COACH.NAME, Tables.EDU_COURSE.PRICE)
                 .orderBy(DSL.sum(Tables.EDU_STUDENT_COURSE_RECORD.HOURS).desc())
                 .fetch();
 
