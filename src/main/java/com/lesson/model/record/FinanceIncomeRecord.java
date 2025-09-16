@@ -32,14 +32,9 @@ public class FinanceIncomeRecord {
     private BigDecimal amount;
     
     /**
-     * 收入类别
+     * 收入类别ID
      */
-    private String category;
-    
-    /**
-     * 收款方式
-     */
-    private String paymentMethod;
+    private Long categoryId;
     
     /**
      * 备注

@@ -32,14 +32,9 @@ public class FinanceExpenseRecord {
     private BigDecimal amount;
     
     /**
-     * 支出类别
+     * 支出类别ID
      */
-    private String category;
-    
-    /**
-     * 支付方式
-     */
-    private String paymentMethod;
+    private Long categoryId;
     
     /**
      * 备注
