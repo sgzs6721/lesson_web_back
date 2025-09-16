@@ -37,10 +37,11 @@ public class FixedScheduleService {
      * @return 固定课表VO
      */
     public FixedScheduleVO getFixedSchedule(Long coachId, Long courseId, String type, Long campusId, Long institutionId) {
-        // 1. 获取所有时间段（只显示标准1小时时间段）
+        // 1. 获取所有时间段（只显示标准1小时时间段，扩展到21:00）
         List<String> timeSlots = Arrays.asList(
             "9:00-10:00", "10:00-11:00", "11:00-12:00", 
-            "14:00-15:00", "15:00-16:00", "16:00-17:00", "17:00-18:00"
+            "14:00-15:00", "15:00-16:00", "16:00-17:00", "17:00-18:00",
+            "18:00-19:00", "19:00-20:00", "20:00-21:00"
         );
         
         // 2. 获取所有星期
