@@ -1994,7 +1994,7 @@ public class StudentService {
         incomeRecord.setIncomeDate(request.getTransactionDate() != null ? request.getTransactionDate() : LocalDate.now());
         incomeRecord.setIncomeItem("学员缴费-" + student.getName());
         incomeRecord.setAmount(request.getAmount());
-        incomeRecord.setCategoryId(1L); // 学费收入类别ID
+        incomeRecord.setCategoryId(null); // 暂时使用NULL，避免外键约束问题
         incomeRecord.setNotes("学员缴费记录ID: " + paymentId + "，课程: " + getCourseName(request.getCourseId()));
         incomeRecord.setCampusId(campusId);
         incomeRecord.setInstitutionId(institutionId);
@@ -2419,7 +2419,7 @@ public class StudentService {
         expenseRecord.setExpenseDate(LocalDate.now());
         expenseRecord.setExpenseItem("学员退费-" + getStudentName(request.getStudentId()));
         expenseRecord.setAmount(actualRefund);
-        expenseRecord.setCategoryId(2L); // 退费支出类别ID
+        expenseRecord.setCategoryId(null); // 暂时使用NULL，避免外键约束问题
         expenseRecord.setNotes("学员退费记录ID: " + refundId + "，原因: " + request.getReason() + "，课程: " + getCourseName(request.getCourseId()));
         expenseRecord.setCampusId(campusId);
         expenseRecord.setInstitutionId(institutionId);

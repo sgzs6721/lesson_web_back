@@ -141,39 +141,57 @@ public class FinanceModel {
      * 创建财务收入记录
      */
     public Long createIncome(FinanceIncomeRecord record) {
-        return dsl.insertInto(table("finance_income"))
-                .set(field("income_date"), record.getIncomeDate())
-                .set(field("income_item"), record.getIncomeItem())
-                .set(field("amount"), record.getAmount())
-                .set(field("category_id"), record.getCategoryId())
-                .set(field("notes"), record.getNotes())
-                .set(field("campus_id"), record.getCampusId())
-                .set(field("institution_id"), record.getInstitutionId())
-                .set(field("created_time"), LocalDateTime.now())
-                .set(field("update_time"), LocalDateTime.now())
-                .set(field("deleted"), 0)
-                .returning(field("id"))
-                .fetchOne()
-                .getValue(field("id", Long.class));
+        try {
+            Record result = dsl.insertInto(table("finance_income"))
+                    .set(field("income_date"), record.getIncomeDate())
+                    .set(field("income_item"), record.getIncomeItem())
+                    .set(field("amount"), record.getAmount())
+                    .set(field("category_id"), record.getCategoryId())
+                    .set(field("notes"), record.getNotes())
+                    .set(field("campus_id"), record.getCampusId())
+                    .set(field("institution_id"), record.getInstitutionId())
+                    .set(field("created_time"), LocalDateTime.now())
+                    .set(field("update_time"), LocalDateTime.now())
+                    .set(field("deleted"), 0)
+                    .returning(field("id"))
+                    .fetchOne();
+            
+            if (result == null) {
+                throw new RuntimeException("创建财务收入记录失败：数据库返回空结果");
+            }
+            
+            return result.getValue(field("id", Long.class));
+        } catch (Exception e) {
+            throw new RuntimeException("创建财务收入记录失败: " + e.getMessage(), e);
+        }
     }
 
     /**
      * 创建财务支出记录
      */
     public Long createExpense(FinanceExpenseRecord record) {
-        return dsl.insertInto(table("finance_expense"))
-                .set(field("expense_date"), record.getExpenseDate())
-                .set(field("expense_item"), record.getExpenseItem())
-                .set(field("amount"), record.getAmount())
-                .set(field("category_id"), record.getCategoryId())
-                .set(field("notes"), record.getNotes())
-                .set(field("campus_id"), record.getCampusId())
-                .set(field("institution_id"), record.getInstitutionId())
-                .set(field("created_time"), LocalDateTime.now())
-                .set(field("update_time"), LocalDateTime.now())
-                .set(field("deleted"), 0)
-                .returning(field("id"))
-                .fetchOne()
-                .getValue(field("id", Long.class));
+        try {
+            Record result = dsl.insertInto(table("finance_expense"))
+                    .set(field("expense_date"), record.getExpenseDate())
+                    .set(field("expense_item"), record.getExpenseItem())
+                    .set(field("amount"), record.getAmount())
+                    .set(field("category_id"), record.getCategoryId())
+                    .set(field("notes"), record.getNotes())
+                    .set(field("campus_id"), record.getCampusId())
+                    .set(field("institution_id"), record.getInstitutionId())
+                    .set(field("created_time"), LocalDateTime.now())
+                    .set(field("update_time"), LocalDateTime.now())
+                    .set(field("deleted"), 0)
+                    .returning(field("id"))
+                    .fetchOne();
+            
+            if (result == null) {
+                throw new RuntimeException("创建财务支出记录失败：数据库返回空结果");
+            }
+            
+            return result.getValue(field("id", Long.class));
+        } catch (Exception e) {
+            throw new RuntimeException("创建财务支出记录失败: " + e.getMessage(), e);
+        }
     }
 } 
