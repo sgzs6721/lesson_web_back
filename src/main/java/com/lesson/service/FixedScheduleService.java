@@ -37,9 +37,13 @@ public class FixedScheduleService {
      * @return 固定课表VO
      */
     public FixedScheduleVO getFixedSchedule(Long coachId, Long courseId, String type, Long campusId, Long institutionId) {
-        // 1. 获取所有时间段
-        List<String> timeSlots = Arrays.asList("9:00-10:00", "10:00-11:00", "11:00-12:00", 
-            "14:00-15:00", "15:00-16:00", "16:00-17:00", "17:00-18:00");
+        // 1. 获取所有时间段（支持1小时和长课程）
+        List<String> timeSlots = Arrays.asList(
+            "9:00-10:00", "10:00-11:00", "11:00-12:00", 
+            "14:00-15:00", "15:00-16:00", "16:00-17:00", "17:00-18:00",
+            // 添加长课程时间段
+            "09:00-16:00", "09:00-12:00", "14:00-18:00", "10:00-16:00"
+        );
         
         // 2. 获取所有星期
         List<String> days = Arrays.asList("MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", 
@@ -48,6 +52,7 @@ public class FixedScheduleService {
         // 3. 构建查询条件
         Condition conditions = EDU_STUDENT_COURSE.DELETED.eq(0)
             .and(EDU_STUDENT_COURSE.STATUS.ne("WAITING_PAYMENT"))
+            .and(EDU_STUDENT_COURSE.TOTAL_HOURS.gt(BigDecimal.ZERO)) // 要求已缴费
             .and(EDU_STUDENT_COURSE.FIXED_SCHEDULE.isNotNull()) // 要求有固定排课时间
             .and(EDU_STUDENT_COURSE.CAMPUS_ID.eq(campusId))
             .and(EDU_STUDENT_COURSE.INSTITUTION_ID.eq(institutionId));
@@ -57,6 +62,9 @@ public class FixedScheduleService {
         }
 
         // 4. 从数据库查询课程数据
+        log.info("排课查询条件 - campusId: {}, institutionId: {}, coachId: {}, courseId: {}, type: {}", 
+                campusId, institutionId, coachId, courseId, type);
+        
         org.jooq.Result<org.jooq.Record9<String, String, Long, String, BigDecimal, BigDecimal, Long, String, Long>> records = dsl.select(
                 EDU_STUDENT_COURSE.FIXED_SCHEDULE,
                 EDU_COURSE.NAME.as("courseName"),
@@ -75,6 +83,8 @@ public class FixedScheduleService {
             .leftJoin(SYS_COACH_COURSE).on(EDU_STUDENT_COURSE.COURSE_ID.eq(SYS_COACH_COURSE.COURSE_ID).and(SYS_COACH_COURSE.DELETED.eq(0)))
             .where(conditions)
             .fetch();
+            
+        log.info("排课查询结果 - 查询到 {} 条记录", records.size());
 
         // 5. 构建课表数据结构
         Map<String, Map<String, List<FixedScheduleVO.FixedScheduleCourseVO>>> schedule = new LinkedHashMap<>();
@@ -110,8 +120,7 @@ public class FixedScheduleService {
                         weekday = convertNumberToChineseWeekday(weekday);
                         String from = scheduleTime.get("from");
                         String to = scheduleTime.get("to");
-                        String timeSlot = from + "-" + to;
-
+                        
                         // 转换中文星期为英文
                         String day = convertWeekdayToEnglish(weekday);
                         
@@ -130,8 +139,13 @@ public class FixedScheduleService {
                         vo.setRemainHours(remainingHours.toString());
                         vo.setCoachId(record.get(SYS_COACH_COURSE.COACH_ID));
                         
-                        // 添加到对应时间段
-                        schedule.get(timeSlot).get(day).add(vo);
+                        // 计算课程跨越的时间段，让跨时间段的课程显示在每一个相关时间段里
+                        List<String> overlappingTimeSlots = getOverlappingTimeSlots(from, to, timeSlots);
+                        
+                        // 添加到所有相关的时间段
+                        for (String timeSlot : overlappingTimeSlots) {
+                            schedule.get(timeSlot).get(day).add(vo);
+                        }
                     }
                 } catch (Exception e) {
                     // 处理JSON解析异常
@@ -174,5 +188,53 @@ public class FixedScheduleService {
             case "7": return "周日";
             default: return weekday;
         }
+    }
+
+    /**
+     * 计算课程跨越的时间段
+     * 例如：09:00-16:00 的课程应该显示在 9:00-10:00, 10:00-11:00, 11:00-12:00, 14:00-15:00, 15:00-16:00 等时间段里
+     */
+    private List<String> getOverlappingTimeSlots(String courseFrom, String courseTo, List<String> timeSlots) {
+        List<String> overlappingSlots = new ArrayList<>();
+        
+        try {
+            // 解析课程时间
+            String[] fromParts = courseFrom.split(":");
+            String[] toParts = courseTo.split(":");
+            int courseStartHour = Integer.parseInt(fromParts[0]);
+            int courseStartMinute = Integer.parseInt(fromParts[1]);
+            int courseEndHour = Integer.parseInt(toParts[0]);
+            int courseEndMinute = Integer.parseInt(toParts[1]);
+            
+            // 转换为分钟数便于比较
+            int courseStartMinutes = courseStartHour * 60 + courseStartMinute;
+            int courseEndMinutes = courseEndHour * 60 + courseEndMinute;
+            
+            // 检查每个预定义时间段是否与课程时间重叠
+            for (String timeSlot : timeSlots) {
+                String[] slotParts = timeSlot.split("-");
+                if (slotParts.length == 2) {
+                    String[] slotFromParts = slotParts[0].split(":");
+                    String[] slotToParts = slotParts[1].split(":");
+                    
+                    int slotStartHour = Integer.parseInt(slotFromParts[0]);
+                    int slotStartMinute = Integer.parseInt(slotFromParts[1]);
+                    int slotEndHour = Integer.parseInt(slotToParts[0]);
+                    int slotEndMinute = Integer.parseInt(slotToParts[1]);
+                    
+                    int slotStartMinutes = slotStartHour * 60 + slotStartMinute;
+                    int slotEndMinutes = slotEndHour * 60 + slotEndMinute;
+                    
+                    // 检查时间段是否重叠：课程开始时间 < 时间段结束时间 && 课程结束时间 > 时间段开始时间
+                    if (courseStartMinutes < slotEndMinutes && courseEndMinutes > slotStartMinutes) {
+                        overlappingSlots.add(timeSlot);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error("解析课程时间失败: {} - {}", courseFrom, courseTo, e);
+        }
+        
+        return overlappingSlots;
     }
 } 
