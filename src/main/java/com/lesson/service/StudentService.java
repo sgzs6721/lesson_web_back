@@ -1990,12 +1990,24 @@ public class StudentService {
 
     // 3.5. 创建财务收入记录
     try {
+        // 获取"学费收入"的常量ID
+        Long tuitionIncomeCategoryId = dsl.select(Tables.SYS_CONSTANT.ID)
+            .from(Tables.SYS_CONSTANT)
+            .where(Tables.SYS_CONSTANT.CONSTANT_KEY.eq("INCOME_TUITION"))
+            .and(Tables.SYS_CONSTANT.TYPE.eq("INCOME"))
+            .and(Tables.SYS_CONSTANT.DELETED.eq(0))
+            .fetchOneInto(Long.class);
+        
+        if (tuitionIncomeCategoryId == null) {
+            log.warn("未找到'学费收入'常量，使用NULL作为categoryId");
+        }
+        
         FinanceIncomeRecord incomeRecord = new FinanceIncomeRecord();
         incomeRecord.setIncomeDate(request.getTransactionDate() != null ? request.getTransactionDate() : LocalDate.now());
-        incomeRecord.setIncomeItem("学员缴费-" + student.getName());
+        incomeRecord.setIncomeItem("学费收入"); // 项目显示为"学费收入"
         incomeRecord.setAmount(request.getAmount());
-        incomeRecord.setCategoryId(null); // 暂时使用NULL，避免外键约束问题
-        incomeRecord.setNotes("学员缴费记录ID: " + paymentId + "，课程: " + getCourseName(request.getCourseId()));
+        incomeRecord.setCategoryId(tuitionIncomeCategoryId); // 设置为"学费收入"的常量ID
+        incomeRecord.setNotes("学员缴费记录ID: " + paymentId + "，课程: " + getCourseName(request.getCourseId()) + "，学员: " + student.getName());
         incomeRecord.setCampusId(campusId);
         incomeRecord.setInstitutionId(institutionId);
         incomeRecord.setCreatedTime(LocalDateTime.now());
@@ -2003,7 +2015,7 @@ public class StudentService {
         incomeRecord.setDeleted(0);
         
         Long incomeId = financeModel.createIncome(incomeRecord);
-        log.info("财务收入记录创建成功 - incomeId: {}, paymentId: {}", incomeId, paymentId);
+        log.info("财务收入记录创建成功 - incomeId: {}, paymentId: {}, categoryId: {}", incomeId, paymentId, tuitionIncomeCategoryId);
     } catch (Exception e) {
         log.error("创建财务收入记录失败，paymentId: {}", paymentId, e);
         throw new BusinessException("创建财务收入记录失败: " + e.getMessage());

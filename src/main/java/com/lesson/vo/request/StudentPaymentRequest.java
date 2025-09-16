@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
@@ -40,6 +41,7 @@ public class StudentPaymentRequest {
 
     @NotNull(message = "缴费金额不能为空")
     @DecimalMin(value = "0.0", inclusive = false, message = "缴费金额必须大于0") // 金额通常大于0
+    @DecimalMax(value = "999999999999999.99", message = "缴费金额不能超过999,999,999,999,999.99")
     @ApiModelProperty(value = "缴费金额", required = true, example = "1980.00")
     private BigDecimal amount;
 
