@@ -43,5 +43,11 @@ public class CourseDetailVO {
 
         @ApiModelProperty(value = "状态", example = "已完成")
         private String status;
+
+        @ApiModelProperty(value = "剩余课时", example = "15.5")
+        private BigDecimal remainingHours;
+
+        @ApiModelProperty(value = "总课时", example = "20.0")
+        private BigDecimal totalHours;
     }
 }

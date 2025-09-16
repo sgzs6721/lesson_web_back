@@ -614,10 +614,15 @@ public class DashboardService {
                     Tables.EDU_STUDENT.NAME.as("student_name"),
                     Tables.EDU_STUDENT_COURSE_RECORD.START_TIME,
                     Tables.EDU_STUDENT_COURSE_RECORD.END_TIME,
-                    Tables.EDU_STUDENT_COURSE_RECORD.STATUS
+                    Tables.EDU_STUDENT_COURSE_RECORD.STATUS,
+                    Tables.EDU_STUDENT_COURSE.TOTAL_HOURS.as("total_hours"),
+                    Tables.EDU_STUDENT_COURSE.CONSUMED_HOURS.as("consumed_hours")
                 )
                 .from(Tables.EDU_STUDENT_COURSE_RECORD)
                 .join(Tables.EDU_STUDENT).on(Tables.EDU_STUDENT_COURSE_RECORD.STUDENT_ID.eq(Tables.EDU_STUDENT.ID))
+                .join(Tables.EDU_STUDENT_COURSE).on(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(Tables.EDU_STUDENT.ID)
+                    .and(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(courseId))
+                    .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0)))
                 .where(Tables.EDU_STUDENT_COURSE_RECORD.COURSE_ID.eq(courseId))
                 .and(Tables.EDU_STUDENT_COURSE_RECORD.COURSE_DATE.eq(courseDate))
                 .and(Tables.EDU_STUDENT_COURSE_RECORD.DELETED.eq(0))
@@ -632,10 +637,20 @@ public class DashboardService {
                 LocalTime startTime = record.get("start_time", LocalTime.class);
                 LocalTime endTime = record.get("end_time", LocalTime.class);
                 String status = record.get("status", String.class);
+                BigDecimal totalHours = record.get("total_hours", BigDecimal.class);
+                BigDecimal consumedHours = record.get("consumed_hours", BigDecimal.class);
 
                 CourseDetailVO.StudentAttendanceVO attendance = new CourseDetailVO.StudentAttendanceVO();
                 attendance.setStudentName(studentName);
                 attendance.setTimeSlot(startTime.format(timeFormatter) + "-" + endTime.format(timeFormatter));
+                
+                // 设置课时信息
+                attendance.setTotalHours(totalHours != null ? totalHours : BigDecimal.ZERO);
+                attendance.setRemainingHours(
+                    (totalHours != null && consumedHours != null) 
+                        ? totalHours.subtract(consumedHours) 
+                        : BigDecimal.ZERO
+                );
                 
                 // 状态映射
                 switch (status) {
