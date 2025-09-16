@@ -27,8 +27,8 @@ public class FinanceRecordUpdateRequest {
     @NotNull(message = "类别不能为空")
     private Long categoryId;
 
-    @ApiModelProperty(value = "项目名称", required = true, example = "7月房租")
-    @NotNull(message = "项目名称不能为空")
+    @ApiModelProperty(value = "项目枚举值", required = true, example = "FIXED_COST")
+    @NotNull(message = "项目不能为空")
     private String item;
 
     @ApiModelProperty(value = "金额", required = true, example = "93000.00")

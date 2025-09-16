@@ -639,11 +639,17 @@ public class DashboardService {
                 
                 // 状态映射
                 switch (status) {
-                    case "COMPLETED":
+                    case "NORMAL":
                         attendance.setStatus("已完成");
                         break;
                     case "LEAVE":
                         attendance.setStatus("请假");
+                        break;
+                    case "ABSENT":
+                        attendance.setStatus("缺席");
+                        break;
+                    case "COMPLETED":
+                        attendance.setStatus("已完成");
                         break;
                     default:
                         attendance.setStatus("未打卡");
