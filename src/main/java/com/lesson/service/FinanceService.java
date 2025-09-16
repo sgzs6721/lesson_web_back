@@ -144,6 +144,47 @@ public class FinanceService {
     }
     
     /**
+     * 删除财务记录
+     */
+    public void deleteFinanceRecord(Long id, Long institutionId) {
+        // 先查询记录类型，判断是收入还是支出
+        Record incomeRecord = dsl.select()
+                .from("finance_income")
+                .where("id = ?", id)
+                .and("deleted = 0")
+                .and("institution_id = ?", institutionId)
+                .fetchOne();
+        
+        if (incomeRecord != null) {
+            // 删除收入记录
+            int deletedRows = dsl.update(table("finance_income"))
+                    .set(field("deleted"), 1)
+                    .set(field("update_time"), LocalDateTime.now())
+                    .where(field("id").eq(id))
+                    .and(field("deleted").eq(0))
+                    .and(field("institution_id").eq(institutionId))
+                    .execute();
+            
+            if (deletedRows == 0) {
+                throw new RuntimeException("收入记录不存在或已被删除");
+            }
+        } else {
+            // 删除支出记录
+            int deletedRows = dsl.update(table("finance_expense"))
+                    .set(field("deleted"), 1)
+                    .set(field("update_time"), LocalDateTime.now())
+                    .where(field("id").eq(id))
+                    .and(field("deleted").eq(0))
+                    .and(field("institution_id").eq(institutionId))
+                    .execute();
+            
+            if (deletedRows == 0) {
+                throw new RuntimeException("支出记录不存在或已被删除");
+            }
+        }
+    }
+    
+    /**
      * 查询财务记录列表
      */
     public FinanceRecordListVO listFinanceRecords(FinanceRecordQueryRequest request) {

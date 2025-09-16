@@ -56,6 +56,20 @@ public class FinanceController {
     }
 
     /**
+     * 删除财务记录
+     */
+    @DeleteMapping("/record/{id}")
+    @Operation(summary = "删除财务记录", description = "删除指定的收入或支出记录")
+    public Result<Void> deleteFinanceRecord(@PathVariable Long id, HttpServletRequest httpServletRequest) {
+        Long institutionId = (Long) httpServletRequest.getAttribute("orgId");
+        if (institutionId == null) {
+            institutionId = 1L;
+        }
+        financeService.deleteFinanceRecord(id, institutionId);
+        return Result.success();
+    }
+
+    /**
      * 查询财务记录列表
      */
     @PostMapping("/list")
