@@ -17,6 +17,7 @@ import java.util.List;
 
 import static org.jooq.impl.DSL.field;
 import static org.jooq.impl.DSL.table;
+import static org.jooq.impl.DSL.*;
 import org.jooq.Condition;
 import org.jooq.Result;
 
@@ -142,7 +143,8 @@ public class FinanceModel {
      */
     public Long createIncome(FinanceIncomeRecord record) {
         try {
-            Record result = dsl.insertInto(table("finance_income"))
+            // 先插入记录
+            int affectedRows = dsl.insertInto(table("finance_income"))
                     .set(field("income_date"), record.getIncomeDate())
                     .set(field("income_item"), record.getIncomeItem())
                     .set(field("amount"), record.getAmount())
@@ -153,14 +155,19 @@ public class FinanceModel {
                     .set(field("created_time"), LocalDateTime.now())
                     .set(field("update_time"), LocalDateTime.now())
                     .set(field("deleted"), 0)
-                    .returning(field("id"))
-                    .fetchOne();
+                    .execute();
             
-            if (result == null) {
-                throw new RuntimeException("创建财务收入记录失败：数据库返回空结果");
+            if (affectedRows == 0) {
+                throw new RuntimeException("创建财务收入记录失败：没有行被插入");
             }
             
-            return result.getValue(field("id", Long.class));
+            // 获取最后插入的ID
+            Long lastInsertId = dsl.select(field("LAST_INSERT_ID()")).fetchOne().getValue(0, Long.class);
+            if (lastInsertId == null) {
+                throw new RuntimeException("创建财务收入记录失败：无法获取插入的ID");
+            }
+            
+            return lastInsertId;
         } catch (Exception e) {
             throw new RuntimeException("创建财务收入记录失败: " + e.getMessage(), e);
         }
@@ -171,7 +178,8 @@ public class FinanceModel {
      */
     public Long createExpense(FinanceExpenseRecord record) {
         try {
-            Record result = dsl.insertInto(table("finance_expense"))
+            // 先插入记录
+            int affectedRows = dsl.insertInto(table("finance_expense"))
                     .set(field("expense_date"), record.getExpenseDate())
                     .set(field("expense_item"), record.getExpenseItem())
                     .set(field("amount"), record.getAmount())
@@ -182,14 +190,19 @@ public class FinanceModel {
                     .set(field("created_time"), LocalDateTime.now())
                     .set(field("update_time"), LocalDateTime.now())
                     .set(field("deleted"), 0)
-                    .returning(field("id"))
-                    .fetchOne();
+                    .execute();
             
-            if (result == null) {
-                throw new RuntimeException("创建财务支出记录失败：数据库返回空结果");
+            if (affectedRows == 0) {
+                throw new RuntimeException("创建财务支出记录失败：没有行被插入");
             }
             
-            return result.getValue(field("id", Long.class));
+            // 获取最后插入的ID
+            Long lastInsertId = dsl.select(field("LAST_INSERT_ID()")).fetchOne().getValue(0, Long.class);
+            if (lastInsertId == null) {
+                throw new RuntimeException("创建财务支出记录失败：无法获取插入的ID");
+            }
+            
+            return lastInsertId;
         } catch (Exception e) {
             throw new RuntimeException("创建财务支出记录失败: " + e.getMessage(), e);
         }
