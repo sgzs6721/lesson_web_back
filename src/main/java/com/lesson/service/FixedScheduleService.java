@@ -51,6 +51,8 @@ public class FixedScheduleService {
         // 3. 构建查询条件
         Condition conditions = EDU_STUDENT_COURSE.DELETED.eq(0)
             .and(EDU_STUDENT_COURSE.STATUS.ne("WAITING_PAYMENT"))
+            .and(EDU_STUDENT_COURSE.STATUS.ne("REFUNDED")) // 排除已退费
+            .and(EDU_STUDENT_COURSE.STATUS.ne("GRADUATED")) // 排除已结业
             .and(EDU_STUDENT_COURSE.TOTAL_HOURS.gt(BigDecimal.ZERO)) // 要求已缴费
             .and(EDU_STUDENT_COURSE.FIXED_SCHEDULE.isNotNull()) // 要求有固定排课时间
             .and(EDU_STUDENT_COURSE.CAMPUS_ID.eq(campusId))

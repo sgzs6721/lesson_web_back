@@ -84,7 +84,7 @@ public class DashboardService {
      * 获取今日数据总览（保持向后兼容）
      */
     public DashboardOverviewVO getTodayOverview() {
-        return getOverview("week");
+        return getOverview("today");
     }
 
     /**
@@ -114,7 +114,14 @@ public class DashboardService {
         LocalDate today = LocalDate.now();
         LocalDate startDate, endDate, startOfLastPeriod, endOfLastPeriod;
         
-        if ("month".equals(period)) {
+        if ("today".equals(period)) {
+            // 今日
+            startDate = today;
+            endDate = today;
+            // 昨日
+            startOfLastPeriod = today.minusDays(1);
+            endOfLastPeriod = today.minusDays(1);
+        } else if ("month".equals(period)) {
             // 本月
             startDate = today.withDayOfMonth(1);
             endDate = today.with(TemporalAdjusters.lastDayOfMonth());
@@ -147,7 +154,7 @@ public class DashboardService {
                 )
                 .from(Tables.EDU_STUDENT_COURSE_RECORD)
                 .join(Tables.EDU_COURSE).on(Tables.EDU_STUDENT_COURSE_RECORD.COURSE_ID.eq(Tables.EDU_COURSE.ID))
-                .where(Tables.EDU_STUDENT_COURSE_RECORD.COURSE_DATE.between(today, today))
+                .where(Tables.EDU_STUDENT_COURSE_RECORD.COURSE_DATE.between(startDate, endDate))
                 .and(Tables.EDU_STUDENT_COURSE_RECORD.DELETED.eq(0))
                 .fetchOne();
 
@@ -352,7 +359,7 @@ public class DashboardService {
                 )
                 .from(Tables.EDU_STUDENT_COURSE_RECORD)
                 .join(Tables.EDU_COURSE).on(Tables.EDU_STUDENT_COURSE_RECORD.COURSE_ID.eq(Tables.EDU_COURSE.ID))
-                .where(Tables.EDU_STUDENT_COURSE_RECORD.COURSE_DATE.between(today, today))
+                .where(Tables.EDU_STUDENT_COURSE_RECORD.COURSE_DATE.eq(today))
                 .and(Tables.EDU_STUDENT_COURSE_RECORD.DELETED.eq(0))
                 .fetchOne();
 
