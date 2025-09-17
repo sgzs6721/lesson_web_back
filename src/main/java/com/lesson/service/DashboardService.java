@@ -84,7 +84,19 @@ public class DashboardService {
      * 获取今日数据总览（保持向后兼容）
      */
     public DashboardOverviewVO getTodayOverview() {
-        return getOverview("today");
+        String cacheKey = REDIS_KEY_DASHBOARD_TODAY;
+        
+        // 先从Redis获取
+        DashboardOverviewVO overview = (DashboardOverviewVO) redisTemplate.opsForValue().get(cacheKey);
+        
+        if (overview == null) {
+            // Redis中没有，实时计算
+            overview = calculateTodayOverview();
+            // 缓存5分钟
+            redisTemplate.opsForValue().set(cacheKey, overview, 5, TimeUnit.MINUTES);
+        }
+        
+        return overview;
     }
 
     /**
