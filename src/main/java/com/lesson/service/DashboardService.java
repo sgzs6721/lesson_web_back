@@ -143,9 +143,10 @@ public class DashboardService {
                             .otherwise(0)
                     ).as("leave_count"),
                     DSL.coalesce(DSL.sum(Tables.EDU_STUDENT_COURSE_RECORD.HOURS.multiply(100)), BigDecimal.ZERO).as("teacher_remuneration"),
-                    DSL.coalesce(DSL.sum(Tables.EDU_STUDENT_COURSE_RECORD.HOURS.multiply(150)), BigDecimal.ZERO).as("consumed_fees")
+                    DSL.coalesce(DSL.sum(Tables.EDU_STUDENT_COURSE_RECORD.HOURS.multiply(Tables.EDU_COURSE.PRICE)), BigDecimal.ZERO).as("consumed_fees")
                 )
                 .from(Tables.EDU_STUDENT_COURSE_RECORD)
+                .join(Tables.EDU_COURSE).on(Tables.EDU_STUDENT_COURSE_RECORD.COURSE_ID.eq(Tables.EDU_COURSE.ID))
                 .where(Tables.EDU_STUDENT_COURSE_RECORD.COURSE_DATE.between(today, today))
                 .and(Tables.EDU_STUDENT_COURSE_RECORD.DELETED.eq(0))
                 .fetchOne();
@@ -172,17 +173,18 @@ public class DashboardService {
             // 3. 查询周期数据统计
             Record periodStatsRecord = dsl.select(
                     DSL.coalesce(DSL.sum(Tables.EDU_STUDENT_COURSE_RECORD.HOURS), BigDecimal.ZERO).as("period_hours"),
-                    DSL.coalesce(DSL.sum(Tables.EDU_STUDENT_COURSE_RECORD.HOURS.multiply(150)), BigDecimal.ZERO).as("period_sales"),
+                    DSL.coalesce(DSL.sum(Tables.EDU_STUDENT_COURSE_RECORD.HOURS.multiply(Tables.EDU_COURSE.PRICE)), BigDecimal.ZERO).as("period_sales"),
                     DSL.countDistinct(Tables.EDU_STUDENT_COURSE_RECORD.STUDENT_ID).as("period_students")
                 )
                 .from(Tables.EDU_STUDENT_COURSE_RECORD)
+                .join(Tables.EDU_COURSE).on(Tables.EDU_STUDENT_COURSE_RECORD.COURSE_ID.eq(Tables.EDU_COURSE.ID))
                 .where(Tables.EDU_STUDENT_COURSE_RECORD.COURSE_DATE.between(startDate, endDate))
                 .and(Tables.EDU_STUDENT_COURSE_RECORD.DELETED.eq(0))
                 .fetchOne();
 
             // 4. 查询上周期数据统计（用于计算变化百分比）
             Record lastPeriodStatsRecord = dsl.select(
-                    DSL.coalesce(DSL.sum(Tables.EDU_STUDENT_COURSE_RECORD.HOURS.multiply(150)), BigDecimal.ZERO).as("last_period_sales"),
+                    DSL.coalesce(DSL.sum(Tables.EDU_STUDENT_COURSE_RECORD.HOURS.multiply(Tables.EDU_COURSE.PRICE)), BigDecimal.ZERO).as("last_period_sales"),
                     DSL.countDistinct(Tables.EDU_STUDENT_COURSE_RECORD.STUDENT_ID).as("last_period_students")
                 )
                 .from(Tables.EDU_STUDENT_COURSE_RECORD)
@@ -346,9 +348,10 @@ public class DashboardService {
                             .otherwise(0)
                     ).as("leave_count"),
                     DSL.coalesce(DSL.sum(Tables.EDU_STUDENT_COURSE_RECORD.HOURS.multiply(100)), BigDecimal.ZERO).as("teacher_remuneration"),
-                    DSL.coalesce(DSL.sum(Tables.EDU_STUDENT_COURSE_RECORD.HOURS.multiply(150)), BigDecimal.ZERO).as("consumed_fees")
+                    DSL.coalesce(DSL.sum(Tables.EDU_STUDENT_COURSE_RECORD.HOURS.multiply(Tables.EDU_COURSE.PRICE)), BigDecimal.ZERO).as("consumed_fees")
                 )
                 .from(Tables.EDU_STUDENT_COURSE_RECORD)
+                .join(Tables.EDU_COURSE).on(Tables.EDU_STUDENT_COURSE_RECORD.COURSE_ID.eq(Tables.EDU_COURSE.ID))
                 .where(Tables.EDU_STUDENT_COURSE_RECORD.COURSE_DATE.between(today, today))
                 .and(Tables.EDU_STUDENT_COURSE_RECORD.DELETED.eq(0))
                 .fetchOne();
@@ -375,10 +378,11 @@ public class DashboardService {
             // 3. 查询本周数据统计
             Record currentWeekStatsRecord = dsl.select(
                     DSL.coalesce(DSL.sum(Tables.EDU_STUDENT_COURSE_RECORD.HOURS), BigDecimal.ZERO).as("current_week_hours"),
-                    DSL.coalesce(DSL.sum(Tables.EDU_STUDENT_COURSE_RECORD.HOURS.multiply(150)), BigDecimal.ZERO).as("current_week_sales"),
+                    DSL.coalesce(DSL.sum(Tables.EDU_STUDENT_COURSE_RECORD.HOURS.multiply(Tables.EDU_COURSE.PRICE)), BigDecimal.ZERO).as("current_week_sales"),
                     DSL.countDistinct(Tables.EDU_STUDENT_COURSE_RECORD.STUDENT_ID).as("current_week_students")
                 )
                 .from(Tables.EDU_STUDENT_COURSE_RECORD)
+                .join(Tables.EDU_COURSE).on(Tables.EDU_STUDENT_COURSE_RECORD.COURSE_ID.eq(Tables.EDU_COURSE.ID))
                 .where(Tables.EDU_STUDENT_COURSE_RECORD.COURSE_DATE.between(startOfWeek, endOfWeek))
                 .and(Tables.EDU_STUDENT_COURSE_RECORD.DELETED.eq(0))
                 .fetchOne();
@@ -386,7 +390,7 @@ public class DashboardService {
             // 4. 查询上周数据用于对比
             Record lastWeekStatsRecord = dsl.select(
                     DSL.coalesce(DSL.sum(Tables.EDU_STUDENT_COURSE_RECORD.HOURS), BigDecimal.ZERO).as("last_week_hours"),
-                    DSL.coalesce(DSL.sum(Tables.EDU_STUDENT_COURSE_RECORD.HOURS.multiply(150)), BigDecimal.ZERO).as("last_week_sales"),
+                    DSL.coalesce(DSL.sum(Tables.EDU_STUDENT_COURSE_RECORD.HOURS.multiply(Tables.EDU_COURSE.PRICE)), BigDecimal.ZERO).as("last_week_sales"),
                     DSL.countDistinct(Tables.EDU_STUDENT_COURSE_RECORD.STUDENT_ID).as("last_week_students")
                 )
                 .from(Tables.EDU_STUDENT_COURSE_RECORD)
@@ -488,8 +492,9 @@ public class DashboardService {
     private BigDecimal calculateTotalRevenue() {
         try {
             // 简化计算：基于学员课程记录的总费用
-            BigDecimal totalRevenue = dsl.select(DSL.coalesce(DSL.sum(Tables.EDU_STUDENT_COURSE_RECORD.HOURS.multiply(150)), BigDecimal.ZERO))
+            BigDecimal totalRevenue = dsl.select(DSL.coalesce(DSL.sum(Tables.EDU_STUDENT_COURSE_RECORD.HOURS.multiply(Tables.EDU_COURSE.PRICE)), BigDecimal.ZERO))
                     .from(Tables.EDU_STUDENT_COURSE_RECORD)
+                    .join(Tables.EDU_COURSE).on(Tables.EDU_STUDENT_COURSE_RECORD.COURSE_ID.eq(Tables.EDU_COURSE.ID))
                     .where(Tables.EDU_STUDENT_COURSE_RECORD.DELETED.eq(0))
                     .fetchOneInto(BigDecimal.class);
             return totalRevenue != null ? totalRevenue : new BigDecimal("128645");
