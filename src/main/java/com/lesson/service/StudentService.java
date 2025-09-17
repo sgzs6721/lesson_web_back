@@ -21,9 +21,11 @@ import com.lesson.vo.request.StudentWithCourseCreateRequest;
 import com.lesson.vo.request.StudentWithCourseUpdateRequest;
 import com.lesson.vo.request.StudentCheckInRequest;
 import com.lesson.vo.request.StudentLeaveRequest;
+import com.lesson.vo.request.BatchCheckInRequest;
 import com.lesson.vo.response.StudentCourseListVO;
 import com.lesson.vo.request.StudentAttendanceQueryRequest;
 import com.lesson.vo.response.StudentAttendanceListVO;
+import com.lesson.vo.response.BatchCheckInResponse;
 import com.lesson.vo.request.StudentPaymentRequest;
 import com.lesson.model.EduStudentPaymentModel;
 import com.lesson.repository.tables.records.EduStudentPaymentRecord;
@@ -3015,5 +3017,99 @@ public class StudentService {
       log.warn("获取学员姓名失败，studentId: {}", studentId, e);
       return "未知学员";
     }
+  }
+
+  /**
+   * 批量学员打卡
+   *
+   * @param request 批量打卡请求
+   * @return 批量打卡响应
+   */
+  @Transactional(rollbackFor = Exception.class)
+  public BatchCheckInResponse batchCheckIn(BatchCheckInRequest request) {
+    log.info("开始批量打卡，共{}个学员", request.getCheckInItems().size());
+    
+    BatchCheckInResponse response = new BatchCheckInResponse();
+    response.setTotalCount(request.getCheckInItems().size());
+    response.setSuccessCount(0);
+    response.setFailureCount(0);
+    response.setSuccessList(new ArrayList<>());
+    response.setFailureList(new ArrayList<>());
+    
+    // 逐个处理每个学员的打卡
+    for (BatchCheckInRequest.BatchCheckInItem item : request.getCheckInItems()) {
+      BatchCheckInResponse.CheckInResult result = new BatchCheckInResponse.CheckInResult();
+      result.setStudentId(item.getStudentId());
+      result.setCourseId(item.getCourseId());
+      
+      try {
+        // 构建单个打卡请求
+        StudentCheckInRequest checkInRequest = new StudentCheckInRequest();
+        checkInRequest.setStudentId(item.getStudentId());
+        checkInRequest.setCourseId(item.getCourseId());
+        checkInRequest.setCourseDate(request.getCourseDate());
+        checkInRequest.setStartTime(request.getStartTime());
+        checkInRequest.setEndTime(request.getEndTime());
+        checkInRequest.setNotes(item.getPersonalNotes() != null ? item.getPersonalNotes() : request.getNotes());
+        checkInRequest.setDuration(request.getDuration());
+        checkInRequest.setType(request.getType());
+        
+        // 执行打卡
+        checkIn(checkInRequest);
+        
+        // 获取学员和课程信息
+        EduStudentRecord student = dsl.selectFrom(Tables.EDU_STUDENT)
+            .where(Tables.EDU_STUDENT.ID.eq(item.getStudentId()))
+            .and(Tables.EDU_STUDENT.DELETED.eq(0))
+            .fetchOne();
+        
+        EduCourseRecord course = dsl.selectFrom(Tables.EDU_COURSE)
+            .where(Tables.EDU_COURSE.ID.eq(item.getCourseId()))
+            .and(Tables.EDU_COURSE.DELETED.eq(0))
+            .fetchOne();
+        
+        EduStudentCourseRecord studentCourse = dsl.selectFrom(Tables.EDU_STUDENT_COURSE)
+            .where(Tables.EDU_STUDENT_COURSE.STUDENT_ID.eq(item.getStudentId()))
+            .and(Tables.EDU_STUDENT_COURSE.COURSE_ID.eq(item.getCourseId()))
+            .and(Tables.EDU_STUDENT_COURSE.DELETED.eq(0))
+            .fetchOne();
+        
+        // 设置成功结果
+        result.setSuccess(true);
+        result.setStudentName(student != null ? student.getName() : "未知学员");
+        result.setCourseName(course != null ? course.getName() : "未知课程");
+        result.setTotalHours(studentCourse != null ? studentCourse.getTotalHours().intValue() : 0);
+        result.setRemainingHours(studentCourse != null ? 
+            studentCourse.getTotalHours().subtract(studentCourse.getConsumedHours()).intValue() : 0);
+        
+        response.getSuccessList().add(result);
+        response.setSuccessCount(response.getSuccessCount() + 1);
+        
+        log.info("学员[{}]批量打卡成功", item.getStudentId());
+        
+      } catch (Exception e) {
+        // 设置失败结果
+        result.setSuccess(false);
+        result.setErrorMessage(e.getMessage());
+        result.setStudentName(getStudentName(item.getStudentId()));
+        result.setCourseName(getCourseName(item.getCourseId()));
+        
+        response.getFailureList().add(result);
+        response.setFailureCount(response.getFailureCount() + 1);
+        
+        log.warn("学员[{}]批量打卡失败: {}", item.getStudentId(), e.getMessage());
+      }
+    }
+    
+    // 清除首页统计缓存，确保数据实时更新
+    try {
+      dashboardService.clearTodayCache();
+      log.info("批量打卡完成，已清除首页统计缓存");
+    } catch (Exception e) {
+      log.warn("清除首页统计缓存失败，但不影响批量打卡功能", e);
+    }
+    
+    log.info("批量打卡完成，成功{}个，失败{}个", response.getSuccessCount(), response.getFailureCount());
+    return response;
   }
 }

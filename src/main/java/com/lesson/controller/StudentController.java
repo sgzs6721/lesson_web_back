@@ -16,6 +16,7 @@ import com.lesson.vo.response.PaymentHoursInfoVO;
 import com.lesson.vo.response.StudentPaymentResponseVO;
 import com.lesson.vo.response.StudentCreateResponseVO;
 import com.lesson.vo.response.StudentStatusResponseVO;
+import com.lesson.vo.response.BatchCheckInResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -179,6 +180,21 @@ public class StudentController {
             @RequestBody @Valid StudentLeaveRequest request) {
         studentService.leave(request);
         return Result.success();
+    }
+
+    /**
+     * 批量学员打卡
+     *
+     * @param request 批量打卡请求体
+     * @return 批量打卡响应
+     */
+    @PostMapping("/batch-check-in")
+    @Operation(summary = "批量学员打卡",
+               description = "批量记录多个学员的上课信息，自动扣除课时，返回详细的成功和失败结果")
+    public Result<BatchCheckInResponse> batchCheckIn(
+            @RequestBody @Valid BatchCheckInRequest request) {
+        BatchCheckInResponse response = studentService.batchCheckIn(request);
+        return Result.success(response);
     }
 
     /**
