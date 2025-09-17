@@ -93,6 +93,7 @@ public class StudentService {
   private final CampusStatsRedisService campusStatsRedisService;
   private final CourseHoursRedisService courseHoursRedisService;
   private final FinanceModel financeModel;
+  private final DashboardService dashboardService;
 
 
   /**
@@ -1609,6 +1610,14 @@ public class StudentService {
           .set(Tables.EDU_COURSE.UPDATE_TIME, LocalDateTime.now())
           .where(Tables.EDU_COURSE.ID.eq(request.getCourseId()))
           .execute();
+    }
+    
+    // 11. 清除首页统计缓存，确保数据实时更新
+    try {
+      dashboardService.clearTodayCache();
+      log.info("学员打卡成功，已清除首页统计缓存");
+    } catch (Exception e) {
+      log.warn("清除首页统计缓存失败，但不影响打卡功能", e);
     }
   }
 
