@@ -2427,12 +2427,25 @@ public class StudentService {
 
     // 5.5. 创建财务支出记录
     try {
+        // 获取"退费"的常量ID
+        Long refundCategoryId = dsl.select(Tables.SYS_CONSTANT.ID)
+            .from(Tables.SYS_CONSTANT)
+            .where(Tables.SYS_CONSTANT.CONSTANT_KEY.eq("EXPENSE_REFUND"))
+            .and(Tables.SYS_CONSTANT.TYPE.eq("EXPEND"))
+            .and(Tables.SYS_CONSTANT.DELETED.eq(0))
+            .fetchOneInto(Long.class);
+        
+        if (refundCategoryId == null) {
+            log.warn("未找到'退费'常量，使用NULL作为categoryId");
+        }
+        
+        String studentName = getStudentName(request.getStudentId());
         FinanceExpenseRecord expenseRecord = new FinanceExpenseRecord();
         expenseRecord.setExpenseDate(LocalDate.now());
-        expenseRecord.setExpenseItem("学员退费-" + getStudentName(request.getStudentId()));
+        expenseRecord.setExpenseItem("其他支出"); // 项目显示为"其他支出"
         expenseRecord.setAmount(actualRefund);
-        expenseRecord.setCategoryId(null); // 暂时使用NULL，避免外键约束问题
-        expenseRecord.setNotes("学员退费记录ID: " + refundId + "，原因: " + request.getReason() + "，课程: " + getCourseName(request.getCourseId()));
+        expenseRecord.setCategoryId(refundCategoryId); // 设置为"退费"的常量ID
+        expenseRecord.setNotes("学员退费记录ID: " + refundId + "，原因: " + request.getReason() + "，课程: " + getCourseName(request.getCourseId()) + "，学员: " + studentName);
         expenseRecord.setCampusId(campusId);
         expenseRecord.setInstitutionId(institutionId);
         expenseRecord.setCreatedTime(LocalDateTime.now());
@@ -2440,7 +2453,7 @@ public class StudentService {
         expenseRecord.setDeleted(0);
         
         Long expenseId = financeModel.createExpense(expenseRecord);
-        log.info("财务支出记录创建成功 - expenseId: {}, refundId: {}", expenseId, refundId);
+        log.info("财务支出记录创建成功 - expenseId: {}, refundId: {}, categoryId: {}", expenseId, refundId, refundCategoryId);
     } catch (Exception e) {
         log.error("创建财务支出记录失败，refundId: {}", refundId, e);
         throw new BusinessException("创建财务支出记录失败: " + e.getMessage());
