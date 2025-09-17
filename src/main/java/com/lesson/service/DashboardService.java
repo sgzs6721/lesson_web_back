@@ -349,12 +349,22 @@ public class DashboardService {
         log.info("开始计算今日数据总览");
         
         LocalDate today = LocalDate.now();
+        log.info("查询日期: {}", today);
+        
         LocalDate startOfWeek = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
         LocalDate endOfWeek = today.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
         LocalDate startOfLastWeek = startOfWeek.minusWeeks(1);
         LocalDate endOfLastWeek = startOfWeek.minusDays(1);
 
         try {
+            // 先检查今日是否有打卡记录
+            Integer recordCount = dsl.select(DSL.count())
+                    .from(Tables.EDU_STUDENT_COURSE_RECORD)
+                    .where(Tables.EDU_STUDENT_COURSE_RECORD.COURSE_DATE.eq(today))
+                    .and(Tables.EDU_STUDENT_COURSE_RECORD.DELETED.eq(0))
+                    .fetchOneInto(Integer.class);
+            log.info("今日打卡记录数量: {}", recordCount);
+            
             // 1. 查询今日打卡记录统计
             Record todayStatsRecord = dsl.select(
                     DSL.countDistinct(Tables.EDU_STUDENT_COURSE_RECORD.COACH_ID).as("teacher_count"),
@@ -374,6 +384,17 @@ public class DashboardService {
                 .where(Tables.EDU_STUDENT_COURSE_RECORD.COURSE_DATE.eq(today))
                 .and(Tables.EDU_STUDENT_COURSE_RECORD.DELETED.eq(0))
                 .fetchOne();
+                
+            if (todayStatsRecord != null) {
+                log.info("今日统计查询结果 - 教练数量: {}, 班级数量: {}, 学员数量: {}, 打卡次数: {}, 消耗课时: {}", 
+                        todayStatsRecord.get("teacher_count"),
+                        todayStatsRecord.get("class_count"),
+                        todayStatsRecord.get("student_count"),
+                        todayStatsRecord.get("checkin_count"),
+                        todayStatsRecord.get("consumed_hours"));
+            } else {
+                log.warn("今日统计查询结果为空!");
+            }
 
             // 2. 查询总体数据统计
             Record totalStatsRecord = dsl.select(
